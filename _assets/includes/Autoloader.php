@@ -1,5 +1,7 @@
 <?php
-class Autoloader {
+
+class autoloader
+{
 
     /**
      * Enregistre l'autoloader
@@ -21,9 +23,6 @@ class Autoloader {
             $replacements = [
                 '\\' => '/',
                 'Blog/' => '',
-                'Controllers/' => 'controllers/',
-                'Views/' => 'views/',
-                'Models/' => 'models/',
             ];
 
             $filename = str_replace(array_keys($replacements), array_values($replacements), $class);

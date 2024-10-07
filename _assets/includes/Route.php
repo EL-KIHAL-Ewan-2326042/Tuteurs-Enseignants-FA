@@ -1,5 +1,7 @@
 <?php
-class Route {
+
+class Route
+{
 
     private $path;
     private $callable;
@@ -7,12 +9,13 @@ class Route {
     private $params = [];
 
     /**
-     * Constructeur de la classe Route
+     * Constructeur de la classe route
      * Associe un lien à une fonction exécutable
      * @param $path
      * @param $callable
      */
-    public function __construct($path, $callable) {
+    public function __construct($path, $callable)
+    {
         $this->path = trim($path, '/');
         $this->callable = $callable;
     }
@@ -22,7 +25,8 @@ class Route {
      * @param $url
      * @return bool
      */
-    public function match($url){
+    public function match($url)
+    {
         $url = trim($url, '/');
         $path = preg_replace('#:(\w+)#', '([^/]+)', $this->path);
         $regex = "#^$path$#i";
@@ -39,7 +43,8 @@ class Route {
      * Appel la fonction associé au lieu avec les paramètres associés
      * @return mixed
      */
-    public function call(){
+    public function call()
+    {
         return call_user_func_array($this->callable, $this->params);
     }
 }
