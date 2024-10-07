@@ -1,0 +1,28 @@
+:root {
+    /* Couleurs */
+    --main-color: #00558B;
+    --secondary-color: #246D9A;
+    --tertiary-color: #E8CE7E;
+    --text-color: white;
+
+    /* Polices */
+    --main-family: "Font Awesome 6 Duotone";
+
+    /* Espacements */
+    --small-spacing: 4px;
+    --medium-spacing: 12px;
+    --large-spacing: 18px;
+
+    /* Tailles de police */
+    --font-small: 0.75em;
+    --font-medium: 1em;
+    --font-large: 1.2em;
+
+    /* Bouttons */
+    --button-radius: 10px;
+    --button-padding: 15px;
+    --button-width: 12em;
+
+    /* Sidenav, menu Hambuger */
+    --sidenav-width: 250px;
+}

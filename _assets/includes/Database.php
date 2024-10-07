@@ -1,0 +1,42 @@
+<?php
+class Database {
+    private string $host = "";
+    private string $user = "";
+    private string $pass = "";
+    private string $dbname = "";
+    private PDO $conn;
+
+    /**
+     * Constructeur de la classe Database
+     * Lors de la construction de l'objet Database, une tentative de connexion est faite vers la bd
+     */
+    public function __construct() {
+        try {
+            $this->conn = new PDO("mysql:host=$this->host;dbname=$this->dbname", $this->user, $this->pass);
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
+            echo "Erreur de connexion: " . $e->getMessage();
+        }
+    }
+
+    /**
+     * Méthode statique pour obtenir l'instance unique de la classe Database(singleton)
+     * @return Database
+     */
+    public static function getInstance(): Database {
+        static $instance = null;
+        if ($instance === null) {
+            $instance = new self();
+        }
+        return $instance;
+    }
+
+    /**
+     * Méthode pour récupérer la connexion PDO
+     * @return PDO
+     */
+    public function getConn(): PDO {
+        return $this->conn;
+    }
+}
+?>
