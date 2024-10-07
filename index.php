@@ -1,7 +1,7 @@
 <?php
 
 require_once '_assets/includes/Autoloader.php';
-Autoloader::register();
+autoloader::register();
 class Router {
     private string $url;
     private array $routes = [];
@@ -13,10 +13,10 @@ class Router {
      * Pour un lien donné via un get, défini un chemin avec une fonction associée
      * @param $path
      * @param $callable
-     * @return Route
+     * @return route
      */
-    public function get($path, $callable): Route {
-        $route = new Route($path, $callable);
+    public function get($path, $callable): route {
+        $route = new route($path, $callable);
 
         $this->routes["GET"][] = $route;
         return $route;
@@ -26,10 +26,10 @@ class Router {
      * Pour un lien donné via un post, défini un chemin avec une fonction associée
      * @param $path
      * @param $callable
-     * @return Route
+     * @return route
      */
-    public function post($path, $callable): Route {
-        $route = new Route($path, $callable);
+    public function post($path, $callable): route {
+        $route = new route($path, $callable);
         $this->routes["POST"][] = $route;
         return $route;
     }
@@ -50,12 +50,13 @@ class Router {
                 return;
             }
         }
-        throw new RouterException('Pas de routes');
+        throw new RouterException("Erreur 404");
     }
 }
 
 /**
  * Initialisation de la session qu'importe le header
+ * id_admin correspond à la session administrateur
  */
 session_start();
 if (!isset($_SESSION['id_admin'])) {
@@ -66,9 +67,26 @@ if (!isset($_SESSION['id_admin'])) {
  * Initialisation du routage des URI
  */
 $router = new Router(strtok($_SERVER["REQUEST_URI"], '?'));
-$router->get('/', function(){ (new \Blog\Controllers\Homepage())->show(); });
-$router->get('/homepage', function(){ (new \Blog\Controllers\Homepage())->show();  });
+$getRoutes = [
+    '/' => function () {
+        (new \Blog\Controllers\Homepage())->show();
+    },
+    '/homepage' => function () {
+        (new \Blog\Controllers\Homepage())->show();
+    },
+    '/hello' => function() { echo 'Hello World'; }
+];
+$postRoutes = [
+    '/temp' => function() { echo 'A supprimer'; }
+];
 
+foreach ($getRoutes as $uri => $action) {
+    $router->get('/' . $uri, $action);
+}
+
+foreach ($postRoutes as $uri => $action) {
+    $router->post('/' . $uri, $action);
+}
 try {
     $router->run();
 } catch (RouterException $e) {
