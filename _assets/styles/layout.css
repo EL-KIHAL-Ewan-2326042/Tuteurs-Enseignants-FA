@@ -1,13 +1,6 @@
 @import "global.css";
 
-nav .navbar .navbar-expand-lg {
-    background-color: var(--main-color) !important;
-}
-
-nav .navbar-nav li a {
-    color: var(--text-color) !important;
-}
-
-.navbar-toggler-icon {
-    color: var(--text-color) !important;
+.p-navigation__link {
+    background-color: var(--main-color);
+    color: var(--text-color);
 }
