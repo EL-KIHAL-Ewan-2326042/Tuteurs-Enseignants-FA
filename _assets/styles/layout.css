@@ -1,6 +1,54 @@
 @import "global.css";
 
-.p-navigation__link {
+/* Global */
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+a {
+    color: var(--text-color);
+}
+
+a:visited {
+    color: var(--text-color);
+}
+
+a:hover {
+    color: var(--hover-color);
+    text-decoration: none;
+}
+
+/* Ajustements Header */
+
+.navbar {
     background-color: var(--main-color);
+}
+
+.sidenav li:first-child {
+    margin-top: 20px;
+}
+
+.brand-logo img {
+    margin-top: 4px;
+}
+
+/* Ajustements Main */
+
+main {
+    display: flex;
+    flex: 1 0 auto;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Ajustements Footer */
+
+.page-footer {
+    background-color: var(--main-color);
+}
+
+.footer-copyright {
     color: var(--text-color);
 }
