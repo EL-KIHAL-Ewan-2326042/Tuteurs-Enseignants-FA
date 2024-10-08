@@ -12,12 +12,13 @@ class Homepage {
     public function show(): void {
 
         $title = "Accueil";
-        $jsFilePath = '';
+        $jsFilePath = '_assets/scripts/layout.js';
+        $cssFilePath = '_assets/styles/layout.css';
 
         $view = new \Blog\Views\Homepage();
 
         $layout = new Layout();
-        $layout->renderTop($title, $jsFilePath);
+        $layout->renderTop($title, $cssFilePath, $jsFilePath);
         $view->showView();
         $layout->renderBottom();
     }
