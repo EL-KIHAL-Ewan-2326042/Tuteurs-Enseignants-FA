@@ -8,7 +8,9 @@ class Homepage {
      */
     public function showView() {
         ?>
-
+        <main>
+            <br>
+        </main>
         <?php
     }
 }

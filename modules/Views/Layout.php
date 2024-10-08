@@ -8,7 +8,7 @@ class Layout {
      * @param string $jsFilePath chemin scripts
      * @return void
      */
-    public function renderTop(string $title, string $jsFilePath): void {
+    public function renderTop(string $title, string $cssFilePath, string $jsFilePath): void {
         ?>
         <!DOCTYPE html>
         <html lang="fr">
@@ -17,43 +17,32 @@ class Layout {
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <title><?php echo $title; ?></title>
                 <link rel="stylesheet" href="https://assets.ubuntu.com/v1/vanilla-framework-version-4.16.0.min.css" />
-                <link href="/_assets/styles/layout.css" rel="stylesheet">
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
                 <?php
+                echo '<link rel="stylesheet" href="' . $cssFilePath . '"></link>';
                 if ($jsFilePath) {
                     echo '<script src="' . $jsFilePath . '"></script>';
                 }?>
             </head>
         <body>
-        <header id="navigation" class="p-navigation">
-            <div class="p-navigation__row--25-75">
-                <div class="p-navigation__banner">
-                    <ul class="p-navigation__items">
-                        <li class="p-navigation__item">
-                            <button class="js-menu-button p-navigation__link">ACCUEIL</button>
-                        </li>
-                        <li class="p-navigation__item">
-                            <button class="js-menu-button p-navigation__link">INTRAMU</button>
-                        </li>
-                    </ul>
-                </div>
-                <nav class="p-navigation__nav" aria-label="Example main">
-                    <ul class="p-navigation__items">
-                        <li class="p-navigation__item is-selected">
-                            <a class="p-navigation__link" href="#">ACCUEIL</a>
-                        </li>
-                        <li class="p-navigation__item">
-                            <a class="p-navigation__link" href="#">INTRAMU</a>
-                        </li>
-                    </ul>
-                    <ul class="p-navigation__items">
-                        <li class="p-navigation__item">
-                            <a class="p-navigation__link" href="#">A PROPOS</a>
-                        </li>
-
-                    </ul>
-                </nav>
+        <nav class="navbar">
+            <div class="nav-wrapper container">
+                <a href="#" data-target="mobile-demo" class="sidenav-trigger"><i class="material-icons">MENU</i></a>
+                <a href="/homepage" class="left brand-logo">
+                    <img src="https://i.postimg.cc/qMT89vt3/amu-logo.png" alt="Logo de AMU" height="80" width="130">
+                </a>
+                <ul class="right hide-on-med-and-down">
+                    <li><a href="/homepage">ACCUEIL</a></li>
+                    <li><a href="/intramu">INTRAMU</a></li>
+                    <li><a href="/aboutus">A PROPOS</a></li>
+                </ul>
             </div>
-        </header>
+        </nav>
+        <ul class="sidenav" id="mobile-demo">
+            <li><a href="/homepage">ACCUEIL</a></li>
+            <li><a href="/intramu">INTRAMU</a></li>
+            <li><a href="/aboutus">A PROPOS</a></li>
+        </ul>
         <?php
     }
 
@@ -63,6 +52,13 @@ class Layout {
      */
     public function renderBottom(): void {
         ?>
+        <footer class="page-footer">
+            <div class="container">
+                © 2024  TutorMap
+                <a class="right" href="/mentions-legales">Mentions Légales</a>
+            </div>
+        </footer>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
         </body>
         </html>
         <?php
