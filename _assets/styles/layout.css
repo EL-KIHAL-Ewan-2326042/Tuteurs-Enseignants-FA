@@ -1,0 +1,52 @@
+@import "global.css";
+
+/* Global */
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+}
+
+a, a:visited  {
+    color: var(--text-color);
+}
+
+a:hover {
+    color: var(--hover-color);
+    text-decoration: none;
+}
+
+/* Ajustements Header */
+
+.navbar {
+    background-color: var(--main-color);
+}
+
+.sidenav li:first-child {
+    margin-top: var(--large-spacing);
+}
+
+a.brand-logo {
+    display: inline-block;
+    height: 60px;
+}
+
+/* Ajustements Main */
+
+main {
+    display: flex;
+    flex: 1 0 auto;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Ajustements Footer */
+
+.page-footer {
+    background-color: var(--main-color);
+}
+
+.footer-copyright {
+    background-color: var(--main-color);
+    color: var(--text-color);
+}
