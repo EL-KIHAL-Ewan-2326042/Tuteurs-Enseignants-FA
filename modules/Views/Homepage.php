@@ -9,7 +9,7 @@ class Homepage {
     public function showView() {
         ?>
         <main>
-            <br>
+            <p>Ceci est un test</p>
         </main>
         <?php
     }
