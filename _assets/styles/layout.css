@@ -7,11 +7,7 @@ body {
     flex-direction: column;
 }
 
-a {
-    color: var(--text-color);
-}
-
-a:visited {
+a, a:visited  {
     color: var(--text-color);
 }
 
@@ -27,11 +23,12 @@ a:hover {
 }
 
 .sidenav li:first-child {
-    margin-top: 20px;
+    margin-top: var(--large-spacing);
 }
 
-.brand-logo img {
-    margin-top: 4px;
+a.brand-logo {
+    display: inline-block;
+    height: 60px;
 }
 
 /* Ajustements Main */
@@ -50,5 +47,6 @@ main {
 }
 
 .footer-copyright {
+    background-color: var(--main-color);
     color: var(--text-color);
 }
