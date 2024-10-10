@@ -34,14 +34,27 @@ class Layout {
                 </a>
                 <ul class="right hide-on-med-and-down">
                     <li><a href="/homepage">ACCUEIL</a></li>
-                    <li><a href="/intramu">INTRAMU</a></li>
+                    <li><a href="/intramu"><?php
+                            if (isset($_SESSION['identifier'])) {
+                                echo 'DECONNEXION';
+                                }
+                            else {
+                                echo 'INTRAMU';
+                                }?>
+                    </a></li>
                     <li><a href="/aboutus">A PROPOS</a></li>
                 </ul>
             </div>
         </nav>
         <ul class="sidenav" id="mobile-demo">
             <li><a href="/homepage">ACCUEIL</a></li>
-            <li><a href="/intramu">INTRAMU</a></li>
+            <li><a href="/intramu"><?php
+                    if (isset($_SESSION['identifier'])) {
+                        echo 'DECONNEXION';
+                    }
+                    else {
+                        echo 'INTRAMU';
+                    }?></a></li>
             <li><a href="/aboutus">A PROPOS</a></li>
         </ul>
         <?php
