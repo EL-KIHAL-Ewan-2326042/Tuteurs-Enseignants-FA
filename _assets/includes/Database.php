@@ -2,11 +2,11 @@
 
 class Database
 {
-    private string $host = "";
-    private string $user = "";
-    private string $pass = "";
-    private string $dbname = "";
-    private \exceptions\PDO $conn;
+    private string $host = "postgresql-tutormap.alwaysdata.net";
+    private string $user = "tutormap";
+    private string $pass = "8exs7JcEpGVfsI";
+    private string $dbname = "tutormap_v1";
+    private PDO $conn;
 
     /**
      * Constructeur de la classe database
@@ -15,9 +15,9 @@ class Database
     public function __construct()
     {
         try {
-            $this->conn = new \exceptions\PDO("mysql:host=$this->host;dbname=$this->dbname", $this->user, $this->pass);
-            $this->conn->setAttribute(\exceptions\PDO::ATTR_ERRMODE, \exceptions\PDO::ERRMODE_EXCEPTION);
-        } catch (\exceptions\PDOException $e) {
+            $this->conn = new PDO("pgsql:host=$this->host;dbname=$this->dbname", $this->user, $this->pass);
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch (PDOException $e) {
             echo "Erreur de connexion: " . $e->getMessage();
         }
     }
@@ -37,9 +37,9 @@ class Database
 
     /**
      * Méthode pour récupérer la connexion PDO
-     * @return \exceptions\PDO
+     * @return PDO
      */
-    public function getConn(): \exceptions\PDO
+    public function getConn(): PDO
     {
         return $this->conn;
     }
