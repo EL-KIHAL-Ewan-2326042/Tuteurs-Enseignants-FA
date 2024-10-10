@@ -77,7 +77,11 @@ $getRoutes = [
     '/intramu' => function () {
         (new \Blog\Controllers\Intramu())->show();
     },
-    '/hello' => function() { echo 'Hello World'; }
+    '/hello' => function() { echo 'Hello World';
+    },
+    '/aboutus' => function () {
+        (new \Blog\Controllers\AboutUs())->show();
+    }
 ];
 
 $postRoutes = [
