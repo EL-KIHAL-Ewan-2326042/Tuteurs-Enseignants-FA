@@ -3,7 +3,7 @@ namespace Blog\Controllers;
 
 use Blog\Views\Layout;
 
-class Homepage {
+class Intramu {
 
     /**
      * Controlleur de la homepage
@@ -12,10 +12,10 @@ class Homepage {
     public function show(): void {
 
         $title = "Accueil";
-        $cssFilePath = '';
+        $cssFilePath = '_assets/styles/intramu.css';
         $jsFilePath = '';
 
-        $view = new \Blog\Views\Homepage();
+        $view = new \Blog\Views\Intramu();
 
         $layout = new Layout();
         $layout->renderTop($title, $cssFilePath);

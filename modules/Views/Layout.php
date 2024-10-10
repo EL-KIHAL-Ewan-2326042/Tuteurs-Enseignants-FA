@@ -9,7 +9,7 @@ class Layout {
      * @param string $jsFilePath chemin scripts
      * @return void
      */
-    public function renderTop(string $title, string $cssFilePath, string $jsFilePath): void {
+    public function renderTop(string $title, string $cssFilePath): void {
         ?>
         <!DOCTYPE html>
         <html lang="fr">
@@ -19,11 +19,10 @@ class Layout {
                 <title><?php echo $title; ?></title>
                 <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
                 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+                <link href="/_assets/styles/layout.css" rel="stylesheet">
                 <?php
-                echo '<link rel="stylesheet" href="' . $cssFilePath . '">';
-                if ($jsFilePath) {
-                    echo '<script src="' . $jsFilePath . '"></script>';
-                }?>
+                echo '<link href="' . $cssFilePath . '" rel="stylesheet">';
+                ?>
             </head>
         <body>
         <nav class="navbar">
@@ -53,7 +52,7 @@ class Layout {
      * Rendu du pied de page(footer)
      * @return void
      */
-    public function renderBottom(): void {
+    public function renderBottom(string $jsFilePath): void {
         ?>
         <footer class="page-footer">
             <div class="container">
@@ -67,6 +66,12 @@ class Layout {
                 </div>
             </div>
         </footer>
+        <?php
+        if ($jsFilePath) {
+            echo '<script src="' . $jsFilePath . '"></script>';
+        }
+        ?>
+        <script src="/_assets/scripts/layout.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
         </body>
         </html>

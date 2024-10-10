@@ -74,8 +74,12 @@ $getRoutes = [
     '/homepage' => function () {
         (new \Blog\Controllers\Homepage())->show();
     },
+    '/intramu' => function () {
+        (new \Blog\Controllers\Intramu())->show();
+    },
     '/hello' => function() { echo 'Hello World'; }
 ];
+
 $postRoutes = [
     '/temp' => function() { echo 'A supprimer'; }
 ];
