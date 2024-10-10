@@ -59,9 +59,6 @@ class Router {
  * id_admin correspond à la session administrateur
  */
 session_start();
-if (!isset($_SESSION['id_admin'])) {
-    $_SESSION['id_admin'] = '';
-}
 
 /**
  * Initialisation du routage des URI
@@ -81,7 +78,9 @@ $getRoutes = [
 ];
 
 $postRoutes = [
-    '/temp' => function() { echo 'A supprimer'; }
+    '/intramu' => function () {
+        (new \Blog\Controllers\Intramu())->show();
+    },
 ];
 
 foreach ($getRoutes as $uri => $action) {
