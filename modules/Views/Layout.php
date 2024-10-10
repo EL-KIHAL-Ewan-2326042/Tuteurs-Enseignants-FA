@@ -6,7 +6,6 @@ class Layout {
      * Rendu du haut de page(header)
      * @param string $title titre de la page
      * @param string $cssFilePath chemin styles
-     * @param string $jsFilePath chemin scripts
      * @return void
      */
     public function renderTop(string $title, string $cssFilePath): void {
@@ -50,6 +49,7 @@ class Layout {
 
     /**
      * Rendu du pied de page(footer)
+     * @param string $jsFilePath fichier js
      * @return void
      */
     public function renderBottom(string $jsFilePath): void {
