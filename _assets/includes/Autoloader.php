@@ -1,6 +1,6 @@
 <?php
 
-class autoloader
+class Autoloader
 {
 
     /**
@@ -29,6 +29,7 @@ class autoloader
 
             require 'modules/' . $filename . '.php';
         } else {
+            $class = strtoupper(substr($class, 0, 1)) . substr($class, 1);
             if (strpos($class, 'Exception')) {
                 require '_assets/includes/exceptions/' . $class . '.php';
             } else {

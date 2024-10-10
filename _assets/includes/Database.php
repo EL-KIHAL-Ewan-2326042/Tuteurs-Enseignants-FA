@@ -1,6 +1,6 @@
 <?php
 
-class database
+class Database
 {
     private string $host = "";
     private string $user = "";
