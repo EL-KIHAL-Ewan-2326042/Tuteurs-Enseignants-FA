@@ -12,12 +12,16 @@ class Intramu {
     /**
      * Liaison entre la vue et le layout et affichage
      * Gestion de la soumission du formulaire de connexion
+     * Si l'utilisateur est connecte, alors il est deconnecte
      * @return void
      */
     public function show(): void {
-        $title = "Connexion";
-        $cssFilePath = '_assets/styles/login.css';
-        $jsFilePath = '';
+        if (isset($_SESSION['identifier'])) {
+            unset($_SESSION['identifier']);
+            header('Location: /homepage');
+            exit();
+        }
+
         $errorMessage = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['identifier']) && isset($_POST['password'])) {
@@ -32,9 +36,13 @@ class Intramu {
                 header('Location: /homepage');
                 exit();
             } else {
-                $errorMessage = 'Pseudo ou mot de passe incorrect';
+                $errorMessage = 'Identifiant ou mot de passe incorrect';
             }
         }
+
+        $title = "Connexion";
+        $cssFilePath = '_assets/styles/login.css';
+        $jsFilePath = '';
 
         $view = new \Blog\Views\Intramu($errorMessage);
 
