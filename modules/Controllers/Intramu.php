@@ -18,6 +18,7 @@ class Intramu {
     public function show(): void {
         if (isset($_SESSION['identifier'])) {
             unset($_SESSION['identifier']);
+            unset($_SESSION['role']);
             header('Location: /homepage');
             exit();
         }
@@ -31,6 +32,7 @@ class Intramu {
             // Gestion Admin(temporaire)
             if ($identifierLogs == 'superAdmin' && $passwordLogs == '8exs7JcEpGVfsI') {
                 $_SESSION['identifier'] = $identifierLogs;
+                $_SESSION['role'] = 'admin';
                 header('Location: /homepage');
                 exit();
             }
@@ -41,6 +43,7 @@ class Intramu {
 
             if ($loginModel->doLogsExist($identifierLogs, $passwordLogs)) {
                 $_SESSION['identifier'] = $identifierLogs;
+                $_SESSION['role'] = 'teacher';
                 header('Location: /homepage');
                 exit();
             } else {
