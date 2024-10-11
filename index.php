@@ -78,6 +78,9 @@ $getRoutes = [
     },
     '/aboutus' => function () {
         (new \Blog\Controllers\AboutUs())->show();
+    },
+    '/mentions-legales' => function () {
+        (new \Blog\Controllers\MentionLeg())->show();
     }
 ];
 
