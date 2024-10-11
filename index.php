@@ -85,6 +85,9 @@ $postRoutes = [
     '/intramu' => function () {
         (new \Blog\Controllers\Intramu())->show();
     },
+    '/homepage' => function () {
+        (new \Blog\Controllers\Homepage())->show();
+    },
 ];
 
 foreach ($getRoutes as $uri => $action) {

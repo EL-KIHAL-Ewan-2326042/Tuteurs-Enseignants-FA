@@ -1,10 +1,33 @@
 @import "global.css";
 
+main {
+    flex-direction: column;
+}
+
 #map {
     height: 600px;
     width: 70%;
 }
 
-main {
-    flex-direction: column;
+h3 {
+    color: var(--main-color);
+}
+
+main a {
+    color: black;
+}
+
+main a:visited {
+    color: black;
+}
+
+main a:hover {
+    color: var(--main-color);
+}
+
+@media screen and (max-width: 640px) {
+    #map {
+        height: 250px;
+        width: 70%;
+    }
 }

@@ -1,3 +1,67 @@
+/**
+ * Recherche etudiant
+ */
+
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search');
+    const searchResults = document.getElementById('searchResults');
+
+    searchInput.addEventListener('input', function() {
+        const searchTerm = searchInput.value.trim();
+
+        if (searchTerm.length > 0) {
+            fetchResults(searchTerm);
+        } else {
+            searchResults.innerHTML = '';
+        }
+    });
+
+    function fetchResults(query) {
+        fetch('', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                search: query
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                displayResults(data);
+            })
+            .catch(error => {
+                console.error('Erreur fetch resultats:', error);
+            });
+    }
+
+    function displayResults(data) {
+        searchResults.innerHTML = '';
+        if (data.length === 0) {
+            searchResults.innerHTML = '<p>Aucun résultat trouvé</p>';
+            return;
+        }
+
+        const ul = document.createElement('ul');
+        data.forEach(student => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#';
+            a.textContent = `${student.num_eleve} - ${student.nom_eleve}`;
+            a.addEventListener('click', function(event) {
+                event.preventDefault();
+            });
+            li.appendChild(a);
+            ul.appendChild(li);
+        });
+        searchResults.appendChild(ul);
+    }
+});
+
+/**
+ * Google Map
+ */
+
 let map;
 let directionsService;
 let directionsRenderer;
