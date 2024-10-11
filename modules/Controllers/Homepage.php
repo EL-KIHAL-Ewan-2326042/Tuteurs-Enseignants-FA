@@ -12,8 +12,8 @@ class Homepage {
     public function show(): void {
 
         $title = "Accueil";
-        $cssFilePath = '';
-        $jsFilePath = '';
+        $cssFilePath = '/_assets/styles/homepage.css';
+        $jsFilePath = '/_assets/scripts/homepage.js';
 
         $view = new \Blog\Views\Homepage();
 
