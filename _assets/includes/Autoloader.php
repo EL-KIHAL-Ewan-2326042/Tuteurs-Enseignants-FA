@@ -26,7 +26,6 @@ class Autoloader
             ];
 
             $filename = str_replace(array_keys($replacements), array_values($replacements), $class);
-
             require 'modules/' . $filename . '.php';
         } else {
             $class = strtoupper(substr($class, 0, 1)) . substr($class, 1);

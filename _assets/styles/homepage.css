@@ -1,0 +1,9 @@
+main .row {
+    width: 85rem;
+}
+
+main .col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

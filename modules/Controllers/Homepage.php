@@ -2,6 +2,7 @@
 namespace Blog\Controllers;
 
 use Blog\Views\Layout;
+use Database;
 
 class Homepage {
 
@@ -12,10 +13,12 @@ class Homepage {
     public function show(): void {
 
         $title = "Accueil";
-        $cssFilePath = '';
+        $cssFilePath = '_assets/styles/homepage.css';
         $jsFilePath = '';
 
-        $view = new \Blog\Views\Homepage();
+        $db = new Database();
+        $model = new \Blog\Models\Homepage($db);
+        $view = new \Blog\Views\Homepage($model);
 
         $layout = new Layout();
         $layout->renderTop($title, $cssFilePath);

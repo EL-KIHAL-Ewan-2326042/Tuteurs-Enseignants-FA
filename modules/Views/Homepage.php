@@ -1,63 +1,42 @@
 <?php
 namespace Blog\Views;
+use Database;
 
 class Homepage {
+
+    public function __construct(private readonly \Blog\Models\Homepage $model) { }
+
     /**
      * Vue de la homepage
      * @return void
      */
     public function showView() {
-        $coeffDuree = 50;
-        $coeffPert = 50;
-        $coeffAsso = 50;
-
-        //$gmaps = new \yidas\googleMaps\Client(['key'=>'AIzaSyB5ZrbmaUNAlL8bVUXigjaYWzb3Qi9f_j4']);
-        //$adresseEt = "All. des Platanes, 13590 Meyreuil";
-        //$adresseProf = "L'Escale , Piscine & Spa, 52 Rue des Myosotis, 13590 Meyreuil";
-        /*$resultDirections = $gmaps->directions($adresseEt, $adresseProf, [
-            'mode' => 'driving',
-            'departure_time' => time(),
-        ]);
-        */
-        $resultDirections = 10;
-
-        $duree = (int)($coeffDuree/$resultDirections);
-
-        $discipline = "exploitation de base de données";
-        $arrayDiscip = explode(' ', $discipline);
-
-        $motsClesDiscipline = "base de données;php;sql";
-        $arrayMCDiscip = explode(';', $motsClesDiscipline);
-
-        // $sujet = <result requete sql>['sujet'];
-        // $arraySujet = explode(' ', $sujet);
-
-        $tags = "base de données;algo;feur";
-        $arrayTags = explode(';', $tags);
-
-        $dejaAsso = $coeffAsso*3;
-
-        $points = 0;
-
-        foreach($arrayTags as $tag) {
-            foreach($arrayDiscip as $discip) {
-                if ($tag == $discip) $points += 5;
-            }
-            foreach($arrayMCDiscip as $mCDiscip) {
-                if ($mCDiscip == $discip) ++$points;
-            }
-        }
-
-        $points = $points*$coeffPert + $duree + $dejaAsso;
-        $points = $points/($coeffDuree+$coeffPert+$coeffAsso);
-
-        echo $duree;
-        echo $dejaAsso;
-        echo $points;
         ?>
-        <main>
-            <p>Ceci est un test</p>
-        </main>
+            <main>
+                <div class="row">
+                    <div class="col s2">ELEVE</div>
+                    <div class="col s2">HISTORIQUE</div>
+                    <div class="col s1">POSITION</div>
+                    <div class="col s2">SUJET</div>
+                    <div class="col s2">ENTREPRISE</div>
+                    <div class="col s2">TOTAL</div>
+                    <div class="col s1">CHOIX</div>
+
+                    <?
+                    foreach($this->model->getEleves(5) as $eleve) {
+                        ?>
+                            <div class="col s2"><? echo $eleve["nom_eleve"] . " " . $eleve["prenom_eleve"] ?></div>
+                            <div class="col s2">...</div>
+                            <div class="col s1">...<? /*echo $this->model->getAdresseEleve($eleve["num_eleve"])["adresse_entreprise"]*/ ?></div>
+                            <div class="col s2">...<? /*echo $this->model->getAdresseEleve($eleve["num_eleve"])["sujet_stage"]*/ ?></div>
+                            <div class="col s2">...<? /*echo $this->model->getAdresseEleve($eleve["num_eleve"])["nom_entreprise"]*/ ?></div>
+                            <div class="col s2">...</div>
+                            <div class="col s1">...</div>
+                        <?
+                    }
+                    ?>
+                </div>
+            </main>
         <?php
     }
 }
