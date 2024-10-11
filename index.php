@@ -71,7 +71,7 @@ $getRoutes = [
     '/homepage' => function () {
         (new \Blog\Controllers\Homepage())->show();
     },
-    '/dahsbord' => function() {
+    '/dashboard' => function() {
         (new  \Blog\Controllers\Dashboard())->show();
     },
     '/intramu' => function () {
