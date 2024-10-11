@@ -7,7 +7,7 @@ class Dashboard{
      * Vue de la Dashboard
      * @return void
      */
-    public function dashboard(): void {
+    public function showView(): void {
         ?>
         <main>
             <p>Ceci est un test <br> </p>
