@@ -5,7 +5,7 @@ namespace Blog\Models;
 use Database;
 use PDOException;
 
-class Homepage{
+class Dashboard{
     private Database $db;
 
     public function __construct(Database $db){

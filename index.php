@@ -71,6 +71,9 @@ $getRoutes = [
     '/homepage' => function () {
         (new \Blog\Controllers\Homepage())->show();
     },
+    '/dahsbord' => function() {
+        (new  \Blog\Controllers\Dashboard())->show();
+    },
     '/intramu' => function () {
         (new \Blog\Controllers\Intramu())->show();
     },
@@ -89,7 +92,7 @@ $postRoutes = [
         (new \Blog\Controllers\Intramu())->show();
     },
     '/uploadCsv' => function () {
-        (new \Blog\Controllers\Homepage())->uploadCsv();
+        (new \Blog\Controllers\Dashboard())->uploadCsv();
     }
 ];
 
