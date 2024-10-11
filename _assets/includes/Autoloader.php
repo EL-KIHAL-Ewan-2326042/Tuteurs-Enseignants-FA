@@ -19,6 +19,7 @@ class Autoloader
      */
     static function autoload($class): void
     {
+
         if (str_contains($class, 'Blog')) {
             $replacements = [
                 '\\' => '/',
