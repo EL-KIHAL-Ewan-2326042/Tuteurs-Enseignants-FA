@@ -1,10 +1,6 @@
 <?php
 namespace Blog\Views;
 
-require 'vendor/autoload.php';
-
-use yidas\googleMaps\Client;
-
 class Homepage {
     /**
      * Vue de la homepage
@@ -15,17 +11,17 @@ class Homepage {
         $coeffPert = 50;
         $coeffAsso = 50;
 
-        $gmaps = new \yidas\googleMaps\Client(['key'=>'AIzaSyB5ZrbmaUNAlL8bVUXigjaYWzb3Qi9f_j4']);
-        $adresseEt = "All. des Platanes, 13590 Meyreuil";
-        $adresseProf = "L'Escale , Piscine & Spa, 52 Rue des Myosotis, 13590 Meyreuil";
-        $resultDirections = $gmaps->directions($adresseEt, $adresseProf, [
+        //$gmaps = new \yidas\googleMaps\Client(['key'=>'AIzaSyB5ZrbmaUNAlL8bVUXigjaYWzb3Qi9f_j4']);
+        //$adresseEt = "All. des Platanes, 13590 Meyreuil";
+        //$adresseProf = "L'Escale , Piscine & Spa, 52 Rue des Myosotis, 13590 Meyreuil";
+        /*$resultDirections = $gmaps->directions($adresseEt, $adresseProf, [
             'mode' => 'driving',
             'departure_time' => time(),
         ]);
-        foreach($resultDirections as $resultDirection) {
-            echo $resultDirection;
-        }
-        $duree = (int)($coeffDuree/$resultDirections['duration_in_traffic']);
+        */
+        $resultDirections = 10;
+
+        $duree = (int)($coeffDuree/$resultDirections);
 
         $discipline = "exploitation de base de données";
         $arrayDiscip = explode(' ', $discipline);
