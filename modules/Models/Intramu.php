@@ -1,7 +1,7 @@
 <?php
 namespace Blog\Models;
 
-use Database;
+use Database;use PDOException;
 
 class Intramu {
 

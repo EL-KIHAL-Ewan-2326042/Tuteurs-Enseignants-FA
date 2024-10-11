@@ -88,6 +88,9 @@ $postRoutes = [
     '/intramu' => function () {
         (new \Blog\Controllers\Intramu())->show();
     },
+    '/uploadCsv' => function () {
+        (new \Blog\Controllers\Homepage())->uploadCsv();
+    }
 ];
 
 foreach ($getRoutes as $uri => $action) {
