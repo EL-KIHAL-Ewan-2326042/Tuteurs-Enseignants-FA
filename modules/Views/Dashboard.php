@@ -10,14 +10,25 @@ class Dashboard{
     public function showView(): void {
         ?>
         <main>
-            <p>Ceci est un test <br> </p>
-            <?php if (isset($_SESSION['role'])=='admin') {?>
-                <form action="/uploadCsv" method="POST" enctype="multipart/form-data">
-                    <label for="file">Choisissez un fichier CSV :</label>
-                    <input type="file" name="csv_file" id="csv_file" accept=".csv">
-                    <input type="submit" name="submit" value="Valider">
-                </form>
-            <?php }?>
+            <div class="row">
+                <?php if (isset($_SESSION['role'])=='admin') {?>
+                    <form action="/dashboard" method="POST" enctype="multipart/form-data">
+                        <div class="file-field input-field">
+                            <div class="btn">
+                                <span>Fichier CSV</span>
+                                <input type="file" name="csv_file" id="csv_file" accept=".csv" multiple>
+                            </div>
+                            <div class="file-path-wrapper">
+                                <input class="file-path validate" type="text" placeholder="Choisissez un fichier CSV" required>
+                            </div>
+
+                            <button class="btn waves-effect waves-light" type="submit" name="submit">Valider
+                                <i class="material-icons right">send</i>
+                            </button>
+                        </div>
+                    </form>
+                <?php }?>
+            </div>
         </main>
         <?php
     }

@@ -10,10 +10,15 @@ class Dashboard {
      * @return void
      */
     public function show(): void {
-
         $title = "Dashboard";
-        $cssFilePath = '';
+        $cssFilePath = '_assets/styles/dashboard.css';
         $jsFilePath = '';
+
+        if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['csv_file'])) {
+            $csvFile = $_FILES['csv_file']['tmp_name'];
+            $model = new \Blog\Models\Dashboard(\Database::getInstance());
+            $model->uploadCsv($csvFile);
+        }
 
         $view = new \Blog\Views\Dashboard();
 
@@ -21,25 +26,5 @@ class Dashboard {
         $layout->renderTop($title, $cssFilePath);
         $view->showView();
         $layout->renderBottom($jsFilePath);
-    }
-
-
-    /**
-     * Controlleur de la gestion de l'importation du fichier CSV
-     * @return void
-     */
-    public function uploadCsv(): void {
-        if (isset($_POST['submit']) && isset($_FILES['csv_file'])) {
-            $db = Database::getInstance();
-            $csvFilePath = $_FILES['csv_file']['tmp_name'];
-
-            // appel modele
-            $uploadModel = new \Blog\Models\Dashboard($db);
-            if($uploadModel->uploadCsv($csvFilePath)) {
-                echo "Le fichier CSV a été importé avec succès.";
-            } else {
-                echo "Erreur lors de l'imporation du fichier CSV.";
-            }
-        }
     }
 }
