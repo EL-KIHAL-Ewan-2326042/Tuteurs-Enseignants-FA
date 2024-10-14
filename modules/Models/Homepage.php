@@ -17,12 +17,13 @@ class Homepage {
         $pdo = $this->db;
 
         $searchTerm = trim($searchTerm);
-        $tsQuery = implode(' & ', explode(' ', $searchTerm)); // Prepare the tsquery
+        $tsQuery = implode(' & ', explode(' ', $searchTerm));
 
         $query = "
-        SELECT num_eleve, nom_eleve, ts_rank_cd(to_tsvector('french', nom_eleve), to_tsquery('french', :searchTerm), 32) AS rank
+        SELECT num_eleve, nom_eleve, prenom_eleve,
+        ts_rank_cd(to_tsvector('french', nom_eleve || ' ' || prenom_eleve), to_tsquery('french', :searchTerm), 32) AS rank
         FROM eleve
-        WHERE to_tsquery('french', :searchTerm) @@ to_tsvector('french', nom_eleve)
+        WHERE to_tsquery('french', :searchTerm) @@ to_tsvector('french', nom_eleve || ' ' || prenom_eleve)
         ORDER BY rank DESC
         LIMIT 5
         ";
@@ -31,13 +32,7 @@ class Homepage {
         $stmt->bindValue(':searchTerm', $tsQuery);
         $stmt->execute();
 
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        foreach ($results as &$row) {
-            $row['rank'] = min(max($row['rank'] / 32, 0), 1);
-        }
-
-        return $results;
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
 }

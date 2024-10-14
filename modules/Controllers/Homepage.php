@@ -16,22 +16,25 @@ class Homepage {
             $db = Database::getInstance();
             $homepageModel = new \Blog\Models\Homepage($db);
 
-            if (isset($_POST['search'])) {
-                $results = $homepageModel->correspondTerms();
-
-                header('Content-Type: application/json');
-                echo json_encode($results);
-                return;
+            if (isset($_POST['action'])) {
+                if ($_POST['action'] === 'search' && isset($_POST['search'])) {
+                    $results = $homepageModel->correspondTerms();
+                    header('Content-Type: application/json');
+                    echo json_encode($results);
+                    return;
+                }
             }
 
-            if (isset($_POST['student_id']) && isset($_POST['student_name'])) {
+            if ($_POST['action'] === 'select_student' && isset($_POST['student_id']) && isset($_POST['student_firstName']) && isset($_POST['student_lastName'])) {
                 $studentId = $_POST['student_id'];
-                $studentName = $_POST['student_name'];
+                $firstName = $_POST['student_firstName'];
+                $secondName = $_POST['student_lastName'];
 
-                $_SESSION['selected_student'] = ['id' => $studentId, 'name' => $studentName];
-
-                echo "Étudiant sélectionné : " . htmlspecialchars($studentName);
-                return;
+                $_SESSION['selected_student'] = [
+                    'id' => $studentId,
+                    'firstName' => $firstName,
+                    'lastName' => $secondName
+                ];
             }
         }
 

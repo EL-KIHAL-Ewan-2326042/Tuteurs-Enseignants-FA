@@ -9,7 +9,13 @@ main {
     width: 70%;
 }
 
-h3 {
+.center {
+    justify-content: center;
+    width: 70%;
+    align-items: flex-start;
+}
+
+h3, h4 {
     color: var(--main-color);
 }
 
@@ -28,6 +34,14 @@ main a:hover {
 @media screen and (max-width: 640px) {
     #map {
         height: 250px;
-        width: 70%;
+        width: 80%;
+    }
+
+    .center {
+        width: 80%;
+    }
+
+    .card-panel {
+        width: 80%;
     }
 }

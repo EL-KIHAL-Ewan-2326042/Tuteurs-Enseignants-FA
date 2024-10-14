@@ -50,7 +50,7 @@ class Router {
                 return;
             }
         }
-        throw new RouterException("Erreur 404");
+        throw new RouterException("Erreur 404 ...");
     }
 }
 
@@ -88,6 +88,9 @@ $postRoutes = [
     '/homepage' => function () {
         (new \Blog\Controllers\Homepage())->show();
     },
+    '/' => function () {
+        (new \Blog\Controllers\Homepage())->show();
+    }
 ];
 
 foreach ($getRoutes as $uri => $action) {
