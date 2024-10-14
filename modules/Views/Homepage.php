@@ -11,6 +11,7 @@ class Homepage {
      * @return void
      */
     public function showView() {
+        if(isset($_SESSION['identifier']) && isset($_SESSION['role']) && $_SESSION['role'] === 'teacher') {
         ?>
             <main>
                 <div class="row">
@@ -23,13 +24,17 @@ class Homepage {
                     <div class="col s1">CHOIX</div>
 
                     <?
-                    foreach($this->model->getEleves(5) as $eleve) {
+                    foreach($this->model->getEleves(5, $_SESSION['identifier']) as $eleve) {
+                        $infoStage = $this->model->getStageEleve($eleve["num_eleve"])
                         ?>
-                            <div class="col s2"><? echo $eleve["nom_eleve"] . " " . $eleve["prenom_eleve"] ?></div>
+                            <div class="col s2"><? echo $eleve['num_eleve'] /*echo $eleve["nom_eleve"] . " " . $eleve["prenom_eleve"]*/ ?></div>
                             <div class="col s2">...</div>
-                            <div class="col s1">...<? /*echo $this->model->getAdresseEleve($eleve["num_eleve"])["adresse_entreprise"]*/ ?></div>
-                            <div class="col s2">...<? /*echo $this->model->getAdresseEleve($eleve["num_eleve"])["sujet_stage"]*/ ?></div>
-                            <div class="col s2">...<? /*echo $this->model->getAdresseEleve($eleve["num_eleve"])["nom_entreprise"]*/ ?></div>
+                            <div class="col s1"> <? if(!$infoStage) echo "...";
+                                                    else echo $infoStage["adresse_stage"] ?> </div>
+                            <div class="col s2"> <? if(!$infoStage) echo "...";
+                                                    else echo $infoStage["sujet_stage"] ?> </div>
+                            <div class="col s2"> <? if(!$infoStage) echo "...";
+                                                    else echo $infoStage["nom_entreprise"] ?> </div>
                             <div class="col s2">...</div>
                             <div class="col s1">...</div>
                         <?
@@ -38,5 +43,6 @@ class Homepage {
                 </div>
             </main>
         <?php
+        }
     }
 }
