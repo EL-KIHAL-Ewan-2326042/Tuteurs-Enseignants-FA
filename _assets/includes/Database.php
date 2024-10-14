@@ -1,5 +1,7 @@
 <?php
-
+namespace Blog\Includes;
+use PDO;
+use PDOException;
 class Database
 {
     private string $host = "postgresql-tutormap.alwaysdata.net";
