@@ -1,8 +1,11 @@
 /**
- * Recherche etudiant
+ * Partie1: Recherche etudiante
  */
-
 document.addEventListener('DOMContentLoaded', function() {
+    /**
+     * A chaque input de la recherche etudiant, on fetch les resultats
+     * @type {HTMLElement}
+     */
     const searchInput = document.getElementById('search');
     const searchResults = document.getElementById('searchResults');
 
@@ -11,18 +14,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (searchTerm.length > 0) {
             fetchResults(searchTerm);
-        } else {
-            searchResults.innerHTML = '';
         }
     });
 
+    /**
+     * Pour un string, on fait un post faisant une requête SQL à la BD
+     * Enfin, on affiche les resultats retournés par la BD
+     * @param query
+     */
     function fetchResults(query) {
-        fetch('', {
+        fetch(window.location.href, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
             body: new URLSearchParams({
+                action: 'search',
                 search: query
             })
         })
@@ -35,10 +42,20 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
+    /**
+     * Selon les resultats renvoyés par la BD, on affiche le num, nom et prenom etudiant
+     * On entour autour d'une balise a, et dès qu'elle est enclenché, on choisit l'etudiant
+     * @param data
+     */
     function displayResults(data) {
-        searchResults.innerHTML = '';
+        if (searchResults) {
+            searchResults.innerHTML = '';
+        }
+
         if (data.length === 0) {
-            searchResults.innerHTML = '<p>Aucun résultat trouvé</p>';
+            if (searchResults) {
+                searchResults.innerHTML = '<p>Aucun résultat trouvé</p>';
+            }
             return;
         }
 
@@ -47,24 +64,69 @@ document.addEventListener('DOMContentLoaded', function() {
             const li = document.createElement('li');
             const a = document.createElement('a');
             a.href = '#';
-            a.textContent = `${student.num_eleve} - ${student.nom_eleve}`;
+            a.textContent = `${student.num_eleve} - ${student.nom_eleve} ${student.prenom_eleve}`;
+            a.classList.add('left-align');
             a.addEventListener('click', function(event) {
                 event.preventDefault();
+                selectStudent(student.num_eleve, student.nom_eleve, student.prenom_eleve);
             });
             li.appendChild(a);
             ul.appendChild(li);
         });
         searchResults.appendChild(ul);
     }
+
+    /**
+     * Pour l'étudiant choisie, on crée un form discret et on l'envoie en tant que requête POST
+     * Avec les informations données en paramètre
+     * @param studentId
+     * @param studentFirstName
+     * @param studentLastName
+     */
+    function selectStudent(studentId, studentFirstName, studentLastName) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = window.location.href;
+
+        const inputId = document.createElement('input');
+        inputId.type = 'hidden';
+        inputId.name = 'student_id';
+        inputId.value = studentId;
+
+        const inputFirstName = document.createElement('input');
+        inputFirstName.type = 'hidden';
+        inputFirstName.name = 'student_firstName';
+        inputFirstName.value = studentFirstName;
+
+        const inputLastName = document.createElement('input');
+        inputLastName.type = 'hidden';
+        inputLastName.name = 'student_lastName';
+        inputLastName.value = studentLastName;
+
+        const inputAction = document.createElement('input');
+        inputAction.type = 'hidden';
+        inputAction.name = 'action';
+        inputAction.value = 'select_student';
+
+        form.appendChild(inputId);
+        form.appendChild(inputFirstName);
+        form.appendChild(inputLastName);
+        form.appendChild(inputAction);
+
+        document.body.appendChild(form);
+
+        form.submit();
+    }
 });
 
 /**
- * Google Map
+ * Partie2: Map Intéractive
  */
-
 let map;
 let directionsService;
 let directionsRenderer;
+
+document.onload(initMap());
 
 function initMap() {
     const centerPoint = { lat: 43.513648188004844, lng: 5.45114076845909 };
@@ -89,7 +151,7 @@ function getDistanceMatrix(origin, destination) {
             {
                 origins: [origin],
                 destinations: [destination],
-                travelMode: 'WALKING',
+                travelMode: google.maps.TravelMode.DRIVING,
                 unitSystem: google.maps.UnitSystem.METRIC,
             },
             (response, status) => {
@@ -109,7 +171,11 @@ function getRoute(origin, destination) {
             {
                 origin: origin,
                 destination: destination,
-                travelMode: 'WALKING',
+                travelMode: 'DRIVING',
+                drivingOptions: {
+                    departureTime: new Date(),
+                    trafficModel: 'pessimistic'
+                },
             },
             (response, status) => {
                 if (status === 'OK') {
@@ -130,13 +196,10 @@ async function calculateDistance() {
     try {
         const response = await getDistanceMatrix(origin, destination);
         const result = response.rows[0].elements[0];
+
+        // TODO: calcul distance et duration
         const distance = result.distance.text;
         const duration = result.duration.text;
-
-        document.getElementById('output').innerHTML = `
-                  Distance: ${distance} <br> 
-                  Temps estimé: ${duration}
-              `;
 
         await getRoute(origin, destination);
     } catch (error) {
