@@ -40,6 +40,11 @@ class Homepage {
             }
         }
 
+        if (!isset($_SESSION['identifier'])) {
+            header('Location: /intramu');
+            return;
+        }
+
         $title = "Accueil";
         $cssFilePath = '/_assets/styles/homepage.css';
         $jsFilePath = '/_assets/scripts/homepage.js';
