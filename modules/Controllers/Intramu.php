@@ -2,7 +2,7 @@
 namespace Blog\Controllers;
 
 use Blog\Views\Layout;
-use Database;
+use Includes\Database;
 
 /**
  * Contrôleur de la page de connexion
