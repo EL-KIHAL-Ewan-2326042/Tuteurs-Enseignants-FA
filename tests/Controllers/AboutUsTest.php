@@ -5,20 +5,26 @@ namespace Test\Controllers;
 use Blog\Controllers\AboutUs;
 use Blog\Views\Layout;
 use Blog\Views\AboutUs as AboutUsView;
-use Couchbase\View;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Classe de AboutUsTest
+ *
+ * Test du contrôleur AboutUs : s'assure que la méthode show()
+ * fonctionne comme prévu
+ */
 class AboutUsTest extends TestCase {
     /**
+     * Test de la méthode show() du contrôleur AboutUs)
      * @return void
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
     public function testShow(){
-        //Mock de layout et vue
+        //Mock des classes layout et vue
         $mockLayout = $this->createMock(Layout::class);
         $mockView = $this->createMock(AboutUsView::class);
 
-        //layout
+        //attentes pour le mock du layout
         $mockLayout->expects($this->once())
             ->method('renderTop')
             ->with($this->equalTo('A Propos'), $this->equalTo(''));
@@ -27,14 +33,14 @@ class AboutUsTest extends TestCase {
             ->method('renderBottom')
             ->with($this->equalTo(''));
 
-        //vue
+        //attentes pour le mock de la vue
         $mockView->expects($this->once())
             ->method('showView');
 
-        //mocks dans controleur
+        //instanciation des mocks
         $controller = new AboutUs($mockLayout,$mockView);
 
-        //executer methode
+        //exécution
         $controller->show();
     }
 }

@@ -60,6 +60,10 @@ class Router {
  */
 session_start();
 
+$layout = new \Blog\Views\Layout();
+$aboutUsView = new \Blog\Views\AboutUs();
+$aboutUsController = new \Blog\Controllers\AboutUs($layout,$aboutUsView);
+
 /**
  * Initialisation du routage des URI
  */
@@ -79,8 +83,8 @@ $getRoutes = [
     },
     '/hello' => function() { echo 'Hello World';
     },
-    '/aboutus' => function () {
-        (new \Blog\Controllers\AboutUs())->show();
+    '/aboutus' => function () use ($aboutUsController){
+        $aboutUsController->show();
     },
     '/mentions-legales' => function () {
         (new \Blog\Controllers\MentionLeg())->show();
