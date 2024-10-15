@@ -1,7 +1,7 @@
 <?php
-
+use Includes\Autoloader;
 require_once '_assets/includes/Autoloader.php';
-autoloader::register();
+Autoloader::register();
 class Router {
     private string $url;
     private array $routes = [];
@@ -60,9 +60,14 @@ class Router {
  */
 session_start();
 
+//Instanciation de classes nécessaires pour About Us
 $layout = new \Blog\Views\Layout();
 $aboutUsView = new \Blog\Views\AboutUs();
 $aboutUsController = new \Blog\Controllers\AboutUs($layout,$aboutUsView);
+
+//Instanciation de classes nécessaires pour le Dashboard
+$dashboardView = new \Blog\Views\Dashboard();
+$dashboardController = new \Blog\Controllers\Dashboard($layout,$dashboardView);
 
 /**
  * Initialisation du routage des URI
@@ -75,8 +80,8 @@ $getRoutes = [
     '/homepage' => function () {
         (new \Blog\Controllers\Homepage())->show();
     },
-    '/dashboard' => function() {
-        (new  \Blog\Controllers\Dashboard())->show();
+    '/dashboard' => function() use ($dashboardController) {
+        $dashboardController->show();
     },
     '/intramu' => function () {
         (new \Blog\Controllers\Intramu())->show();
@@ -95,8 +100,8 @@ $postRoutes = [
     '/intramu' => function () {
         (new \Blog\Controllers\Intramu())->show();
     },
-    '/dashboard' => function () {
-        (new \Blog\Controllers\Dashboard())->show();
+    '/dashboard' => function ($dashboardController) {
+        $dashboardController->show();
 }
 ];
 
