@@ -1,6 +1,6 @@
 <?php
 
-namespace tests\Controllers;
+namespace Test\Controllers;
 
 use Blog\Controllers\AboutUs;
 use Blog\Views\Layout;
@@ -16,14 +16,14 @@ class AboutUsTest extends TestCase {
     public function testShow(){
         //Mock de layout et vue
         $mockLayout = $this->createMock(Layout::class);
-        $mockView = $this->createMock(AboutUs::class);
+        $mockView = $this->createMock(AboutUsView::class);
 
         //layout
         $mockLayout->expects($this->once())
             ->method('renderTop')
             ->with($this->equalTo('A Propos'), $this->equalTo(''));
 
-        $mockView->expects($this->once())
+        $mockLayout->expects($this->once())
             ->method('renderBottom')
             ->with($this->equalTo(''));
 
@@ -32,7 +32,7 @@ class AboutUsTest extends TestCase {
             ->method('showView');
 
         //mocks dans controleur
-        $controller = new AboutUs();
+        $controller = new AboutUs($mockLayout,$mockView);
 
         //executer methode
         $controller->show();
