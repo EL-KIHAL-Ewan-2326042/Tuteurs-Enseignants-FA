@@ -11,8 +11,8 @@ class Dashboard {
 
     /**
      * Constructeur de la classe Dashboard
-     * @param Layout $layout
-     * @param DashboardView $view
+     * @param Layout $layout Instance de la classe Layout
+     * @param DashboardView $view Instance de la classe DashboardView
      */
     public function __construct(Layout $layout, DashboardView $view) {
         $this->layout = $layout;
