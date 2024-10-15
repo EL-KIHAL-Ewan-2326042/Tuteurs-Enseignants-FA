@@ -3,10 +3,24 @@
 namespace Blog\Controllers;
 
 use Blog\Views\Layout;
+use Blog\Views\Dashboard as DashboardView;
 
 class Dashboard {
+    private Layout $layout;
+    private DashboardView $view;
+
     /**
-     * Controlleur de la dashboard
+     * Constructeur de la classe Dashboard
+     * @param Layout $layout
+     * @param DashboardView $view
+     */
+    public function __construct(Layout $layout, DashboardView $view) {
+        $this->layout = $layout;
+        $this->view = $view;
+    }
+
+    /**
+     * Contrôleur de la dashboard
      * @return void
      */
     public function show(): void {
@@ -16,15 +30,13 @@ class Dashboard {
 
         if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['csv_file'])) {
             $csvFile = $_FILES['csv_file']['tmp_name'];
-            $model = new \Blog\Models\Dashboard(\Database::getInstance());
+            $db = \Includes\Database::getInstance();
+            $model = new \Blog\Models\Dashboard($db);
             $model->uploadCsv($csvFile);
         }
 
-        $view = new \Blog\Views\Dashboard();
-
-        $layout = new Layout();
-        $layout->renderTop($title, $cssFilePath);
-        $view->showView();
-        $layout->renderBottom($jsFilePath);
+        $this->layout->renderTop($title, $cssFilePath);
+        $this->view->showView();
+        $this->layout->renderBottom($jsFilePath);
     }
 }

@@ -1,9 +1,8 @@
 <?php
-namespace Blog\Includes;
+namespace Includes;
 use PDO;
 use PDOException;
-class Database
-{
+class Database {
     private string $host = "postgresql-tutormap.alwaysdata.net";
     private string $user = "tutormap";
     private string $pass = "8exs7JcEpGVfsI";
@@ -28,7 +27,7 @@ class Database
      * Méthode statique pour obtenir l'instance unique de la classe database(singleton)
      * @return database
      */
-    public static function getInstance(): database
+    public static function getInstance(): Database
     {
         static $instance = null;
         if ($instance === null) {
