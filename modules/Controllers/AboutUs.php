@@ -9,6 +9,11 @@ class AboutUs {
     private Layout $layout;
     private AboutUsView $view;
 
+    /**
+     * Constructeur de la classe AboutUs (controller)
+     * @param Layout $layout Instance de la classe Layout
+     * @param AboutUsView $view Instance de la classe AboutUsView
+     */
     public function __construct(Layout $layout, AboutUsView $view) {
         $this->layout = $layout;
         $this->view = $view;
@@ -25,8 +30,8 @@ class AboutUs {
         $jsFilePath = '';
 
         $this->layout->renderTop($title,$cssFilePath);
-        $this->layout->renderBottom($jsFilePath);
         $this->view->showView();
+        $this->layout->renderBottom($jsFilePath);
 
     }
 }
