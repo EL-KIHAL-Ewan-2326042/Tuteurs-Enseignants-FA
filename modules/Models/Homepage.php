@@ -22,7 +22,9 @@ class Homepage {
     }
 
     public function getStageEleve(string $id): bool|array {
-        $query = 'SELECT nom_entreprise, adresse_entreprise, sujet_stage FROM stage WHERE num_eleve = :id';
+        $query = 'SELECT DISTINCT nom_entreprise, adresse_entreprise, sujet_stage
+                    FROM stage
+                    WHERE est_stagiaire.num_eleve = :id';
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':id', $id);
         $stmt->execute();
@@ -35,7 +37,10 @@ class Homepage {
         $result = array();
 
         foreach($tmp as $ranking) {
-            $query = 'SELECT num_eleve, nom_eleve, prenom_eleve FROM eleve WHERE num_eleve = :num LIMIT ' . $nb . ' OFFSET 1';
+            $query = 'SELECT num_eleve, nom_eleve, prenom_eleve
+                        FROM eleve
+                        WHERE num_eleve = :num
+                        LIMIT ' . $nb;
             $stmt = $this->db->getConn()->prepare($query);
             $stmt->bindParam(':num', $ranking['num_eleve']);
             $stmt->execute();
@@ -43,37 +48,43 @@ class Homepage {
             $result = array_merge($result, $tmpResult);
         }
 
-        foreach($result as $eleve) {
-            echo $eleve['num_eleve'];
-        }
-
         return $result;
     }
 
     public function scoreDiscipSujet(string $id): array {
-        $query1 = 'SELECT discipline FROM enseignant WHERE id_enseignant = :id';
+        $query1 = 'SELECT nom_discipline FROM est_enseigne WHERE id_enseignant = :id';
         $stmt1 = $this->db->getConn()->prepare($query1);
         $stmt1->bindParam(':id', $id);
         $stmt1->execute();
-        $searchTerm = $stmt1->fetch($this->db->getConn()::FETCH_ASSOC)['discipline'];
+        $searchTerm = $stmt1->fetchAll($this->db->getConn()::FETCH_ASSOC);
 
         $pdo = $this->db;
 
-        $searchTerm = trim($searchTerm);
+        $searchTerm = trim(implode('', $searchTerm));
         $tsQuery = implode(' | ', explode('_', $searchTerm));
 
-        $query2 = "
-        SELECT num_eleve, mots_cles, ts_rank_cd(to_tsvector('french', mots_cles), to_tsquery('french', :searchTerm), 32) AS rank
-        FROM stage
-        WHERE to_tsquery('french', :searchTerm) @@ to_tsvector('french', mots_cles)
-        ORDER BY rank DESC
-        LIMIT 5
-        ";
+        $query2 = "SELECT num_eleve, mots_cles, ts_rank_cd(to_tsvector('french', mots_cles), to_tsquery('french', :searchTerm), 32) AS rank
+                    FROM stage
+                    WHERE to_tsquery('french', :searchTerm) @@ to_tsvector('french', mots_cles)
+                    ORDER BY rank DESC
+                    LIMIT 5";
 
         $stmt2 = $pdo->getConn()->prepare($query2);
         $stmt2->bindValue(':searchTerm', $tsQuery);
         $stmt2->execute();
 
         return $stmt2->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function calculScore(int $duree, int $coeffDuree, int $asso, int $coeffAsso, float $scorePert, int $coeffPert, int $nbAssoEleve): float {
+        $scoreDuree = $coeffDuree/(1+0.02*$duree);
+        $scorePert *= $coeffPert;
+        if ($asso === 0) $scoreAsso = 0;
+        else $scoreAsso = $asso*$coeffAsso/$nbAssoEleve;
+
+        $score = $scoreDuree + $scoreAsso + $scorePert;
+        $scoreSur1 = $score / ($coeffDuree + $coeffAsso + $coeffPert);
+
+        return round($scoreSur1 * 5, 2);
     }
 }
