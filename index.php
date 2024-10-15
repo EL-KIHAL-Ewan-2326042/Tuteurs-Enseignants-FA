@@ -69,16 +69,20 @@ $aboutUsController = new \Blog\Controllers\AboutUs($layout,$aboutUsView);
 $dashboardView = new \Blog\Views\Dashboard();
 $dashboardController = new \Blog\Controllers\Dashboard($layout,$dashboardView);
 
+//Instanciation de classes nécessaire pour Homepage
+$homepageView = new \Blog\Views\Homepage();
+$homepageController = new \Blog\Controllers\Homepage($layout,$homepageView);
+
 /**
  * Initialisation du routage des URI
  */
 $router = new Router(strtok($_SERVER["REQUEST_URI"], '?'));
 $getRoutes = [
-    '/' => function () {
-        (new \Blog\Controllers\Homepage())->show();
+    '/' => function () use($homepageController) {
+        $homepageController->show();
     },
-    '/homepage' => function () {
-        (new \Blog\Controllers\Homepage())->show();
+    '/homepage' => function () use($homepageController) {
+        $homepageController->show();
     },
     '/dashboard' => function() use ($dashboardController) {
         $dashboardController->show();
