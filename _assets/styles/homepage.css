@@ -3,11 +3,14 @@ main {
 }
 
 main .row {
+    display: table-row;
     width: 85rem;
+    border: solid 1px black;
+    margin-bottom: -1px;
 }
 
 main .col {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: table-cell;
+    overflow: auto;
+    text-align: center;
 }

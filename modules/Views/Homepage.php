@@ -15,7 +15,7 @@ class Homepage {
             <main>
                 <div> contenu </div>
         <?
-        if(isset($_SESSION['identifier']) && isset($_SESSION['role']) && $_SESSION['role'] === 'admin') {
+        if(isset($_SESSION['identifier']) && isset($_SESSION['role']) && $_SESSION['role'] === 'teacher') {
         ?>
 
             <div class="row">
@@ -26,35 +26,37 @@ class Homepage {
                 <div class="col s2">ENTREPRISE</div>
                 <div class="col s2">TOTAL</div>
                 <div class="col s1">CHOIX</div>
+            </div>
 
-                <?
-                foreach($this->model->getEleves(5, $_SESSION['identifier']) as $eleve) {
-                    $infoStage = $this->model->getStageEleve($eleve["num_eleve"])
-                    ?>
-                        <div class="col s2"><? echo $eleve['num_eleve'] /*echo $eleve["nom_eleve"] . " " . $eleve["prenom_eleve"]*/ ?></div>
+            <?
+            foreach($this->model->getEleves(5, $_SESSION['identifier']) as $eleve) {
+                $infoStage = $this->model->getStageEleve($eleve["num_eleve"])
+                ?>
+                    <div class="row">
+                        <div class="col s2"><? echo $eleve["nom_eleve"] . " " . $eleve["prenom_eleve"] ?></div>
                         <div class="col s2">...</div>
                         <div class="col s1"> <? if(!$infoStage) echo "...";
-                                                else echo $infoStage["adresse_stage"] ?> </div>
+                                                else echo $infoStage["adresse_entreprise"] ?> </div>
                         <div class="col s2"> <? if(!$infoStage) echo "...";
-                                                else echo $infoStage["sujet_stage"] ?> </div>
+                                                else echo str_replace('_', ' ', $infoStage["sujet_stage"]) ?> </div>
                         <div class="col s2"> <? if(!$infoStage) echo "...";
                                                 else echo $infoStage["nom_entreprise"] ?> </div>
                         <div class="col s2">...</div>
                         <div class="col s1">...</div>
-                    <?
-                }
-                $duree = 10;
-                $coeffDuree = 7;
-                $asso = 1;
-                $coeffAsso = 2;
-                $scorePert = 0.728;
-                $coeffPert = 10;
-                $nbAssoEleve = 2;
+                    </div>
+                <?
+            }
+            /*
+            $duree = 10;
+            $coeffDuree = 7;
+            $asso = 1;
+            $coeffAsso = 2;
+            $scorePert = 0.728;
+            $coeffPert = 10;
+            $nbAssoEleve = 2;
 
-                echo "  --------------  <strong>" . $this->model->calculScore($duree, $coeffDuree, $asso, $coeffAsso, $scorePert, $coeffPert, $nbAssoEleve) . "</strong>/5"
-                ?>
-            </div>
-        <?php
+            echo "  --------------  <strong>" . $this->model->calculScore($duree, $coeffDuree, $asso, $coeffAsso, $scorePert, $coeffPert, $nbAssoEleve) . "</strong>/5"
+            */
         }
         ?>
         </main>
