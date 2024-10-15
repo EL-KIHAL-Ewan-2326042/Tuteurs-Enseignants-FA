@@ -23,19 +23,49 @@ class Intramu {
         }
 
         $db = $this->db;
-        $query = 'SELECT mdp_enseignant FROM enseignant WHERE id_enseignant = :id_enseignant';
+        $query = 'SELECT mdp_user FROM utilisateur WHERE id_user = :id_user';
         $stmt = $db->getConn()->prepare($query);
-        $stmt->bindParam(':id_enseignant', $identifier);
+        $stmt->bindParam(':id_user', $identifier);
         $stmt->execute();
 
         $result = $stmt->fetch($db->getConn()::FETCH_ASSOC);
 
-        if ($result && isset($result['mdp_enseignant'])) {
-            if (password_verify($password, $result['mdp_enseignant'])) {
+        if ($result && isset($result['mdp_user'])) {
+            if (password_verify($password, $result['mdp_user'])) {
                 return true;
             }
         }
         return false;
+    }
+
+    public function getRole(string $identifier) {
+        if ($_SESSION['identifier'] !== $identifier) {
+            return false;
+        }
+
+        $db = $this->db;
+        $query = 'SELECT nom_role FROM utilisateur 
+                  JOIN a_role ON utilisateur.id_user = a_role.id_user
+                  WHERE a_role.id_user = :id_user';
+        $stmt = $db->getConn()->prepare($query);
+        $stmt->bindParam(':id_user', $_SESSION['identifier']);
+        $stmt->execute();
+
+        return $stmt->fetch($db->getConn()::FETCH_ASSOC);
+    }
+
+    public function fetchAll(string $identifier) {
+        if ($_SESSION['identifier'] !== $identifier) {
+            return false;
+        }
+
+        $db = $this->db;
+        $query = 'SELECT * FROM enseignant WHERE id_enseignant = :id_enseignant';
+        $stmt = $db->getConn()->prepare($query);
+        $stmt->bindParam(':id_enseignant', $_SESSION['identifier']);
+        $stmt->execute();
+
+        return $stmt->fetch($db->getConn()::FETCH_ASSOC);
     }
 }
 ?>

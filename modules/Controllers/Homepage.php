@@ -29,11 +29,13 @@ class Homepage {
                 $studentId = $_POST['student_id'];
                 $firstName = $_POST['student_firstName'];
                 $secondName = $_POST['student_lastName'];
+                $address = $homepageModel->getStudentAddress($studentId);
 
                 $_SESSION['selected_student'] = [
                     'id' => $studentId,
                     'firstName' => $firstName,
-                    'lastName' => $secondName
+                    'lastName' => $secondName,
+                    'address' => $address
                 ];
             }
         }
