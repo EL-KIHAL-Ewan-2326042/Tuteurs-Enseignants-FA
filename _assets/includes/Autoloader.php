@@ -1,7 +1,6 @@
 <?php
-
-class Autoloader
-{
+namespace Includes;
+class Autoloader {
 
     /**
      * Enregistre l'autoloader
@@ -20,6 +19,11 @@ class Autoloader
     static function autoload($class): void
     {
 
+        if($class === 'Blog\Includes\Database'){
+            require '_assets/includes/Database.php';
+            return;
+        }
+
         if (str_contains($class, 'Blog')) {
             $replacements = [
                 '\\' => '/',
@@ -27,7 +31,6 @@ class Autoloader
             ];
 
             $filename = str_replace(array_keys($replacements), array_values($replacements), $class);
-
             require 'modules/' . $filename . '.php';
 
         } elseif (str_contains($class, 'Test')) {
@@ -37,13 +40,13 @@ class Autoloader
             ];
 
             $filename = str_replace(array_keys($replacements), array_values($replacements), $class);
-
             require 'tests/' . $filename . '.php';
 
         } else {
-            $class = strtoupper(substr($class, 0, 1)) . substr($class, 1);
+            $class = str_replace('\\', '/', $class);
             if (strpos($class, 'Exception')) {
                 require '_assets/includes/exceptions/' . $class . '.php';
+
             } else {
                 require '_assets/includes/' . $class . '.php';
             }

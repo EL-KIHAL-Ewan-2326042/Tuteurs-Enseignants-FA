@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
  */
 class AboutUsTest extends TestCase {
     /**
-     * Test de la méthode show() du contrôleur AboutUs)
+     * Test de la méthode show() du contrôleur AboutUs
      * @return void
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
