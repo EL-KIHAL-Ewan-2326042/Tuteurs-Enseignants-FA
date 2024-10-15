@@ -35,4 +35,21 @@ class Homepage {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getStudentAddress(string $studentId): string {
+        if ($studentId !== $_POST['student_id']) {
+            return false;
+        }
+
+        $pdo = $this->db;
+
+        $query = 'SELECT adresse_entreprise FROM stage 
+                  WHERE stage.num_eleve = :num_eleve';
+
+        $stmt = $pdo->getConn()->prepare($query);
+        $stmt->bindValue(':num_eleve', $studentId);
+        $stmt->execute();
+
+        return $stmt->fetchColumn();
+    }
+
 }

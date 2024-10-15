@@ -27,9 +27,11 @@ class Homepage {
             </div>
 
             <div id="map"></div>
+            <div class="row"></div>
 
             <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBS2OwTaG2rfupX3wA-DlTbsBEG9yDVKk&callback=initMap" async defer></script>
         </main>
         <?php
     }
 }
+
