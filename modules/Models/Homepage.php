@@ -24,7 +24,7 @@ class Homepage {
     public function getStageEleve(string $id): bool|array {
         $query = 'SELECT DISTINCT nom_entreprise, adresse_entreprise, sujet_stage
                     FROM stage
-                    WHERE est_stagiaire.num_eleve = :id';
+                    WHERE num_eleve = :id';
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':id', $id);
         $stmt->execute();
@@ -33,7 +33,6 @@ class Homepage {
 
     public function getEleves(int $nb, string $enseignant): bool|array {
         $tmp = $this->scoreDiscipSujet($enseignant);
-        foreach($tmp as $test) echo $test['num_eleve'];
         $result = array();
 
         foreach($tmp as $ranking) {
@@ -56,11 +55,17 @@ class Homepage {
         $stmt1 = $this->db->getConn()->prepare($query1);
         $stmt1->bindParam(':id', $id);
         $stmt1->execute();
-        $searchTerm = $stmt1->fetchAll($this->db->getConn()::FETCH_ASSOC);
+        $result = $stmt1->fetchAll(PDO::FETCH_ASSOC);
+        $searchTerm = "";
+
+        for($i = 0; $i < count($result); $i++) {
+            $searchTerm .= $result[$i]['nom_discipline'];
+            if($i < count($result) - 1) $searchTerm .= '_';
+        }
 
         $pdo = $this->db;
 
-        $searchTerm = trim(implode('', $searchTerm));
+        $searchTerm = trim($searchTerm);
         $tsQuery = implode(' | ', explode('_', $searchTerm));
 
         $query2 = "SELECT num_eleve, mots_cles, ts_rank_cd(to_tsvector('french', mots_cles), to_tsquery('french', :searchTerm), 32) AS rank
