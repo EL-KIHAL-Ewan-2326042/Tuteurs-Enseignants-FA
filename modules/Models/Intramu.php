@@ -23,15 +23,15 @@ class Intramu {
         }
 
         $db = $this->db;
-        $query = 'SELECT mdp_enseignant FROM enseignant WHERE id_enseignant = :id_enseignant';
+        $query = 'SELECT mdp_user FROM utilisateur WHERE id_user = :id_user';
         $stmt = $db->getConn()->prepare($query);
-        $stmt->bindParam(':id_enseignant', $identifier);
+        $stmt->bindParam(':id_user', $identifier);
         $stmt->execute();
 
         $result = $stmt->fetch($db->getConn()::FETCH_ASSOC);
 
-        if ($result && isset($result['mdp_enseignant'])) {
-            if (password_verify($password, $result['mdp_enseignant'])) {
+        if ($result && isset($result['mdp_user'])) {
+            if (password_verify($password, $result['mdp_user'])) {
                 return true;
             }
         }
