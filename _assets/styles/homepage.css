@@ -1,3 +1,7 @@
+main {
+    flex-direction: column;
+}
+
 main .row {
     width: 85rem;
 }
