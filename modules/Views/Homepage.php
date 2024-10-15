@@ -15,19 +15,29 @@ class Homepage {
             <div class="card-panel white">
                 <form id="searchForm" onsubmit="return false;" method="POST">
                     <label for="search">Rechercher un étudiant:</label>
-                    <input type="text" id="search" name="search" autocomplete="off" required>
+                    <input type="text" id="search" name="search" autocomplete="off" maxlength="50" required>
                     <div id="searchResults"></div>
                 </form>
             </div>
             <div class="center">
                 <?php if (isset($_SESSION['selected_student'])) {
-                    echo '<h4 class="left-align"> Résultats pour: ' . $_SESSION['selected_student']['firstName'] . ' ' .  $_SESSION['selected_student']['lastName'] . '</h4>';
+                    echo '<h4 class="left-align"> Résultat pour: ' . $_SESSION['selected_student']['firstName'] . ' ' .  $_SESSION['selected_student']['lastName'] . '</h4>';
                 }
                 ?>
             </div>
 
             <div id="map"></div>
             <div class="row"></div>
+
+            <script>
+                <?php
+                if (isset($_SESSION['selected_student'])) { ?>
+                    let companyAddress = <?php echo json_encode($_SESSION['selected_student']['address']); ?>;
+                    let teacherAddress = <?php echo json_encode($_SESSION['address']); ?>;
+                <?php
+                }
+                ?>
+            </script>
 
             <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBS2OwTaG2rfupX3wA-DlTbsBEG9yDVKk&callback=initMap" async defer></script>
         </main>

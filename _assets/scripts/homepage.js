@@ -56,7 +56,7 @@ function displayResults(data) {
 
     if (data.length === 0) {
         if (searchResults) {
-            searchResults.innerHTML = '<p>Aucun résultat trouvé</p>';
+            searchResults.innerHTML = '<p>Aucun étudiant trouvé</p>';
         }
         return;
     }
@@ -126,36 +126,36 @@ function selectStudent(studentId, studentFirstName, studentLastName) {
  */
 
 let map, directionsService, directionsRenderer, companyLocation, teacherLocation;
-initMap();
-
-function getLatLng(address) {
-    console.log('Getting LatLng for address:', address); // Log the address
-
-    var geocoder = new google.maps.Geocoder();
-
-    return new Promise((resolve, reject) => {
-        geocoder.geocode({ 'address': address }, function (results, status) {
-            if (status === 'OK') {
-                var latLng = results[0].geometry.location;
-                resolve(latLng);
-            } else {
-                reject('Erreur récupération lat et lng: ' + status);
-            }
-        });
-    });
-}
-
-async function getStudentLocation() {
-    let teacherAddress = "<?php echo $_SESSION['address']; ?>";
-    let companyAddress = "<?php echo $_SESSION['selected_student']['address']; ?>";
+async function geocodeAddress(address) {
+    const apiKey = 'AIzaSyCBS2OwTaG2rfupX3wA-DlTbsBEG9yDVKk';
+    const endpoint = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
 
     try {
-        teacherLocation = await getLatLng(teacherAddress);
-        companyLocation = await getLatLng(companyAddress);
+        console.log(endpoint);
+        const response = await fetch(endpoint);
+        const data = await response.json();
 
-        console.log('Teacher Location:', teacherLocation);
-        console.log('Company Location:', companyLocation);
+        if (data.status === 'OK') {
+            const location = data.results[0].geometry.location;
 
+            console.log(`Latitude: ${location.lat}, Longitude: ${location.lng}`);
+            return location;
+        }
+        else {
+            console.error(data.status);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        return null;
+    }
+}
+
+
+async function getStudentLocation() {
+    try {
+        teacherLocation = await geocodeAddress(teacherAddress);
+        companyLocation = await geocodeAddress(companyAddress);
+        initMap();
     } catch (error) {
         console.error(error);
     }
