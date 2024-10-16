@@ -3,11 +3,23 @@ namespace Blog\Controllers;
 
 use Blog\Views\Layout;
 use Includes\Database;
+use Blog\Views\Intramu as IntramuView;
 
 /**
  * Contrôleur de la page de connexion
  */
 class Intramu {
+    private Layout $layout;
+    private IntramuView $view;
+    /**
+     * Constructeur de la classe Intramu (contrôleur)
+     * @param Layout $layout Instance de la classe Layout
+     * @param IntramuView $view Instance de la classe IntramuView
+     */
+    public function __construct(Layout $layout, IntramuView $view) {
+        $this->layout = $layout;
+        $this->view = $view;
+    }
 
     /**
      * Liaison entre la vue et le layout et affichage
