@@ -9,7 +9,7 @@ class Homepage {
      * Vue de la homepage
      * @return void
      */
-    public function showView($estStagiare) {
+    public function showView() {
         ?>
         <main>
             <h3 class="center-align">Répartiteur de tuteurs enseignants</h3>
@@ -22,18 +22,16 @@ class Homepage {
                 </form>
             </div>
             <div class="center">
-                <?php if (isset($_SESSION['selected_student'])) {
+                <?php if (isset($_SESSION['selected_student']['address']) && $_SESSION['selected_student']['address'] != '') {
                     echo '<h4 class="left-align"> Résultat pour: ' . $_SESSION['selected_student']['firstName'] . ' ' .  $_SESSION['selected_student']['lastName'] . '</h4>';
-                }
                 ?>
             </div>
-
+            <div id="map"></div>
             <?php
-            if ($estStagiare) { ?>
-                <div id="map"></div>
-            <?php } else { ?>
-                <p>Cet étudiant n'a pas de stage ...</p>
-            <?php  } ?>
+            } else {
+                echo "<p>Cet étudiant n'a pas de stage ...</p>";
+            }
+            ?>
 
             <div class="row"></div>
 
