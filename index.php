@@ -93,7 +93,13 @@ $postRoutes = [
     },
     '/dashboard' => function () {
         (new \Blog\Controllers\Dashboard())->show();
-}
+    },
+    '/' => function () {
+        (new \Blog\Controllers\Homepage())->show();
+    },
+    '/homepage' => function () {
+        (new \Blog\Controllers\Homepage())->show();
+    },
 ];
 
 foreach ($getRoutes as $uri => $action) {
