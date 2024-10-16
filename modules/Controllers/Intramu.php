@@ -67,11 +67,9 @@ class Intramu {
         $cssFilePath = '_assets/styles/login.css';
         $jsFilePath = '';
 
-        $view = new \Blog\Views\Intramu($errorMessage);
-
-        $layout = new Layout();
-        $layout->renderTop($title, $cssFilePath);
-        $view->showView();
-        $layout->renderBottom($jsFilePath);
+        $this->view = new IntramuView($errorMessage);
+        $this->layout->renderTop($title, $cssFilePath);
+        $this->view->showView();
+        $this->layout->renderBottom($jsFilePath);
     }
 }
