@@ -10,7 +10,7 @@ class Homepage {
      * Vue de la homepage
      * @return void
      */
-    public function showView() {
+    public function showView(): void {
         ?>
         <main>
             <script>
@@ -42,17 +42,17 @@ class Homepage {
             <div id="map"></div>
             <div class="row"></div>
 
-            <table class="highlight centered">
+            <table class="highlight centered center-align">
                 <thead>
-                <tr>
-                    <th>ELEVE</th>
-                    <th>HISTORIQUE</th>
-                    <th>POSITION</th>
-                    <th>SUJET</th>
-                    <th>ENTREPRISE</th>
-                    <th>TOTAL</th>
-                    <th>CHOIX</th>
-                </tr>
+                    <tr>
+                        <th>ELEVE</th>
+                        <th>HISTORIQUE</th>
+                        <th>POSITION</th>
+                        <th>SUJET</th>
+                        <th>ENTREPRISE</th>
+                        <th>TOTAL</th>
+                        <th>CHOIX</th>
+                    </tr>
                 </thead>
                 <tbody>
                 <?
@@ -61,9 +61,9 @@ class Homepage {
                     ?>
                     <tr>
                         <td><? echo $eleve["nom_eleve"] . " " . $eleve["prenom_eleve"] ?></td>
-                        <td>...</td>
+                        <td><? echo $this->model->getNbAsso($eleve["num_eleve"], $_SESSION['identifier']) ?></td>
                         <td> <? if(!$infoStage) echo "...";
-                            else echo $infoStage["adresse_entreprise"] ?> </td>
+                            else echo str_replace('_', "'", $infoStage["adresse_entreprise"]) ?> </td>
                         <td> <? if(!$infoStage) echo "...";
                             else echo str_replace('_', ' ', $infoStage["sujet_stage"]) ?> </td>
                         <td> <? if(!$infoStage) echo "...";

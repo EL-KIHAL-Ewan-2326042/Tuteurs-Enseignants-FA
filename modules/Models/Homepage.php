@@ -73,10 +73,13 @@ class Homepage {
     }
 
     public function getEleves(int $nb, string $enseignant): bool|array {
-        $query = 'SELECT num_eleve, nom_eleve, prenom_eleve
-                        FROM eleve
-                        LIMIT ' . $nb;
+        $query = 'SELECT eleve.num_eleve, nom_eleve, prenom_eleve
+                    FROM eleve
+                    JOIN etudie_a
+                    ON eleve.num_eleve = etudie_a.num_eleve
+                    WHERE nom_departement = :dep';
         $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindParam(':dep', $this->getDepEnseignant($enseignant)[0]['nom_departement']);
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -98,6 +101,30 @@ class Homepage {
         */
 
         return $result;
+    }
+
+    public function getDepEnseignant(string $enseignant): bool|array {
+        $query = 'SELECT nom_departement
+                    FROM enseigne_a
+                    WHERE  id_enseignant = :enseignant';
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindParam(':enseignant', $enseignant);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getNbAsso(string $eleve, string $enseignant): string {
+        $query = 'SELECT COUNT(*) nbAsso
+                    FROM est_responsable
+                    WHERE num_eleve = :eleve
+                    AND id_enseignant = :enseignant';
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindParam(':eleve', $eleve);
+        $stmt->bindParam(':enseignant', $enseignant);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$result) return '0';
+        return $result['nbasso'];
     }
 
     public function scoreDiscipSujet(int $nb, string $id): array {
