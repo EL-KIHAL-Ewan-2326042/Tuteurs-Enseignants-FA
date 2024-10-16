@@ -32,7 +32,15 @@ class Homepage {
     }
 
     public function getEleves(int $nb, string $enseignant): bool|array {
-        $tmp = $this->scoreDiscipSujet($enseignant);
+        $query = 'SELECT num_eleve, nom_eleve, prenom_eleve
+                        FROM eleve
+                        LIMIT ' . $nb;
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+
+        /*$tmp = $this->scoreDiscipSujet($nb, $enseignant);
         $result = array();
 
         foreach($tmp as $ranking) {
@@ -46,11 +54,12 @@ class Homepage {
             $tmpResult = $stmt->fetchAll(PDO::FETCH_ASSOC);
             $result = array_merge($result, $tmpResult);
         }
+        */
 
         return $result;
     }
 
-    public function scoreDiscipSujet(string $id): array {
+    public function scoreDiscipSujet(int $nb, string $id): array {
         $query1 = 'SELECT nom_discipline FROM est_enseigne WHERE id_enseignant = :id';
         $stmt1 = $this->db->getConn()->prepare($query1);
         $stmt1->bindParam(':id', $id);
@@ -72,7 +81,7 @@ class Homepage {
                     FROM stage
                     WHERE to_tsquery('french', :searchTerm) @@ to_tsvector('french', mots_cles)
                     ORDER BY rank DESC
-                    LIMIT 5";
+                    LIMIT " . $nb;
 
         $stmt2 = $pdo->getConn()->prepare($query2);
         $stmt2->bindValue(':searchTerm', $tsQuery);
@@ -88,6 +97,7 @@ class Homepage {
         else $scoreAsso = $asso*$coeffAsso/$nbAssoEleve;
 
         $score = $scoreDuree + $scoreAsso + $scorePert;
+        if($score === 0.0) return $score;
         $scoreSur1 = $score / ($coeffDuree + $coeffAsso + $coeffPert);
 
         return round($scoreSur1 * 5, 2);

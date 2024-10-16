@@ -17,35 +17,41 @@ class Homepage {
         <?
         if(isset($_SESSION['identifier']) && isset($_SESSION['role']) && $_SESSION['role'] === 'teacher') {
         ?>
-
-            <div class="row">
-                <div class="col s2">ELEVE</div>
-                <div class="col s2">HISTORIQUE</div>
-                <div class="col s1">POSITION</div>
-                <div class="col s2">SUJET</div>
-                <div class="col s2">ENTREPRISE</div>
-                <div class="col s2">TOTAL</div>
-                <div class="col s1">CHOIX</div>
-            </div>
-
+            <table class="highlight centered">
+                <thead>
+                    <tr>
+                        <th>ELEVE</th>
+                        <th>HISTORIQUE</th>
+                        <th>POSITION</th>
+                        <th>SUJET</th>
+                        <th>ENTREPRISE</th>
+                        <th>TOTAL</th>
+                        <th>CHOIX</th>
+                    </tr>
+                </thead>
+                <tbody>
             <?
-            foreach($this->model->getEleves(5, $_SESSION['identifier']) as $eleve) {
+            foreach($this->model->getEleves(20, $_SESSION['identifier']) as $eleve) {
                 $infoStage = $this->model->getStageEleve($eleve["num_eleve"])
                 ?>
-                    <div class="row">
-                        <div class="col s2"><? echo $eleve["nom_eleve"] . " " . $eleve["prenom_eleve"] ?></div>
-                        <div class="col s2">...</div>
-                        <div class="col s1"> <? if(!$infoStage) echo "...";
-                                                else echo $infoStage["adresse_entreprise"] ?> </div>
-                        <div class="col s2"> <? if(!$infoStage) echo "...";
-                                                else echo str_replace('_', ' ', $infoStage["sujet_stage"]) ?> </div>
-                        <div class="col s2"> <? if(!$infoStage) echo "...";
-                                                else echo $infoStage["nom_entreprise"] ?> </div>
-                        <div class="col s2">...</div>
-                        <div class="col s1">...</div>
-                    </div>
+                    <tr>
+                        <td><? echo $eleve["nom_eleve"] . " " . $eleve["prenom_eleve"] ?></td>
+                        <td>...</td>
+                        <td> <? if(!$infoStage) echo "...";
+                                                else echo $infoStage["adresse_entreprise"] ?> </td>
+                        <td> <? if(!$infoStage) echo "...";
+                                                else echo str_replace('_', ' ', $infoStage["sujet_stage"]) ?> </td>
+                        <td> <? if(!$infoStage) echo "...";
+                                                else echo $infoStage["nom_entreprise"] ?> </td>
+                        <td>...</td>
+                        <td>...</td>
+                    </tr>
                 <?
             }
+            ?>
+                </tbody>
+            </table>
+            <?
             /*
             $duree = 10;
             $coeffDuree = 7;
