@@ -118,7 +118,7 @@ function selectStudent(studentId, studentFirstName, studentLastName) {
     document.body.appendChild(form);
 
     form.submit();
-    getStudentLocation();
+    getStudentLocation().then();
 }
 
 /**
@@ -126,36 +126,27 @@ function selectStudent(studentId, studentFirstName, studentLastName) {
  */
 
 let map, directionsService, directionsRenderer, companyLocation, teacherLocation;
-async function geocodeAddress(address) {
-    const apiKey = 'AIzaSyCBS2OwTaG2rfupX3wA-DlTbsBEG9yDVKk';
-    const endpoint = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
 
-    try {
-        console.log(endpoint);
-        const response = await fetch(endpoint);
-        const data = await response.json();
-
-        if (data.status === 'OK') {
-            const location = data.results[0].geometry.location;
-
-            console.log(`Latitude: ${location.lat}, Longitude: ${location.lng}`);
-            return location;
-        }
-        else {
-            console.error(data.status);
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        return null;
+function geocodeAddress(address) {
+    geocoder = new google.maps.Geocoder();
+    if (geocoder) {
+        geocoder.geocode({
+            'address': address
+        }, function (results, status) {
+            if (status === google.maps.GeocoderStatus.OK) {
+                return results[0];
+            }
+        });
     }
 }
 
-
 async function getStudentLocation() {
     try {
-        teacherLocation = await geocodeAddress(teacherAddress);
-        companyLocation = await geocodeAddress(companyAddress);
-        initMap();
+        companyLocation = await geocodeAddress('Marseille');
+        teacherLocation = await geocodeAddress('Paris');
+        if (teacherLocation && companyLocation) {
+            initMap();
+        }
     } catch (error) {
         console.error(error);
     }
