@@ -73,6 +73,11 @@ $dashboardController = new \Blog\Controllers\Dashboard($layout,$dashboardView);
 $homepageView = new \Blog\Views\Homepage();
 $homepageController = new \Blog\Controllers\Homepage($layout,$homepageView);
 
+//Instanciation de classes nécessaire pour Intramu
+$errorMessage = '';
+$intramuView = new \Blog\Views\Intramu($errorMessage);
+$intramuController = new \Blog\Controllers\Intramu($layout,$intramuView);
+
 /**
  * Initialisation du routage des URI
  */
@@ -87,8 +92,8 @@ $getRoutes = [
     '/dashboard' => function() use ($dashboardController) {
         $dashboardController->show();
     },
-    '/intramu' => function () {
-        (new \Blog\Controllers\Intramu())->show();
+    '/intramu' => function () use ($intramuController) {
+        $intramuController->show();
     },
     '/hello' => function() { echo 'Hello World';
     },
@@ -101,12 +106,12 @@ $getRoutes = [
 ];
 
 $postRoutes = [
-    '/intramu' => function () {
-        (new \Blog\Controllers\Intramu())->show();
+    '/intramu' => function () use ($intramuController) {
+        $intramuController->show();
     },
     '/dashboard' => function ($dashboardController) {
         $dashboardController->show();
-}
+    }
 ];
 
 foreach ($getRoutes as $uri => $action) {
