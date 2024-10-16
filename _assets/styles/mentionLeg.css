@@ -1,0 +1,14 @@
+h3, h4{
+    color: #00558B;
+}
+
+
+main a:visited ,main a:link{
+    color: #00558B;
+}
+
+a:hover{
+    color: #E8CE7E;
+}
+
+
