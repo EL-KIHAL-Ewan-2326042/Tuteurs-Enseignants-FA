@@ -37,8 +37,20 @@ main table {
 }
 
 tbody {
-    max-height: 25rem;
-    overflow-y: scroll;
+    display: block;
+    height: 40rem;
+    overflow: auto;
+}
+
+thead, tbody tr {
+    display: table;
+    width: 100%;
+    height: 20%;
+    table-layout: fixed;
+}
+
+thead {
+    background-color: #246D9A80;
 }
 
 @media screen and (max-width: 640px) {
@@ -54,8 +66,16 @@ tbody {
     .card-panel {
         width: 80%;
     }
+}
 
+@media (max-width: 768px) {
     main table {
         font-size: 0.65rem;
+    }
+}
+
+@media (max-width: 450px) {
+    main table {
+        font-size: 0.55rem;
     }
 }

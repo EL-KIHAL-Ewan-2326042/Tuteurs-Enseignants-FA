@@ -12,9 +12,15 @@ class Homepage {
      */
     public function show(): void {
 
+        if (!isset($_SESSION['identifier'])) {
+            header('Location: /intramu');
+            return;
+        }
+
+        $db = Database::getInstance();
+        $homepageModel = new \Blog\Models\Homepage($db);
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $db = Database::getInstance();
-            $homepageModel = new \Blog\Models\Homepage($db);
 
             if (isset($_POST['action'])) {
                 if ($_POST['action'] === 'search' && isset($_POST['search'])) {
@@ -40,16 +46,11 @@ class Homepage {
             }
         }
 
-        if (!isset($_SESSION['identifier'])) {
-            header('Location: /intramu');
-            return;
-        }
-
         $title = "Accueil";
         $cssFilePath = '/_assets/styles/homepage.css';
         $jsFilePath = '/_assets/scripts/homepage.js';
 
-        $view = new \Blog\Views\Homepage();
+        $view = new \Blog\Views\Homepage($homepageModel);
 
         $layout = new Layout();
         $layout->renderTop($title, $cssFilePath);
