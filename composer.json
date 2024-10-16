@@ -1,0 +1,15 @@
+{
+    "autoload": {
+        "psr-4": {
+            "Blog\\": "modules/",
+            "Includes\\": "_assets/includes/"
+        }
+    },
+
+    "require-dev": {
+        "phpunit/phpunit": "10.2.4"
+    },
+  "require": {
+    "ext-pdo": "*"
+  }
+}
