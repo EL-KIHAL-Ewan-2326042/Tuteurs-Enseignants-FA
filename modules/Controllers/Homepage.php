@@ -62,7 +62,7 @@ class Homepage {
         $jsFilePath = '/_assets/scripts/homepage.js';
 
         $this->layout->renderTop($title, $cssFilePath);
-        $this->view->showView();
+        $this->view->showView($_SESSION['selected_student']['address']);
         $this->layout->renderBottom($jsFilePath);
     }
 }
