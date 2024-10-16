@@ -11,10 +11,12 @@ use Blog\Views\Intramu as IntramuView;
 class Intramu {
     private Layout $layout;
     private IntramuView $view;
+    private Database $db;
     /**
      * Constructeur de la classe Intramu (contrôleur)
      * @param Layout $layout Instance de la classe Layout
      * @param IntramuView $view Instance de la classe IntramuView
+     * @param Database $db Instance de la classe Database
      */
     public function __construct(Layout $layout, IntramuView $view) {
         $this->layout = $layout;
