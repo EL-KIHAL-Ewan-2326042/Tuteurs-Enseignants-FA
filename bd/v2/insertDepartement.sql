@@ -1,0 +1,1 @@
+INSERT INTO Departement (Nom_departement) VALUES ('IUT_INFO_AIX');

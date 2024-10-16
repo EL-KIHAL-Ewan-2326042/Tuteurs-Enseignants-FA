@@ -1,7 +1,7 @@
 <?php
 namespace Blog\Models;
 
-use Database;
+use Database;use PDOException;
 
 class Intramu {
 
@@ -36,6 +36,36 @@ class Intramu {
             }
         }
         return false;
+    }
+
+    public function getRole(string $identifier) {
+        if ($_SESSION['identifier'] !== $identifier) {
+            return false;
+        }
+
+        $db = $this->db;
+        $query = 'SELECT nom_role FROM utilisateur 
+                  JOIN a_role ON utilisateur.id_user = a_role.id_user
+                  WHERE a_role.id_user = :id_user';
+        $stmt = $db->getConn()->prepare($query);
+        $stmt->bindParam(':id_user', $_SESSION['identifier']);
+        $stmt->execute();
+
+        return $stmt->fetch($db->getConn()::FETCH_ASSOC);
+    }
+
+    public function fetchAll(string $identifier) {
+        if ($_SESSION['identifier'] !== $identifier) {
+            return false;
+        }
+
+        $db = $this->db;
+        $query = 'SELECT * FROM enseignant WHERE id_enseignant = :id_enseignant';
+        $stmt = $db->getConn()->prepare($query);
+        $stmt->bindParam(':id_enseignant', $_SESSION['identifier']);
+        $stmt->execute();
+
+        return $stmt->fetch($db->getConn()::FETCH_ASSOC);
     }
 }
 ?>

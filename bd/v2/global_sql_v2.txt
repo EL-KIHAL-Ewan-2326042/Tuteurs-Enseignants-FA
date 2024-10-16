@@ -1,0 +1,732 @@
+DROP TABLE IF EXISTS a_role;
+DROP TABLE IF EXISTS Etudie_a;
+DROP TABLE IF EXISTS Est_enseigne;
+DROP TABLE IF EXISTS Enseigne_a;
+DROP TABLE IF EXISTS Est_demande;
+DROP TABLE IF EXISTS Est_responsable;
+DROP TABLE IF EXISTS Citere_rapartiteur;
+DROP TABLE IF EXISTS Role;
+DROP TABLE IF EXISTS Utilisateur;
+DROP TABLE IF EXISTS Discipline;
+DROP TABLE IF EXISTS Departement;
+DROP TABLE IF EXISTS Stage;
+DROP TABLE IF EXISTS Eleve;
+DROP TABLE IF EXISTS Enseignant;
+
+
+CREATE TABLE Enseignant(
+   Id_enseignant VARCHAR(10),
+   Adresse VARCHAR(100) NOT NULL,
+   Nom_prof VARCHAR(50),
+   Prenom_prof VARCHAR(50),
+   Nombre_max_stagiaire INT,
+   PRIMARY KEY(Id_enseignant)
+);
+
+CREATE TABLE Eleve(
+   Num_eleve VARCHAR(10),
+   Nom_eleve VARCHAR(50) NOT NULL,
+   Prenom_eleve VARCHAR(50) NOT NULL,
+   Formation VARCHAR(50) NOT NULL,
+   Groupe VARCHAR(50) NOT NULL,
+   PRIMARY KEY(Num_eleve)
+);
+
+CREATE TABLE Stage(
+   Id_stage VARCHAR(50),
+   Nom_entreprise VARCHAR(50) NOT NULL,
+   Adresse_entreprise VARCHAR(100) NOT NULL,
+   Mots_cles VARCHAR(200),
+   Date_debut DATE NOT NULL,
+   Type VARCHAR(50),
+   Date_fin DATE NOT NULL,
+   Sujet_stage VARCHAR(150) NOT NULL,
+   Num_eleve VARCHAR(10) NOT NULL,
+   PRIMARY KEY(Id_stage),
+   FOREIGN KEY(Num_eleve) REFERENCES Eleve(Num_eleve)
+);
+
+CREATE TABLE Departement(
+   Nom_departement VARCHAR(50),
+   PRIMARY KEY(Nom_departement)
+);
+
+CREATE TABLE Discipline(
+   Nom_discipline VARCHAR(50),
+   PRIMARY KEY(Nom_discipline)
+);
+
+CREATE TABLE Utilisateur(
+   Id_user VARCHAR(10),
+   Mdp_user VARCHAR(100),
+   PRIMARY KEY(Id_user)
+);
+
+CREATE TABLE Role(
+   Nom_role VARCHAR(50),
+   PRIMARY KEY(Nom_role)
+);
+
+CREATE TABLE Citere_rapartiteur(
+   Nom_critere VARCHAR(50),
+   PRIMARY KEY(Nom_critere)
+);
+
+CREATE TABLE Est_responsable(
+   Id_enseignant VARCHAR(10),
+   Num_eleve VARCHAR(10),
+   Distance_minute INT NOT NULL,
+   Score_pertinence INT NOT NULL,
+   Date_debut_resp DATE NOT NULL,
+   Date_fin_resp DATE NOT NULL,
+   PRIMARY KEY(Id_enseignant, Num_eleve),
+   FOREIGN KEY(Id_enseignant) REFERENCES Enseignant(Id_enseignant),
+   FOREIGN KEY(Num_eleve) REFERENCES Eleve(Num_eleve)
+);
+
+CREATE TABLE Est_demande(
+   Id_enseignant VARCHAR(10),
+   Num_eleve VARCHAR(10),
+   PRIMARY KEY(Id_enseignant, Num_eleve),
+   FOREIGN KEY(Id_enseignant) REFERENCES Enseignant(Id_enseignant),
+   FOREIGN KEY(Num_eleve) REFERENCES Eleve(Num_eleve)
+);
+
+CREATE TABLE Enseigne_a(
+   Id_enseignant VARCHAR(10),
+   Nom_departement VARCHAR(50),
+   PRIMARY KEY(Id_enseignant, Nom_departement),
+   FOREIGN KEY(Id_enseignant) REFERENCES Enseignant(Id_enseignant),
+   FOREIGN KEY(Nom_departement) REFERENCES Departement(Nom_departement)
+);
+
+CREATE TABLE Est_enseigne(
+   Id_enseignant VARCHAR(10),
+   Nom_discipline VARCHAR(50),
+   PRIMARY KEY(Id_enseignant, Nom_discipline),
+   FOREIGN KEY(Id_enseignant) REFERENCES Enseignant(Id_enseignant),
+   FOREIGN KEY(Nom_discipline) REFERENCES Discipline(Nom_discipline)
+);
+
+CREATE TABLE a_role(
+   Id_user VARCHAR(10),
+   Nom_role VARCHAR(50),
+   PRIMARY KEY(Id_user, Nom_role),
+   FOREIGN KEY(Id_user) REFERENCES Utilisateur(Id_user),
+   FOREIGN KEY(Nom_role) REFERENCES Role(Nom_role)
+);
+
+CREATE TABLE Etudie_a(
+   Num_eleve VARCHAR(10),
+   Nom_departement VARCHAR(50),
+   PRIMARY KEY(Num_eleve, Nom_departement),
+   FOREIGN KEY(Num_eleve) REFERENCES Eleve(Num_eleve),
+   FOREIGN KEY(Nom_departement) REFERENCES Departement(Nom_departement)
+);
+
+
+
+
+
+INSERT INTO Role (Nom_role) VALUES ('Enseignant');
+INSERT INTO Role (Nom_role) VALUES ('Admin_dep');
+INSERT INTO Role (Nom_role) VALUES ('Super_admin');
+
+
+INSERT INTO Discipline (Nom_discipline) VALUES ('Droit_du_numerique');
+INSERT INTO Discipline (Nom_discipline) VALUES ('Architecture_des_ordinateurs');
+INSERT INTO Discipline (Nom_discipline) VALUES ('Gestion_de_projet');
+INSERT INTO Discipline (Nom_discipline) VALUES ('Communication');
+INSERT INTO Discipline (Nom_discipline) VALUES ('Gestion_de_BD');
+INSERT INTO Discipline (Nom_discipline) VALUES ('POO');
+
+
+INSERT INTO Departement (Nom_departement) VALUES ('IUT_INFO_AIX');
+
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('B22662146', '$2y$10$DNpKk6g77ufGETaD7A4FQua4ZrO9HwHl1J4qAwUgL1XwdpKPAXMRu');
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('R14328249', '$2y$10$TvPQhHaaEB1aTJ/FxvEo3O9GaFoIx2vOeZoyE5ahmKnhwSds6ZkiK');
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('G42185815', '$2y$10$WG0pe2kKpQiEP0xYbfH/GuT.pr9eBvmzwdOgP.QUr34308q./ZM6a');
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('R32281327', '$2y$10$V2YG65gZXZjCoPpxEpANtuFxtmyDPi9Qxe2D1rthC129SbeSuMG8.');
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('O75041198', '$2y$10$YVWvia1C.bm1EDV5u/4yI.kb6pkwJM0DcGNmvDQ64Qs71rCRB/7ye');
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('V73654623', '$2y$10$4GvAufarNFnQYAesWMWaPOcDNn3a1nZNuTy/OL/eoX9y7PpfbjEWO');
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('Z17235374', '$2y$10$ulYwK4OEEbxpqusPRlXZXum4royyp5FUC/rRIWpdtjBzgNqMSBjuC');
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('R84623671', '$2y$10$9.y/9zxukaG8yKJ7JOEK4OAXupNCZEnXGYCzXpd1au4coMY4j.iyC');
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('D78106598', '$2y$10$iv4ZU3DVYRY6QQnIIN7VVusjbCmIZkVk82fqedfcuX23m9qDvvP8a');
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('S85694088', '$2y$10$SwkcJmkKmvAGsuflQLacee6./yEHLpeHaqhnS3wUpSshKS/F11EMi');
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('Y68664772', '$2y$10$CqU0sotf9LnlAlhT.Dbd0eb3tlqIRA5aH/ETRtH5vqVTq/K/V4qhW');
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('Q66676064', '$2y$10$UFlM4t4JwnaRjVfWraUoo.XvaNk2LlIWR/jheXOFnfMa0QvMc/5fy');
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('B10648624', '$2y$10$tdF/FDwEhV3lZ6DKa.Vesu98kBdIfPLZOyPxifs9k8C5i8ByMsiie');
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('N26332417', '$2y$10$FdJ5wEicQxaX3d05.lLKS.P1Lujrdq/m79NGiXyGEc.KgMXt7Gnly');
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('F42358144', '$2y$10$J9Bl5I2xx33d9qrawJDqluIULAW/NUZ.fEccpgSKTvFQwXdPlr4q2');
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('I57332640', '$2y$10$G47oWpYdhJnN1OW.r1NYS.GdWq/jkrCMK2l5EhcUjs8Vk0HbRlw1O');
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('B51423637', '$2y$10$WAFksdTEA2UkFuzwc02OqemZ1bardfPqc4yZM6Osiq6hfQdjbkv7G');
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('C45328794', '$2y$10$d1t0mAYts3uDMQCHQ8InQeH.YZjDALitHrBxcyUqbVfi.ygbfn8dm');
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('H48344613', '$2y$10$DqXmxG1udGp82W05ShrQc.FVp81iW4IEIKSwosD6fNXM0zGF0uMGu');
+INSERT INTO Utilisateur (Id_user, Mdp_user) VALUES ('R41814241', '$2y$10$Px3DIuPvY5UCPv8201EAOORdbch5tUUVOS8DyYsFeMYAM6WJIHo4G');
+
+
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('B22662146', 'Lunel', 'Cases', 'Murphy', 3);
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('R14328249', 'Boulogne-sur-Mer', 'Alvarados', 'Christen', 2);
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('G42185815', 'Orléans', 'Kochs', 'Barry', 4);
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('R32281327', 'Cambrai', 'Dudleys', 'Wylie', 5);
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('O75041198', 'La Rochelle', 'Slaters', 'Colleen', 1);
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('V73654623', 'Vandoeuvre-lès-Nancy', 'Monroes', 'Linus', 2);
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('Z17235374', 'Le Puy-en-Velay', 'Fischers', 'Isabella', 4);
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('R84623671', 'Auxerre', 'Mccartys', 'Claudia', 3);
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('D78106598', 'Orléans', 'Castanedas', 'Beau', 5);
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('S85694088', 'Le Puy-en-Velay', 'Dorseys', 'Colby', 2);
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('Y68664772', 'Orléans', 'Cotes', 'Juliet', 4);
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('Q66676064', 'Saint-Lô', 'Mcphersons', 'Perry', 3);
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('B10648624', 'Beauvais', 'Haneys', 'Nolan', 5);
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('N26332417', 'Montpellier', 'Meyerss', 'Mufutau', 1);
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('F42358144', 'Lille', 'Aguirres', 'Halee', 2);
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('I57332640', 'La Rochelle', 'Emersons', 'Jenette', 4);
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('B51423637', 'Ajaccio', 'Cruzs', 'Hayden', 3);
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('C45328794', 'Sarreguemines', 'Lawrences', 'Brittany', 5);
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('H48344613', 'Chalon-sur-Saône', 'Irwins', 'Alisa', 2);
+INSERT INTO Enseignant (Id_enseignant, Adresse, Nom_prof, Prenom_prof, Nombre_max_stagiaire) VALUES ('R41814241', 'Fréjus', 'Miless', 'Aidan', 4);
+
+
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe) VALUES ('B82656814','Kerrs','Reese','BUT_INFO','B-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe) VALUES ('Y26472238','Mcculloughs','Jorden','BUT_INFO','B-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('B14955698','Cranes','Lester','BUT_INFO','A2-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('S47843997','Mendozas','Hiram','BUT_INFO','A2-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('D83154177','Burnss','Kaseem','BUT_INFO','B-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('D97153746','Hoppers','Ira','BUT_INFO','A2-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('O18468102','Yatess','Price','BUT_INFO','A2-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('Y51150412','Deleons','Quail','BUT_INFO','B-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('U84466434','Dudleys','Xyla','BUT_INFO','B-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('P43090772','Ruizs','Quail','BUT_INFO','A2-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('H47232920','Hortons','Murphy','BUT_INFO','A1-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('C35008429','Mosleys','Ferris','BUT_INFO','B-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('U64274615','Days','Stacey','BUT_INFO','A2-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('C67683232','Whitneys','Olivia','BUT_INFO','B-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('K71754824','Cantus','Ray','BUT_INFO','A2-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('S60552402','Grahams','Darryl','BUT_INFO','A2-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('R15640225','Masseys','Russell','BUT_INFO','B-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('Q49315273','Gilmores','Charde','BUT_INFO','A1-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('Q44691862','Deleons','Alexander','BUT_INFO','B-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('R27448536','Huffs','Teegan','BUT_INFO','A2-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('F03019685','Scotts','Quinn','BUT_INFO','A2-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('B13433362','Wests','Mollie','BUT_INFO','A2-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('C70741722','Cobbs','Marah','BUT_INFO','B-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('Z21392555','Baileys','Bree','BUT_INFO','A2-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('D06749632','Vazquezs','Caleb','BUT_INFO','B-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('S33551879','Mercados','Anika','BUT_INFO','A2-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('W36736211','Bradleys','Cally','BUT_INFO','B-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('R56931231','Humphreys','Mark','BUT_INFO','A2-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('C25155368','Fullers','Olga','BUT_INFO','A1-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('N65851779','Hatfields','Eleanor','BUT_INFO','A2-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('B61337468','Fredericks','Sylvester','BUT_INFO','B-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('X13183474','Potters','Odessa','BUT_INFO','A2-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('V88128782','Mathewss','Halla','BUT_INFO','A2-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('T37746743','Weavers','Dale','BUT_INFO','A1-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('B62553911','Alvarados','Phillip','BUT_INFO','B-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('L86338389','Sellerss','Xena','BUT_INFO','A1-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('I69456267','Velazquezs','Ignatius','BUT_INFO','A1-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('B40239339','Forbess','Alana','BUT_INFO','B-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('H14863692','Terrys','Autumn','BUT_INFO','A2-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('T74730069','Monroes','Jarrod','BUT_INFO','A2-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('P15063542','Lancasters','Lee','BUT_INFO','A2-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('M33382558','Macdonalds','Chaim','BUT_INFO','A2-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('U60431135','Mosss','Ian','BUT_INFO','B-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('M34783033','Rodgerss','Fulton','BUT_INFO','A1-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('O64863218','Pruitts','Kaitlin','BUT_INFO','B-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('V51296562','Burnss','Marny','BUT_INFO','A2-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('X62847517','Keiths','Edward','BUT_INFO','A2-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('J95442213','Strongs','Kieran','BUT_INFO','B-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('J17865151','Mcleans','Leonard','BUT_INFO','A1-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('E35962258','Navarros','Germane','BUT_INFO','A1-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('D93211952','Manns','Helen','BUT_INFO','A2-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('K11370670','Colemans','Nicholas','BUT_INFO','A2-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('L61872638','Mcdaniels','Hanna','BUT_INFO','A2-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('L10783379','Underwoods','Dalton','BUT_INFO','A2-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('K14815933','Burkes','Coby','BUT_INFO','B-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('L24677322','Pollards','Nehru','BUT_INFO','A2-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('C90023858','Dales','Chase','BUT_INFO','B-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('I40581417','Lyonss','Basia','BUT_INFO','B-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('U44158779','Lowerys','Juliet','BUT_INFO','B-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('U18373223','Lancasters','Hakeem','BUT_INFO','B-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('Q61178516','Patricks','Emerald','BUT_INFO','A2-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('X76731856','Pucketts','Buffy','BUT_INFO','B-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('T97220228','Keys','Calvin','BUT_INFO','B-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('G12824677','Dejesuss','Cameron','BUT_INFO','A1-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('V62147234','Averys','Matthew','BUT_INFO','A2-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('G23254613','Burriss','Chancellor','BUT_INFO','B-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('Q78353565','Wattss','Derek','BUT_INFO','A1-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('C86247631','Rochas','Brenden','BUT_INFO','A1-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('L27312376','Ruizs','Emerald','BUT_INFO','A1-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('P36571511','Bryants','Sylvester','BUT_INFO','A1-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('P08567312','Wilcoxs','Michael','BUT_INFO','A2-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('N63215569','Larsons','Haley','BUT_INFO','B-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('F97127967','Buckleys','Quon','BUT_INFO','B-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('M87422896','Kemps','Jin','BUT_INFO','B-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('E61327716','Palmers','Scott','BUT_INFO','A2-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('E89368273','Bankss','Dante','BUT_INFO','A2-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('B66537879','Pottss','Melanie','BUT_INFO','A2-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('R47255376','Hughess','Zane','BUT_INFO','A2-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('N38268628','Englishs','Urielle','BUT_INFO','B-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('O14132859','Sanderss','Ciaran','BUT_INFO','A2-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('J93570177','Harriss','Melanie','BUT_INFO','A2-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('M04459427','Pachecos','Lamar','BUT_INFO','A1-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('I07746111','Conways','Dennis','BUT_INFO','A2-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('P08664347','Sandovals','Grady','BUT_INFO','A1-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('X77543350','Tanners','Debra','BUT_INFO','B-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('L65151712','Brennans','Dacey','BUT_INFO','B-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('C69818318','Stevensons','Acton','BUT_INFO','A1-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('O53891790','Rodriquezs','Matthew','BUT_INFO','A1-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('P81524434','Stephensons','Sawyer','BUT_INFO','A1-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('V36767537','Prestons','Jemima','BUT_INFO','A2-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('X75842440','Prices','Alexis','BUT_INFO','A1-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('I89553120','Johnss','Felicia','BUT_INFO','A2-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('T73738333','Nunezs','Craig','BUT_INFO','A2-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('M82251745','Potters','Giacomo','BUT_INFO','B-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('R18634641','Gatess','Declan','BUT_INFO','B-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('P48118413','Stevensons','Evelyn','BUT_INFO','A2-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('U36743854','Schneiders','Britanni','BUT_INFO','A2-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('D75827545','Halls','Fatima','BUT_INFO','A1-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('D21640336','Christians','Lucian','BUT_INFO','B-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('M05227831','Todds','Kessie','BUT_INFO','B-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('V77414394','Barreras','Xenos','BUT_INFO','A1-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('Y67152665','Sniders','Lacey','BUT_INFO','B-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('E67351791','Hopkinss','Seth','BUT_INFO','A1-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('E27192381','Johnsons','Sylvia','BUT_INFO','B-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('F55522863','Mosess','Daryl','BUT_INFO','A1-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('F48626191','Batess','Donna','BUT_INFO','B-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('T91338854','Colons','Gareth','BUT_INFO','A1-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('L64795769','Richardsons','Kelsey','BUT_INFO','A2-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe)
+VALUES
+  ('M22758723','Pruitts','Medge','BUT_INFO','A1-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe) VALUES ('P04312112','Haleys','Ivan','BUT_INFO','B-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe) VALUES ('H22564973','Burtons','Garth','BUT_INFO','A2-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe) VALUES ('H51561432','Wallaces','Chase','BUT_INFO','A2-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe) VALUES ('E73591777','Cotes','Jennifer','BUT_INFO','A1-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe) VALUES ('X87316377','Mcclains','Yeo','BUT_INFO','B-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe) VALUES ('I47154666','Millss','Ian','BUT_INFO','A2-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe) VALUES ('N74214375','Mcclains','Kimberly','BUT_INFO','A1-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe) VALUES ('Y75773561','Fullers','Deirdre','BUT_INFO','A1-1_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe) VALUES ('N97352362','Nguyens','Francis','BUT_INFO','A2-2_An2');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe) VALUES ('O25165661','Wallss','Benjamin','BUT_INFO','A2-2_An3');
+INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe) VALUES ('J81275836','Thompsons','Daquan','BUT_INFO','A2-1_An2');
+
+
+INSERT INTO stage (id_stage, nom_entreprise, adresse_entreprise, mots_cles, date_debut, type, date_fin, sujet_stage, num_eleve) VALUES ('NV22432349XN','Qwant','Brive-la-Gaillarde','Architecture_des_ordinateurs Gestion_de_projet','2024-05-11','alternance','2024-11-22','Developpement_de_jeux_video','B82656814');
+INSERT INTO stage (id_stage, nom_entreprise, adresse_entreprise, mots_cles, date_debut, type, date_fin, sujet_stage, num_eleve) VALUES ('FO60456314IK','Unowhy','Albi','Architecture_des_ordinateurs Gestion_de_projet','2025-11-21','stage','2025-12-21','Systemes_informatiques_embarques','Y26472238');
+INSERT INTO stage (id_stage, nom_entreprise, adresse_entreprise, mots_cles, date_debut, type, date_fin, sujet_stage, num_eleve) VALUES ('VK73845811RP','Bull','Saint-Étienne-du-Rouvray','Gestion_de_projet Communication','2023-12-16','alternance','2024-06-21','Big_data_et_visualisation','B14955698');
+INSERT INTO stage (id_stage, nom_entreprise, adresse_entreprise, mots_cles, date_debut, type, date_fin, sujet_stage, num_eleve) VALUES ('YJ11570210YV','1Kubator','Agen','BD POO','2024-07-27','stage','2025-05-21','Developpement_de_solution_devops','S47843997');
+INSERT INTO stage (id_stage, nom_entreprise, adresse_entreprise, mots_cles, date_debut, type, date_fin, sujet_stage, num_eleve) VALUES ('AR75067342MC','Quantmetry','Perpignan','Gestion_de_projet Communication','2024-02-05','alternance','2025-04-03','Securite_informatique_et_tests_de_penetration','D83154177');
+INSERT INTO stage (id_stage, nom_entreprise, adresse_entreprise, mots_cles, date_debut, type, date_fin, sujet_stage, num_eleve) VALUES ('TM05282265IJ','OVH','Dreux','BD POO','2024-09-03','stage','2025-08-30','Developpement_de_solution_devops','D97153746');
+INSERT INTO stage (id_stage, nom_entreprise, adresse_entreprise, mots_cles, date_debut, type, date_fin, sujet_stage, num_eleve) VALUES ('IY68488176WZ','Studio_Azzurro','Évreux','Gestion_de_projet Communication','2024-04-17','alternance','2025-09-01','Developpement_de_plugins_PHP','O18468102');
+INSERT INTO stage (id_stage, nom_entreprise, adresse_entreprise, mots_cles, date_debut, type, date_fin, sujet_stage, num_eleve) VALUES ('UF46874472WY','Quantmetry','Angoulême','Architecture_des_ordinateurs Gestion_de_projet','2023-11-16','stage','2024-06-30','IoT_et_technologies_connectees','Y51150412');
+INSERT INTO stage (id_stage, nom_entreprise, adresse_entreprise, mots_cles, date_debut, type, date_fin, sujet_stage, num_eleve) VALUES ('LP97488083AF','Sopra_Steria','Paris','BD POO','2025-01-14','alternance','2025-12-07','Developpement_d_API_restful','U84466434');
+INSERT INTO stage (id_stage, nom_entreprise, adresse_entreprise, mots_cles, date_debut, type, date_fin, sujet_stage, num_eleve) VALUES ('SP88568031FA','1Kubator','La Rochelle','Gestion_de_projet Communication','2024-10-10','stage','2024-12-28','Cloud_computing_et_services_web','P43090772');
+INSERT INTO stage (id_stage, nom_entreprise, adresse_entreprise, mots_cles, date_debut, type, date_fin, sujet_stage, num_eleve) VALUES ('CL14652869OJ','Cdiscount','Albi','Architecture_des_ordinateurs Gestion_de_projet','2023-04-14','alternance','2025-01-23','Gestion_de_projet_Agile','H47232920'); 
+INSERT INTO stage (id_stage, nom_entreprise, adresse_entreprise, mots_cles, date_debut, type, date_fin, sujet_stage, num_eleve) VALUES ('TY09846524WT','iDems','Aulnay-sous-Bois','BD POO','2024-03-10','stage','2024-04-29','Intelligence_artificielle','C35008429');
+INSERT INTO stage (id_stage, nom_entreprise, adresse_entreprise, mots_cles, date_debut, type, date_fin, sujet_stage, num_eleve) VALUES ('NF72097659LK','Devoteam','Périgueux','Communication BD','2023-09-11','alternance','2025-06-21','Application_web_en_temps_reel','U64274615');
+INSERT INTO stage (id_stage, nom_entreprise, adresse_entreprise, mots_cles, date_debut, type, date_fin, sujet_stage, num_eleve) VALUES ('GE85072652YN','OVH','Villenave-d_Ornon','Gestion_de_projet Communication','2024-05-19','stage','2025-04-25','Developpement_de_plugins_PHP','C67683232');
+INSERT INTO stage (id_stage, nom_entreprise, adresse_entreprise, mots_cles, date_debut, type, date_fin, sujet_stage, num_eleve) VALUES ('CL81638837DL','GFI_Informatique','Dijon','Communication BD','2024-08-05','alternance','2023-12-08','Automatisation_de_processus_avec_RPA','K71754824');
+INSERT INTO stage (id_stage, nom_entreprise, adresse_entreprise, mots_cles, date_debut, type, date_fin, sujet_stage, num_eleve) VALUES ('JR69230420VL','Bull','Vandoeuvre-lès-Nancy','Architecture_des_ordinateurs Gestion_de_projet','2025-02-11','stage','2023-11-26','Developpement_d_API_restful','S60552402');
+INSERT INTO stage (id_stage, nom_entreprise, adresse_entreprise, mots_cles, date_debut, type, date_fin, sujet_stage, num_eleve) VALUES ('KL52238788XC','Linagora','Marcq-en-Baroeul','BD POO','2023-06-27','alternance','2023-08-19','E_commerce_et_marketing_numerique','R15640225');
+INSERT INTO stage (id_stage, nom_entreprise, adresse_entreprise, mots_cles, date_debut, type, date_fin, sujet_stage, num_eleve) VALUES ('ON05862680OQ','Talend','Brive-la-Gaillarde','BD POO','2024-08-19','stage','2025-01-01','Securite_informatique_et_tests_de_penetration','Q49315273');
+INSERT INTO stage (id_stage, nom_entreprise, adresse_entreprise, mots_cles, date_debut, type, date_fin, sujet_stage, num_eleve) VALUES ('UC62205346ZN','Talend','Colmar','BD POO','2024-09-28','alternance','2024-11-19','Cloud_computing_et_services_web','Q44691862');
+
+
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('B82656814', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('Y26472238', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('B14955698', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('S47843997', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('D83154177', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('D97153746', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('O18468102', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('Y51150412', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('U84466434', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('P43090772', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('H47232920', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('C35008429', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('U64274615', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('C67683232', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('K71754824', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('S60552402', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('R15640225', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('Q49315273', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('Q44691862', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('R27448536', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('F03019685', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('B13433362', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('C70741722', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('Z21392555', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('D06749632', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('S33551879', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('W36736211', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('R56931231', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('C25155368', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('N65851779', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('B61337468', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('X13183474', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('V88128782', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('T37746743', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('B62553911', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('L86338389', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('I69456267', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('B40239339', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('H14863692', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('T74730069', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('P15063542', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('M33382558', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('U60431135', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('M34783033', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('O64863218', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('V51296562', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('X62847517', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('J95442213', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('J17865151', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('E35962258', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('D93211952', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('K11370670', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('L61872638', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('L10783379', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('K14815933', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('L24677322', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('C90023858', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('I40581417', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('U44158779', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('U18373223', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('Q61178516', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('X76731856', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('T97220228', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('G12824677', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('V62147234', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('G23254613', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('Q78353565', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('C86247631', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('L27312376', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('P36571511', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('P08567312', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('N63215569', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('F97127967', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('M87422896', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('E61327716', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('E89368273', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('B66537879', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('R47255376', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('N38268628', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('O14132859', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('J93570177', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('M04459427', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('I07746111', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('P08664347', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('X77543350', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('L65151712', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('C69818318', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('O53891790', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('P81524434', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('V36767537', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('X75842440', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('I89553120', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('T73738333', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('M82251745', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('R18634641', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('P48118413', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('U36743854', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('D75827545', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('D21640336', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('M05227831', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('V77414394', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('Y67152665', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('E67351791', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('E27192381', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('F55522863', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('F48626191', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('T91338854', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('L64795769', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('M22758723', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('P04312112', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('H22564973', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('H51561432', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('E73591777', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('X87316377', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('I47154666', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('N74214375', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('Y75773561', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('N97352362', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('O25165661', 'IUT_INFO_AIX');
+INSERT INTO Etudie_a (Num_eleve, Nom_departement) VALUES ('J81275836', 'IUT_INFO_AIX');
+
+
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('B22662146', 'Enseignant');
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('R14328249', 'Enseignant');
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('G42185815', 'Enseignant');
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('R32281327', 'Enseignant');
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('O75041198', 'Enseignant');
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('V73654623', 'Enseignant');
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('Z17235374', 'Enseignant');
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('R84623671', 'Enseignant');
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('D78106598', 'Enseignant');
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('S85694088', 'Enseignant');
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('Y68664772', 'Enseignant');
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('Q66676064', 'Enseignant');
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('B10648624', 'Enseignant');
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('N26332417', 'Enseignant');
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('F42358144', 'Enseignant');
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('I57332640', 'Enseignant');
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('B51423637', 'Enseignant');
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('C45328794', 'Enseignant');
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('H48344613', 'Enseignant');
+INSERT INTO A_role (Id_user, Nom_role) VALUES ('R41814241', 'Enseignant');
+
+
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('R14328249', 'Droit_du_numerique');
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('G42185815', 'Gestion_de_projet');
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('R32281327', 'Communication');
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('O75041198', 'Gestion_de_projet');
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('V73654623', 'Gestion_de_BD');
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('Z17235374', 'Gestion_de_projet');
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('R84623671', 'Communication');
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('D78106598', 'Gestion_de_BD');
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('S85694088', 'Communication');
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('Y68664772', 'Droit_du_numerique');
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('Q66676064', 'Architecture_des_ordinateurs');
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('B10648624', 'Gestion_de_BD');
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('N26332417', 'Droit_du_numerique');
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('F42358144', 'Gestion_de_BD');
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('I57332640', 'Communication');
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('B51423637', 'Communication');
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('C45328794', 'Gestion_de_BD');
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('H48344613', 'POO');
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('R41814241', 'POO');
+INSERT INTO Est_enseigne (Id_enseignant, Nom_discipline) VALUES ('B22662146', 'Architecture_des_ordinateurs');
+
+
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('R14328249', 'IUT_INFO_AIX');
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('G42185815', 'IUT_INFO_AIX');
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('R32281327', 'IUT_INFO_AIX');
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('O75041198', 'IUT_INFO_AIX');
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('V73654623', 'IUT_INFO_AIX');
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('Z17235374', 'IUT_INFO_AIX');
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('R84623671', 'IUT_INFO_AIX');
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('D78106598', 'IUT_INFO_AIX');
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('S85694088', 'IUT_INFO_AIX');
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('Y68664772', 'IUT_INFO_AIX');
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('Q66676064', 'IUT_INFO_AIX');
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('B10648624', 'IUT_INFO_AIX');
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('N26332417', 'IUT_INFO_AIX');
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('F42358144', 'IUT_INFO_AIX');
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('I57332640', 'IUT_INFO_AIX');
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('B51423637', 'IUT_INFO_AIX');
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('C45328794', 'IUT_INFO_AIX');
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('H48344613', 'IUT_INFO_AIX');
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('R41814241', 'IUT_INFO_AIX');
+INSERT INTO Enseigne_a (Id_enseignant, Nom_departement) VALUES ('B22662146', 'IUT_INFO_AIX');

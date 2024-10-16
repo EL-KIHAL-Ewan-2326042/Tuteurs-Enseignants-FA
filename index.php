@@ -71,6 +71,9 @@ $getRoutes = [
     '/homepage' => function () {
         (new \Blog\Controllers\Homepage())->show();
     },
+    '/dashboard' => function() {
+        (new  \Blog\Controllers\Dashboard())->show();
+    },
     '/intramu' => function () {
         (new \Blog\Controllers\Intramu())->show();
     },
@@ -88,6 +91,9 @@ $postRoutes = [
     '/intramu' => function () {
         (new \Blog\Controllers\Intramu())->show();
     },
+    '/dashboard' => function () {
+        (new \Blog\Controllers\Dashboard())->show();
+}
 ];
 
 foreach ($getRoutes as $uri => $action) {
