@@ -118,44 +118,26 @@ function selectStudent(studentId, studentFirstName, studentLastName) {
     document.body.appendChild(form);
 
     form.submit();
-    getStudentLocation().then();
 }
 
 /**
  * Partie2: Map Intéractive
  */
 
-let map, directionsService, directionsRenderer, companyLocation, teacherLocation;
+let companyLocation, teacherLocation;
+let directionsService, directionsRenderer;
 
-function geocodeAddress(address) {
-    geocoder = new google.maps.Geocoder();
-    if (geocoder) {
-        geocoder.geocode({
-            'address': address
-        }, function (results, status) {
-            if (status === google.maps.GeocoderStatus.OK) {
-                return results[0];
-            }
-        });
-    }
-}
+/**
+ * Appellé lors du chargement de la homepage, initialise la map selon l'addresse du professeur et du stage
+ * @returns {Promise<void>}
+ */
+async function initMap() {
+    companyLocation = await geocodeAddress(companyAddress);
+    teacherLocation = await geocodeAddress(teacherAddress);
 
-async function getStudentLocation() {
-    try {
-        companyLocation = await geocodeAddress('Marseille');
-        teacherLocation = await geocodeAddress('Paris');
-        if (teacherLocation && companyLocation) {
-            initMap();
-        }
-    } catch (error) {
-        console.error(error);
-    }
-}
-
-function initMap() {
     const centerPoint = { lat: companyLocation.lat, lng: companyLocation.lng };
 
-    map = new google.maps.Map(document.getElementById("map"), {
+    const map = new google.maps.Map(document.getElementById("map"), {
         center: centerPoint,
         zoom: 13,
     });
@@ -165,9 +147,15 @@ function initMap() {
 
     directionsRenderer.setMap(map);
 
-    calculateDistance();
+    await calculateDistance({ lat: companyLocation.lat, lng: companyLocation.lng }, { lat: teacherLocation.lat, lng: teacherLocation.lng });
 }
 
+/**
+ * Calcul la durée du trajet entre un point d'origine et la destination
+ * @param origin
+ * @param destination
+ * @returns {Promise<unknown>}
+ */
 function getDistanceMatrix(origin, destination) {
     return new Promise((resolve, reject) => {
         const service = new google.maps.DistanceMatrixService();
@@ -189,6 +177,12 @@ function getDistanceMatrix(origin, destination) {
     });
 }
 
+/**
+ * Permet d'avoir la route la plus optimale, en voiture, entre le point d'origine et de destination
+ * @param origin
+ * @param destination
+ * @returns {Promise<unknown>}
+ */
 function getRoute(origin, destination) {
     return new Promise((resolve, reject) => {
         directionsService.route(
@@ -213,10 +207,31 @@ function getRoute(origin, destination) {
     });
 }
 
-async function calculateDistance() {
-    const origin = { lat: companyLocation.lat, lng: companyLocation.lng };
-    const destination = { lat: teacherLocation.lat, lng: teacherLocation.lng };
+/**
+ * Geocode une adresse en lattitude et longitude
+ * @param address
+ * @returns {Promise<unknown>}
+ */
+function geocodeAddress(address) {
+    const geocoder = new google.maps.Geocoder();
 
+    return new Promise((resolve, reject) => {
+        geocoder.geocode({ 'address': address }, (results, status) => {
+            if (status === 'OK') {
+                const location = results[0].geometry.location;
+                resolve({ lat: location.lat(), lng: location.lng() });
+            } else {
+                reject('Geocoding failed: ' + status);
+            }
+        });
+    });
+}
+
+/**
+ * Calcul la distance et la durée renvoyées pour la matrix
+ * @returns {Promise<void>}
+ */
+async function calculateDistance(origin, destination) {
     try {
         const response = await getDistanceMatrix(origin, destination);
         const result = response.rows[0].elements[0];

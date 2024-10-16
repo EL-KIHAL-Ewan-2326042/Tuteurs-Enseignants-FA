@@ -1,6 +1,5 @@
 <?php
 namespace Blog\Views;
-use Database;
 
 class Homepage {
 
@@ -10,19 +9,9 @@ class Homepage {
      * Vue de la homepage
      * @return void
      */
-    public function showView(): void {
+    public function showView($estStagiare) {
         ?>
         <main>
-            <script>
-                <?php
-                if (isset($_SESSION['selected_student'])) { ?>
-                let companyAddress = <?php echo json_encode($_SESSION['selected_student']['address']); ?>;
-                let teacherAddress = <?php echo json_encode($_SESSION['address']); ?>;
-                <?php
-                }
-                ?>
-            </script>
-
             <h3 class="center-align">Répartiteur de tuteurs enseignants</h3>
 
             <div class="card-panel white">
@@ -39,20 +28,26 @@ class Homepage {
                 ?>
             </div>
 
-            <div id="map"></div>
+            <?php
+            if ($estStagiare) { ?>
+                <div id="map"></div>
+            <?php } else { ?>
+                <p>Cet étudiant n'a pas de stage ...</p>
+            <?php  } ?>
+
             <div class="row"></div>
 
             <table class="highlight centered center-align">
                 <thead>
-                    <tr>
-                        <th>ELEVE</th>
-                        <th>HISTORIQUE</th>
-                        <th>POSITION</th>
-                        <th>SUJET</th>
-                        <th>ENTREPRISE</th>
-                        <th>TOTAL</th>
-                        <th>CHOIX</th>
-                    </tr>
+                <tr>
+                    <th>ELEVE</th>
+                    <th>HISTORIQUE</th>
+                    <th>POSITION</th>
+                    <th>SUJET</th>
+                    <th>ENTREPRISE</th>
+                    <th>TOTAL</th>
+                    <th>CHOIX</th>
+                </tr>
                 </thead>
                 <tbody>
                 <?
@@ -77,7 +72,10 @@ class Homepage {
                 </tbody>
             </table>
 
-            <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBS2OwTaG2rfupX3wA-DlTbsBEG9yDVKk&callback=initMap" async defer></script>
+            <script>
+                const teacherAddress = "<?php echo isset($_SESSION['address']) ? $_SESSION['address'] : 'Aix-En-Provence'; ?>";
+                const companyAddress = "<?php echo isset($_SESSION['selected_student']['address']) ? $_SESSION['selected_student']['address'] : 'Marseille'; ?>";
+            </script>
         </main>
         <?php
     }
