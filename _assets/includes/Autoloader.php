@@ -19,7 +19,7 @@ class Autoloader {
     static function autoload($class): void
     {
 
-        if($class === 'Blog\Includes\Database'){
+        if ($class === 'Includes\Database') {
             require '_assets/includes/Database.php';
             return;
         }

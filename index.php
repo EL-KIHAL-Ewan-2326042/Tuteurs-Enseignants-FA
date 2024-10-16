@@ -116,11 +116,11 @@ $postRoutes = [
     '/dashboard' => function ($dashboardController) {
         $dashboardController->show();
     },
-    '/' => function () {
-        (new \Blog\Controllers\Homepage())->show();
+    '/' => function () use ($homepageController){
+        $homepageController->show();
     },
-    '/homepage' => function () {
-        (new \Blog\Controllers\Homepage())->show();
+    '/homepage' => function () use ($homepageController){
+        $homepageController->show();
     },
 
 ];
