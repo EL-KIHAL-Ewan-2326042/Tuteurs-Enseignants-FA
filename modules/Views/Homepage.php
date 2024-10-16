@@ -10,6 +10,16 @@ class Homepage {
     public function showView() {
         ?>
         <main>
+            <script>
+                <?php
+                    if (isset($_SESSION['selected_student'])) { ?>
+                    let companyAddress = <?php echo json_encode($_SESSION['selected_student']['address']); ?>;
+                    let teacherAddress = <?php echo json_encode($_SESSION['address']); ?>;
+                <?php
+                }
+                ?>
+            </script>
+
             <h3 class="center-align">Répartiteur de tuteurs enseignants</h3>
 
             <div class="card-panel white">
@@ -28,16 +38,6 @@ class Homepage {
 
             <div id="map"></div>
             <div class="row"></div>
-
-            <script>
-                <?php
-                if (isset($_SESSION['selected_student'])) { ?>
-                    let companyAddress = <?php echo json_encode($_SESSION['selected_student']['address']); ?>;
-                    let teacherAddress = <?php echo json_encode($_SESSION['address']); ?>;
-                <?php
-                }
-                ?>
-            </script>
 
             <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBS2OwTaG2rfupX3wA-DlTbsBEG9yDVKk&callback=initMap" async defer></script>
         </main>
