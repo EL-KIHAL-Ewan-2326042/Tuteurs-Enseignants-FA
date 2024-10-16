@@ -23,6 +23,7 @@ use PHPUnit\Event\Test\NoticeTriggered;
 use PHPUnit\Event\Test\PhpDeprecationTriggered;
 use PHPUnit\Event\Test\PhpNoticeTriggered;
 use PHPUnit\Event\Test\PhpWarningTriggered;
+use PHPUnit\Event\Test\PrintedUnexpectedOutput;
 use PHPUnit\Event\Test\WarningTriggered;
 use PHPUnit\Event\TestRunner\ExecutionStarted;
 use PHPUnit\Event\UnknownSubscriberTypeException;
@@ -33,8 +34,6 @@ use PHPUnit\TextUI\Output\Printer;
 use PHPUnit\Util\Color;
 
 /**
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
- *
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
 final class ProgressPrinter
@@ -101,10 +100,6 @@ final class ProgressPrinter
 
     public function testTriggeredNotice(NoticeTriggered $event): void
     {
-        if ($event->ignoredByBaseline()) {
-            return;
-        }
-
         if ($this->source->restrictNotices() &&
             !(new SourceFilter)->includes($this->source, $event->file())) {
             return;
@@ -119,10 +114,6 @@ final class ProgressPrinter
 
     public function testTriggeredPhpNotice(PhpNoticeTriggered $event): void
     {
-        if ($event->ignoredByBaseline()) {
-            return;
-        }
-
         if ($this->source->restrictNotices() &&
             !(new SourceFilter)->includes($this->source, $event->file())) {
             return;
@@ -137,10 +128,6 @@ final class ProgressPrinter
 
     public function testTriggeredDeprecation(DeprecationTriggered $event): void
     {
-        if ($event->ignoredByBaseline() || $event->ignoredByTest()) {
-            return;
-        }
-
         if ($this->source->restrictDeprecations() &&
             !(new SourceFilter)->includes($this->source, $event->file())) {
             return;
@@ -155,10 +142,6 @@ final class ProgressPrinter
 
     public function testTriggeredPhpDeprecation(PhpDeprecationTriggered $event): void
     {
-        if ($event->ignoredByBaseline() || $event->ignoredByTest()) {
-            return;
-        }
-
         if ($this->source->restrictDeprecations() &&
             !(new SourceFilter)->includes($this->source, $event->file())) {
             return;
@@ -183,10 +166,6 @@ final class ProgressPrinter
 
     public function testTriggeredWarning(WarningTriggered $event): void
     {
-        if ($event->ignoredByBaseline()) {
-            return;
-        }
-
         if ($this->source->restrictWarnings() &&
             !(new SourceFilter)->includes($this->source, $event->file())) {
             return;
@@ -201,10 +180,6 @@ final class ProgressPrinter
 
     public function testTriggeredPhpWarning(PhpWarningTriggered $event): void
     {
-        if ($event->ignoredByBaseline()) {
-            return;
-        }
-
         if ($this->source->restrictWarnings() &&
             !(new SourceFilter)->includes($this->source, $event->file())) {
             return;
@@ -252,6 +227,11 @@ final class ProgressPrinter
         } else {
             $this->updateTestStatus(TestStatus::error());
         }
+    }
+
+    public function testPrintedOutput(PrintedUnexpectedOutput $event): void
+    {
+        $this->printer->print($event->output());
     }
 
     public function testFinished(): void
@@ -304,6 +284,7 @@ final class ProgressPrinter
             new TestTriggeredPhpunitWarningSubscriber($this),
             new TestTriggeredPhpWarningSubscriber($this),
             new TestTriggeredWarningSubscriber($this),
+            new TestPrintedUnexpectedOutputSubscriber($this),
         );
     }
 

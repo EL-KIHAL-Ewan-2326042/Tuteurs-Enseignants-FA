@@ -27,11 +27,11 @@ class HomepageTest extends TestCase{
         //attentes pour le mock ud layout
         $mockLayout->expects($this->once())
             ->method('renderTop')
-            ->with($this->equalTo('Accueil'),$this->equalTo(''));
+            ->with($this->equalTo('Accueil'),$this->equalTo('/_assets/styles/homepage.css'));
 
         $mockLayout->expects($this->once())
             ->method('renderBottom')
-            ->with($this->equalTo(''));
+            ->with($this->equalTo('/_assets/scripts/homepage.js'));
 
         //attentes pour le mock de la vue
         $mockView->expects($this->once())
@@ -39,6 +39,9 @@ class HomepageTest extends TestCase{
 
         //instanciation des mocks
         $controller = new Homepage($mockLayout, $mockView);
+
+        //simulation de session
+        $_SESSION['identifier'] = 'test_user';
 
         //exécution
         $controller->show();

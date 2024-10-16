@@ -10,8 +10,6 @@
 namespace PHPUnit\Event;
 
 /**
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
- *
  * @internal This interface is not covered by the backward compatibility promise for PHPUnit
  */
 interface SubscribableDispatcher extends Dispatcher
@@ -22,4 +20,9 @@ interface SubscribableDispatcher extends Dispatcher
     public function registerSubscriber(Subscriber $subscriber): void;
 
     public function registerTracer(Tracer\Tracer $tracer): void;
+
+    /**
+     * @psalm-param class-string $className
+     */
+    public function hasSubscriberFor(string $className): bool;
 }
