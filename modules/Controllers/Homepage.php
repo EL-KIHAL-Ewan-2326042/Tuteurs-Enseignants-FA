@@ -12,11 +12,6 @@ class Homepage {
      */
     public function show(): void {
 
-        if (!isset($_SESSION['identifier'])) {
-            header('Location: /intramu');
-            return;
-        }
-
         $db = Database::getInstance();
         $homepageModel = new \Blog\Models\Homepage($db);
 
@@ -46,6 +41,11 @@ class Homepage {
             }
         }
 
+        if (!isset($_SESSION['identifier'])) {
+            header('Location: /intramu');
+            return;
+        }
+
         $title = "Accueil";
         $cssFilePath = '/_assets/styles/homepage.css';
         $jsFilePath = '/_assets/scripts/homepage.js';
@@ -54,7 +54,7 @@ class Homepage {
 
         $layout = new Layout();
         $layout->renderTop($title, $cssFilePath);
-        $view->showView($_SESSION['selected_student']['address']);
+        $view->showView();
         $layout->renderBottom($jsFilePath);
     }
 }
