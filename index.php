@@ -69,14 +69,18 @@ $aboutUsController = new \Blog\Controllers\AboutUs($layout,$aboutUsView);
 $dashboardView = new \Blog\Views\Dashboard();
 $dashboardController = new \Blog\Controllers\Dashboard($layout,$dashboardView);
 
-//Instanciation de classes nécessaire pour Homepage
+//Instanciation de classes nécessaires pour Homepage
 $homepageView = new \Blog\Views\Homepage();
 $homepageController = new \Blog\Controllers\Homepage($layout,$homepageView);
 
-//Instanciation de classes nécessaire pour Intramu
+//Instanciation de classes nécessaires pour Intramu
 $errorMessage = '';
 $intramuView = new \Blog\Views\Intramu($errorMessage);
 $intramuController = new \Blog\Controllers\Intramu($layout,$intramuView);
+
+//Instanciation de classe nécessaires pour MentionLeg
+$mentionLegView = new \Blog\Views\MentionLeg();
+$mentionLegController = new \Blog\Controllers\MentionLeg($layout,$mentionLegView);
 
 /**
  * Initialisation du routage des URI
@@ -100,8 +104,8 @@ $getRoutes = [
     '/aboutus' => function () use ($aboutUsController){
         $aboutUsController->show();
     },
-    '/mentions-legales' => function () {
-        (new \Blog\Controllers\MentionLeg())->show();
+    '/mentions-legales' => function () use ($mentionLegController) {
+        $mentionLegController->show();
     }
 ];
 
