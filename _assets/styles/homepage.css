@@ -2,15 +2,19 @@ main {
     flex-direction: column;
 }
 
-main .row {
-    display: table-row;
-    width: 85rem;
-    border: solid 1px black;
-    margin-bottom: -1px;
+main table {
+    width: 85%;
+    border: solid #e0e0e0 1px;
 }
 
-main .col {
-    display: table-cell;
-    overflow: auto;
-    text-align: center;
+tbody {
+    max-height: 25rem;
+    overflow-y: scroll;
+}
+
+/* Responsive sur téléphone*/
+@media (max-width: 768px) {
+    main table {
+        font-size: 0.65rem;
+    }
 }
