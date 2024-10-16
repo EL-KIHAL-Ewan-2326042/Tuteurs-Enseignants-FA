@@ -8,7 +8,7 @@ class Homepage {
     private Layout $layout;
     private HomepageView $view;
     /**
-     * Constructeur de la classe Homepage (controller))
+     * Constructeur de la classe Homepage (controller)
      * @param Layout $layout Instance de la classe Layout
      * @param HomepageView $view Instance de la classe HomepageView
      */
