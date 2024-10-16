@@ -35,6 +35,19 @@ class Homepage {
 
             <div class="row"></div>
 
+            <form class="selection" action="#">
+                <?
+                foreach($this->model->getDepEnseignant($_SESSION['identifier']) as $dep) {
+                    ?>
+                    <label>
+                        <input type="checkbox" class="filled-in" />
+                        <span><? echo $dep['nom_departement'] ?></span>
+                    </label>
+                    <?
+                }
+                ?>
+            </form>
+
             <table class="highlight centered center-align">
                 <thead>
                 <tr>

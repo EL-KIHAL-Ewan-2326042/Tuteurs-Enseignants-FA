@@ -31,6 +31,12 @@ main a:hover {
     color: var(--main-color);
 }
 
+.selection {
+    display: flex;
+    width: 85%;
+    justify-content: space-around;
+}
+
 main table {
     width: 85%;
     border: solid #e0e0e0 1px;
