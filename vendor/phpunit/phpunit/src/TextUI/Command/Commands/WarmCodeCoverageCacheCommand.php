@@ -9,7 +9,6 @@
  */
 namespace PHPUnit\TextUI\Command;
 
-use const PHP_EOL;
 use function printf;
 use PHPUnit\TextUI\Configuration\CodeCoverageFilterRegistry;
 use PHPUnit\TextUI\Configuration\Configuration;
@@ -19,11 +18,7 @@ use SebastianBergmann\Timer\NoActiveTimerException;
 use SebastianBergmann\Timer\Timer;
 
 /**
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
- *
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
- *
- * @codeCoverageIgnore
  */
 final class WarmCodeCoverageCacheCommand implements Command
 {
@@ -73,7 +68,7 @@ final class WarmCodeCoverageCacheCommand implements Command
         printf(
             '[%s]%s',
             $timer->stop()->asString(),
-            PHP_EOL,
+            \PHP_EOL,
         );
 
         return Result::from();

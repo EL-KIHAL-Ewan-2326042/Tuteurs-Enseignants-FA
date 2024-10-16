@@ -115,15 +115,9 @@ final class IsType extends Constraint
         'callable'          => true,
         'iterable'          => true,
     ];
-
-    /**
-     * @psalm-var 'array'|'boolean'|'bool'|'double'|'float'|'integer'|'int'|'null'|'numeric'|'object'|'real'|'resource'|'resource (closed)'|'string'|'scalar'|'callable'|'iterable'
-     */
     private readonly string $type;
 
     /**
-     * @psalm-param 'array'|'boolean'|'bool'|'double'|'float'|'integer'|'int'|'null'|'numeric'|'object'|'real'|'resource'|'resource (closed)'|'string'|'scalar'|'callable'|'iterable' $type
-     *
      * @throws UnknownTypeException
      */
     public function __construct(string $type)

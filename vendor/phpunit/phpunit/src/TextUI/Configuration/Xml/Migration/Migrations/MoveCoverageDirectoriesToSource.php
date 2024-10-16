@@ -15,8 +15,6 @@ use DOMElement;
 use DOMXPath;
 
 /**
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise for PHPUnit
- *
  * @internal This class is not covered by the backward compatibility promise for PHPUnit
  */
 final class MoveCoverageDirectoriesToSource implements Migration
@@ -52,13 +50,5 @@ final class MoveCoverageDirectoriesToSource implements Migration
                 $source->appendChild($node);
             }
         }
-
-        if ($coverage->childElementCount !== 0) {
-            return;
-        }
-
-        assert($coverage->parentNode !== null);
-
-        $coverage->parentNode->removeChild($coverage);
     }
 }
