@@ -53,7 +53,7 @@ class Homepage {
 
         $layout = new Layout();
         $layout->renderTop($title, $cssFilePath);
-        $view->showView();
+        $view->showView($_SESSION['selected_student']['address']);
         $layout->renderBottom($jsFilePath);
     }
 }
