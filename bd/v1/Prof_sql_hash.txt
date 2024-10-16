@@ -1,0 +1,60 @@
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('B22662146','Lunel','','Cases','Murphy','$2y$10$DNpKk6g77ufGETaD7A4FQua4ZrO9HwHl1J4qAwUgL1XwdpKPAXMRu');
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('R14328249','Boulogne-sur-Mer','Droit_du_numerique','Alvarados','Christen','$2y$10$TvPQhHaaEB1aTJ/FxvEo3O9GaFoIx2vOeZoyE5ahmKnhwSds6ZkiK');
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('G42185815','Orléans','Gestion_de_projet','Kochs','Barry','$2y$10$WG0pe2kKpQiEP0xYbfH/GuT.pr9eBvmzwdOgP.QUr34308q./ZM6a');
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('R32281327','Cambrai','Communication','Dudleys','Wylie','$2y$10$V2YG65gZXZjCoPpxEpANtuFxtmyDPi9Qxe2D1rthC129SbeSuMG8.');
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('O75041198','La Rochelle','Gestion_de_projet','Slaters','Colleen','$2y$10$YVWvia1C.bm1EDV5u/4yI.kb6pkwJM0DcGNmvDQ64Qs71rCRB/7ye');
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('V73654623','Vandoeuvre-lès-Nancy','BD','Monroes','Linus','$2y$10$4GvAufarNFnQYAesWMWaPOcDNn3a1nZNuTy/OL/eoX9y7PpfbjEWO');
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('Z17235374','Le Puy-en-Velay','Gestion_de_projet','Fischers','Isabella','$2y$10$ulYwK4OEEbxpqusPRlXZXum4royyp5FUC/rRIWpdtjBzgNqMSBjuC');
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('R84623671','Auxerre','Communication','Mccartys','Claudia','$2y$10$9.y/9zxukaG8yKJ7JOEK4OAXupNCZEnXGYCzXpd1au4coMY4j.iyC');
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('D78106598','Orléans','BD','Castanedas','Beau','$2y$10$iv4ZU3DVYRY6QQnIIN7VVusjbCmIZkVk82fqedfcuX23m9qDvvP8a');
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('S85694088','Le Puy-en-Velay','Communication','Dorseys','Colby','$2y$10$SwkcJmkKmvAGsuflQLacee6./yEHLpeHaqhnS3wUpSshKS/F11EMi');
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('Y68664772','Orléans','Droit_du_numerique','Cotes','Juliet','$2y$10$CqU0sotf9LnlAlhT.Dbd0eb3tlqIRA5aH/ETRtH5vqVTq/K/V4qhW');
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('Q66676064','Saint-Lô','Architecture_des_ordinateurs','Mcphersons','Perry','$2y$10$UFlM4t4JwnaRjVfWraUoo.XvaNk2LlIWR/jheXOFnfMa0QvMc/5fy');
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('B10648624','Beauvais','BD','Haneys','Nolan','$2y$10$tdF/FDwEhV3lZ6DKa.Vesu98kBdIfPLZOyPxifs9k8C5i8ByMsiie');
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('N26332417','Montpellier','Droit_du_numerique','Meyerss','Mufutau','$2y$10$FdJ5wEicQxaX3d05.lLKS.P1Lujrdq/m79NGiXyGEc.KgMXt7Gnly');
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('F42358144','Lille','BD','Aguirres','Halee','$2y$10$J9Bl5I2xx33d9qrawJDqluIULAW/NUZ.fEccpgSKTvFQwXdPlr4q2');
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('I57332640','La Rochelle','Communication','Emersons','Jenette','$2y$10$G47oWpYdhJnN1OW.r1NYS.GdWq/jkrCMK2l5EhcUjs8Vk0HbRlw1O');
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('B51423637','Ajaccio','Communication','Cruzs','Hayden','$2y$10$WAFksdTEA2UkFuzwc02OqemZ1bardfPqc4yZM6Osiq6hfQdjbkv7G');
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('C45328794','Sarreguemines','BD','Lawrences','Brittany','$2y$10$d1t0mAYts3uDMQCHQ8InQeH.YZjDALitHrBxcyUqbVfi.ygbfn8dm');
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('H48344613','Chalon-sur-Saône','POO','Irwins','Alisa','$2y$10$DqXmxG1udGp82W05ShrQc.FVp81iW4IEIKSwosD6fNXM0zGF0uMGu');
+INSERT INTO Enseignant (id_enseignant,adresse,discipline,nom_prof,prenom_prof,mdp_enseignant)
+VALUES
+  ('R41814241','Fréjus','POO','Miless','Aidan','$2y$10$Px3DIuPvY5UCPv8201EAOORdbch5tUUVOS8DyYsFeMYAM6WJIHo4G');

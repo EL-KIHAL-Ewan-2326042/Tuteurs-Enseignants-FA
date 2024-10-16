@@ -28,22 +28,16 @@ class Intramu {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['identifier']) && isset($_POST['password'])) {
             $identifierLogs = $_POST['identifier'];
             $passwordLogs = $_POST['password'];
-
-            // Gestion Admin(temporaire)
-            if ($identifierLogs == 'superAdmin' && $passwordLogs == '8exs7JcEpGVfsI') {
-                $_SESSION['identifier'] = $identifierLogs;
-                $_SESSION['role'] = 'admin';
-                header('Location: /homepage');
-                exit();
-            }
-
             $db = Database::getInstance();
 
             $loginModel = new \Blog\Models\Intramu($db);
 
             if ($loginModel->doLogsExist($identifierLogs, $passwordLogs)) {
                 $_SESSION['identifier'] = $identifierLogs;
-                $_SESSION['role'] = 'teacher';
+
+                $row = $loginModel->fetchAll($identifierLogs);
+                $_SESSION['role'] = $loginModel->getRole($identifierLogs);
+                $_SESSION['address'] = $row['adresse'];
                 header('Location: /homepage');
                 exit();
             } else {
