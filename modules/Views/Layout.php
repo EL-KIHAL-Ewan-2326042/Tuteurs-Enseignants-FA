@@ -16,6 +16,7 @@ class Layout {
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <title><?php echo $title; ?></title>
+                <link rel="icon" type="image/x-icon" href="/favicon.ico">
                 <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
                 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
                 <link href="/_assets/styles/layout.css" rel="stylesheet">
@@ -34,6 +35,8 @@ class Layout {
                 </a>
                 <ul class="right hide-on-med-and-down">
                     <li><a href="/homepage">ACCUEIL</a></li>
+                    <?php if (isset($_SESSION['role']) && $_SESSION['role']=='admin') { ?>
+                        <li><a href="/dashboard"> <?php echo 'DASHBOARD'; ?> </a></li> <?php }?>
                     <li><a href="/intramu"><?php
                             if (isset($_SESSION['identifier'])) {
                                 echo 'DECONNEXION';
@@ -48,6 +51,8 @@ class Layout {
         </nav>
         <ul class="sidenav" id="mobile-demo">
             <li><a href="/homepage">ACCUEIL</a></li>
+            <?php if (isset($_SESSION['role']) && $_SESSION['role']=='admin') { ?>
+                <li><a href="/dashboard"> <?php echo 'DASHBOARD'; ?> </a></li> <?php }?>
             <li><a href="/intramu"><?php
                     if (isset($_SESSION['identifier'])) {
                         echo 'DECONNEXION';

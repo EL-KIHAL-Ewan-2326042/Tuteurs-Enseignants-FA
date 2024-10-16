@@ -50,7 +50,7 @@ class Router {
                 return;
             }
         }
-        throw new RouterException("Erreur 404 ...");
+        throw new RouterException("Erreur 404");
     }
 }
 
@@ -71,6 +71,9 @@ $getRoutes = [
     '/homepage' => function () {
         (new \Blog\Controllers\Homepage())->show();
     },
+    '/dashboard' => function() {
+        (new  \Blog\Controllers\Dashboard())->show();
+    },
     '/intramu' => function () {
         (new \Blog\Controllers\Intramu())->show();
     },
@@ -78,6 +81,9 @@ $getRoutes = [
     },
     '/aboutus' => function () {
         (new \Blog\Controllers\AboutUs())->show();
+    },
+    '/mentions-legales' => function () {
+        (new \Blog\Controllers\MentionLeg())->show();
     }
 ];
 
@@ -85,12 +91,9 @@ $postRoutes = [
     '/intramu' => function () {
         (new \Blog\Controllers\Intramu())->show();
     },
-    '/homepage' => function () {
-        (new \Blog\Controllers\Homepage())->show();
-    },
-    '/' => function () {
-        (new \Blog\Controllers\Homepage())->show();
-    }
+    '/dashboard' => function () {
+        (new \Blog\Controllers\Dashboard())->show();
+}
 ];
 
 foreach ($getRoutes as $uri => $action) {
