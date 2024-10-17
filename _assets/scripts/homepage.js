@@ -76,16 +76,16 @@ function displayResults(data) {
         const li = document.createElement('li');
         const a = document.createElement('a');
         a.href = '#';
-        if (student.nom_entreprise) {
-            a.textContent = `${student.nom_entreprise}: ${student.num_eleve} - ${student.nom_eleve} ${student.prenom_eleve}`;
+        if (student.company_name) {
+            a.textContent = `${student.company_name}: ${student.student_number} - ${student.student_name} ${student.student_firstname}`;
         }
         else {
-            a.textContent = `${student.num_eleve} - ${student.nom_eleve} ${student.prenom_eleve}`;
+            a.textContent = `${student.student_number} - ${student.student_name} ${student.student_firstname}`;
         }
         a.classList.add('left-align');
         a.addEventListener('click', function(event) {
             event.preventDefault();
-            selectStudent(student.num_eleve, student.nom_eleve, student.prenom_eleve);
+            selectStudent(student.student_number, student.student_name, student.student_firstname);
         });
         li.appendChild(a);
         ul.appendChild(li);
@@ -147,18 +147,68 @@ let directionsService, directionsRenderer;
  * @returns {Promise<void>}
  */
 async function initMap() {
+    if (!companyAddress || !teacherAddress) {
+        return;
+    }
+
     companyLocation = await geocodeAddress(companyAddress);
     teacherLocation = await geocodeAddress(teacherAddress);
 
-    const centerPoint = { lat: companyLocation.lat, lng: companyLocation.lng };
+    const centerPoint = { lat: teacherLocation.lat, lng: teacherLocation.lng };
 
     const map = new google.maps.Map(document.getElementById("map"), {
         center: centerPoint,
         zoom: 13,
+        mapId: "HOMEPAGE"
     });
 
     directionsService = new google.maps.DirectionsService();
-    directionsRenderer = new google.maps.DirectionsRenderer();
+    directionsRenderer = new google.maps.DirectionsRenderer({
+        suppressMarkers: true
+    });
+
+
+    const companyMarker = new google.maps.marker.AdvancedMarkerElement ({
+        map,
+        position: companyLocation,
+        title: "Company",
+        content: document.createElement('div'),
+    });
+
+    const teacherMarker = new google.maps.marker.AdvancedMarkerElement ({
+        map,
+        position: teacherLocation,
+        title: "Teacher",
+        content: document.createElement('div'),
+    });
+
+    companyMarker.content.innerHTML = `
+    <div style="
+        background-color: white;
+        padding: 5px;
+        border: 1px solid black;
+        border-radius: 4px;
+        font-size: 16px;
+        color: black;
+        text-align: center;
+    ">
+        Entreprise
+    </div>
+    `;
+
+    teacherMarker.content.innerHTML = `
+    <div style="
+        background-color: white;
+        padding: 5px;
+        border: 1px solid black;
+        border-radius: 4px;
+        font-size: 16px;
+        color: black;
+        text-align: center;
+    ">
+        Domicile
+    </div>
+    `;
 
     directionsRenderer.setMap(map);
 
@@ -215,7 +265,12 @@ function getRoute(origin, destination) {
                     directionsRenderer.setDirections(response);
                     resolve(response);
                 } else {
-                    reject('Erreur lors du calcul des routes: ' + status);
+                    if (status === 'UNKNOWN_ERROR') {
+                        reject('Distance trop loin pour être calculée');
+                    }
+                    else {
+                        reject('Erreur lors du calcul des routes: ' + status);
+                    }
                 }
             }
         );

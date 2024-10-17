@@ -63,52 +63,34 @@ session_start();
 /**
  * Initialisation du routage des URI
  */
-$router = new Router(strtok($_SERVER["REQUEST_URI"], '?'));
-$getRoutes = [
-    '/' => function () {
-        (new \Blog\Controllers\Homepage())->show();
-    },
-    '/homepage' => function () {
-        (new \Blog\Controllers\Homepage())->show();
-    },
-    '/dashboard' => function() {
-        (new  \Blog\Controllers\Dashboard())->show();
-    },
-    '/intramu' => function () {
-        (new \Blog\Controllers\Intramu())->show();
-    },
-    '/hello' => function() { echo 'Hello World';
-    },
-    '/aboutus' => function () {
-        (new \Blog\Controllers\AboutUs())->show();
-    },
-    '/mentions-legales' => function () {
-        (new \Blog\Controllers\MentionLeg())->show();
+$uri = strtok($_SERVER['REQUEST_URI'], '?');
+$router = new Router($uri);
+
+function createAction($uri): Closure {
+    if ($uri === '/') {
+        $uri = 'homepage';
     }
-];
+    $uri = str_replace('-', '', $uri);
 
-$postRoutes = [
-    '/intramu' => function () {
-        (new \Blog\Controllers\Intramu())->show();
-    },
-    '/dashboard' => function () {
-        (new \Blog\Controllers\Dashboard())->show();
-    },
-    '/' => function () {
-        (new \Blog\Controllers\Homepage())->show();
-    },
-    '/homepage' => function () {
-        (new \Blog\Controllers\Homepage())->show();
-    },
-];
+    $controllerName = ucfirst(ltrim($uri, '/'));
 
-foreach ($getRoutes as $uri => $action) {
-    $router->get('/' . $uri, $action);
+    $className = "Blog\\Controllers\\$controllerName";
+
+    if (class_exists($className)) {
+        return function() use ($className) {
+            (new $className())->show();
+        };
+    } else {
+        return function() {
+            echo "Erreur 404 ...";
+        };
+    }
 }
 
-foreach ($postRoutes as $uri => $action) {
-    $router->post('/' . $uri, $action);
-}
+$action = createAction($uri);
+$router->get($uri, $action);
+$router->post($uri, $action);
+
 try {
     $router->run();
 } catch (RouterException $e) {
