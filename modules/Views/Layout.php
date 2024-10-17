@@ -91,7 +91,7 @@ class Layout {
         $currentUri = $_SERVER['REQUEST_URI'];
 
         if ($currentUri === '/' || $currentUri === '/homepage') {
-            echo '<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBS2OwTaG2rfupX3wA-DlTbsBEG9yDVKk&callback=initMap" async defer></script>';
+            echo '<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBS2OwTaG2rfupX3wA-DlTbsBEG9yDVKk&loading=async&libraries=marker&callback=initMap" async defer></script>';
         }
         ?>
         <script src="/_assets/scripts/layout.js"></script>

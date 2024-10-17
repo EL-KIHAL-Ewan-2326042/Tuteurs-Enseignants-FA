@@ -7,7 +7,9 @@ use Database;
 class Homepage {
 
     /**
-     * Controlleur de la homepage
+     * Controlleur de la homepage.
+     * Elle gere des requetes post, via le model, pour recuperer des informations
+     * tels que les resultats de recherche ou les informations de l'etudiant selectione
      * @return void
      */
     public function show(): void {
@@ -53,7 +55,7 @@ class Homepage {
 
         $layout = new Layout();
         $layout->renderTop($title, $cssFilePath);
-        $view->showView($_SESSION['selected_student']['address']);
+        $view->showView();
         $layout->renderBottom($jsFilePath);
     }
 }
