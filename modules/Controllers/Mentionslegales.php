@@ -1,21 +1,21 @@
 <?php
+
 namespace Blog\Controllers;
 
 use Blog\Views\Layout;
 
-class AboutUs {
+class Mentionslegales {
 
     /**
-     * Controlleur de la page a propos
+     * Controlleur de la page mentions légales
      * @return void
      */
     public function show(): void {
-
-        $title = "A Propos";
-        $cssFilePath = '';
+        $title = "Mentions légales";
+        $cssFilePath = '_assets/styles/mentionLeg.css';
         $jsFilePath = '';
 
-        $view = new \Blog\Views\AboutUs();
+        $view = new \Blog\Views\Mentionslegales();
 
         $layout = new Layout();
         $layout->renderTop($title, $cssFilePath);

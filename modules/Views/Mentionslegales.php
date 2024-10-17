@@ -2,7 +2,7 @@
 
 namespace Blog\Views;
 
-class MentionLeg{
+class Mentionslegales{
     /**
      * Vue de la page mentions légales
      */
