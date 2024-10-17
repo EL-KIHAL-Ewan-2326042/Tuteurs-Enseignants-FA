@@ -7,7 +7,7 @@ class Homepage {
      * Vue de la homepage
      * @return void
      */
-    public function showView($estStagiare) {
+    public function showView() {
         ?>
         <main>
             <h3 class="center-align">Répartiteur de tuteurs enseignants</h3>
@@ -17,8 +17,8 @@ class Homepage {
                     <label for="searchType">Type de recherche:</label>
                     <div class="input-field">
                         <select id="searchType" name="searchType">
-                            <option value="numeroEtudiant" selected>Numéro Etudiant</option>
-                            <option value="nomEtPrenom">Nom et Prénom</option>
+                            <option value="studentNumber" selected>Numéro Etudiant</option>
+                            <option value="name">Nom et Prénom</option>
                             <option value="company">Entreprise</option>
                         </select>
                     </div>
@@ -29,19 +29,22 @@ class Homepage {
                 </form>
             </div>
             <div class="center">
-                <?php if (isset($_SESSION['selected_student'])) {
+                <?php
+                if (isset($_SESSION['selected_student']) && isset($_SESSION['selected_student']['firstName']) && isset($_SESSION['selected_student']['lastName'])) {
                     echo '<h4 class="left-align"> Résultat pour: ' . $_SESSION['selected_student']['firstName'] . ' ' .  $_SESSION['selected_student']['lastName'] . '</h4>';
                 }
                 ?>
             </div>
-
             <?php
-            if (isset($_SESSION['selected_student']) && $estStagiare) { ?>
+            if (!isset($_SESSION['selected_student']['address']) || $_SESSION['selected_student']['address'] === '') {
+                echo "<p>Cet étudiant n'a pas de stage ...</p>";
+            }
+            else {
+            ?>
                 <div id="map"></div>
-            <?php } else { ?>
-                <p>Cet étudiant n'a pas de stage ...</p>
-            <?php  } ?>
-
+            <?php
+            }
+            ?>
             <div class="row"></div>
 
             <script>
