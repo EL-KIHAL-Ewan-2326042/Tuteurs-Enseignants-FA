@@ -32,6 +32,5 @@ class AboutUs {
         $this->layout->renderTop($title,$cssFilePath);
         $this->view->showView();
         $this->layout->renderBottom($jsFilePath);
-
     }
 }

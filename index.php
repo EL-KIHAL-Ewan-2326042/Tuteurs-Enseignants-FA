@@ -87,53 +87,34 @@ $mentionLegController = new \Blog\Controllers\MentionLeg($layout,$mentionLegView
 /**
  * Initialisation du routage des URI
  */
-$router = new Router(strtok($_SERVER["REQUEST_URI"], '?'));
-$getRoutes = [
-    '/' => function () use($homepageController) {
-        $homepageController->show();
-    },
-    '/homepage' => function () use($homepageController) {
-        $homepageController->show();
-    },
-    '/dashboard' => function() use ($dashboardController) {
-        $dashboardController->show();
-    },
-    '/intramu' => function () use ($intramuController) {
-        $intramuController->show();
-    },
-    '/hello' => function() { echo 'Hello World';
-    },
-    '/aboutus' => function () use ($aboutUsController){
-        $aboutUsController->show();
-    },
-    '/mentions-legales' => function () use ($mentionLegController) {
-        $mentionLegController->show();
+$uri = strtok($_SERVER['REQUEST_URI'], '?');
+$router = new Router($uri);
+
+function createAction($uri): Closure {
+    if ($uri === '/') {
+        $uri = 'homepage';
     }
-];
+    $uri = str_replace('-', '', $uri);
 
-$postRoutes = [
-    '/intramu' => function () use ($intramuController) {
-        $intramuController->show();
-    },
-    '/dashboard' => function ($dashboardController) {
-        $dashboardController->show();
-    },
-    '/' => function () use ($homepageController){
-        $homepageController->show();
-    },
-    '/homepage' => function () use ($homepageController){
-        $homepageController->show();
-    },
+    $controllerName = ucfirst(ltrim($uri, '/'));
 
-];
+    $className = "Blog\\Controllers\\$controllerName";
 
-foreach ($getRoutes as $uri => $action) {
-    $router->get('/' . $uri, $action);
+    if (class_exists($className)) {
+        return function() use ($className) {
+            (new $className())->show();
+        };
+    } else {
+        return function() {
+            echo "Erreur 404 ...";
+        };
+    }
 }
 
-foreach ($postRoutes as $uri => $action) {
-    $router->post('/' . $uri, $action);
-}
+$action = createAction($uri);
+$router->get($uri, $action);
+$router->post($uri, $action);
+
 try {
     $router->run();
 } catch (RouterException $e) {

@@ -3,7 +3,7 @@ namespace Blog\Controllers;
 
 use Blog\Views\Layout;
 use Blog\Views\Homepage as HomepageView;
-use Database;
+use Includes\Database;
 
 class Homepage {
     private Layout $layout;
@@ -19,7 +19,9 @@ class Homepage {
     }
 
     /**
-     * Controlleur de la homepage
+     * Controlleur de la homepage.
+     * Elle gere des requetes post, via le model, pour recuperer des informations
+     * tels que les resultats de recherche ou les informations de l'etudiant selectione
      * @return void
      */
     public function show(): void {
