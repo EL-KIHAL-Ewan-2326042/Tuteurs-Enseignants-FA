@@ -1,7 +1,7 @@
 <?php
 namespace Blog\Models;
 
-use Database;
+use Includes\Database;
 use PDO;
 
 class Homepage {
