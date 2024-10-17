@@ -75,8 +75,10 @@ $homepageController = new \Blog\Controllers\Homepage($layout,$homepageView);
 
 //Instanciation de classes nécessaire pour Intramu
 $errorMessage = '';
+$db = \Includes\Database::getInstance();
 $intramuView = new \Blog\Views\Intramu($errorMessage);
-$intramuController = new \Blog\Controllers\Intramu($layout,$intramuView);
+$intramuModel = new \Blog\Models\Intramu($db);
+$intramuController = new \Blog\Controllers\Intramu($layout,$intramuView,$intramuModel);
 
 //Instanciation de classe nécessaires pour MentionLeg
 $mentionLegView = new \Blog\Views\MentionLeg();
