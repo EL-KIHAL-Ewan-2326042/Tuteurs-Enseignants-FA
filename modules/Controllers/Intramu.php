@@ -4,6 +4,7 @@ namespace Blog\Controllers;
 use Blog\Views\Layout;
 use Includes\Database;
 use Blog\Views\Intramu as IntramuView;
+use Blog\Models\Intramu as IntramuModel;
 
 /**
  * Contrôleur de la page de connexion
@@ -11,16 +12,17 @@ use Blog\Views\Intramu as IntramuView;
 class Intramu {
     private Layout $layout;
     private IntramuView $view;
-    private Database $db;
+    private IntramuModel $model;
     /**
      * Constructeur de la classe Intramu (contrôleur)
      * @param Layout $layout Instance de la classe Layout
      * @param IntramuView $view Instance de la classe IntramuView
-     * @param Database $db Instance de la classe Database
+     * @param IntramuModel $model Instance de la classe IntramuModel
      */
-    public function __construct(Layout $layout, IntramuView $view) {
+    public function __construct(Layout $layout, IntramuView $view, IntramuModel $model) {
         $this->layout = $layout;
         $this->view = $view;
+        $this->model = $model;
     }
 
     /**
