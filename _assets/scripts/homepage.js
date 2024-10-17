@@ -7,24 +7,33 @@
  * @type {HTMLElement}
  */
 document.addEventListener('DOMContentLoaded', function() {
+    var elems = document.querySelectorAll('select');
+    var instances = M.FormSelect.init(elems);
+
     const searchInput = document.getElementById('search');
     const searchResults = document.getElementById('searchResults');
+    const searchType = document.getElementById('searchType');
+    searchResults.innerHTML = '<p>Barre de recherche vide</p>'
 
     searchInput.addEventListener('input', function() {
         const searchTerm = searchInput.value.trim();
 
         if (searchTerm.length > 0) {
-            fetchResults(searchTerm);
+            fetchResults(searchTerm, searchType.value);
+        }
+        else {
+            searchResults.innerHTML = '<p>Barre de recherche vide</p>'
         }
     })
 });
 
 /**
  * Pour un string, on fait un post faisant une requête SQL à la BD
- * Enfin, on affiche les resultats retournés par la BD
- * @param query
+ * Enfin, on affiche les resultats retournés par la BD selon le type de recherche
+ * @param query la recherche en elle-même
+ * @param searchType numéro etudiant, nom de famille, ...
  */
-function fetchResults(query) {
+function fetchResults(query, searchType) {
     fetch(window.location.href, {
         method: 'POST',
         headers: {
@@ -32,7 +41,8 @@ function fetchResults(query) {
         },
         body: new URLSearchParams({
             action: 'search',
-            search: query
+            search: query,
+            searchType: searchType
         })
     })
         .then(response => response.json())
@@ -41,12 +51,12 @@ function fetchResults(query) {
         })
         .catch(error => {
             console.error('Erreur fetch resultats:', error);
-        });
+    });
 }
 
 /**
  * Selon les resultats renvoyés par la BD, on affiche le num, nom et prenom etudiant
- * On entour autour d'une balise a, et dès qu'elle est enclenché, on choisit l'etudiant
+ * On entour autour d'une balise a, et dès qu'elle est enclenché, on choisi l'etudiant
  * @param data
  */
 function displayResults(data) {
@@ -66,7 +76,12 @@ function displayResults(data) {
         const li = document.createElement('li');
         const a = document.createElement('a');
         a.href = '#';
-        a.textContent = `${student.num_eleve} - ${student.nom_eleve} ${student.prenom_eleve}`;
+        if (student.nom_entreprise) {
+            a.textContent = `${student.nom_entreprise}: ${student.num_eleve} - ${student.nom_eleve} ${student.prenom_eleve}`;
+        }
+        else {
+            a.textContent = `${student.num_eleve} - ${student.nom_eleve} ${student.prenom_eleve}`;
+        }
         a.classList.add('left-align');
         a.addEventListener('click', function(event) {
             event.preventDefault();
@@ -237,7 +252,6 @@ async function calculateDistance(origin, destination) {
         const result = response.rows[0].elements[0];
 
         const duration = result.duration.text;
-        console.log(duration);
 
         await getRoute(origin, destination);
     } catch (error) {
