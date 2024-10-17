@@ -2,21 +2,21 @@
 
 namespace Controllers;
 
-use Blog\Controllers\MentionLeg;
+use Blog\Controllers\Mentionslegales;
 use Blog\Views\Layout;
-use Blog\Views\MentionLeg as MentionLegView;
+use Blog\Views\Mentionslegales as MentionLegView;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Classe de MentionLegTest
+ * Classe de MentionslegalesTest
  *
- * Test du contrôler MentionLeg : s'assure que show()
+ * Test du contrôler Mentionslegales : s'assure que show()
  * fonctionne comme prévu
  */
-class MentionLegTest extends TestCase {
+class MentionslegalesTest extends TestCase {
     /**
-     * Test de la méthode show() du contrôleur MentionLeg
+     * Test de la méthode show() du contrôleur Mentionslegales
      * @return void
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
@@ -39,7 +39,7 @@ class MentionLegTest extends TestCase {
             ->method('showView');
 
         //instanciation des mocks
-        $controller = new MentionLeg($mockLayout,$mockView);
+        $controller = new Mentionslegales($mockLayout,$mockView);
 
         //exécution
         $controller->show();

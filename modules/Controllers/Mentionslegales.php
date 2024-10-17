@@ -3,17 +3,17 @@
 namespace Blog\Controllers;
 
 use Blog\Views\Layout;
-use Blog\Views\MentionLeg as MentionLegView;
+use Blog\Views\Mentionslegales as MentionLegView;
 
 /**
  * Contrôleur de la page mentions légales
  */
-class MentionLeg{
+class Mentionslegales{
     private Layout $layout;
     private MentionLegView $view;
 
     /**
-     * Constructeur de la classe MentionLeg (contrôleur)
+     * Constructeur de la classe Mentionslegales (contrôleur)
      * @param Layout $layout Instance de la classe Layout
      * @param MentionLegView $view Instance de la classe MentionLegView
      */
