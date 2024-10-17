@@ -2,15 +2,15 @@
 namespace Blog\Controllers;
 
 use Blog\Views\Layout;
-use Blog\Views\AboutUs as AboutUsView;
+use Blog\Views\Aboutus as AboutUsView;
 
-class AboutUs {
+class Aboutus {
 
     private Layout $layout;
     private AboutUsView $view;
 
     /**
-     * Constructeur de la classe AboutUs (controller)
+     * Constructeur de la classe Aboutus (controller)
      * @param Layout $layout Instance de la classe Layout
      * @param AboutUsView $view Instance de la classe AboutUsView
      */

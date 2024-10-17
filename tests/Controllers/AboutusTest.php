@@ -2,20 +2,20 @@
 
 namespace Test\Controllers;
 
-use Blog\Controllers\AboutUs;
+use Blog\Controllers\Aboutus;
 use Blog\Views\Layout;
-use Blog\Views\AboutUs as AboutUsView;
+use Blog\Views\Aboutus as AboutUsView;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Classe de AboutUsTest
+ * Classe de AboutusTest
  *
- * Test du contrôleur AboutUs : s'assure que la méthode show()
+ * Test du contrôleur Aboutus : s'assure que la méthode show()
  * fonctionne comme prévu
  */
-class AboutUsTest extends TestCase {
+class AboutusTest extends TestCase {
     /**
-     * Test de la méthode show() du contrôleur AboutUs
+     * Test de la méthode show() du contrôleur Aboutus
      * @return void
      * @throws \PHPUnit\Framework\MockObject\Exception
      */
@@ -38,7 +38,7 @@ class AboutUsTest extends TestCase {
             ->method('showView');
 
         //instanciation des mocks
-        $controller = new AboutUs($mockLayout,$mockView);
+        $controller = new Aboutus($mockLayout,$mockView);
 
         //exécution
         $controller->show();

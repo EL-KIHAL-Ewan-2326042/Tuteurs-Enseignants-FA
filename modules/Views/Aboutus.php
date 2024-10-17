@@ -2,7 +2,7 @@
 
 namespace Blog\Views;
 
-class AboutUs{
+class Aboutus{
     /**
      * Vue de la page a propos
      */

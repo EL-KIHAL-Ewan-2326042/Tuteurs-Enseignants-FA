@@ -62,8 +62,8 @@ session_start();
 
 //Instanciation de classes nécessaires pour About Us
 $layout = new \Blog\Views\Layout();
-$aboutUsView = new \Blog\Views\AboutUs();
-$aboutUsController = new \Blog\Controllers\AboutUs($layout,$aboutUsView);
+$aboutUsView = new \Blog\Views\Aboutus();
+$aboutUsController = new \Blog\Controllers\Aboutus($layout,$aboutUsView);
 
 //Instanciation de classes nécessaires pour le Dashboard
 $dashboardView = new \Blog\Views\Dashboard();
@@ -80,9 +80,9 @@ $intramuView = new \Blog\Views\Intramu($errorMessage);
 $intramuModel = new \Blog\Models\Intramu($db);
 $intramuController = new \Blog\Controllers\Intramu($layout,$intramuView,$intramuModel);
 
-//Instanciation de classe nécessaires pour MentionLeg
-$mentionLegView = new \Blog\Views\MentionLeg();
-$mentionLegController = new \Blog\Controllers\MentionLeg($layout,$mentionLegView);
+//Instanciation de classe nécessaires pour Mentionslegales
+$mentionLegView = new \Blog\Views\Mentionslegales();
+$mentionLegController = new \Blog\Controllers\Mentionslegales($layout,$mentionLegView);
 
 /**
  * Initialisation du routage des URI
@@ -90,7 +90,7 @@ $mentionLegController = new \Blog\Controllers\MentionLeg($layout,$mentionLegView
 $uri = strtok($_SERVER['REQUEST_URI'], '?');
 $router = new Router($uri);
 
-function createAction($uri): Closure {
+function createAction($uri,$layout): Closure {
     if ($uri === '/') {
         $uri = 'homepage';
     }
@@ -101,8 +101,21 @@ function createAction($uri): Closure {
     $className = "Blog\\Controllers\\$controllerName";
 
     if (class_exists($className)) {
-        return function() use ($className) {
-            (new $className())->show();
+        return function() use ($className,$layout,$controllerName) {
+            if($className === 'Blog\Controllers\Intramu') {
+                $db = \Includes\Database::getInstance();
+                $view = new \Blog\Views\Intramu('');
+                $model = new \Blog\Models\Intramu($db);
+                $controller = new $className($layout,$view,$model);
+            } else if ($className === 'Blog\Controllers\Homepage'){
+                $view = new \Blog\Views\Homepage();
+                $controller = new $className($layout,$view);
+            } else {
+                $view = "Blog\\Views\\$controllerName";
+                $viewInstance = new $view();
+                $controller = new $className($layout,$viewInstance);
+            }
+            $controller->show();
         };
     } else {
         return function() {
@@ -111,7 +124,7 @@ function createAction($uri): Closure {
     }
 }
 
-$action = createAction($uri);
+$action = createAction($uri,$layout);
 $router->get($uri, $action);
 $router->post($uri, $action);
 
