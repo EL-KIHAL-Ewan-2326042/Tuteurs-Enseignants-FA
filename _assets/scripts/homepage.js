@@ -34,7 +34,6 @@ document.addEventListener('DOMContentLoaded', function() {
  * @param searchType numéro etudiant, nom de famille, ...
  */
 function fetchResults(query, searchType) {
-    console.log(query, searchType);
     fetch(window.location.href, {
         method: 'POST',
         headers: {
@@ -57,7 +56,7 @@ function fetchResults(query, searchType) {
 
 /**
  * Selon les resultats renvoyés par la BD, on affiche le num, nom et prenom etudiant
- * On entour autour d'une balise a, et dès qu'elle est enclenché, on choisit l'etudiant
+ * On entour autour d'une balise a, et dès qu'elle est enclenché, on choisi l'etudiant
  * @param data
  */
 function displayResults(data) {
@@ -253,7 +252,6 @@ async function calculateDistance(origin, destination) {
         const result = response.rows[0].elements[0];
 
         const duration = result.duration.text;
-        console.log(duration);
 
         await getRoute(origin, destination);
     } catch (error) {
