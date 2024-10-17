@@ -44,6 +44,7 @@ class HomepageTest extends TestCase{
         ];
 
         //configuration du mock
+        /**
         $query = "
             SELECT num_eleve, nom_eleve, prenom_eleve,
             ts_rank_cd(to_tsvector('french', num_eleve), to_tsquery('french', :searchTerm), 32) AS rank
@@ -51,11 +52,11 @@ class HomepageTest extends TestCase{
             WHERE num_eleve ILIKE :searchTerm
             ORDER BY num_eleve
             LIMIT 5
-        ";
+        ";*/
 
         $stmt = $this->createMock(\PDOStatement::class);
         $this->mockConn->method('prepare')->willReturn($stmt);
-        $stmt->method('bindValue')->willReturn(true);
+        $stmt->expects($this->once())->method('bindValue')->with(':searchTerm',"$search%");
         $stmt->method('execute')->willReturn(true);
         $stmt->method('fetchAll')->willReturn($expectedResult);
 
@@ -71,5 +72,140 @@ class HomepageTest extends TestCase{
 
         //assertion
         $this->assertEquals($expectedResult, $results);
+
+        //nettoyage
+        $_POST = [];
+    }
+
+    /**
+     * Test de la méthode correspondTerms() avec un nom
+     * et un prénom
+     * @return void
+     * @throws Exception
+     */
+    public function testCorrespondTermsWithNameAndSurname(){
+        //données
+        $search = "Doe John";
+        $expectedResult = [
+            ['num_eleve' => '67890', 'nom_eleve' => 'Doe', 'prenom_eleve' => 'John']
+        ];
+
+        //configuration du mock
+        $stmt = $this->createMock(\PDOStatement::class);
+        $this->mockConn->method('prepare')->willReturn($stmt);
+        $stmt->expects($this->once())->method('bindValue')->with(':searchTerm', "%$search%"); // Vérification du bon paramètre
+        $stmt->method('execute')->willReturn(true);
+        $stmt->method('fetchAll')->willReturn($expectedResult);
+
+        //instance du modèle
+        $homepage = new Homepage($this->mockDb);
+
+        //simulation des entrées POST
+        $_POST['search'] = $search;
+        $_POST['searchType'] = 'nomEtPrenom';
+
+        //exécution
+        $results = $homepage->correspondTerms();
+
+        //assertion
+        $this->assertEquals($expectedResult, $results);
+
+        //nettoyage
+        $_POST = [];
+    }
+
+    /**
+     * Test de la méthode correspondTerms() avec une entreprise
+     * @return void
+     * @throws Exception
+     */
+    public function testCorrespondTermsWithCompany() {
+        //données
+        $search = "Tech Corp";
+        $expectedResult = [
+            ['num_eleve' => '12345', 'nom_eleve' => 'Smith', 'prenom_eleve' => 'Jane', 'nom_entreprise' => 'Tech Corp']
+        ];
+
+        //configuration du mock
+        $stmt = $this->createMock(\PDOStatement::class);
+        $this->mockConn->method('prepare')->willReturn($stmt);
+        $stmt->expects($this->once())->method('bindValue')->with(':searchTerm', "$search%"); // Vérification du bon paramètre
+        $stmt->method('execute')->willReturn(true);
+        $stmt->method('fetchAll')->willReturn($expectedResult);
+
+        //instance du modèle
+        $homepage = new Homepage($this->mockDb);
+
+        //simulation des entrées POST
+        $_POST['search'] = $search;
+        $_POST['searchType'] = 'company';
+
+        //exécution
+        $results = $homepage->correspondTerms();
+
+        //assertion
+        $this->assertEquals($expectedResult, $results);
+
+        //nettoyage
+        $_POST = [];
+    }
+
+    /**
+     * Test de la méthode getStudentAddress() avec un ID valide
+     * @return void
+     * @throws Exception
+     */
+    public function testGetStudentAddressWithValidId() {
+        //données
+        $studentId = "12345";
+        $expectedAddress = "123 Rue de l'Université, 75001 Paris";
+
+        //configuration du mock
+        $stmt = $this->createMock(\PDOStatement::class);
+        $this->mockConn->method('prepare')->willReturn($stmt);
+        $stmt->expects($this->once())->method('bindValue')->with(':num_eleve', $studentId);
+        $stmt->method('execute')->willReturn(true);
+        $stmt->method('fetchColumn')->willReturn($expectedAddress);
+
+        //instance du modèle
+        $homepage = new Homepage($this->mockDb);
+
+        //simulation des entrées POST
+        $_POST['student_id'] = $studentId;
+
+        //exécution
+        $address = $homepage->getStudentAddress($studentId);
+
+        //assertion
+        $this->assertEquals($expectedAddress, $address);
+
+        //nettoyage
+        $_POST = [];
+    }
+
+    /**
+     * Test de la méthode getStudentAddress() avec un ID invalide
+     * @return void
+     * @throws Exception
+     */
+    public function testGetStudentAddressWithInvalidId() {
+        //données
+        $studentId = "67890";
+        $expectedResult = false;
+
+        //instance du modèle
+        $homepage = new Homepage($this->mockDb);
+
+        //simulation des entrées POST
+        $_POST['student_id'] = "12345";  // ID différent de celui testé
+
+        //exécution
+        $address = $homepage->getStudentAddress($studentId);
+
+        //assertion
+        $this->assertEquals($expectedResult, $address);
+
+        //nettoyage
+        $_POST = [];
     }
 }
