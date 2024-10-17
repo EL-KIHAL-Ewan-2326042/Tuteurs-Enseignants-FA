@@ -7,24 +7,33 @@
  * @type {HTMLElement}
  */
 document.addEventListener('DOMContentLoaded', function() {
+    var elems = document.querySelectorAll('select');
+    var instances = M.FormSelect.init(elems);
+
     const searchInput = document.getElementById('search');
     const searchResults = document.getElementById('searchResults');
+    const searchType = document.getElementById('searchType');
+    searchResults.innerHTML = '<p>Barre de recherche vide</p>'
 
     searchInput.addEventListener('input', function() {
         const searchTerm = searchInput.value.trim();
 
         if (searchTerm.length > 0) {
-            fetchResults(searchTerm);
+            fetchResults(searchTerm, searchType.value);
+        }
+        else {
+            searchResults.innerHTML = '<p>Barre de recherche vide</p>'
         }
     })
 });
 
 /**
  * Pour un string, on fait un post faisant une requête SQL à la BD
- * Enfin, on affiche les resultats retournés par la BD
- * @param query
+ * Enfin, on affiche les resultats retournés par la BD selon le type de recherche
+ * @param query la recherche en elle-même
+ * @param searchType numéro etudiant, nom de famille, ...
  */
-function fetchResults(query) {
+function fetchResults(query, searchType) {
     fetch(window.location.href, {
         method: 'POST',
         headers: {
@@ -32,7 +41,8 @@ function fetchResults(query) {
         },
         body: new URLSearchParams({
             action: 'search',
-            search: query
+            search: query,
+            searchType: searchType
         })
     })
         .then(response => response.json())
