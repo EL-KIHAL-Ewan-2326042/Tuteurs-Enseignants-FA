@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
  * @param searchType numéro etudiant, nom de famille, ...
  */
 function fetchResults(query, searchType) {
+    console.log(query, searchType);
     fetch(window.location.href, {
         method: 'POST',
         headers: {
@@ -51,7 +52,7 @@ function fetchResults(query, searchType) {
         })
         .catch(error => {
             console.error('Erreur fetch resultats:', error);
-        });
+    });
 }
 
 /**
@@ -76,7 +77,12 @@ function displayResults(data) {
         const li = document.createElement('li');
         const a = document.createElement('a');
         a.href = '#';
-        a.textContent = `${student.num_eleve} - ${student.nom_eleve} ${student.prenom_eleve}`;
+        if (student.nom_entreprise) {
+            a.textContent = `${student.nom_entreprise}: ${student.num_eleve} - ${student.nom_eleve} ${student.prenom_eleve}`;
+        }
+        else {
+            a.textContent = `${student.num_eleve} - ${student.nom_eleve} ${student.prenom_eleve}`;
+        }
         a.classList.add('left-align');
         a.addEventListener('click', function(event) {
             event.preventDefault();

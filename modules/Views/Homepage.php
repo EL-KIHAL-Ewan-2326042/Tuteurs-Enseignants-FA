@@ -19,8 +19,7 @@ class Homepage {
                         <select id="searchType" name="searchType">
                             <option value="numeroEtudiant" selected>Numéro Etudiant</option>
                             <option value="nomEtPrenom">Nom et Prénom</option>
-                            <option value="nomDeFamille">Nom de Famille</option>
-                            <option value="prenom">Prenom</option>
+                            <option value="company">Entreprise</option>
                         </select>
                     </div>
                     <label for="search">Rechercher un étudiant:</label>
