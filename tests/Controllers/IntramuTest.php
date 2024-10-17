@@ -6,6 +6,7 @@ use Blog\Controllers\Intramu;
 use Includes\Database;
 use Blog\Views\Layout;
 use Blog\Views\Intramu as IntramuView;
+use Blog\Models\Intramu as IntramuModel;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -27,6 +28,7 @@ class IntramuTest extends TestCase{
         //Mock des classes layout et vue
         $mockLayout = $this->createMock(Layout::class);
         $mockView = $this->createMock(IntramuView::class);
+        $mockModel = $this->createMock(IntramuModel::class);
 
         //attentes pour le mock du layout
         $mockLayout->expects($this->once())
@@ -42,7 +44,7 @@ class IntramuTest extends TestCase{
             ->method('showView');
 
         //instanciation des mocks
-        $controller = new Intramu($mockLayout,$mockView);
+        $controller = new Intramu($mockLayout,$mockView,$mockModel);
 
         //exécution
         $controller->show();
