@@ -13,9 +13,18 @@ class Homepage {
             <h3 class="center-align">Répartiteur de tuteurs enseignants</h3>
 
             <div class="card-panel white">
-                <form id="searchForm" onsubmit="return false;" method="POST">
+                <form class="col" id="searchForm" onsubmit="return false;" method="POST">
+                    <label for="searchType">Type de recherche:</label>
+                    <div class="input-field">
+                        <select id="searchType" name="searchType">
+                            <option value="numeroEtudiant" selected>Numéro Etudiant</option>
+                            <option value="nomEtPrenom">Nom et Prénom</option>
+                            <option value="company">Entreprise</option>
+                        </select>
+                    </div>
                     <label for="search">Rechercher un étudiant:</label>
                     <input type="text" id="search" name="search" autocomplete="off" maxlength="50" required>
+                    <p>Etudiant(s):</p>
                     <div id="searchResults"></div>
                 </form>
             </div>
@@ -27,7 +36,7 @@ class Homepage {
             </div>
 
             <?php
-            if ($estStagiare) { ?>
+            if (isset($_SESSION['selected_student']) && $estStagiare) { ?>
                 <div id="map"></div>
             <?php } else { ?>
                 <p>Cet étudiant n'a pas de stage ...</p>
