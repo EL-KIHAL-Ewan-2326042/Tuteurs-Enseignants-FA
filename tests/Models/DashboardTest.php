@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
  * Classe de DashboardTest
  *
  * Test du modèle Dashboard : s'assure que uploadCsv()
- * fonctionne  comme prévu
+ * fonctionne comme prévu
  *
  */
 class DashboardTest extends TestCase  {
