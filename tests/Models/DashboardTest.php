@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\Models;
+namespace Models;
 
 use Blog\Models\Dashboard;
 use Includes\Database;
@@ -39,9 +39,19 @@ class DashboardTest extends TestCase  {
         $dashboard = new Dashboard($mockDb);
 
         //fichier temporaire
-        $csvFilePath = 'path/to/temp/file.csv';
-        $tempFile = fopen($csvFilePath,'w');
-        fputcsv($tempFile,['1','Doe','John','Informatique','A']);
+        $tempDir = 'path/to/temp';
+        if (!file_exists($tempDir)) {
+            mkdir($tempDir, 0777, true);
+        }
+
+        $csvFilePath = $tempDir . '/file.csv';
+
+        $tempFile = fopen($csvFilePath, 'w');
+        if ($tempFile === false) {
+            $this->fail("Impossible d'ouvrir le fichier : $csvFilePath");
+            return;
+        }
+        fputcsv($tempFile, ['1', 'Doe', 'John', 'Informatique', 'A']);
         fclose($tempFile);
 
         try {
@@ -99,15 +109,25 @@ class DashboardTest extends TestCase  {
         $dashboard = new Dashboard($mockDb);
 
         //fichier temporaire
-        $csvFilePath = 'path/to/temp/file.csv';
-        $tempFile = fopen($csvFilePath,'w');
-        fputcsv($tempFile,['1','Doe','John','Informatique','A']);
+        $tempDir = 'path/to/temp';
+        if (!file_exists($tempDir)) {
+            mkdir($tempDir, 0777, true);
+        }
+
+        $csvFilePath = $tempDir . '/file.csv';
+
+        $tempFile = fopen($csvFilePath, 'w');
+        if ($tempFile === false) {
+            $this->fail("Impossible d'ouvrir le fichier : $csvFilePath");
+            return;
+        }
+        fputcsv($tempFile, ['1', 'Doe', 'John', 'Informatique', 'A']);
         fclose($tempFile);
 
         try {
             //exécution
             $result = $dashboard->uploadCsv($csvFilePath);
-            $this->assertTrue($result,"L'importation aurait dû échouer car csv invalide");
+            $this->assertFalse($result,"L'importation aurait dû échouer car csv invalide");
         } finally {
             //nettoyage
             unlink($csvFilePath);
