@@ -44,26 +44,16 @@ class HomepageTest extends TestCase{
         ];
 
         //configuration du mock
-        /**
-        $query = "
-            SELECT num_eleve, nom_eleve, prenom_eleve,
-            ts_rank_cd(to_tsvector('french', num_eleve), to_tsquery('french', :searchTerm), 32) AS rank
-            FROM eleve
-            WHERE num_eleve ILIKE :searchTerm
-            ORDER BY num_eleve
-            LIMIT 5
-        ";*/
-
         $stmt = $this->createMock(\PDOStatement::class);
         $this->mockConn->method('prepare')->willReturn($stmt);
-        $stmt->expects($this->once())->method('bindValue')->with(':searchTerm',"$search%");
+        $stmt->expects($this->once())->method('bindValue')->with(':searchTerm',"$search");
         $stmt->method('execute')->willReturn(true);
         $stmt->method('fetchAll')->willReturn($expectedResult);
 
         //instance du modèle
         $homepage = new Homepage($this->mockDb);
 
-        //simulationdes entrées POST
+        //simulation des entrées POST
         $_POST['search'] = $search;
         $_POST['searchType'] = 'numeroEtudiant';
 
@@ -93,7 +83,7 @@ class HomepageTest extends TestCase{
         //configuration du mock
         $stmt = $this->createMock(\PDOStatement::class);
         $this->mockConn->method('prepare')->willReturn($stmt);
-        $stmt->expects($this->once())->method('bindValue')->with(':searchTerm', "%$search%"); // Vérification du bon paramètre
+        $stmt->expects($this->once())->method('bindValue')->with(':searchTerm', "$search"); // Vérification du bon paramètre
         $stmt->method('execute')->willReturn(true);
         $stmt->method('fetchAll')->willReturn($expectedResult);
 
@@ -129,7 +119,7 @@ class HomepageTest extends TestCase{
         //configuration du mock
         $stmt = $this->createMock(\PDOStatement::class);
         $this->mockConn->method('prepare')->willReturn($stmt);
-        $stmt->expects($this->once())->method('bindValue')->with(':searchTerm', "$search%"); // Vérification du bon paramètre
+        $stmt->expects($this->once())->method('bindValue')->with(':searchTerm', "$search%");
         $stmt->method('execute')->willReturn(true);
         $stmt->method('fetchAll')->willReturn($expectedResult);
 
@@ -163,7 +153,7 @@ class HomepageTest extends TestCase{
         //configuration du mock
         $stmt = $this->createMock(\PDOStatement::class);
         $this->mockConn->method('prepare')->willReturn($stmt);
-        $stmt->expects($this->once())->method('bindValue')->with(':num_eleve', $studentId);
+        $stmt->expects($this->once())->method('bindValue')->with(':student_number', $studentId);
         $stmt->method('execute')->willReturn(true);
         $stmt->method('fetchColumn')->willReturn($expectedAddress);
 
@@ -186,7 +176,6 @@ class HomepageTest extends TestCase{
     /**
      * Test de la méthode getStudentAddress() avec un ID invalide
      * @return void
-     * @throws Exception
      */
     public function testGetStudentAddressWithInvalidId() {
         //données
