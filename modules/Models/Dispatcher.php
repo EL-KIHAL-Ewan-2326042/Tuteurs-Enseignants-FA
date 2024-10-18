@@ -28,35 +28,31 @@ class Dispatcher{
     }
 
 
-
-    /**
-     * Importation des données depuis un fichier CSV vers la base de données
-     * @param string $csvFilePath Chemin vers le fichier CSV
-     * @return bool True si l'importation a réussi, sinon false
-     */
-    public function uploadCsv(string $csvFilePath): bool {
+    public function dispatcher(array $dicoCoef){
         $db = $this->db;
-        if (($handle = fopen($csvFilePath, "r")) !== FALSE) {
-            try {
-                while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                    print_r($data);
-                    $query = 'INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe) VALUES (:colonne1, :colonne2,:colonne3,:colonne4,:colonne5)';
-                    $stmt = $db->getConn()->prepare($query);
-                    $stmt->bindParam(':colonne1', $data[0]);
-                    $stmt->bindParam(':colonne2', $data[1]);
-                    $stmt->bindParam(':colonne3', $data[2]);
-                    $stmt->bindParam(':colonne4', $data[3]);
-                    $stmt->bindParam(':colonne5', $data[4]);
+        $query = 'SELECT Id_teacher, Maxi_number_trainees FROM Teacher JOIN Teaches ON Teacher.Id_Teacher = Teaches.Id_Teaches
+                    where Departement_name = :Role_departement';
+        $stmt = $db->getConn()->prepare($query);
+        $stmt->bindParam(':Role_departement', $_SESSION['role_departement']);
+        $stmt->execute();
+        $listTeacherMax = $stmt->fetchAll();
 
-                    $stmt->execute();
-                }
-                fclose($handle);
-                return true;
-            } catch (PDOException $e) {
-                echo "Erreur lors de l'importation : ", $e->getMessage();
-                return false;
-            }
-        }
-        return false;
+        $query = 'SELECT Id_teacher, 0 FROM Teacher JOIN Teaches ON Teacher.Id_Teacher = Teaches.Id_Teaches
+                    where Departement_name = :Role_departement';
+        $stmt = $db->getConn()->prepare($query);
+        $stmt->bindParam(':Role_departement', $_SESSION['role_departement']);
+        $stmt->execute();
+        $listteacherIntership = $stmt->fetchAll();
+
+        $query = 'SELECT Student_number FROM Student JOIN Study_at ON Study_at.Student_number = Student.Student_number
+                    where Departement_name = :Role_departement';
+        $stmt = $db->getConn()->prepare($query);
+        $stmt->bindParam(':Role_departement', $_SESSION['role_departement']);
+        $stmt->execute();
+        $listStudent = $stmt->fetchColumn();
+
+        $listFinal = [];
+        $listStart = utile($_SESSION['role_departement'], $dicoCoef);
     }
+
 }
