@@ -24,20 +24,20 @@ class Homepage {
                     echo json_encode($results);
                     return;
                 }
-            }
 
-            if ($_POST['action'] === 'select_student' && isset($_POST['student_id']) && isset($_POST['student_firstName']) && isset($_POST['student_lastName'])) {
-                $studentId = $_POST['student_id'];
-                $firstName = $_POST['student_firstName'];
-                $secondName = $_POST['student_lastName'];
-                $address = $homepageModel->getStudentAddress($studentId);
+                if ($_POST['action'] === 'select_student' && isset($_POST['student_id']) && isset($_POST['student_firstName']) && isset($_POST['student_lastName'])) {
+                    $studentId = $_POST['student_id'];
+                    $firstName = $_POST['student_firstName'];
+                    $secondName = $_POST['student_lastName'];
+                    $address = $homepageModel->getStudentAddress($studentId);
 
-                $_SESSION['selected_student'] = [
-                    'id' => $studentId,
-                    'firstName' => $firstName,
-                    'lastName' => $secondName,
-                    'address' => $address
-                ];
+                    $_SESSION['selected_student'] = [
+                        'id' => $studentId,
+                        'firstName' => $firstName,
+                        'lastName' => $secondName,
+                        'address' => $address
+                    ];
+                }
             }
         }
 
