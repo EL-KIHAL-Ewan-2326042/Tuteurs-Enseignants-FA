@@ -469,6 +469,7 @@ INSERT INTO Has_role (User_id, Role_name) VALUES ('B51423637', 'Teacher');
 INSERT INTO Has_role (User_id, Role_name) VALUES ('C45328794', 'Teacher');
 INSERT INTO Has_role (User_id, Role_name) VALUES ('H48344613', 'Teacher');
 INSERT INTO Has_role (User_id, Role_name) VALUES ('R41814241', 'Teacher');
+INSERT INTO Has_role (User_id, Role_name, role_department) VALUES ('B22662146', 'Admin_dep','IUT_INFO_AIX');
 
 INSERT INTO Study_at (Student_number, Department_name) VALUES ('B82656814', 'IUT_INFO_AIX');
 INSERT INTO Study_at (Student_number, Department_name) VALUES ('Y26472238', 'IUT_INFO_AIX');
