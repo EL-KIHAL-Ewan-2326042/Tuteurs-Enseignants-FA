@@ -31,7 +31,7 @@ CREATE TABLE Role(
    PRIMARY KEY(Role_name)
 );
 
-CREATE TABLE Critere_repartiteur(
+CREATE TABLE Distribution_criteria(
    Name_criteria VARCHAR(50),
    PRIMARY KEY(Name_criteria)
 );
