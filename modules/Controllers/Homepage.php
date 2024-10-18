@@ -12,6 +12,11 @@ class Homepage {
      */
     public function show(): void {
 
+        if (!isset($_SESSION['identifier'])) {
+            header('Location: /intramu');
+            return;
+        }
+
         $db = Database::getInstance();
         $homepageModel = new \Blog\Models\Homepage($db);
 
@@ -39,11 +44,6 @@ class Homepage {
                     ];
                 }
             }
-        }
-
-        if (!isset($_SESSION['identifier'])) {
-            header('Location: /intramu');
-            return;
         }
 
         $title = "Accueil";
