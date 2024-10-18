@@ -53,7 +53,7 @@ CREATE TABLE Role(
    PRIMARY KEY(Role_name)
 );
 
-CREATE TABLE Critere_repartiteur(
+CREATE TABLE Distribution_criteria(
    Name_criteria VARCHAR(50),
    PRIMARY KEY(Name_criteria)
 );
@@ -68,10 +68,6 @@ CREATE TABLE Address_type(
    PRIMARY KEY(Type)
 );
 
-CREATE TABLE Coef(
-   Coef DECIMAL(6,2),
-   PRIMARY KEY(Coef)
-);
 
 CREATE TABLE Internship(
    Internship_identifier VARCHAR(50),
@@ -165,8 +161,7 @@ CREATE TABLE Backup(
    Num_backup VARCHAR(50) NOT NULL,
    PRIMARY KEY(User_id, Name_criteria, Coef),
    FOREIGN KEY(User_id) REFERENCES User_connect(User_id),
-   FOREIGN KEY(Name_criteria) REFERENCES Critere_repartiteur(Name_criteria),
-   FOREIGN KEY(Coef) REFERENCES Coef(Coef)
+   FOREIGN KEY(Name_criteria) REFERENCES Distribution_criteria(Name_criteria)
 );
 
 
@@ -613,3 +608,10 @@ INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('C45328794', 'Sarreg
 INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('H48344613', 'Chalon-sur-Saône', 'Domicile_1');
 INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('R41814241', 'Fréjus', 'Domicile_1');
 
+INSERT INTO Distribution_criteria (Name_criteria) VALUES ('A été responsable');
+INSERT INTO Distribution_criteria (Name_criteria) VALUES ('Distance');
+INSERT INTO Distribution_criteria (Name_criteria) VALUES ('Cohérence');
+
+INSERT INTO Backup (user_id, name_criteria, coef, num_backup) VALUES ('B22662146','A été responsable', 1,1);
+INSERT INTO Backup (user_id, name_criteria, coef, num_backup) VALUES ('B22662146','Distance', 1,1);
+INSERT INTO Backup (user_id, name_criteria, coef, num_backup) VALUES ('B22662146','Cohérence', 1,1);
