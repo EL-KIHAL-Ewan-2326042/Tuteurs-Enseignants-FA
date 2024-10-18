@@ -9,7 +9,7 @@ class Homepage {
      * Vue de la homepage
      * @return void
      */
-    public function showView() {
+    public function showView(): void {
         ?>
         <main>
             <h3 class="center-align">Répartiteur de tuteurs enseignants</h3>
@@ -33,55 +33,63 @@ class Homepage {
             }
             ?>
 
+            <h4 class="left-align">Sélectionnez le(s) département(s) :</h4>
+
             <div class="row"></div>
 
-            <form class="selection" action="#">
-                <?
-                foreach($this->model->getDepEnseignant($_SESSION['identifier']) as $dep) {
-                    ?>
-                    <label>
-                        <input type="checkbox" class="filled-in" />
-                        <span><? echo $dep['nom_departement'] ?></span>
-                    </label>
+            <form method="post" class="center-align">
+                <div class="selection">
                     <?
-                }
-                ?>
+                    foreach($this->model->getDepEnseignant() as $dep): ?>
+                    <label class="formCell">
+                        <input type="checkbox" id="selecDep[]" name="selecDep[]" class="filled-in" value="<?= $dep['nom_departement'] ?>" <? if(isset($_POST['selecDep']) && in_array($dep['nom_departement'], $_POST['selecDep'])): ?> checked="checked" <? endif; ?> />
+                        <span><? echo str_replace('_', ' ', $dep['nom_departement']) ?></span>
+                    </label>
+                    <? endforeach; ?>
+                </div>
+                <button class="waves-effect waves-light btn" type="submit">Afficher</button>
             </form>
 
-            <table class="highlight centered center-align">
-                <thead>
-                <tr>
-                    <th>ELEVE</th>
-                    <th>HISTORIQUE</th>
-                    <th>POSITION</th>
-                    <th>SUJET</th>
-                    <th>ENTREPRISE</th>
-                    <th>TOTAL</th>
-                    <th>CHOIX</th>
-                </tr>
-                </thead>
-                <tbody>
-                <?
-                foreach($this->model->getEleves(20, $_SESSION['identifier']) as $eleve) {
-                    $infoStage = $this->model->getStageEleve($eleve["num_eleve"])
-                    ?>
-                    <tr>
-                        <td><? echo $eleve["nom_eleve"] . " " . $eleve["prenom_eleve"] ?></td>
-                        <td><? echo $this->model->getNbAsso($eleve["num_eleve"], $_SESSION['identifier']) ?></td>
-                        <td> <? if(!$infoStage) echo "...";
-                            else echo str_replace('_', "'", $infoStage["adresse_entreprise"]) ?> </td>
-                        <td> <? if(!$infoStage) echo "...";
-                            else echo str_replace('_', ' ', $infoStage["sujet_stage"]) ?> </td>
-                        <td> <? if(!$infoStage) echo "...";
-                            else echo $infoStage["nom_entreprise"] ?> </td>
-                        <td>...</td>
-                        <td>...</td>
-                    </tr>
-                    <?
-                }
-                ?>
-                </tbody>
-            </table>
+            <div class="row"></div>
+
+            <?
+            if(!empty($_POST['selecDep'])):
+            ?>
+                <form method="post" class="center-align">
+                    <table class="highlight centered">
+                        <thead>
+                        <tr>
+                            <th>ELEVE</th>
+                            <th>HISTORIQUE</th>
+                            <th>POSITION</th>
+                            <th>SUJET</th>
+                            <th>ENTREPRISE</th>
+                            <th>TOTAL</th>
+                            <th>CHOIX</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <?
+                        foreach($this->model->getStudentsList($_POST['selecDep']) as $eleve): ?>
+                            <tr>
+                                <td><? echo $eleve["nom_eleve"] . " " . $eleve["prenom_eleve"] ?></td>
+                                <td><? echo $eleve["internshipTeacher"] ?></td>
+                                <td> <? echo str_replace('_', "'", $eleve["adresse_entreprise"]) ?> </td>
+                                <td> <? echo str_replace('_', ' ', $eleve["sujet_stage"]) ?> </td>
+                                <td> <? echo $eleve["nom_entreprise"] ?> </td>
+                                <td><? echo "<strong>" . round($eleve['relevance'], 2) . "</strong>/5" ?></td>
+                                <td>
+                                    <label>
+                                        <input type="checkbox" id="selecStudent[]" name="selecStudent[]" class="center-align filled-in" value="<?= $eleve['num_eleve'] ?>" />
+                                        <span></span>
+                                    </label>
+                                </td>
+                            </tr>
+                        <? endforeach; ?>
+                        </tbody>
+                    </table>
+                </form>
+            <? endif; ?>
 
             <script>
                 const teacherAddress = "<?php echo isset($_SESSION['address']) ? $_SESSION['address'] : 'Aix-En-Provence'; ?>";
