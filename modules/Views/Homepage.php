@@ -22,14 +22,20 @@ class Homepage {
                 </form>
             </div>
             <div class="center">
-                <?php if (isset($_SESSION['selected_student']['address']) && $_SESSION['selected_student']['address'] != '') {
+                <?php
+                if (isset($_SESSION['selected_student']['firstName']) && isset($_SESSION['selected_student']['lastName'])) {
                     echo '<h4 class="left-align"> Résultat pour: ' . $_SESSION['selected_student']['firstName'] . ' ' .  $_SESSION['selected_student']['lastName'] . '</h4>';
+                }
                 ?>
             </div>
-            <div id="map"></div>
             <?php
-            } else {
+            if (!isset($_SESSION['selected_student']['address']) || $_SESSION['selected_student']['address'] === '') {
                 echo "<p>Cet étudiant n'a pas de stage ...</p>";
+            }
+            else {
+                ?>
+                <div id="map"></div>
+                <?php
             }
             ?>
 
