@@ -42,9 +42,9 @@ class Homepage {
                 echo "<p>Cet étudiant n'a pas de stage ...</p>";
             }
             else {
-            ?>
+                ?>
                 <div id="map"></div>
-            <?php
+                <?php
             }
             ?>
 
@@ -63,8 +63,8 @@ class Homepage {
                         <?
                         foreach($departments as $dep): ?>
                         <label class="formCell">
-                            <input type="checkbox" id="selecDep[]" name="selecDep[]" class="filled-in" value="<?= $dep['nom_departement'] ?>" <? if(isset($_POST['selecDep']) && in_array($dep['nom_departement'], $_POST['selecDep'])): ?> checked="checked" <? endif; ?> />
-                            <span><? echo str_replace('_', ' ', $dep['nom_departement']) ?></span>
+                            <input type="checkbox" id="selecDep[]" name="selecDep[]" class="filled-in" value="<?= $dep['department_name'] ?>" <? if(isset($_POST['selecDep']) && in_array($dep['department_name'], $_POST['selecDep'])): ?> checked="checked" <? endif; ?> />
+                            <span><? echo str_replace('_', ' ', $dep['department_name']) ?></span>
                         </label>
                         <? endforeach; ?>
                     </div>
@@ -93,15 +93,15 @@ class Homepage {
                             <?
                             foreach($this->model->getStudentsList($_POST['selecDep']) as $eleve): ?>
                                 <tr>
-                                    <td><? echo $eleve["nom_eleve"] . " " . $eleve["prenom_eleve"] ?></td>
+                                    <td><? echo $eleve["student_name"] . " " . $eleve["student_firstname"] ?></td>
                                     <td><? echo $eleve["internshipTeacher"] ?></td>
-                                    <td> <? echo str_replace('_', "'", $eleve["adresse_entreprise"]) ?> </td>
-                                    <td> <? echo str_replace('_', ' ', $eleve["sujet_stage"]) ?> </td>
-                                    <td> <? echo $eleve["nom_entreprise"] ?> </td>
+                                    <td> <? echo str_replace('_', "'", $eleve["address"]) ?> </td>
+                                    <td> <? echo str_replace('_', ' ', $eleve["internship_subject"]) ?> </td>
+                                    <td> <? echo $eleve["company_name"] ?> </td>
                                     <td><? echo "<strong>" . round($eleve['relevance'], 2) . "</strong>/5" ?></td>
                                     <td>
                                         <label>
-                                            <input type="checkbox" id="selecStudent[]" name="selecStudent[]" class="center-align filled-in" value="<?= $eleve['num_eleve'] ?>" />
+                                            <input type="checkbox" id="selecStudent[]" name="selecStudent[]" class="center-align filled-in" value="<?= $eleve['student_name'] ?>" />
                                             <span></span>
                                         </label>
                                     </td>
