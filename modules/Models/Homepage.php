@@ -106,13 +106,13 @@ class Homepage {
         $studentsList = array_unique($studentsList, 0);
 
         foreach($studentsList as & $row) {
-            $internshipsResp = $this->getInternships($row['num_eleve']);
+            $internshipsResp = $this->getInternships($row['student_number']);
             if(!$internshipsResp) {
                 $row['internshipTeacher'] = 0;
                 $row['countInternship'] = 0;
             } else {
                 foreach($internshipsResp as $internshipInfo) {
-                    if($row['date_debut'] === $internshipInfo['date_debut_resp'] && $row['date_fin'] === $internshipInfo['date_fin_resp']) {
+                    if($row['start_date_internship'] === $internshipInfo['responsible_start_date'] && $row['end_date_internship'] === $internshipInfo['responsible_end_date']) {
                         unset($row);
                         break;
                     }
@@ -121,15 +121,15 @@ class Homepage {
                 $row['internshipTeacher'] = $this->getInternshipTeacher($internshipsResp);
                 $row['countInternship'] = count($internshipsResp);
             }
-            $row['relevance'] = $this->scoreDiscipSubject($row['num_eleve']);
+            $row['relevance'] = $this->scoreDiscipSubject($row['student_number']);
         }
 
         usort($studentsList, function ($a, $b) {
             $rank = $b['relevance'] <=> $a['relevance'];
             if ($rank === 0) {
-                $lastName = $a['nom_eleve'] <=> $b['nom_eleve'];
+                $lastName = $a['student_name'] <=> $b['student_name'];
                 if ($lastName === 0) {
-                    return $a['prenom_eleve'] <=> $b['prenom_eleve'];
+                    return $a['student_firstname'] <=> $b['student_firstname'];
                 }
                 return $lastName;
             }
@@ -145,14 +145,14 @@ class Homepage {
      * @return false|array tableau contenant le numéro, le nom et le prénom de l'élève, ainsi que le nom de l'entreprise dans lequel il va faire son stage, le sujet et les dates, false sinon
      */
     public function getStudentsPerDepartment(string $department): false|array {
-        $query = 'SELECT eleve.num_eleve, nom_eleve, prenom_eleve, nom_entreprise, adresse_entreprise, sujet_stage, date_debut, date_fin
-                    FROM eleve
-                    JOIN etudie_a
-                    ON eleve.num_eleve = etudie_a.num_eleve
-                    JOIN stage
-                    ON eleve.num_eleve = stage.num_eleve
-                    WHERE nom_departement = :dep
-                    AND stage.date_debut > CURRENT_DATE';
+        $query = 'SELECT student.student_number, student_name, student_firstname, company_name, address, internship_subject, start_date_internship, end_date_internship
+                    FROM student
+                    JOIN study_at
+                    ON student.student_number = study_at.student_number
+                    JOIN internship
+                    ON student.student_number = internship.student_number
+                    WHERE department_name = :dep
+                    AND internship.start_date_internship > CURRENT_DATE';
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':dep', $department);
         $stmt->execute();
@@ -164,25 +164,25 @@ class Homepage {
      * @return false|array tableau contenant tous les départements dont l'enseignant connecté fait partie, false sinon
      */
     public function getDepTeacher(): false|array {
-        $query = 'SELECT nom_departement
-                    FROM enseigne_a
-                    WHERE  id_enseignant = :enseignant';
+        $query = 'SELECT department_name
+                    FROM teaches
+                    WHERE  id_teacher = :teacher';
         $stmt = $this->db->getConn()->prepare($query);
-        $stmt->bindParam(':enseignant', $_SESSION['identifier']);
+        $stmt->bindParam(':teacher', $_SESSION['identifier']);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
-     * Renvoie un tableau contenant les informations de chaque tutorat de l'élève passé en paramètre, ou false
+     * Renvoie un tableau contenant les informations de chaque tutorat terminé de l'élève passé en paramètre, ou false
      * @param string $student le numéro de l'étudiant dont on récupère les informations
      * @return false|array tableau contenant, pour chaque tutorat, le numéro d'enseignant du tuteur, le numéro de l'élève et les dates, false sinon
      */
     public function getInternships(string $student): false|array {
-        $query = 'SELECT id_enseignant, num_eleve, date_debut_resp, date_fin_resp
-                    FROM est_responsable
-                    WHERE num_eleve = :student
-                    AND date_fin_resp < CURRENT_DATE';
+        $query = 'SELECT id_teacher, student_number, responsible_start_date, responsible_end_date
+                    FROM is_responsible
+                    WHERE student_number = :student
+                    AND responsible_end_date < CURRENT_DATE';
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':student', $student);
         $stmt->execute();
@@ -197,7 +197,7 @@ class Homepage {
     public function getInternshipTeacher(array $internshipStudent): int {
         $internshipTeacher = 0;
         foreach($internshipStudent as $row) {
-            if($row['id_enseignant'] == $_SESSION['identifier']) ++$internshipTeacher;
+            if($row['id_teacher'] == $_SESSION['identifier']) ++$internshipTeacher;
         }
         return $internshipTeacher;
     }
@@ -208,7 +208,7 @@ class Homepage {
      * @return float score associé à la pertinence entre le sujet de stage et les disciplines enseignées par le professeur connecté
      */
     public function scoreDiscipSubject(string $studentId): float {
-        $query1 = 'SELECT nom_discipline FROM est_enseigne WHERE id_enseignant = :id';
+        $query1 = 'SELECT discipline_name FROM is_taught WHERE id_teacher = :id';
         $stmt1 = $this->db->getConn()->prepare($query1);
         $stmt1->bindParam(':id', $_SESSION['identifier']);
         $stmt1->execute();
@@ -216,7 +216,7 @@ class Homepage {
         $searchTerm = "";
 
         for($i = 0; $i < count($result); $i++) {
-            $searchTerm .= $result[$i]['nom_discipline'];
+            $searchTerm .= $result[$i]['discipline_name'];
             if($i < count($result) - 1) $searchTerm .= '_';
         }
 
@@ -224,11 +224,11 @@ class Homepage {
         $searchTerm = trim($searchTerm);
         $tsQuery = implode(' | ', explode('_', $searchTerm));
 
-        $query2 = "SELECT num_eleve, mots_cles, ts_rank_cd(to_tsvector('french', mots_cles), to_tsquery('french', :searchTerm), 32) AS rank
-                    FROM stage
-                    WHERE to_tsquery('french', :searchTerm) @@ to_tsvector('french', mots_cles)
-                    AND num_eleve = :studentId
-                    AND date_debut > CURRENT_DATE";
+        $query2 = "SELECT student_number, keywords, ts_rank_cd(to_tsvector('french', keywords), to_tsquery('french', :searchTerm), 32) AS rank
+                    FROM internship
+                    WHERE to_tsquery('french', :searchTerm) @@ to_tsvector('french', keywords)
+                    AND student_number = :studentId
+                    AND start_date_internship > CURRENT_DATE";
 
         $stmt2 = $pdo->getConn()->prepare($query2);
         $stmt2->bindValue(':searchTerm', $tsQuery);
