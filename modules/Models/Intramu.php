@@ -13,9 +13,9 @@ class Intramu {
 
     /**
      * On vérifie si l'utilisateur existe dans le BD, si oui return vrai(true) sinon faux(false)
-     * @param string $identifier
-     * @param string $password
-     * @return bool
+     * @param string $identifier l'identifiant entrée
+     * @param string $password le mot de passe entrée
+     * @return bool renvoie vrai(true) s'il y a corrependance, sinon faux(false)
      */
     public function doLogsExist(string $identifier, string $password): bool {
         if (empty($identifier) || empty($password)) {
@@ -23,46 +23,55 @@ class Intramu {
         }
 
         $db = $this->db;
-        $query = 'SELECT mdp_user FROM utilisateur WHERE id_user = :id_user';
+        $query = 'SELECT user_pass FROM user_connect WHERE user_id = :user_id';
         $stmt = $db->getConn()->prepare($query);
-        $stmt->bindParam(':id_user', $identifier);
+        $stmt->bindParam(':user_id', $identifier);
         $stmt->execute();
 
         $result = $stmt->fetch($db->getConn()::FETCH_ASSOC);
 
-        if ($result && isset($result['mdp_user'])) {
-            if (password_verify($password, $result['mdp_user'])) {
+        if ($result && isset($result['user_pass'])) {
+            if (password_verify($password, $result['user_pass'])) {
                 return true;
             }
         }
         return false;
     }
 
+    /**
+     * renvoie le role de l'utilisateur selon son identifiant
+     * @param string $identifier l'identifiant de l'utilisateur
+     * @return false|mixed renvoie le rôle dans la DB
+     */
     public function getRole(string $identifier) {
         if ($_SESSION['identifier'] !== $identifier) {
             return false;
         }
 
         $db = $this->db;
-        $query = 'SELECT nom_role FROM utilisateur 
-                  JOIN a_role ON utilisateur.id_user = a_role.id_user
-                  WHERE a_role.id_user = :id_user';
+        $query = 'SELECT role_name FROM has_role 
+                  WHERE has_role.user_id = :user_id';
         $stmt = $db->getConn()->prepare($query);
-        $stmt->bindParam(':id_user', $_SESSION['identifier']);
+        $stmt->bindParam(':user_id', $_SESSION['identifier']);
         $stmt->execute();
 
         return $stmt->fetch($db->getConn()::FETCH_ASSOC);
     }
 
+    /**
+     * Recuperer toute une ligne selon la cle primaire dans la table teacher
+     * @param string $identifier l'identifiant du professeur
+     * @return false|mixed renvoie la ligne dans la DB
+     */
     public function fetchAll(string $identifier) {
         if ($_SESSION['identifier'] !== $identifier) {
             return false;
         }
 
         $db = $this->db;
-        $query = 'SELECT * FROM enseignant WHERE id_enseignant = :id_enseignant';
+        $query = 'SELECT * FROM teacher WHERE id_teacher = :id_teacher';
         $stmt = $db->getConn()->prepare($query);
-        $stmt->bindParam(':id_enseignant', $_SESSION['identifier']);
+        $stmt->bindParam(':id_teacher', $_SESSION['identifier']);
         $stmt->execute();
 
         return $stmt->fetch($db->getConn()::FETCH_ASSOC);

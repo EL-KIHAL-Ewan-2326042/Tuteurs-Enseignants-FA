@@ -15,15 +15,24 @@ class Homepage {
             <h3 class="center-align">Répartiteur de tuteurs enseignants</h3>
 
             <div class="card-panel white">
-                <form id="searchForm" onsubmit="return false;" method="POST">
+                <form class="col" id="searchForm" onsubmit="return false;" method="POST">
+                    <label for="searchType">Type de recherche:</label>
+                    <div class="input-field">
+                        <select id="searchType" name="searchType">
+                            <option value="studentNumber" selected>Numéro Etudiant</option>
+                            <option value="name">Nom et Prénom</option>
+                            <option value="company">Entreprise</option>
+                        </select>
+                    </div>
                     <label for="search">Rechercher un étudiant:</label>
                     <input type="text" id="search" name="search" autocomplete="off" maxlength="50" required>
+                    <p>Etudiant(s):</p>
                     <div id="searchResults"></div>
                 </form>
             </div>
             <div class="center">
                 <?php
-                if (isset($_SESSION['selected_student']['firstName']) && isset($_SESSION['selected_student']['lastName'])) {
+                if (isset($_SESSION['selected_student']) && isset($_SESSION['selected_student']['firstName']) && isset($_SESSION['selected_student']['lastName'])) {
                     echo '<h4 class="left-align"> Résultat pour: ' . $_SESSION['selected_student']['firstName'] . ' ' .  $_SESSION['selected_student']['lastName'] . '</h4>';
                 }
                 ?>
@@ -33,9 +42,9 @@ class Homepage {
                 echo "<p>Cet étudiant n'a pas de stage ...</p>";
             }
             else {
-                ?>
+            ?>
                 <div id="map"></div>
-                <?php
+            <?php
             }
             ?>
 

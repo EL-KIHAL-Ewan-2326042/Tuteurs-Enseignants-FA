@@ -23,7 +23,6 @@ class Dashboard{
             try {
                 while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                     print_r($data);
-                    // prepare insertion
                     $query = 'INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe) VALUES (:colonne1, :colonne2,:colonne3,:colonne4,:colonne5)';
                     $stmt = $db->getConn()->prepare($query);
                     $stmt->bindParam(':colonne1', $data[0]);
@@ -31,8 +30,7 @@ class Dashboard{
                     $stmt->bindParam(':colonne3', $data[2]);
                     $stmt->bindParam(':colonne4', $data[3]);
                     $stmt->bindParam(':colonne5', $data[4]);
-
-                    // execute insertion
+                    
                     $stmt->execute();
                 }
                 fclose($handle);
