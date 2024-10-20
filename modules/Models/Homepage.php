@@ -52,6 +52,13 @@ class Homepage {
         return $stmt->fetchColumn();
     }
 
+    /**
+     * Renvoie un tableau trié selon la note, le nom et le prénom de l'élève contenant tous les stages et leurs informations
+     * Les stages sélectionnés sont uniquement ceux des élèves faisant partie d'au moins un des départements passés en paramètre
+     * Les stages n'ont pas encore débuté et n'ont aucun tuteur attribué
+     * @param array $departments liste des départements dont on veut récupérer les stages des élèves
+     * @return array tableau contenant les informations relatives à chaque stage, le nombre fois où l'enseignant connecté a été le tuteur de l'élève ainsi qu'une note représentant la pertinence du stage pour l'enseignant
+     */
     public function getStudentsList(array $departments): array {
         $studentsList = array();
         foreach($departments as $department) {
@@ -77,7 +84,7 @@ class Homepage {
                 $row['internshipTeacher'] = $this->getInternshipTeacher($internshipsResp);
                 $row['countInternship'] = count($internshipsResp);
             }
-            $row['relevance'] = $this->scoreDiscipSujet($row['num_eleve']);
+            $row['relevance'] = $this->scoreDiscipSubject($row['num_eleve']);
         }
 
         usort($studentsList, function ($a, $b) {
@@ -95,7 +102,12 @@ class Homepage {
         return $studentsList;
     }
 
-    public function getStudentsPerDepartment(string $department): bool|array {
+    /**
+     * Renvoie un tableau contenant les stages des élèves du département passé en paramètre et leurs informations, ou false
+     * @param string $department le département duquel les élèves sélectionnés font partie
+     * @return false|array tableau contenant le numéro, le nom et le prénom de l'élève, ainsi que le nom de l'entreprise dans lequel il va faire son stage, le sujet et les dates, false sinon
+     */
+    public function getStudentsPerDepartment(string $department): false|array {
         $query = 'SELECT eleve.num_eleve, nom_eleve, prenom_eleve, nom_entreprise, adresse_entreprise, sujet_stage, date_debut, date_fin
                     FROM eleve
                     JOIN etudie_a
@@ -110,7 +122,11 @@ class Homepage {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getDepEnseignant(): bool|array {
+    /**
+     * Renvoie tous les départements dont l'enseignant connecté fait partie, ou false
+     * @return false|array tableau contenant tous les départements dont l'enseignant connecté fait partie, false sinon
+     */
+    public function getDepTeacher(): false|array {
         $query = 'SELECT nom_departement
                     FROM enseigne_a
                     WHERE  id_enseignant = :enseignant';
@@ -120,7 +136,12 @@ class Homepage {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getInternships(string $student): bool|array {
+    /**
+     * Renvoie un tableau contenant les informations de chaque tutorat de l'élève passé en paramètre, ou false
+     * @param string $student le numéro de l'étudiant dont on récupère les informations
+     * @return false|array tableau contenant, pour chaque tutorat, le numéro d'enseignant du tuteur, le numéro de l'élève et les dates, false sinon
+     */
+    public function getInternships(string $student): false|array {
         $query = 'SELECT id_enseignant, num_eleve, date_debut_resp, date_fin_resp
                     FROM est_responsable
                     WHERE num_eleve = :student
@@ -131,7 +152,12 @@ class Homepage {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function getInternshipTeacher(array $internshipStudent): string {
+    /**
+     * Renvoie le nombre de fois où l'enseignant connecté a été tuteur dans le tableau passé en paramètre
+     * @param array $internshipStudent tableau renvoyé par la méthode 'getInternships()'
+     * @return int nombre de fois où l'enseignant connecté a été tuteur dans le tablau passé en paramètre
+     */
+    public function getInternshipTeacher(array $internshipStudent): int {
         $internshipTeacher = 0;
         foreach($internshipStudent as $row) {
             if($row['id_enseignant'] == $_SESSION['identifier']) ++$internshipTeacher;
@@ -139,7 +165,12 @@ class Homepage {
         return $internshipTeacher;
     }
 
-    public function scoreDiscipSujet(string $studentId): string {
+    /**
+     * Renvoie un score associé à la pertinence entre le sujet de stage de l'élève passé en paramètre et les disciplines enseignées par le professeur connecté
+     * @param string $studentId numéro d'élève
+     * @return float score associé à la pertinence entre le sujet de stage et les disciplines enseignées par le professeur connecté
+     */
+    public function scoreDiscipSubject(string $studentId): float {
         $query1 = 'SELECT nom_discipline FROM est_enseigne WHERE id_enseignant = :id';
         $stmt1 = $this->db->getConn()->prepare($query1);
         $stmt1->bindParam(':id', $_SESSION['identifier']);
@@ -169,10 +200,22 @@ class Homepage {
 
         $result = $stmt2->fetch(PDO::FETCH_ASSOC);
 
-        if(!$result) return "0";
+        if(!$result) return 0;
         return $result["rank"]*5;
     }
 
+    /**
+     * Renvoie le score final normalisé sur 5 représentant l'intérêt d'un enseignant pour un stage en prenant en compte des critères et leurs coefficients associés
+     * Représente l'algorithme de calcul sur lequel le score final se base
+     * @param int $duration temps de trajet en voiture séparant le professeur et l'adresse du stage
+     * @param int $factorDuration coefficient associé au temps de trajet
+     * @param int $internshipTeacher nombre de fois où l'enseignant a été le tuteur de l'élève
+     * @param int $factorInternshipTeacher coefficient associé au nombre de fois où l'enseignant a été le tuteur de l'élève
+     * @param float $scoreRelevance score de pertinence renvoyé par la méthode 'scoreDiscipSujet()'
+     * @param int $factorRelevance coefficient associé au score de pertinence
+     * @param int $countInternship nombre total de stages et alternances effectués par l'élève
+     * @return float score final normalisé sur 5
+     */
     public function calculateScore(int $duration, int $factorDuration, int $internshipTeacher, int $factorInternshipTeacher, float $scoreRelevance, int $factorRelevance, int $countInternship): float {
         $scoreDuration = $factorDuration/(1+0.02*$duration);
         $scoreRelevance *= $factorRelevance;
