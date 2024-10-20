@@ -44,7 +44,7 @@ class Homepage {
             <div class="row"></div>
 
             <?
-            $departments = $this->model->getDepEnseignant();
+            $departments = $this->model->getDepTeacher();
             if(!$departments): ?>
                 <h6 class="left-align">Vous ne faîtes partie d'aucun département</h6>
             <?
