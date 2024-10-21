@@ -23,13 +23,13 @@ class Dashboard{
             try {
                 while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                     print_r($data);
-                    $query = 'INSERT INTO eleve (num_eleve,nom_eleve,prenom_eleve,formation,groupe) VALUES (:colonne1, :colonne2,:colonne3,:colonne4,:colonne5)';
+                    $query = 'INSERT INTO student (student_number,student_name,student_surname,formation,class_groupe) VALUES (:column1, :column2,:column3,:column4,:column5)';
                     $stmt = $db->getConn()->prepare($query);
-                    $stmt->bindParam(':colonne1', $data[0]);
-                    $stmt->bindParam(':colonne2', $data[1]);
-                    $stmt->bindParam(':colonne3', $data[2]);
-                    $stmt->bindParam(':colonne4', $data[3]);
-                    $stmt->bindParam(':colonne5', $data[4]);
+                    $stmt->bindParam(':column1', $data[0]);
+                    $stmt->bindParam(':column2', $data[1]);
+                    $stmt->bindParam(':column3', $data[2]);
+                    $stmt->bindParam(':column4', $data[3]);
+                    $stmt->bindParam(':column5', $data[4]);
                     
                     $stmt->execute();
                 }
