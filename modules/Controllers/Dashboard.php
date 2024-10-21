@@ -28,11 +28,22 @@ class Dashboard {
         $cssFilePath = '_assets/styles/dashboard.css';
         $jsFilePath = '';
 
-        if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_FILES['csv_file'])) {
-            $csvFile = $_FILES['csv_file']['tmp_name'];
+        if($_SERVER["REQUEST_METHOD"] == "POST") {
             $db = \Includes\Database::getInstance();
             $model = new \Blog\Models\Dashboard($db);
-            $model->uploadCsv($csvFile);
+
+            if (isset($_FILES['csv_file_student'])){
+                $csvFile = $_FILES['csv_file_student']['tmp_name'];
+                $model->uploadCsvStudent($csvFile);
+            } elseif (isset($_FILES['csv_file_teacher'])){
+                $csvFile = $_FILES['csv_file_teacher']['tmp_name'];
+                $model->uploadCsvTeacher($csvFile);
+            } elseif (isset($_FILES['csv_file_internship'])){
+                $csvFile = $_FILES['csv_file_internship']['tmp_name'];
+                $model->uploadCsvInternship($csvFile);
+            } else {
+                echo "Aucun fichier CSV n'est reconnu.";
+            }
         }
 
         $this->layout->renderTop($title, $cssFilePath);
