@@ -60,6 +60,27 @@ class Intramu {
     }
 
     /**
+     * renvoie le role_department de l'utilisateur selon son identifiant
+     * @param string $identifier l'identifiant de l'utilisateur
+     * @return false|mixed renvoie le rôle dans la DB
+     */
+    public function getRole_department(string $identifier) {
+        if ($_SESSION['identifier'] !== $identifier) {
+            return false;
+        }
+
+        $db = $this->db;
+        $query = 'SELECT Role_department FROM has_role 
+                  WHERE has_role.user_id = :user_id';
+
+        $stmt = $db->getConn()->prepare($query);
+        $stmt->bindParam(':user_id', $identifier);
+        $stmt->execute();
+
+        return $stmt->fetchColumn();
+    }
+
+    /**
      * Recuperer toute une ligne selon la cle primaire dans la table teacher
      * @param string $identifier l'identifiant du professeur
      * @return false|mixed renvoie la ligne dans la DB

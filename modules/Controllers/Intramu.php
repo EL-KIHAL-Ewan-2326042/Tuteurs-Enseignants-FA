@@ -53,6 +53,7 @@ class Intramu {
 
                 $row = $loginModel->fetchAll($identifierLogs);
                 $_SESSION['role'] = $loginModel->getRole($identifierLogs);
+                $_SESSION['role_department'] = $loginModel->getRole_department($identifierLogs);
                 $_SESSION['address'] = $row['adresse'];
                 header('Location: /homepage');
                 exit();
