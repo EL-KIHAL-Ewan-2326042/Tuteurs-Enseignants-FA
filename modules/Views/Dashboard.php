@@ -27,7 +27,7 @@ class Dashboard{
                             </button>
                         </div>
                     </form>
-                <?php }?>
+                <?php } else header('Location: /homepage'); ?>
             </div>
         </main>
         <?php
