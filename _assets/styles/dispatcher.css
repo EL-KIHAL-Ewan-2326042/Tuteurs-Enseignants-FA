@@ -1,0 +1,5 @@
+@import "global.css";
+
+.button-margin {
+    margin-top: var(--medium-spacing);
+}
