@@ -75,44 +75,69 @@ class Homepage {
 
                 <?
                 if(!empty($_POST['selecDep'])):
-                ?>
-                    <form method="post" class="center-align">
-                        <table class="highlight centered">
-                            <thead>
-                            <tr>
-                                <th>ELEVE</th>
-                                <th>HISTORIQUE</th>
-                                <th>POSITION</th>
-                                <th>SUJET</th>
-                                <th>ENTREPRISE</th>
-                                <th>TOTAL</th>
-                                <th>CHOIX</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <?
-                            foreach($this->model->getStudentsList($_POST['selecDep']) as $eleve): ?>
+                    $table = $this->model->getStudentsList($_POST['selecDep']);
+                    if(empty($table)):
+                        echo "<h6 class='left-align'>Aucun stage disponible</h6>";
+                    else: ?>
+                        <form method="post" class="center-align">
+                            <table class="highlight centered">
+                                <thead>
                                 <tr>
-                                    <td><? echo $eleve["student_name"] . " " . $eleve["student_firstname"] ?></td>
-                                    <td><? echo $eleve["internshipTeacher"] ?></td>
-                                    <td> <? echo str_replace('_', "'", $eleve["address"]) ?> </td>
-                                    <td> <? echo str_replace('_', ' ', $eleve["internship_subject"]) ?> </td>
-                                    <td> <? echo $eleve["company_name"] ?> </td>
-                                    <td><? echo "<strong>" . round($eleve['relevance'], 2) . "</strong>/5" ?></td>
-                                    <td>
-                                        <label>
-                                            <input type="checkbox" id="selecStudent[]" name="selecStudent[]" class="center-align filled-in" value="<?= $eleve['student_name'] ?>" />
-                                            <span></span>
-                                        </label>
-                                    </td>
+                                    <th>ELEVE</th>
+                                    <th>HISTORIQUE</th>
+                                    <th>POSITION</th>
+                                    <th>SUJET</th>
+                                    <th>ENTREPRISE</th>
+                                    <th>TOTAL</th>
+                                    <th>CHOIX</th>
                                 </tr>
-                            <? endforeach; ?>
-                            </tbody>
-                        </table>
-                    </form>
-                <? endif; ?>
-            <? endif; ?>
-
+                                </thead>
+                                <tbody>
+                                <?
+                                foreach($table as $row): ?>
+                                    <tr>
+                                        <td><? echo $row["student_name"] . " " . $row["student_firstname"] ?></td>
+                                        <td><? echo $row["internshipTeacher"] ?></td>
+                                        <td>
+                                            <script>
+                                                window.addEventListener('load', async function () {
+                                                    const checkGoogleMaps = setInterval(async () => {
+                                                        if (typeof google !== 'undefined' && google.maps && google.maps.Geocoder) {
+                                                            clearInterval(checkGoogleMaps);
+                                                            addressTeach = [];
+                                                            <? if(gettype($_SESSION['address']) === 'array'):
+                                                                foreach($_SESSION['address'] as $address): ?>
+                                                                    addressTeach.push(await geocodeAddress(<?= '"' . str_replace('_', "'", $address) . '"' ?>));
+                                                                <? endforeach;
+                                                            elseif(gettype($_SESSION['address']) === 'string'): ?>
+                                                                addressTeach.push(await geocodeAddress(<?= '"' . str_replace('_', "'", $_SESSION['address']) . '"' ?>));
+                                                            <? endif; ?>
+                                                            addressStudent = await geocodeAddress(<?= '"' . str_replace('_', "'", $row["address"]) . '"' ?>);
+                                                            addressTeach.forEach(async (address) => console.log('Adresse: ', (await calculateDistance(addressStudent, address)).text));
+                                                        } else {
+                                                            console.log('L\'API Google Maps n\'est pas encore chargée.');
+                                                        }
+                                                    }, 100);
+                                                });
+                                            </script>
+                                        </td>
+                                        <td> <? echo str_replace('_', ' ', $row["internship_subject"]) ?> </td>
+                                        <td> <? echo str_replace('_', ' ', $row["company_name"]) ?> </td>
+                                        <td><? echo "<strong>" . round($row['relevance'], 2) . "</strong>/5" ?></td>
+                                        <td>
+                                            <label>
+                                                <input type="checkbox" id="selecStudent[]" name="selecStudent[]" class="center-align filled-in" value="<?= $row['student_name'] ?>" />
+                                                <span></span>
+                                            </label>
+                                        </td>
+                                    </tr>
+                                <? endforeach; ?>
+                                </tbody>
+                            </table>
+                        </form>
+                    <? endif;
+                endif;
+            endif; ?>
             <script>
                 const teacherAddress = "<?php echo isset($_SESSION['address']) ? $_SESSION['address'] : 'Aix-En-Provence'; ?>";
                 const companyAddress = "<?php echo isset($_SESSION['selected_student']['address']) ? $_SESSION['selected_student']['address'] : 'Marseille'; ?>";

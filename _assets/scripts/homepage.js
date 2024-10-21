@@ -306,9 +306,12 @@ async function calculateDistance(origin, destination) {
         const response = await getDistanceMatrix(origin, destination);
         const result = response.rows[0].elements[0];
 
-        const duration = result.duration.text;
+        if(origin === companyLocation || destination === teacherLocation) {
+            await getRoute(origin, destination);
+        } else {
+            return result.duration;
+        }
 
-        await getRoute(origin, destination);
     } catch (error) {
         alert(error);
     }

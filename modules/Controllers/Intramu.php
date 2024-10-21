@@ -34,10 +34,8 @@ class Intramu {
 
             if ($loginModel->doLogsExist($identifierLogs, $passwordLogs)) {
                 $_SESSION['identifier'] = $identifierLogs;
-
-                $row = $loginModel->fetchAll($identifierLogs);
                 $_SESSION['role'] = $loginModel->getRole($identifierLogs);
-                $_SESSION['address'] = $row['adresse'];
+                $_SESSION['address'] = $loginModel->getAddress($identifierLogs);
                 header('Location: /homepage');
                 exit();
             } else {
