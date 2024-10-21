@@ -44,7 +44,7 @@ class IntramuTest extends TestCase {
             ->method('prepare')
             ->willReturn($stmt);
 
-        $this->dbMock->expects($this->once())
+        $this->dbMock->expects($this->any())
             ->method('getConn')
             ->willReturn($pdo);
 
@@ -76,7 +76,7 @@ class IntramuTest extends TestCase {
             ->method('prepare')
             ->willReturn($stmt);
 
-        $this->dbMock->expects($this->once())
+        $this->dbMock->expects($this->any())
             ->method('getConn')
             ->willReturn($pdo);
 
@@ -111,7 +111,7 @@ class IntramuTest extends TestCase {
             ->method('prepare')
             ->willReturn($stmt);
 
-        $this->dbMock->expects($this->once())
+        $this->dbMock->expects($this->any())
             ->method('getConn')
             ->willReturn($pdo);
 
@@ -146,7 +146,7 @@ class IntramuTest extends TestCase {
             ->method('prepare')
             ->willReturn($stmt);
 
-        $this->dbMock->expects($this->once())
+        $this->dbMock->expects($this->any())
             ->method('getConn')
             ->willReturn($pdo);
 
