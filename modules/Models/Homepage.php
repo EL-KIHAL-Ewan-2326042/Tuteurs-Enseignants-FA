@@ -89,6 +89,10 @@ class Homepage {
         return $stmt->fetchColumn();
     }
 
+    public function sortRows(array $table): array {
+
+    }
+
     /**
      * Renvoie un tableau trié selon la note, le nom et le prénom de l'élève contenant tous les stages et leurs informations
      * Les stages sélectionnés sont uniquement ceux des élèves faisant partie d'au moins un des départements passés en paramètre
@@ -123,18 +127,6 @@ class Homepage {
             }
             $row['relevance'] = $this->scoreDiscipSubject($row['student_number']);
         }
-
-        usort($studentsList, function ($a, $b) {
-            $rank = $b['relevance'] <=> $a['relevance'];
-            if ($rank === 0) {
-                $lastName = $a['student_name'] <=> $b['student_name'];
-                if ($lastName === 0) {
-                    return $a['student_firstname'] <=> $b['student_firstname'];
-                }
-                return $lastName;
-            }
-            return $rank;
-        });
 
         return $studentsList;
     }
