@@ -11,7 +11,7 @@ class Dashboard{
         ?>
         <main>
             <div class="row">
-                <?php if (isset($_SESSION['role'])=='admin') {?>
+                <?php if (isset($_SESSION['role']['role_name'])=='Admin_dep') {?>
                     <form action="/dashboard" method="POST" enctype="multipart/form-data">
                         <div class="file-field input-field">
                             <div class="btn">
