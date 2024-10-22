@@ -147,7 +147,7 @@ let directionsService, directionsRenderer;
  * @returns {Promise<void>}
  */
 async function initMap() {
-    if (!companyAddress || !teacherAddress) {
+    if (typeof companyAddress === 'undefined' || typeof teacherAddress === 'undefined') {
         return;
     }
 
@@ -316,3 +316,4 @@ async function calculateDistance(origin, destination) {
         alert(error);
     }
 }
+

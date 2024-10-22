@@ -93,6 +93,21 @@ class Homepage {
                                 </tr>
                                 </thead>
                                 <tbody>
+                                <script>
+                                    let addressTeach = [];
+                                    window.addEventListener('load', async function () {
+                                        const checkGoogleMaps = setInterval(async () => {
+                                            if (typeof google !== 'undefined' && google.maps && google.maps.Geocoder) {
+                                                clearInterval(checkGoogleMaps);
+                                                <? foreach($_SESSION['address'] as $address): ?>
+                                                    addressTeach.push(await geocodeAddress(<?= '"' . str_replace('_', "'", $address['address']) . '"' ?>));
+                                                <? endforeach; ?>
+                                                } else {
+                                                console.log('L\'API Google Maps n\'est pas encore chargée.');
+                                            }
+                                        }, 100);
+                                    });
+                                </script>
                                 <?
                                 foreach($table as $row): ?>
                                     <tr>
@@ -104,16 +119,13 @@ class Homepage {
                                                     const checkGoogleMaps = setInterval(async () => {
                                                         if (typeof google !== 'undefined' && google.maps && google.maps.Geocoder) {
                                                             clearInterval(checkGoogleMaps);
-                                                            addressTeach = [];
-                                                            <? if(gettype($_SESSION['address']) === 'array'):
-                                                                foreach($_SESSION['address'] as $address): ?>
-                                                                    addressTeach.push(await geocodeAddress(<?= '"' . str_replace('_', "'", $address) . '"' ?>));
-                                                                <? endforeach;
-                                                            elseif(gettype($_SESSION['address']) === 'string'): ?>
-                                                                addressTeach.push(await geocodeAddress(<?= '"' . str_replace('_', "'", $_SESSION['address']) . '"' ?>));
-                                                            <? endif; ?>
-                                                            addressStudent = await geocodeAddress(<?= '"' . str_replace('_', "'", $row["address"]) . '"' ?>);
-                                                            addressTeach.forEach(async (address) => console.log('Adresse: ', (await calculateDistance(addressStudent, address)).text));
+                                                            const addressStudent = await geocodeAddress(<?= '"' . str_replace('_', "'", $row["address"]) . '"' ?>);
+                                                            let durations = [];
+                                                            for (const address of addressTeach) {
+                                                                durations.push(await calculateDistance(addressStudent, address));
+                                                            }
+                                                            const durationValues = Array.from(durations, (x) => x.value);
+                                                            console.log(durationValues.indexOf(Math.min(durationValues)));
                                                         } else {
                                                             console.log('L\'API Google Maps n\'est pas encore chargée.');
                                                         }
@@ -123,10 +135,10 @@ class Homepage {
                                         </td>
                                         <td> <? echo str_replace('_', ' ', $row["internship_subject"]) ?> </td>
                                         <td> <? echo str_replace('_', ' ', $row["company_name"]) ?> </td>
-                                        <td><? echo "<strong>" . round($row['relevance'], 2) . "</strong>/5" ?></td>
+                                        <td> <? echo "<strong>" . round($row['relevance'], 2) . "</strong>/5" ?> </td>
                                         <td>
                                             <label>
-                                                <input type="checkbox" id="selecStudent[]" name="selecStudent[]" class="center-align filled-in" value="<?= $row['student_name'] ?>" />
+                                                <input type="checkbox" id="selecStudent[]" name="selecStudent[]" class="center-align filled-in" value="<?= $row['student_name'] ?>" <? if(isset($_POST['selecStudent']) && in_array($row['student_name'], $_POST['selecStudent'])): ?> checked="checked" <? endif; ?> />
                                                 <span></span>
                                             </label>
                                         </td>
@@ -139,7 +151,7 @@ class Homepage {
                 endif;
             endif; ?>
             <script>
-                const teacherAddress = "<?php echo isset($_SESSION['address']) ? $_SESSION['address'] : 'Aix-En-Provence'; ?>";
+                const teacherAddress = "<?php echo isset($_SESSION['address']) ? $_SESSION['address'][0]['address'] : 'Aix-En-Provence'; ?>";
                 const companyAddress = "<?php echo isset($_SESSION['selected_student']['address']) ? $_SESSION['selected_student']['address'] : 'Marseille'; ?>";
             </script>
         </main>
