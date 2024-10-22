@@ -2,6 +2,7 @@
 
 namespace Blog\Models;
 
+use Exception;
 use Includes\Database;
 use PDO;
 use PDOException;
@@ -102,70 +103,54 @@ class Dashboard{
         return $headers === $expectedHeaders;
     }
 
+    /**
+     * Exportation des données de la base de données vers un fichier CSV
+     * pour une table donnée
+     * @param string $tableName
+     * @param array $headers
+     * @return void
+     * @throws Exception
+     */
     public function exportToCsvByDepartment(string $tableName, array $headers): void {
         $db = $this->db;
-        $department = $_SESSION['Role_department'];  //in_array('Admin_dep', $_SESSION['role'])
-        $filePath = "/path/to/exports/{$tableName}_export.csv";
-        $fileHandle = fopen($filePath, "w");
+        $department = $_SESSION['role_department'];
 
-        fputcsv($fileHandle, $headers);
+        //envoyer les en-têtes pour le téléchargement
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="' . $tableName . '_export.csv"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
 
-        $query = "SELECT " . implode(',',$headers) . " FROM $tableName";
+        $output = fopen('php://output', 'w');
+
+        if ($output === false){
+            throw new Exception("Impossible d'ouvrir le fichier CSV");
+        }
+
+        fputcsv($output, $headers);
+
+        $query = "SELECT " . implode(',',array_map(fn($headers) => "$tableName.$headers", $headers)). " FROM $tableName";
 
         //condition filtrant par département
-        switch ($tableName) {
-            case 'student':
-                $query .= "JOIN study_at ON student.student_number = study_at.student_number WHERE study_at.department_name = :department";
-                break;
-            case 'teacher':
-                $query .= "JOIN teaches ON teacher.id_teacher = teaches.id_teacher WHERE teaches.department_name 
-                = :department";
-                break;
-            case 'internship':
-                $query .= "JOIN study_at ON internship.student_number = study_at.student_number WHERE 
-                study_at.department_name = :department";
-                break;
-            case 'teaches':
-            case 'department':
-            case 'study_at':
-                $query .= "WHERE department_name = :department";
-                break;
-            case 'is_requested':
-                $query .= "JOIN study_at ON is_requested.student_number = study_at.student_number WHERE 
-                study_at.department_name = :department";
-                break;
-            case 'is_taught':
-                $query .= "JOIN teaches ON is_taught.id_teacher = teaches.id_teacher WHERE teaches.department_name 
-                = :department";
-                break;
-            case 'discipline':
-                $query .= "JOIN is_taught ON discipline.discipline_name = is_taught.discipline JOIN teaches 
-                ON is_taught.id_teacher = teaches.id_teacher WHERE teaches.department_name = :department";
-                break;
-            case 'is_responsible':
-                $query .= "JOIN study_at ON is_responsible.student_number = study_at.student_number WHERE 
-                study_at.department_name = :department";
-                break;
-            case 'has_address':
-                $query .= "JOIN teaches ON has_address.id_teacher = study_at.id_teacher WHERE 
-                teaches.department_name = :department";
-                break;
-            case 'address_type':
-                $query .= "JOIN has_address ON address_type.adr_type = has_address.adr_type JOIN teaches 
-                ON has_address.id_teacher = study_at.id_teacher WHERE teaches.department_name = :department";
-                break;
-            case 'addr_name':
-                $query .= "JOIN has_address ON addr_name.address = has_address.address JOIN teaches 
-                ON has_address.id_teacher = study_at.id_teacher WHERE teaches.department_name = :department";
-                break;
-
-                //suite case partie backup
-
-            default:
-                echo "Table non reconnue";
-                fclose($fileHandle);
-                return;
-        }
+        $query .= match ($tableName) {
+            'student' => " JOIN study_at ON student.student_number = study_at.student_number WHERE study_at.department_name = :department",
+            'teacher' => " JOIN teaches ON teacher.id_teacher = teaches.id_teacher WHERE teaches.department_name = :department",
+            'internship' => " JOIN study_at ON internship.student_number = study_at.student_number WHERE study_at.department_name = :department",
+            'teaches', 'department', 'study_at' => " WHERE department_name = :department",
+            'is_requested' => " JOIN study_at ON is_requested.student_number = study_at.student_number WHERE study_at.department_name = :department",
+            'is_taught' => " JOIN teaches ON is_taught.id_teacher = teaches.id_teacher WHERE teaches.department_name = :department",
+            'discipline' => " JOIN is_taught ON discipline.discipline_name = is_taught.discipline JOIN teaches ON is_taught.id_teacher = teaches.id_teacher WHERE teaches.department_name = :department",
+            'is_responsible' => " JOIN study_at ON is_responsible.student_number = study_at.student_number WHERE study_at.department_name = :department",
+            'has_address' => " JOIN teaches ON has_address.id_teacher = study_at.id_teacher WHERE teaches.department_name = :department",
+            'address_type' => " JOIN has_address ON address_type.adr_type = has_address.adr_type JOIN teaches ON has_address.id_teacher = study_at.id_teacher WHERE teaches.department_name = :department",
+            'addr_name' => " JOIN has_address ON addr_name.address = has_address.address JOIN teaches ON has_address.id_teacher = study_at.id_teacher WHERE teaches.department_name = :department",
+            'has_role' => " WHERE role_department = :department",
+            'role' => " JOIN has_role ON role.role_name = has_role.role_name WHERE role_department = :department",
+            'user_connect' => " JOIN has_role ON user_connect.user_id = has_role.user_id WHERE role_department = :department",
+            'backup' => " JOIN has_role ON backup.user_id = has_role.user_id WHERE role_department = :department",
+            'distribution_criteria' => " JOIN backup ON distribution_criteria.name_criteria = backup.name_criteria JOIN has_role ON backup.user_id = has_role.user_id WHERE role_department = :department",
+            default => throw new Exception("Table non reconnue : " . $tableName),
+        };
 
         //préparation et exécution de la requête
         $stmt = $db->getConn()->prepare($query);
@@ -174,10 +159,11 @@ class Dashboard{
 
         //écriture des données récupérées
         while ($row =$stmt->fetch(PDO::FETCH_ASSOC)) {
-            fputcsv($fileHandle, $row);
+            fputcsv($output, $row);
         }
 
-        fclose($fileHandle);
-        echo "Les données ont été exportées vers : {$filePath}";
+        fclose($output);
+        exit();
+
     }
 }

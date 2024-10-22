@@ -12,6 +12,7 @@ class Dashboard{
         <main>
             <?php if (isset($_SESSION['role']['role_name'])=='Admin_dep') {?>
                 <h3> Dashboard </h3>
+                <h4>Importer :</h4>
                 <div class="cell">
                     <div class="column">
                         <h5> Table étudiant (student) : </h5>
@@ -67,6 +68,19 @@ class Dashboard{
                         </form>
                     </div>
                 </div>
+
+                <h4>Exporter :</h4>
+                <form action="/dashboard" method="POST">
+                    <div class="input-field">
+                        <input id="export_table" name="export_table" type="text" class="validate" required>
+                        <label for="export_table">Nom de la table</label>
+                        <span class="helper-text" data-error="wrong" data-success="right">Ecrire le nom de la table désirée</span>
+                    </div>
+                    <button class="btn waves-effect waves-light" type="submit">Exporter
+                        <i class="material-icons right">send</i>
+                    </button>
+                </form>
+
             <?php } else header('Location: /homepage'); ?>
         </main>
         <?php
