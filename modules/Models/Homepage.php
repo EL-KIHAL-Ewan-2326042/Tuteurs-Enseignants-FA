@@ -89,9 +89,9 @@ class Homepage {
         return $stmt->fetchColumn();
     }
 
-    public function sortRows(array $table): array {
+    /*public function sortRows(array $table): array {
 
-    }
+    }*/
 
     /**
      * Renvoie un tableau trié selon la note, le nom et le prénom de l'élève contenant tous les stages et leurs informations
@@ -113,7 +113,6 @@ class Homepage {
             $internshipsResp = $this->getInternships($row['student_number']);
             if(!$internshipsResp) {
                 $row['internshipTeacher'] = 0;
-                $row['countInternship'] = 0;
             } else {
                 foreach($internshipsResp as $internshipInfo) {
                     if($row['start_date_internship'] === $internshipInfo['responsible_start_date'] && $row['end_date_internship'] === $internshipInfo['responsible_end_date']) {
@@ -123,10 +122,21 @@ class Homepage {
                 }
                 if(!isset($row)) continue;
                 $row['internshipTeacher'] = $this->getInternshipTeacher($internshipsResp);
-                $row['countInternship'] = count($internshipsResp);
             }
             $row['relevance'] = $this->scoreDiscipSubject($row['student_number']);
         }
+
+        usort($studentsList, function ($a, $b) {
+            $rank = $b['relevance'] <=> $a['relevance'];
+            if ($rank === 0) {
+                $lastName = $a['student_name'] <=> $b['student_name'];
+                if ($lastName === 0) {
+                    return $a['student_firstname'] <=> $b['student_firstname'];
+                }
+                return $lastName;
+            }
+            return $rank;
+        });
 
         return $studentsList;
     }
@@ -147,6 +157,20 @@ class Homepage {
                     AND internship.start_date_internship > CURRENT_DATE';
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':dep', $department);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Renvoie les critères et leurs coefficients associés pour l'enseignant connecté, ou false
+     * @return false|array tableau contenant chaque crtière et son coefficient, false sinon
+     */
+    public function getFactors(): false|array {
+        $query = 'SELECT name_criteria, coef
+                    FROM backup
+                    WHERE  user_id = :user_id';
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindParam(':user_id', $_SESSION['identifier']);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -255,4 +279,8 @@ class Homepage {
         if($score === 0.0) return 0.0;
         return ($score * 5) / ($factorDuration + $factorInternshipTeacher + $factorRelevance);
     }
+
+    /*public function calculateScore(array $dictCriteria): float {
+
+    }*/
 }
