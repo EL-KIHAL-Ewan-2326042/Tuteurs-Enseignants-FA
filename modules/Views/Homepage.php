@@ -53,6 +53,14 @@ class Homepage {
             <div class="row"></div>
 
             <?
+            if(isset($_POST['selecDepSubmitted'])) {
+                if(isset($_POST['selecDep'])) {
+                    $_SESSION['selecDep'] = $_POST['selecDep'];
+                } else {
+                    unset($_SESSION['selecDep']);
+                }
+            }
+
             $departments = $this->model->getDepTeacher();
             if(!$departments): ?>
                 <h6 class="left-align">Vous ne faîtes partie d'aucun département</h6>
@@ -63,96 +71,113 @@ class Homepage {
                         <?
                         foreach($departments as $dep): ?>
                         <label class="formCell">
-                            <input type="checkbox" id="selecDep[]" name="selecDep[]" class="filled-in" value="<?= $dep['department_name'] ?>" <? if(isset($_POST['selecDep']) && in_array($dep['department_name'], $_POST['selecDep'])): ?> checked="checked" <? endif; ?> />
+                            <input type="checkbox" name="selecDep[]" class="filled-in" value="<?= $dep['department_name'] ?>" <? if(isset($_SESSION['selecDep']) && in_array($dep['department_name'], $_SESSION['selecDep'])): ?> checked="checked" <? endif; ?> />
                             <span><? echo str_replace('_', ' ', $dep['department_name']) ?></span>
                         </label>
                         <? endforeach; ?>
                     </div>
+                    <input type="hidden" name="selecDepSubmitted" value="1">
                     <button class="waves-effect waves-light btn" type="submit">Afficher</button>
                 </form>
 
                 <div class="row"></div>
 
                 <?
-                if(!empty($_POST['selecDep'])):
-                    $table = $this->model->getStudentsList($_POST['selecDep']);
+                if(isset($_POST['selecStudentSubmitted'])) {
+                    if(isset($_POST['selecStudent'])) {
+                        $_SESSION['selecStudent'] = $_POST['selecStudent'];
+                    } else {
+                        unset($_SESSION['selecStudent']);
+                    }
+                }
+
+                if(!empty($_SESSION['selecDep'])):
+                    $table = $this->model->getStudentsList($_SESSION['selecDep']);
                     if(empty($table)):
                         echo "<h6 class='left-align'>Aucun stage disponible</h6>";
                     else: ?>
                         <form method="post" class="center-align">
-                            <table class="highlight centered">
-                                <thead>
-                                <tr>
-                                    <th>ELEVE</th>
-                                    <th>HISTORIQUE</th>
-                                    <th>POSITION</th>
-                                    <th>SUJET</th>
-                                    <th>ENTREPRISE</th>
-                                    <th>TOTAL</th>
-                                    <th>CHOIX</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <script>
-                                    let addressTeach = [];
-                                    window.addEventListener('load', async function () {
-                                        const checkGoogleMaps = setInterval(async () => {
-                                            if (typeof google !== 'undefined' && google.maps && google.maps.Geocoder) {
-                                                clearInterval(checkGoogleMaps);
-                                                <? foreach($_SESSION['address'] as $address): ?>
-                                                    addressTeach.push(await geocodeAddress(<?= '"' . str_replace('_', "'", $address['address']) . '"' ?>));
-                                                <? endforeach; ?>
-                                                } else {
-                                                console.log('L\'API Google Maps n\'est pas encore chargée.');
-                                            }
-                                        }, 100);
-                                    });
-                                </script>
-                                <?
-                                foreach($table as $row): ?>
+                            <div class="selection">
+                                <table class="highlight centered">
+                                    <thead>
                                     <tr>
-                                        <td><? echo $row["student_name"] . " " . $row["student_firstname"] ?></td>
-                                        <td><? echo $row["internshipTeacher"] ?></td>
-                                        <td>
-                                            <script>
-                                                window.addEventListener('load', async function () {
-                                                    const checkGoogleMaps = setInterval(async () => {
-                                                        if (typeof google !== 'undefined' && google.maps && google.maps.Geocoder) {
-                                                            clearInterval(checkGoogleMaps);
-                                                            const addressStudent = await geocodeAddress(<?= '"' . str_replace('_', "'", $row["address"]) . '"' ?>);
-                                                            let durations = [];
-                                                            for (const address of addressTeach) {
-                                                                durations.push(await calculateDistance(addressStudent, address));
-                                                            }
-                                                            const durationValues = Array.from(durations, (x) => x.value);
-                                                            console.log(durationValues.indexOf(Math.min(durationValues)));
-                                                        } else {
-                                                            console.log('L\'API Google Maps n\'est pas encore chargée.');
-                                                        }
-                                                    }, 100);
-                                                });
-                                            </script>
-                                        </td>
-                                        <td> <? echo str_replace('_', ' ', $row["internship_subject"]) ?> </td>
-                                        <td> <? echo str_replace('_', ' ', $row["company_name"]) ?> </td>
-                                        <td> <? echo "<strong>" . round($row['relevance'], 2) . "</strong>/5" ?> </td>
-                                        <td>
-                                            <label>
-                                                <input type="checkbox" id="selecStudent[]" name="selecStudent[]" class="center-align filled-in" value="<?= $row['student_name'] ?>" <? if(isset($_POST['selecStudent']) && in_array($row['student_name'], $_POST['selecStudent'])): ?> checked="checked" <? endif; ?> />
-                                                <span></span>
-                                            </label>
-                                        </td>
+                                        <th>ELEVE</th>
+                                        <th>HISTORIQUE</th>
+                                        <th>POSITION</th>
+                                        <th>SUJET</th>
+                                        <th>ENTREPRISE</th>
+                                        <th>TOTAL</th>
+                                        <th>CHOIX</th>
                                     </tr>
-                                <? endforeach; ?>
-                                </tbody>
-                            </table>
+                                    </thead>
+                                    <tbody>
+                                    <script>
+                                        let addressTeach = [];
+                                        window.addEventListener('load', async function () {
+                                            const checkGoogleMaps = setInterval(async () => {
+                                                if (typeof google !== 'undefined' && google.maps && google.maps.Geocoder) {
+                                                    clearInterval(checkGoogleMaps);
+                                                    <? foreach($_SESSION['address'] as $address): ?>
+                                                        addressTeach.push(await geocodeAddress(<?= '"' . str_replace('_', "'", $address['address']) . '"' ?>));
+                                                    <? endforeach; ?>
+                                                    } else {
+                                                    console.log('L\'API Google Maps n\'est pas encore chargée.');
+                                                }
+                                            }, 100);
+                                        });
+                                    </script>
+                                    <?
+                                    foreach($table as $row): ?>
+                                        <tr>
+                                            <td><? echo $row["student_name"] . " " . $row["student_firstname"] ?></td>
+                                            <td><? echo $row["internshipTeacher"] ?></td>
+                                            <td>
+                                                <script>
+                                                    window.addEventListener('load', async function () {
+                                                        const checkGoogleMaps = setInterval(async () => {
+                                                            if (typeof google !== 'undefined' && google.maps && google.maps.Geocoder) {
+                                                                clearInterval(checkGoogleMaps);
+                                                                const addressStudent = await geocodeAddress(<?= '"' . str_replace('_', "'", $row["address"]) . '"' ?>);
+                                                                let durations = [];
+                                                                for (const address of addressTeach) {
+                                                                    durations.push(await calculateDistance(addressStudent, address));
+                                                                }
+                                                                const durationValues = Array.from(durations, (x) => x.value);
+                                                                console.log(durationValues.indexOf(Math.min(durationValues)));
+                                                            } else {
+                                                                console.log('L\'API Google Maps n\'est pas encore chargée.');
+                                                            }
+                                                        }, 100);
+                                                    });
+                                                </script>
+                                            </td>
+                                            <td> <? echo str_replace('_', ' ', $row["internship_subject"]) ?> </td>
+                                            <td> <? echo str_replace('_', ' ', $row["company_name"]) ?> </td>
+                                            <td> <? echo "<strong>" . round($row['relevance'], 2) . "</strong>/5" ?> </td>
+                                            <td>
+                                                <label>
+                                                    <input type="checkbox" name="selecStudent[]" class="center-align filled-in" value="<?= $row['student_name'] ?>" <? if(isset($_SESSION['selecStudent']) && in_array($row['student_name'], $_SESSION['selecStudent'])): ?> checked="checked" <? endif; ?> />
+                                                    <span></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    <? endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <input type="hidden" name="selecStudentSubmitted" value="1">
+                            <button class="waves-effect waves-light btn" type="submit">Valider</button>
                         </form>
                     <? endif;
                 endif;
             endif; ?>
             <script>
-                const teacherAddress = "<?php echo isset($_SESSION['address']) ? $_SESSION['address'][0]['address'] : 'Aix-En-Provence'; ?>";
-                const companyAddress = "<?php echo isset($_SESSION['selected_student']['address']) ? $_SESSION['selected_student']['address'] : 'Marseille'; ?>";
+                <? if(isset($_SESSION['address'])): ?>
+                    const teacherAddress = "<?= $_SESSION['address'][0]['address']; ?>";
+                <? endif;
+                if(isset($_SESSION['selected_student']['address'])): ?>
+                    const companyAddress = "<?= $_SESSION['selected_student']['address']; ?>";
+                <? endif; ?>
             </script>
         </main>
         <?php
