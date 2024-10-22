@@ -1,3 +1,4 @@
+-- etudiant en INFO à l'IUT d'aix en provence
 INSERT INTO Student (Student_number,Student_name,Student_firstname,formation,Class_group) VALUES ('B82656814','Kerrs','Reese','BUT_INFO','B-1_An2');
 INSERT INTO Student (Student_number,Student_name,Student_firstname,formation,Class_group) VALUES ('Y26472238','Mcculloughs','Jorden','BUT_INFO','B-2_An3');
 INSERT INTO Student (Student_number,Student_name,Student_firstname,formation,Class_group) VALUES ('B14955698','Cranes','Lester','BUT_INFO','A2-2_An3');
@@ -118,3 +119,45 @@ INSERT INTO Student (Student_number,Student_name,Student_firstname,formation,Cla
 INSERT INTO Student (Student_number,Student_name,Student_firstname,formation,Class_group) VALUES ('N97352362','Nguyens','Francis','BUT_INFO','A2-2_An2');
 INSERT INTO Student (Student_number,Student_name,Student_firstname,formation,Class_group) VALUES ('O25165661','Wallss','Benjamin','BUT_INFO','A2-2_An3');
 INSERT INTO Student (Student_number,Student_name,Student_firstname,formation,Class_group) VALUES ('J81275836','Thompsons','Daquan','BUT_INFO','A2-1_An2');
+-- etudiant en TC à l'IUT d'aix en provence
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S12345678', 'Smith', 'John', null, 'A_An1');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S22345679', 'Doe', 'Jane', null, 'B_An1');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S32345680', 'Brown', 'Charlie', null, 'C_An2');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S42345681', 'Taylor', 'Sam', null, 'A_An3');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S52345682', 'Johnson', 'Chris', null, 'B_An2');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S62345683', 'Lee', 'Alex', null, 'C_An1');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S72345684', 'Garcia', 'Maria', null, 'A_An2');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S82345685', 'Martinez', 'Carlos', null, 'B_An3');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S92345686', 'Rodriguez', 'Sofia', null, 'C_An3');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S03345687', 'Davis', 'Emily', null, 'A_An1');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S13345688', 'Wilson', 'Olivia', null, 'B_An1');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S23345689', 'Lopez', 'Miguel', null, 'C_An2');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S33345690', 'Gonzalez', 'Luna', null, 'A_An3');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S43345691', 'Nguyen', 'Kevin', null, 'B_An2');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S53345692', 'Harris', 'Ava', null, 'C_An1');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S63345693', 'Clark', 'Ethan', null, 'A_An2');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S73345694', 'Lewis', 'Sophia', null, 'B_An3');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S83345695', 'Walker', 'Daniel', null, 'C_An3');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S93345696', 'King', 'Mason', null, 'A_An1');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S03345697', 'Hall', 'Emma', null, 'B_An2');
+-- etudiant en GEA à l'IUT d'aix en provence
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S14345678', 'Adams', 'Sarah', NULL, 'A_An1');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S24345679', 'Baker', 'James', NULL, 'B_An2');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S34345680', 'Carter', 'Liam', NULL, 'C_An3');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S44345681', 'Davis', 'Noah', NULL, 'A_An2');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S54345682', 'Evans', 'Olivia', NULL, 'B_An3');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S64345683', 'Fisher', 'Isabella', NULL, 'C_An1');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S74345684', 'Garcia', 'Mason', NULL, 'A_An1');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S84345685', 'Harris', 'Lucas', NULL, 'B_An2');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S94345686', 'Ivy', 'Sophia', NULL, 'C_An3');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S05345687', 'Jones', 'Emily', NULL, 'A_An2');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S15345688', 'King', 'Alexander', NULL, 'B_An3');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S25345689', 'Lopez', 'Ella', NULL, 'C_An1');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S35345690', 'Martinez', 'Benjamin', NULL, 'A_An1');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S45345691', 'Nelson', 'Zoe', NULL, 'B_An2');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S55345692', 'Owens', 'Lily', NULL, 'C_An3');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S65345693', 'Parker', 'Elijah', NULL, 'A_An2');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S75345694', 'Quinn', 'Ava', NULL, 'B_An3');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S85345695', 'Roberts', 'James', NULL, 'C_An1');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S95345696', 'Stewart', 'Ethan', NULL, 'A_An1');
+INSERT INTO Student (Student_number, Student_name, Student_firstname, formation, Class_group) VALUES ('S06345697', 'Turner', 'Mia', NULL, 'B_An2');
