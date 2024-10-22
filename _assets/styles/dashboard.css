@@ -5,9 +5,9 @@ main {
 }
 
 
-h3 {
+h3,h4 {
     color: #00558B;
-    margin: 0 0 45px 0;
+    margin: 25px;
 }
 
 .cell {
@@ -16,6 +16,7 @@ h3 {
     align-self: center;
     align-items: center;
     justify-content: center;
+    margin: 20px;
 }
 
 .row {
