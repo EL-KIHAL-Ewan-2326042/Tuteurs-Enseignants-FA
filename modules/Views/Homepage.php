@@ -143,7 +143,29 @@ class Homepage {
                                                                     durations.push(await calculateDistance(addressStudent, address));
                                                                 }
                                                                 const durationValues = Array.from(durations, (x) => x.value);
-                                                                console.log(durationValues.indexOf(Math.min(durationValues)));
+                                                                const durationMin = Math.min(durationValues);
+
+                                                                if (durationMin) {
+                                                                    const form = document.createElement('form');
+                                                                    form.method = 'POST';
+                                                                    form.action = window.location.href;
+
+                                                                    const inputId = document.createElement('input');
+                                                                    inputId.type = 'hidden';
+                                                                    inputId.name = 'shortest_duration[]';
+                                                                    inputId.value = durationMin;
+
+                                                                    form.appendChild(inputId);
+
+                                                                    document.body.appendChild(form);
+                                                                    /*form.submit();
+                                                                    form.addEventListener('submit', function(event) {
+                                                                        event.preventDefault();
+                                                                    });
+
+                                                                    form.dispatchEvent(new Event('submit'));*/
+
+                                                                }
                                                             } else {
                                                                 console.log('L\'API Google Maps n\'est pas encore chargée.');
                                                             }

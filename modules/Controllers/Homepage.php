@@ -23,7 +23,6 @@ class Homepage {
         $homepageModel = new \Blog\Models\Homepage($db);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
             if (isset($_POST['action'])) {
                 if ($_POST['action'] === 'search' && isset($_POST['search'])) {
                     $results = $homepageModel->correspondTerms();
@@ -45,6 +44,9 @@ class Homepage {
                         'address' => $address
                     ];
                 }
+            }
+            if (isset($_POST['shortest_duration'])) {
+
             }
         }
 
