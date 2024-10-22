@@ -3,11 +3,16 @@
 namespace Blog\Models;
 
 use Includes\Database;
+use PDO;
 use PDOException;
 
 class Dashboard{
     private Database $db;
 
+    /**
+     * Constructeur de la classe Dashboard (modèle)
+     * @param Database $db Instance de la base de données
+     */
     public function __construct(Database $db){
         $this->db = $db;
     }
@@ -95,5 +100,84 @@ class Dashboard{
      */
     private function validateHeaders(array $headers, array $expectedHeaders): bool {
         return $headers === $expectedHeaders;
+    }
+
+    public function exportToCsvByDepartment(string $tableName, array $headers): void {
+        $db = $this->db;
+        $department = $_SESSION['Role_department'];  //in_array('Admin_dep', $_SESSION['role'])
+        $filePath = "/path/to/exports/{$tableName}_export.csv";
+        $fileHandle = fopen($filePath, "w");
+
+        fputcsv($fileHandle, $headers);
+
+        $query = "SELECT " . implode(',',$headers) . " FROM $tableName";
+
+        //condition filtrant par département
+        switch ($tableName) {
+            case 'student':
+                $query .= "JOIN study_at ON student.student_number = study_at.student_number WHERE study_at.department_name = :department";
+                break;
+            case 'teacher':
+                $query .= "JOIN teaches ON teacher.id_teacher = teaches.id_teacher WHERE teaches.department_name 
+                = :department";
+                break;
+            case 'internship':
+                $query .= "JOIN study_at ON internship.student_number = study_at.student_number WHERE 
+                study_at.department_name = :department";
+                break;
+            case 'teaches':
+            case 'department':
+            case 'study_at':
+                $query .= "WHERE department_name = :department";
+                break;
+            case 'is_requested':
+                $query .= "JOIN study_at ON is_requested.student_number = study_at.student_number WHERE 
+                study_at.department_name = :department";
+                break;
+            case 'is_taught':
+                $query .= "JOIN teaches ON is_taught.id_teacher = teaches.id_teacher WHERE teaches.department_name 
+                = :department";
+                break;
+            case 'discipline':
+                $query .= "JOIN is_taught ON discipline.discipline_name = is_taught.discipline JOIN teaches 
+                ON is_taught.id_teacher = teaches.id_teacher WHERE teaches.department_name = :department";
+                break;
+            case 'is_responsible':
+                $query .= "JOIN study_at ON is_responsible.student_number = study_at.student_number WHERE 
+                study_at.department_name = :department";
+                break;
+            case 'has_address':
+                $query .= "JOIN teaches ON has_address.id_teacher = study_at.id_teacher WHERE 
+                teaches.department_name = :department";
+                break;
+            case 'address_type':
+                $query .= "JOIN has_address ON address_type.adr_type = has_address.adr_type JOIN teaches 
+                ON has_address.id_teacher = study_at.id_teacher WHERE teaches.department_name = :department";
+                break;
+            case 'addr_name':
+                $query .= "JOIN has_address ON addr_name.address = has_address.address JOIN teaches 
+                ON has_address.id_teacher = study_at.id_teacher WHERE teaches.department_name = :department";
+                break;
+
+                //suite case partie backup
+
+            default:
+                echo "Table non reconnue";
+                fclose($fileHandle);
+                return;
+        }
+
+        //préparation et exécution de la requête
+        $stmt = $db->getConn()->prepare($query);
+        $stmt->bindValue(':department', $department);
+        $stmt->execute();
+
+        //écriture des données récupérées
+        while ($row =$stmt->fetch(PDO::FETCH_ASSOC)) {
+            fputcsv($fileHandle, $row);
+        }
+
+        fclose($fileHandle);
+        echo "Les données ont été exportées vers : {$filePath}";
     }
 }
