@@ -118,3 +118,69 @@ INSERT INTO Study_at (Student_number, Department_name) VALUES ('Y75773561', 'IUT
 INSERT INTO Study_at (Student_number, Department_name) VALUES ('N97352362', 'IUT_INFO_AIX');
 INSERT INTO Study_at (Student_number, Department_name) VALUES ('O25165661', 'IUT_INFO_AIX');
 INSERT INTO Study_at (Student_number, Department_name) VALUES ('J81275836', 'IUT_INFO_AIX');
+
+-- insert de relation pour des etudiant en TC
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S12345678', 'IUT_TC_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S22345679', 'IUT_TC_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S32345680', 'IUT_TC_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S42345681', 'IUT_TC_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S52345682', 'IUT_TC_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S62345683', 'IUT_TC_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S72345684', 'IUT_TC_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S82345685', 'IUT_TC_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S92345686', 'IUT_TC_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S03345687', 'IUT_TC_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S13345688', 'IUT_TC_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S23345689', 'IUT_TC_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S33345690', 'IUT_TC_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S43345691', 'IUT_TC_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S53345692', 'IUT_TC_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S63345693', 'IUT_TC_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S73345694', 'IUT_TC_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S83345695', 'IUT_TC_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S93345696', 'IUT_TC_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S03345697', 'IUT_TC_AIX');
+
+-- insert de relation pour des etudiant en GMP
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S14345678', 'IUT_GEA_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S24345679', 'IUT_GEA_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S34345680', 'IUT_GEA_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S44345681', 'IUT_GEA_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S54345682', 'IUT_GEA_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S64345683', 'IUT_GEA_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S74345684', 'IUT_GEA_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S84345685', 'IUT_GEA_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S94345686', 'IUT_GEA_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S05345687', 'IUT_GEA_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S15345688', 'IUT_GEA_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S25345689', 'IUT_GEA_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S35345690', 'IUT_GEA_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S45345691', 'IUT_GEA_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S55345692', 'IUT_GEA_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S65345693', 'IUT_GEA_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S75345694', 'IUT_GEA_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S85345695', 'IUT_GEA_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S95345696', 'IUT_GEA_AIX');
+INSERT INTO Study_at (Student_number, Department_name) VALUES ('S06345697', 'IUT_GEA_AIX');
+
+-- Ajout des étudiants dans Study_at avec un département NULL
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('B22662146', 'Lunel', 'Domicile_1');
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('R14328249', 'Boulogne-sur-Mer', 'Domicile_1');
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('G42185815', 'Orléans', 'Domicile_1');
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('R32281327', 'Cambrai', 'Domicile_1');
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('O75041198', 'La Rochelle', 'Domicile_1');
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('V73654623', 'Vandoeuvre-lès-Nancy', 'Domicile_1');
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('Z17235374', 'Le Puy-en-Velay', 'Domicile_1');
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('R84623671', 'Auxerre', 'Domicile_1');
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('D78106598', 'Orléans', 'Domicile_1');
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('S85694088', 'Le Puy-en-Velay', 'Domicile_1');
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('Y68664772', 'Orléans', 'Domicile_1');
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('Q66676064', 'Saint-Lô', 'Domicile_1');
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('B10648624', 'Beauvais', 'Domicile_1');
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('N26332417', 'Montpellier', 'Domicile_1');
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('F42358144', 'Lille', 'Domicile_1');
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('I57332640', 'La Rochelle', 'Domicile_1');
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('B51423637', 'Ajaccio', 'Domicile_1');
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('C45328794', 'Sarreguemines', 'Domicile_1');
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('H48344613', 'Chalon-sur-Saône', 'Domicile_1');
+INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('R41814241', 'Fréjus', 'Domicile_1');

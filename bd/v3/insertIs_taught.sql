@@ -18,3 +18,17 @@ INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('C45328794', 'Gestio
 INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('H48344613', 'POO');
 INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('R41814241', 'POO');
 INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('B22662146', 'Architecture_des_ordinateurs');
+
+-- Association des enseignants aux disciplines pour GEA
+INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('B51423637', 'Communication');
+INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('C45328794', 'Gestion_de_BD');
+INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('H48344613', 'Droit');
+INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('R41814241', 'Économie');
+INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('B22662146', 'Gestion financière');
+
+-- Association des enseignants aux disciplines pour TC
+INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('A12345678', 'Marketing');
+INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('B23456789', 'Communication digitale');
+INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('C34567890', 'Vente et négociation');
+INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('D45678901', 'Stratégies de communication');
+INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('E56789012', 'Management');
