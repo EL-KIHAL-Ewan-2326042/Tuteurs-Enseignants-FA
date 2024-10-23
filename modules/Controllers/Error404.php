@@ -15,7 +15,7 @@ class Error404
     public function show(): void
     {
         $title = "Erreur 404";
-        $cssFilePath = '';
+        $cssFilePath = '/_assets/styles/erreur404.css';
         $jsFilePath = '';
 
         $view = new \Blog\Views\Error404();
