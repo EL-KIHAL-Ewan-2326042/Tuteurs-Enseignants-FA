@@ -86,7 +86,7 @@ class Dispatcher{
 
                 $listFinal[] = $tab_max_table;
                 unset($listStart[array_search($tab_max_table, $listStart)]);
-                if ($tab_max_table[3] == 'alterant') {
+                if ($tab_max_table[3] == 'alternant') {
                     $listteacherIntership[$tab_max_table[0]] = $listteacherIntership[$tab_max_table[0]] + 2;
                 } else {
                     $listteacherIntership[$tab_max_table[0]] = $listteacherIntership[$tab_max_table[0]] + 1;

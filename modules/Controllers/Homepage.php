@@ -13,7 +13,6 @@ class Homepage {
      * @return void
      */
     public function show(): void {
-
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $db = Database::getInstance();
             $homepageModel = new \Blog\Models\Homepage($db);

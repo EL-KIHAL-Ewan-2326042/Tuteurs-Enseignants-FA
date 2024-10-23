@@ -10,8 +10,9 @@ class Dispatcher{
 
     /**
      * @param \Blog\Models\Dispatcher $dispatcherModel
+     * @param string $errorMessage
      */
-    public function __construct(private readonly \Blog\Models\Dispatcher $dispatcherModel) {
+    public function __construct(private readonly \Blog\Models\Dispatcher $dispatcherModel, private readonly string $errorMessage) {
     }
     public function showView(): void {
         ?>
@@ -23,7 +24,6 @@ class Dispatcher{
                     foreach ($listCriteria as $criteria) {
                         ?>
                         <div class="row" style="display: flex; align-items: center; flex-wrap: wrap;">
-                            <!-- Adding margin-right for the checkbox container to create space -->
                             <div class="col s12 m6" style="flex: 1; margin-right: 20px;">
                                 <p>
                                     <label>
@@ -46,36 +46,49 @@ class Dispatcher{
                     ?>
 
                     <div class="col s12">
-                        <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Enregister
-                            <i class="material-icons right">arrow_downward</i>
-                        </button>
-                        <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Générer
-                            <i class="material-icons right">send</i>
-                        </button>
-                        <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Charger
-                            <i class="material-icons right">arrow_upward</i>
-                        </button>
+                        <form action="./dispatcher" method="post" id="pushCoef">
+                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Enregister
+                                <i class="material-icons right">arrow_downward</i>
+                            </button>
+                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Générer
+                                <i class="material-icons right">send</i>
+                            </button>
+                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Charger
+                                <i class="material-icons right">arrow_upward</i>
+                            </button>
+                        </form>
                     </div>
                 </div>
-
-                <div class="col s12 m6" style="margin-top: 20px;">
-                    <div class="row">
-                        <div class="input-field col s6">
-                            <input id="Id_teacher" type="text" class="validate">
-                            <label for="Id_teacher">First Name</label>
+                <form action="./dispatcher" method="post" id="insertAssociate">
+                    <div class="col s12 m6" style="margin-top: 20px;">
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="Id_teacher" name= "Id_teacher" type="text" class="validate">
+                                <label for="Id_teacher">Id_teacher</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input id="Student_number" name="Student_number" type="text" class="validate">
+                                <label for="Student_number">Student_number</label>
+                            </div>
                         </div>
-                        <div class="input-field col s6">
-                            <input id="Student_number" type="text" class="validate">
-                            <label for="Student_number">Last Name</label>
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <input id="Start_date" name="Start_date" type="text" class="validate">
+                                <label for="Start_date">Date de début</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input id="End_date" name="End_date" type="text" class="validate">
+                                <label for="End_date">Date de fin</label>
+                            </div>
+                        </div>
+                        <p class="red-text"><?php echo $this->errorMessage?></p>
+                        <div class="col s12">
+                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Associé
+                                <i class="material-icons right">arrow_downward</i>
+                            </button>
                         </div>
                     </div>
-
-                    <div class="col s12">
-                        <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Associé
-                            <i class="material-icons right">arrow_downward</i>
-                        </button>
-                    </div>
-                </div>
+                </form>
 
                 <div class="row s12">
                     <table>

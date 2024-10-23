@@ -19,7 +19,7 @@ class Intramu {
         <main>
             <div class="card-panel white z-depth-3">
                 <div class="row">
-                    <form class="col s12" action="./intramu" method="post">
+                    <form class="col s12" action="./intramu" method="POST" id="formAssociate">
                         <div class="row">
                             <h5 class="indigo-text center-align">Aix-Marseille Université - Service d'authentification</h5>
                         </div>
