@@ -179,7 +179,8 @@ class Homepage {
                                                         }
                                                     }
 
-                                                    return Math.max(0, Math.min(5, (totalScore * 5) / totalCoef).toFixed(2));
+                                                    // Score max/normalisé sur 5, si on a un pb, on renvoie 0
+                                                    return Math.max(0, Math.min(5, (totalScore * 5) / totalCoef).toFixed(2)) || 0;
                                                 }
 
                                                 const geocodeAddresses = async () => {
@@ -198,7 +199,7 @@ class Homepage {
                                                                     const addressTeach = await Promise.all(addressTeachPromises);
                                                                     const addressStudent = await geocodeAddress('<?= str_replace('_', "'", $row["address"]) ?>');
 
-                                                                    const durationPromises = addressTeach.map(teacherAddress => calculateDistance(addressStudent, teacherAddress));
+                                                                    const durationPromises = addressTeach.map(teacherAddress => calculateDistance(addressStudent, teacherAddress, 1));
                                                                     const durations = await Promise.all(durationPromises);
 
                                                                     const durationValues = durations.map(duration => duration.value);
