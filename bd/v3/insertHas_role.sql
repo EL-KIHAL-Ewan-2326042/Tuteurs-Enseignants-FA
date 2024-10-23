@@ -19,3 +19,16 @@ INSERT INTO Has_role (User_id, Role_name) VALUES ('C45328794', 'Teacher');
 INSERT INTO Has_role (User_id, Role_name) VALUES ('H48344613', 'Teacher');
 INSERT INTO Has_role (User_id, Role_name) VALUES ('R41814241', 'Teacher');
 INSERT INTO Has_role (User_id, Role_name, role_department) VALUES ('B22662146', 'Admin_dep','IUT_INFO_AIX');
+-- insert pour prof de TC et GEA
+INSERT INTO Has_role (User_id, Role_name) VALUES ('A12345678', 'Teacher');
+INSERT INTO Has_role (User_id, Role_name) VALUES ('B23456789', 'Teacher');
+INSERT INTO Has_role (User_id, Role_name) VALUES ('C34567890', 'Teacher');
+INSERT INTO Has_role (User_id, Role_name) VALUES ('D45678901', 'Teacher');
+INSERT INTO Has_role (User_id, Role_name) VALUES ('E56789012', 'Teacher');
+INSERT INTO Has_role (User_id, Role_name) VALUES ('F67890123', 'Teacher');
+INSERT INTO Has_role (User_id, Role_name) VALUES ('G78901234', 'Teacher');
+INSERT INTO Has_role (User_id, Role_name) VALUES ('H89012345', 'Teacher');
+INSERT INTO Has_role (User_id, Role_name) VALUES ('I90123456', 'Teacher');
+INSERT INTO Has_role (User_id, Role_name) VALUES ('J01234567', 'Teacher');
+INSERT INTO Has_role (User_id, Role_name, role_department) VALUES ('J01234567', 'Admin_dep', 'IUT_TC_AIX');
+INSERT INTO Has_role (User_id, Role_name, role_department) VALUES ('A12345678', 'Admin_dep','IUT_GEA_AIX');
