@@ -10,13 +10,12 @@ h3,h4 {
     margin: 25px;
 }
 
-.cell {
+.card-panel {
     display: flex;
     flex-wrap: wrap;
-    align-self: center;
     align-items: center;
     justify-content: center;
-    margin: 20px;
+    margin: 25px;
 }
 
 .row {
