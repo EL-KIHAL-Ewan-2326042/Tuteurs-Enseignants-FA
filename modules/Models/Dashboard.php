@@ -108,19 +108,21 @@ class Dashboard{
      * pour une table donnée
      * @param string $tableName
      * @param array $headers
-     * @return void
+     * @return bool
      * @throws Exception
      */
-    public function exportToCsvByDepartment(string $tableName, array $headers): void {
+    public function exportToCsvByDepartment(string $tableName, array $headers): bool {
         $db = $this->db;
         $department = $_SESSION['role_department'];
 
         //envoyer les en-têtes pour le téléchargement
+        /**
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="' . $tableName . '_export.csv"');
         header('Pragma: no-cache');
         header('Expires: 0');
-
+        */
+        ob_start();
         $output = fopen('php://output', 'w');
 
         if ($output === false){
@@ -163,7 +165,9 @@ class Dashboard{
         }
 
         fclose($output);
-        exit();
+        $csvData = ob_get_clean();
+        file_put_contents("export_$tableName.csv",$csvData);
 
+        return true;
     }
 }

@@ -15,125 +15,6 @@ use PHPUnit\Framework\TestCase;
  *
  */
 class DashboardTest extends TestCase  {
-    /**
-     * Test de la méthode uploadCsv() avec un fichier CSV valide
-     * @return void
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     *
-    public function testUploadCsvSuccess(){
-        //mock de la base de données
-        $mockDb = $this->createMock(Database::class);
-        $mockConn = $this->createMock(\PDO::class);
-
-        //attentes pour le mock de la base de données
-        $mockDb->method('getConn')->willReturn($mockConn);
-
-        //preparation d'une requête simulée
-        $mockStmt = $this->createMock(\PDOStatement::class);
-        $mockConn->method('prepare')->willReturn($mockStmt);
-
-        //exécution de cette requête
-        $mockStmt->method('execute')->willReturn(true);
-
-        //instance du modèle avec le mock de la base de données
-        $dashboard = new Dashboard($mockDb);
-
-        //fichier temporaire
-        $tempDir = 'path/to/temp';
-        if (!file_exists($tempDir)) {
-            mkdir($tempDir, 0777, true);
-        }
-
-        $csvFilePath = $tempDir . '/file.csv';
-
-        $tempFile = fopen($csvFilePath, 'w');
-        if ($tempFile === false) {
-            $this->fail("Impossible d'ouvrir le fichier : $csvFilePath");
-            return;
-        }
-        fputcsv($tempFile, ['1', 'Doe', 'John', 'Informatique', 'A']);
-        fclose($tempFile);
-
-        try {
-            //exécution
-            $result = $dashboard->uploadCsv($csvFilePath);
-            $this->assertTrue($result,"L'importation aurait dû réussir");
-        } finally {
-            //nettoyage
-            unlink($csvFilePath);
-        }
-    }*/
-
-    /**
-     * Test de la méthode uploadCsv() avec un fichier CSV inexistant
-     * @return void
-     * @throws Exception
-     *
-    public function testUploadCsvFileNotFound(){
-        //mock de la base de données
-        $mockDb = $this->createMock(Database::class);
-
-        //instance du modèle avec le mock de la base de données
-        $dashboard = new Dashboard($mockDb);
-
-        //exécution
-        $result = $dashboard->uploadCsv('invalide/path/to/file.csv');
-        $this->assertFalse($result,"L'importation du  CSV aurait du échouer car csv inexistant");
-    }
-*/
-
-
-    /**
-     * Test de la méthode uploadCsv() en simulant une erreur de
-     * base de données
-     * @return void
-     * @throws \PHPUnit\Framework\MockObject\Exception
-     *
-    public function testUploadCsvSDatabaseError(){
-        //mock de la base de données
-        $mockDb = $this->createMock(Database::class);
-        $mockConn = $this->createMock(\PDO::class);
-
-        //attentes pour le mock de la base de données
-        $mockDb->method('getConn')->willReturn($mockConn);
-
-        //preparation d'une requête simulée
-        $mockStmt = $this->createMock(\PDOStatement::class);
-        $mockConn->method('prepare')->willReturn($mockStmt);
-
-        //exécution de cette requête
-        $mockStmt->method('execute')
-            ->will($this->throwException(new \PDOException("Erreur d'insertion")));
-
-        //instance du modèle avec le mock de la base de données
-        $dashboard = new Dashboard($mockDb);
-
-        //fichier temporaire
-        $tempDir = 'path/to/temp';
-        if (!file_exists($tempDir)) {
-            mkdir($tempDir, 0777, true);
-        }
-
-        $csvFilePath = $tempDir . '/file.csv';
-
-        $tempFile = fopen($csvFilePath, 'w');
-        if ($tempFile === false) {
-            $this->fail("Impossible d'ouvrir le fichier : $csvFilePath");
-            return;
-        }
-        fputcsv($tempFile, ['1', 'Doe', 'John', 'Informatique', 'A']);
-        fclose($tempFile);
-
-        try {
-            //exécution
-            $result = $dashboard->uploadCsv($csvFilePath);
-            $this->assertFalse($result,"L'importation aurait dû échouer car csv invalide");
-        } finally {
-            //nettoyage
-            unlink($csvFilePath);
-        }
-    }*/
-
     private string $tempDir;
 
     /**
@@ -184,7 +65,6 @@ class DashboardTest extends TestCase  {
     public function testUploadCSvStudentSuccess(): void {
         $this->runCsvUploadTest('uploadCsvStudent', ['1', 'Doe', 'John', 'Informatique', 'A']);
     }
-
     /**
      * Test d'importation pour les enseignants
      * @return void
@@ -193,7 +73,6 @@ class DashboardTest extends TestCase  {
     public function testUploadCsvTeacherSuccess() {
         $this->runCsvUploadTest('uploadCsvTeacher', ['1', 'Smith', 'Alice', '5']);
     }
-
     /**
      * Test d'importation pour les stages/alternances
      * @return void
@@ -273,21 +152,171 @@ class DashboardTest extends TestCase  {
     }
 
     /**
-     * Test de l'erreur
+     * Test de l'erreur d'importation pour les étudiants
      * @return void
      * @throws Exception
      */
     public function testUploadCsvStudentDatabaseError() {
         $this->runCsvUploadTestDatabaseError('uploadCsvStudent', ['1', 'Doe', 'John', 'Informatique', 'A']);
     }
-
+    /**
+     * Test de l'erreur d'importation pour les professeurs
+     * @return void
+     * @throws Exception
+     */
     public function testUploadCsvTeacherDatabaseError() {
         $this->runCsvUploadTestDatabaseError('uploadCsvTeacher', ['1', 'Smith', 'Alice', '5']);
     }
-
+    /**
+     * Test de l'erreur d'importation pour les stages/alternances
+     * @return void
+     * @throws Exception
+     */
     public function testUploadCsvInternshipDatabaseError() {
         $this->runCsvUploadTestDatabaseError('uploadCsvInternship', ['123', 'CompanyName', 'Tech', '2024-01-01', '2024-06-01']);
     }
 
+    // --------- Test exportation --------- //
+
+    /**
+     * Test de l'exportation CSV pour student
+     * @return void
+     * @throws Exception
+     */
+    public function testExportToCsvStudentSuccess() {
+        $headers = ['student_number', 'student_name', 'student_firstname', 'formation', 'class_group'];
+        $data = [
+            ['1', 'Doe', 'John', 'Informatique', 'A'],
+            ['2', 'Smith', 'Alice', 'Mathématiques', 'B']
+        ];
+        $this->runCsvExportTest('student', $headers, $data);
+    }
+
+    /**
+     * Test de l'exportation CSV pour teacher
+     * @return void
+     * @throws Exception
+     */
+    public function testExportToCsvTeacherSuccess() {
+        $headers = ['id_teacher', 'teacher_name', 'teacher_firstname', 'maxi_number_trainees'];
+        $data = [
+            ['1', 'Doe', 'John', '5'],
+            ['2', 'Smith', 'Alice', '10']
+        ];
+        $this->runCsvExportTest('teacher', $headers, $data);
+    }
+
+    /**
+     * Test de l'exportation CSV pour intership
+     * @return void
+     * @throws Exception
+     */
+    public function testExportToCsvInternshipSuccess() {
+        $headers = ['internship_identifier', 'company_name', 'keywords', 'start_date_internship', 'type', 'end_date_internship', 'internship_subject', 'address', 'student_number'];
+        $data = [
+            ['123', 'CompanyA', 'Tech', '2024-01-01', 'Full-time', '2024-06-01', 'Software Development', '123 Street', '1'],
+            ['124', 'CompanyB', 'Business', '2024-02-01', 'Part-time', '2024-07-01', 'Marketing', '456 Avenue', '2']
+        ];
+        $this->runCsvExportTest('internship', $headers, $data);
+    }
+
+    /**
+     * Test pour l'exportation de fichier CSV avec succés
+     * @param string $table
+     * @param array $headers
+     * @param array $data
+     * @return void
+     * @throws Exception
+     * @throws \Exception
+     */
+    private function runCsvExportTest(string $table, array $headers, array $data): void {
+        $mockDb = $this->createMock(Database::class);
+        $mockConn = $this->createMock(\PDO::class);
+        $dashboard = new Dashboard($mockDb);
+
+        //simulation de la connexion à la base données
+        $mockDb->method('getConn')->willReturn($mockConn);
+
+        //préparation de la requête
+        $mockStmt = $this->createMock(\PDOStatement::class);
+        $mockConn->method('prepare')->willReturn($mockStmt);
+        $mockStmt->method('execute')->willReturn(true);
+        $mockStmt->method('fetchAll')->willReturn($data);
+
+        //création d'un fichier temporaire
+        $tempCsvPath = $this->tempDir . '/export_' . $table . '.csv';
+        try {
+            $output = fopen($tempCsvPath, 'w');
+            if ($output === false) {
+                throw new \Exception("Impossible d'ouvrir le fichier CSV temporaire");
+            }
+        } catch (\Exception $e) {
+            $this->fail("Erreur lors de la création du fichier CSV : " . $e->getMessage());
+        }
+
+        //exécution
+        //$headers = array_keys($data[0]);
+        $result = $dashboard->exportToCsvByDepartment($table,$headers);
+        $this->assertTrue($result,"L'exportation aurait dû réussir pour la table $table");
+
+        //vérification de l'exportation
+        $exportedFilePath = "export_$table.csv";
+        $this->assertFileExists($exportedFilePath,"L'exportation aurait dû réussir pour la table $table");
+
+        //vérification du contenu
+        $exportedData = file($tempCsvPath,FILE_IGNORE_NEW_LINES);
+        $this->assertNotEmpty($exportedData,"Le fichier CSV ne devrait pas être vide.");
+
+        //vérification des en-têtes
+        $this->assertEquals(implode(',',$headers),$exportedData[0],"Les en-têtes du CSV ne correspondent pas");
+
+        //vérification des données
+        foreach ($data as $index => $row) {
+            $this->assertEquals(implode(',',$row),$exportedData[$index + 1]);
+        }
+        unlink($exportedFilePath);
+    }
+
+    /**
+     * Test de l'erreur d'exportation avec une table inconnue
+     * @return void
+     * @throws Exception
+     * @throws \Exception
+     */
+    public function testExportToCsvUnknownTable() {
+        //Mock de la base de données
+        $mockDb = $this->createMock(Database::class);
+        $dashboard = new Dashboard($mockDb);
+
+        //exécution
+        $result = $dashboard->exportToCsvByDepartment('unknown_table',[],$this->tempDir . '/file.csv');
+        $this->assertFalse($result,"L'exportation aurait dû échouer avec une table inconnue");
+    }
+
+    /**
+     * Test de l'erreur d'exportation avec une erreur de base de données
+     * @return void
+     * @throws Exception
+     * @throws \Exception
+     */
+    public function testExportToCsvDatabaseError(){
+        $mockDb = $this->createMock(Database::class);
+        $mockConn = $this->createMock(Database::class);
+
+        //simulation de l'erreur dans la base de données
+        $mockDb->method('getConn')->willReturn($mockConn);
+        $mockStmt = $this->createMock(\PDOStatement::class);
+        $mockConn->method('prepare')->willReturn($mockStmt);
+        $mockStmt->method('execute')->will($this->throwException(new \PDOException("Erreur d'insertion")));
+
+        $csvFilePath = $this->tempDir . '/export_table.csv';
+        $dashboard = new Dashboard($mockDb);
+
+        //exécution
+        $result = $dashboard->exportToCsvByDepartment('student', ['id', 'name'], $csvFilePath);
+
+        //vérification
+        $this->assertFalse($result,"L'exportation aurait dû échouer suite à une erreur de base données.");
+    }
 
 }
