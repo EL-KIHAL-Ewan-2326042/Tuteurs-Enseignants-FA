@@ -9,18 +9,16 @@ class Error404 {
     public function showView(){
         ?>
         <main>
-            <div class="container">
-                <div class="row">
-                    <div class="col s12">
-                        <h1 class="error-message">Oups! Erreur 404</h1>
-                        <p class="description">Désolé, la page que vous recherchez est introuvable.</p>
-                        <div class="home-link">
-                            <a href="/" class="btn waves-effect waves-light red darken-1">
+            <div class="container card-panel white z-depth-3 s12 m6">
+                <div class="row s12 m6 center">
+                    <div class="col s12 center">
+                        <h1 class="row">Oups! Erreur 404</h1>
+                        <p class="row">Désolé, la page que vous recherchez est introuvable.</p>
+                        <div class="row">
+                            <a href="/" class="btn waves-effect waves-light">
                                 Retour à la page d'accueil
                             </a>
                         </div>
-                        <img src="https://cdn-icons-png.flaticon.com/512/2748/2748558.png" alt="Erreur 404"
-                             class="responsive-img" style="width: 200px; margin-top: 20px;">
                     </div>
                 </div>
             </div>

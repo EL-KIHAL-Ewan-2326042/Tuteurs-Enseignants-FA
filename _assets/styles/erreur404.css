@@ -1,0 +1,10 @@
+@import "global.css";
+
+.btn {
+    background-color: var(--main-color);
+}
+
+.btn:hover {
+    color: var(--hover-color);
+    background-color: var(--main-color);
+}
