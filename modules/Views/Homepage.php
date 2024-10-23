@@ -89,7 +89,7 @@ class Homepage {
                     } else {
                         $update = $this->model->updateRequests(array());
                     }
-                    if(!$update || gettype($update) !== 'boolean') echo '<h6 class="red-text">Une erreur est survenue</h6>';
+                    if(!$update || gettype($update) !== 'boolean') echo '<p class="red-text">Une erreur est survenue</p>';
                 }
 
                 if(!empty($_SESSION['selecDep'])):
