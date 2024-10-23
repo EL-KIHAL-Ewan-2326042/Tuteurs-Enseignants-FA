@@ -31,6 +31,68 @@ main a:hover {
     color: var(--main-color);
 }
 
+main form {
+    max-width: 85%;
+}
+
+.selection {
+    display: block;
+    flex-wrap: wrap;
+    max-width: 100%;
+    padding-bottom: 10px;
+    justify-content: space-around;
+}
+
+.formCell {
+    padding-left: 3rem;
+    padding-right: 3rem;
+}
+
+main table {
+    @media (max-width: 830px) {
+        font-size: 0.8rem;
+    }
+
+    @media (max-width: 650px) {
+        font-size: 0.7rem;
+    }
+
+    @media (max-width: 600px) {
+        font-size: 0.65rem;
+    }
+
+    @media (max-width: 550px) {
+        font-size: 0.6rem;
+    }
+
+    @media (max-width: 500px) {
+        font-size: 0.52rem;
+    }
+
+    @media (max-width: 450px) {
+        font-size: 0.47rem;
+    }
+
+    border: solid #e0e0e0 1px;
+}
+
+tbody {
+    display: block;
+    max-height: 40rem;
+    overflow: auto;
+}
+
+thead, tbody tr {
+    display: table;
+    width: 100%;
+    height: 20%;
+    table-layout: fixed;
+}
+
+thead {
+    background-color: #246D9A80;
+}
+
 @media screen and (max-width: 640px) {
     #map {
         height: 250px;

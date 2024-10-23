@@ -85,18 +85,18 @@ class Intramu {
      * @param string $identifier l'identifiant du professeur
      * @return false|mixed renvoie la ligne dans la DB
      */
-    public function fetchAll(string $identifier) {
+    public function getAddress(string $identifier): false|array {
         if ($_SESSION['identifier'] !== $identifier) {
             return false;
         }
 
         $db = $this->db;
-        $query = 'SELECT * FROM teacher WHERE id_teacher = :id_teacher';
+        $query = 'SELECT address FROM has_address WHERE id_teacher = :id_teacher';
         $stmt = $db->getConn()->prepare($query);
         $stmt->bindParam(':id_teacher', $_SESSION['identifier']);
         $stmt->execute();
 
-        return $stmt->fetch($db->getConn()::FETCH_ASSOC);
+        return $stmt->fetchAll($db->getConn()::FETCH_ASSOC);
     }
 }
 ?>
