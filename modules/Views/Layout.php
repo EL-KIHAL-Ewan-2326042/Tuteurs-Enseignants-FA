@@ -96,6 +96,8 @@ class Layout {
                 </div>
             </div>
         </footer>
+        <script src="/_assets/scripts/layout.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
         <?php
         if ($jsFilePath) {
             echo '<script src="' . $jsFilePath . '"></script>';
@@ -106,8 +108,6 @@ class Layout {
             echo '<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBS2OwTaG2rfupX3wA-DlTbsBEG9yDVKk&loading=async&libraries=marker&callback=initMap" async defer></script>';
         }
         ?>
-        <script src="/_assets/scripts/layout.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
         </body>
         </html>
         <?php
