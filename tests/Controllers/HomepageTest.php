@@ -5,6 +5,7 @@ namespace Controllers;
 use Blog\Controllers\Homepage;
 use Blog\Views\Layout;
 use Blog\Views\Homepage as HomepageView;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -17,14 +18,14 @@ class HomepageTest extends TestCase{
     /**
      * Test de la méthode show() du contrôleur Homepage
      * @return void
-     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @throws Exception
      */
     public function testShow(){
         //Mock des classes layout et vue
         $mockLayout = $this->createMock(Layout::class);
         $mockView = $this->createMock(HomepageView::class);
 
-        //attentes pour le mock ud layout
+        //attentes pour le mock du layout
         $mockLayout->expects($this->once())
             ->method('renderTop')
             ->with($this->equalTo('Accueil'),$this->equalTo('/_assets/styles/homepage.css'));

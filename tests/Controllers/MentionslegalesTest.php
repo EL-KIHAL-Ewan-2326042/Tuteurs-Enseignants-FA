@@ -18,7 +18,7 @@ class MentionslegalesTest extends TestCase {
     /**
      * Test de la méthode show() du contrôleur Mentionslegales
      * @return void
-     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @throws Exception
      */
     public function testShow(){
         //Mock des classes layout et vue

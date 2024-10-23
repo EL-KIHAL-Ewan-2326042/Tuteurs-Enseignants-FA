@@ -1,11 +1,12 @@
 <?php
 
-namespace Test\Controllers;
+namespace Controllers;
 
 use Blog\Controllers\Dashboard;
 use Includes\Database;
 use Blog\Views\Layout;
 use Blog\Views\Dashboard as DashboardView;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -37,7 +38,7 @@ class DashboardTest extends TestCase {
      * Test de la méthode show() du contrôleur Dashboard
      * et simule le téléchargement d'un fichier csv
      * @return void
-     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @throws Exception
      */
     public function testShow(){
         //Mock des classes layout et vue
@@ -60,12 +61,13 @@ class DashboardTest extends TestCase {
         //instanciation des mocks
         $controller = new Dashboard($mockLayout,$mockView);
 
-
-        //simulation d'une requête POST avec un fichier CSV
+        //simulation d'une requête POST avec un fichier CSV (student par exemple)
         $_SERVER['REQUEST_METHOD'] = 'POST';
-        $_FILES['csv_file'] = ['tmp_name' => 'path/to/temp/file.csv'];
+        $_FILES['csv_file_student'] = ['tmp_name' => 'path/to/temp/file.csv'];
 
         //exécution
         $controller->show();
     }
+
+
 }
