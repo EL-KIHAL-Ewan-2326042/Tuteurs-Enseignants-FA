@@ -45,10 +45,9 @@ class Homepage {
                     ];
                 }
             }
-            if (isset($_POST['shortest_duration'])) {
-                foreach ($_POST['shortest_duration'] as $key => $value) {
-                    // ici
-                }
+
+            if (isset($_POST['durationMin'])) {
+                echo 'ici';
             }
         }
 
