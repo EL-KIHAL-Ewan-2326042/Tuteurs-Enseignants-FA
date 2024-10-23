@@ -48,14 +48,15 @@ class Homepage {
             }
             ?>
 
-            <h4 class="left-align">Sélectionnez le(s) département(s) :</h4>
+            <h4 class="center">Sélectionnez le(s) département(s) :</h4>
 
             <div class="row"></div>
 
-            <?
-            if(isset($_POST['selecDepSubmitted'])) {
-                if(isset($_POST['selecDep'])) {
+            <? if (isset($_POST['selecDepSubmitted'])) {
+
+                if (isset($_POST['selecDep'])) {
                     $_SESSION['selecDep'] = $_POST['selecDep'];
+
                 } else {
                     unset($_SESSION['selecDep']);
                 }
@@ -84,12 +85,17 @@ class Homepage {
 
                 <?
                 if(isset($_POST['selecStudentSubmitted'])) {
+
                     if(isset($_POST['selecStudent'])) {
                         $update = $this->model->updateRequests($_POST['selecStudent']);
+
                     } else {
                         $update = $this->model->updateRequests(array());
                     }
-                    if(!$update || gettype($update) !== 'boolean') echo '<p class="red-text">Une erreur est survenue</p>';
+
+                    if(!$update || gettype($update) !== 'boolean') {
+                        echo '<p class="red-text">Une erreur est survenue</p>';
+                    }
                 }
 
                 if(!empty($_SESSION['selecDep'])):
@@ -112,66 +118,122 @@ class Homepage {
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <?
-                                    foreach($table as $row): ?>
+                                    <? foreach ($table as $row): ?>
                                         <tr>
-                                            <td><? echo $row["student_name"] . " " . $row["student_firstname"] ?></td>
-                                            <td><? echo $row["internshipTeacher"] ?></td>
+                                            <td><?= $row["student_name"] . " " . $row["student_firstname"] ?></td>
                                             <td>
-                                            <script>
-                                                window.addEventListener('load', async function () {
-                                                    let addressTeach = [];
-
-                                                    const geocodeAddresses = async () => {
-                                                        const checkGoogleMaps = setInterval(async () => {
-                                                            if (typeof google !== 'undefined' && google.maps && google.maps.Geocoder) {
-                                                                clearInterval(checkGoogleMaps);
-
-                                                                const addressTeachPromises = [
-                                                                    <? foreach($_SESSION['address'] as $address): ?>
-                                                                    geocodeAddress(<?= '"' . str_replace('_', "'", $address['address']) . '"' ?>),
-                                                                    <? endforeach; ?>
-                                                                ];
-
-                                                                addressTeach = await Promise.all(addressTeachPromises);
-
-                                                                const addressStudent = await geocodeAddress(<?= '"' . str_replace('_', "'", $row["address"]) . '"' ?>);
-
-                                                                const durationPromises = addressTeach.map(teacherAddress => calculateDistance(addressStudent, teacherAddress));
-                                                                const durations = await Promise.all(durationPromises);
-
-                                                                const durationValues = durations.map(duration => duration.value);
-                                                                const durationMin = Math.min(...durationValues);
-
-                                                                if (durationMin) {
-                                                                    await fetch(window.location.href, {
-                                                                        method: 'POST',
-                                                                        headers: {
-                                                                            'Content-Type': 'application/x-www-form-urlencoded',
-                                                                        },
-                                                                        body: `shortest_duration[]=${durationMin}`
-                                                                    });
-                                                                }
-                                                            } else {
-                                                                console.log('Google Maps API is not yet loaded.');
-                                                            }
-                                                        }, 100);
-                                                    };
-
-                                                    await geocodeAddresses();
-                                                });
-                                            </script>
+                                                <?php
+                                                $internships = $this->model->getInternships($row['student_number']);
+                                                $internshipCount = count($internships);
+                                                echo $internshipCount > 0 ? 'Oui' : 'Non';
+                                                ?>
                                             </td>
-                                            <td> <? echo str_replace('_', ' ', $row["internship_subject"]) ?> </td>
-                                            <td> <? echo str_replace('_', ' ', $row["company_name"]) ?> </td>
-                                            <td> <? echo "<strong>" . round($row['relevance'], 2) . "</strong>/5" ?> </td>
+                                            <td id="position-<?= $row['student_number'] ?>">Calcul ...</td>
+                                            <td><?= str_replace('_', ' ', $row["internship_subject"]) ?></td>
+                                            <td><?= str_replace('_', ' ', $row["company_name"]) ?></td>
+                                            <td id="totalScore-<?= $row['student_number'] ?>">
+                                                <strong>Calcul ...</strong>
+                                            </td>
                                             <td>
-                                                <label>
-                                                    <input type="checkbox" name="selecStudent[]" class="center-align filled-in" value="<?= $row['student_number'] ?>" <? if($row['requested']): ?> checked="checked" <? endif; ?> />
+                                                <label class="center">
+                                                    <input type="checkbox" name="selecStudent[]" class="center-align filled-in" value="<?= $row['student_number'] ?>" <?= $row['requested'] ? 'checked="checked"' : '' ?> />
                                                     <span></span>
                                                 </label>
                                             </td>
                                         </tr>
+                                        <script>
+                                            window.addEventListener('load', async function () {
+                                                let durationMin;
+
+                                                function calculateScore(dictValues, dictCoef) {
+                                                    let totalScore = 0;
+                                                    let totalCoef = 0;
+
+                                                    for (let criteria in dictValues) {
+                                                        if (dictCoef.hasOwnProperty(criteria)) {
+                                                            const value = dictValues[criteria];
+                                                            let coef = dictCoef[criteria];
+
+                                                            switch (criteria) {
+                                                                case 'Distance':
+                                                                    const scoreDuration = (coef / (1 + 0.02 * value));
+                                                                    totalScore += scoreDuration;
+                                                                    break;
+
+                                                                case 'A été responsable':
+                                                                    const scoreInternship = (value > 0) ? value * coef : 1;
+                                                                    totalScore += scoreInternship;
+                                                                    break;
+
+                                                                case 'Cohérence':
+                                                                    const scoreRelevance = value * coef;
+                                                                    totalScore += scoreRelevance;
+                                                                    break;
+
+                                                                default:
+                                                                    totalScore += value * coef;
+                                                                    break;
+                                                            }
+
+                                                            totalCoef += coef;
+                                                        }
+                                                    }
+
+                                                    return Math.max(0, Math.min(5, (totalScore * 5) / totalCoef).toFixed(2));
+                                                }
+
+                                                const geocodeAddresses = async () => {
+                                                    return new Promise((resolve, reject) => {
+                                                        const checkGoogleMaps = setInterval(async () => {
+                                                            if (typeof google !== 'undefined' && google.maps && google.maps.Geocoder) {
+                                                                clearInterval(checkGoogleMaps);
+
+                                                                try {
+                                                                    const addressTeachPromises = [
+                                                                        <? foreach ($_SESSION['address'] as $address): ?>
+                                                                        await geocodeAddress('<?= str_replace('_', "'", $address['address']) ?>'),
+                                                                        <? endforeach; ?>
+                                                                    ];
+
+                                                                    const addressTeach = await Promise.all(addressTeachPromises);
+                                                                    const addressStudent = await geocodeAddress('<?= str_replace('_', "'", $row["address"]) ?>');
+
+                                                                    const durationPromises = addressTeach.map(teacherAddress => calculateDistance(addressStudent, teacherAddress));
+                                                                    const durations = await Promise.all(durationPromises);
+
+                                                                    const durationValues = durations.map(duration => duration.value);
+                                                                    durationMin = Math.min(...durationValues);
+
+                                                                    document.getElementById('position-<?= $row['student_number'] ?>').innerHTML = '~' + Math.floor(durationMin / 60) + ' minutes';
+                                                                    resolve(durationMin);
+                                                                } catch (error) {
+                                                                    reject('Error in geocoding: ' + error);
+                                                                }
+
+                                                            } else {
+                                                                console.log('Google Maps API is not yet loaded.');
+                                                            }
+                                                        }, 100);
+                                                    });
+                                                };
+
+                                                try {
+                                                    await geocodeAddresses();
+
+                                                    const dictValues = {
+                                                        'A été responsable': <? echo $internshipCount ?>,
+                                                        'Distance': Math.floor(durationMin / 60),
+                                                        'Cohérence': <? echo round($row['relevance'], 2) ?>
+                                                    };
+
+                                                    const dictCoef = <?php echo json_encode($this->model->getCoef($_SESSION['identifier']), JSON_NUMERIC_CHECK) ?>;
+
+                                                    document.getElementById('totalScore-<?= $row['student_number'] ?>').innerHTML = calculateScore(dictValues, dictCoef) + '/5';
+                                                } catch (error) {
+                                                    console.error(error);
+                                                }
+                                            });
+                                        </script>
                                     <? endforeach; ?>
                                     </tbody>
                                 </table>
@@ -179,6 +241,8 @@ class Homepage {
                             <input type="hidden" name="selecStudentSubmitted" value="1">
                             <button class="waves-effect waves-light btn" type="submit">Valider</button>
                         </form>
+
+
                     <? endif;
                 endif;
             endif; ?>
