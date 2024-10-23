@@ -18,3 +18,17 @@ INSERT INTO Teaches (Id_teacher, Department_name) VALUES ('C45328794', 'IUT_INFO
 INSERT INTO Teaches (Id_teacher, Department_name) VALUES ('H48344613', 'IUT_INFO_AIX');
 INSERT INTO Teaches (Id_teacher, Department_name) VALUES ('R41814241', 'IUT_INFO_AIX');
 INSERT INTO Teaches (Id_teacher, Department_name) VALUES ('B22662146', 'IUT_INFO_AIX');
+-- Association des enseignants GEA avec le département IUT_GEA_AIX
+INSERT INTO Teaches (Id_teacher, Department_name) VALUES ('B22662146', 'IUT_GEA_AIX');
+INSERT INTO Teaches (Id_teacher, Department_name) VALUES ('F67890123', 'IUT_GEA_AIX');
+INSERT INTO Teaches (Id_teacher, Department_name) VALUES ('G78901234', 'IUT_GEA_AIX');
+INSERT INTO Teaches (Id_teacher, Department_name) VALUES ('H89012345', 'IUT_GEA_AIX');
+INSERT INTO Teaches (Id_teacher, Department_name) VALUES ('I90123456', 'IUT_GEA_AIX');
+INSERT INTO Teaches (Id_teacher, Department_name) VALUES ('J01234567', 'IUT_GEA_AIX');
+-- Association des enseignants TC avec le département IUT_TC_AIX
+INSERT INTO Teaches (Id_teacher, Department_name) VALUES ('B22662146', 'IUT_TC_AIX');
+INSERT INTO Teaches (Id_teacher, Department_name) VALUES ('A12345678', 'IUT_TC_AIX');
+INSERT INTO Teaches (Id_teacher, Department_name) VALUES ('B23456789', 'IUT_TC_AIX');
+INSERT INTO Teaches (Id_teacher, Department_name) VALUES ('C34567890', 'IUT_TC_AIX');
+INSERT INTO Teaches (Id_teacher, Department_name) VALUES ('D45678901', 'IUT_TC_AIX');
+INSERT INTO Teaches (Id_teacher, Department_name) VALUES ('E56789012', 'IUT_TC_AIX');
