@@ -140,32 +140,35 @@ class Homepage {
                                                                 clearInterval(checkGoogleMaps);
                                                                 const addressStudent = await geocodeAddress(<?= '"' . str_replace('_', "'", $row["address"]) . '"' ?>);
                                                                 let durations = [];
+
                                                                 for (const address of addressTeach) {
                                                                     durations.push(await calculateDistance(addressStudent, address));
                                                                 }
-                                                                const durationValues = Array.from(durations, (x) => x.value);
-                                                                const durationMin = Math.min(durationValues);
+
+                                                                const durationValues = durations.map((x) => x.value);
+                                                                const durationMin = Math.min(...durationValues);
 
                                                                 if (durationMin) {
-                                                                    const form = document.createElement('form');
-                                                                    form.method = 'POST';
-                                                                    form.action = window.location.href;
 
-                                                                    const inputId = document.createElement('input');
-                                                                    inputId.type = 'hidden';
-                                                                    inputId.name = 'shortest_duration[]';
-                                                                    inputId.value = durationMin;
+                                                                    const form = new FormData();
+                                                                    form.append('shortest_duration[]', durationMin.toString());
 
-                                                                    form.appendChild(inputId);
+                                                                    try {
+                                                                        const response = await fetch(window.location.href, {
+                                                                            method: 'POST',
+                                                                            body: form
+                                                                        });
 
-                                                                    document.body.appendChild(form);
-                                                                    /*form.submit();
-                                                                    form.addEventListener('submit', function(event) {
-                                                                        event.preventDefault();
-                                                                    });
-
-                                                                    form.dispatchEvent(new Event('submit'));*/
-
+                                                                        if (response.ok) {
+                                                                            const result = await response.text();
+                                                                            console.log('Formulaire soumis avec succès:', result);
+                                                                            // Effectuer des actions sur la page sans la recharger, si besoin
+                                                                        } else {
+                                                                            console.error('Erreur lors de la soumission:', response.statusText);
+                                                                        }
+                                                                    } catch (error) {
+                                                                        console.error('Erreur lors de la requête AJAX:', error);
+                                                                    }
                                                                 }
                                                             } else {
                                                                 console.log('L\'API Google Maps n\'est pas encore chargée.');
@@ -186,6 +189,11 @@ class Homepage {
                                         </tr>
                                     <? endforeach; ?>
                                     </tbody>
+                                    <script>
+                                        window.addEventListener('load', async function () {
+
+                                        });
+                                    </script>
                                 </table>
                             </div>
                             <input type="hidden" name="selecStudentSubmitted" value="1">
