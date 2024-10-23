@@ -1,6 +1,6 @@
 <?php
 
-namespace Test\Controllers;
+namespace Controllers;
 
 use Blog\Controllers\Aboutus;
 use Blog\Views\Layout;

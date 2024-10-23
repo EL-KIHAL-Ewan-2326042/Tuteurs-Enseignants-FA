@@ -3,10 +3,10 @@
 namespace Controllers;
 
 use Blog\Controllers\Intramu;
-use Includes\Database;
 use Blog\Views\Layout;
 use Blog\Views\Intramu as IntramuView;
 use Blog\Models\Intramu as IntramuModel;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -19,7 +19,7 @@ class IntramuTest extends TestCase{
     /**
      * Test de la méthode show() du contrôleur Intramu
      * @return void
-     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @throws Exception
      */
     public function testShow(){
         //initialisation session
