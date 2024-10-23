@@ -76,15 +76,13 @@ function createAction($uri): Closure {
 
     $className = "Blog\\Controllers\\$controllerName";
 
-    if (class_exists($className)) {
-        return function() use ($className) {
-            (new $className())->show();
-        };
-    } else {
-        return function() {
-            echo "Erreur 404 ...";
-        };
+    if (!(class_exists($className))) {
+        $className = "Blog\\Controllers\\Error404";
     }
+
+    return function() use ($className) {
+        (new $className())->show();
+    };
 }
 
 $action = createAction($uri);
