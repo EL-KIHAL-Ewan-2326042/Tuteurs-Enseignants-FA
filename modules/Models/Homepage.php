@@ -110,6 +110,8 @@ class Homepage {
 
         $studentsList = array_unique($studentsList, 0);
 
+        $requests = $this->getRequests();
+
         foreach($studentsList as & $row) {
             $internshipsResp = $this->getInternships($row['student_number']);
             if(!$internshipsResp) {
@@ -125,18 +127,23 @@ class Homepage {
                 $row['internshipTeacher'] = $this->getInternshipTeacher($internshipsResp);
             }
             $row['relevance'] = $this->scoreDiscipSubject($row['student_number']);
+            $row['requested'] = in_array($row['student_number'], $requests);
         }
 
         usort($studentsList, function ($a, $b) {
-            $rank = $b['relevance'] <=> $a['relevance'];
-            if ($rank === 0) {
-                $lastName = $a['student_name'] <=> $b['student_name'];
-                if ($lastName === 0) {
-                    return $a['student_firstname'] <=> $b['student_firstname'];
+            $requested = $b['requested'] <=> $a['requested'];
+            if($requested === 0) {
+                $rank = $b['relevance'] <=> $a['relevance'];
+                if ($rank === 0) {
+                    $lastName = $a['student_name'] <=> $b['student_name'];
+                    if ($lastName === 0) {
+                        return $a['student_firstname'] <=> $b['student_firstname'];
+                    }
+                    return $lastName;
                 }
-                return $lastName;
+                return $rank;
             }
-            return $rank;
+            return $requested;
         });
 
         return $studentsList;
