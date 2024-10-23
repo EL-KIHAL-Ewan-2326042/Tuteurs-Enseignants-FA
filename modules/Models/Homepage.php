@@ -3,6 +3,7 @@ namespace Blog\Models;
 
 use Database;
 use PDO;
+use PDOException;
 
 class Homepage {
 
@@ -142,7 +143,7 @@ class Homepage {
     }
 
     /**
-     * Renvoie un tableau contenant les stages des élèves du département passé en paramètre et leurs informations, ou false
+     * Renvoie un tableau contenant les stages des élèves du département passé en paramètre et leurs informations
      * @param string $department le département duquel les élèves sélectionnés font partie
      * @return false|array tableau contenant le numéro, le nom et le prénom de l'élève, ainsi que le nom de l'entreprise dans lequel il va faire son stage, le sujet et les dates, false sinon
      */
@@ -162,7 +163,7 @@ class Homepage {
     }
 
     /**
-     * Renvoie les critères et leurs coefficients associés pour l'enseignant connecté, ou false
+     * Renvoie les critères et leurs coefficients associés pour l'enseignant connecté
      * @return false|array tableau contenant chaque crtière et son coefficient, false sinon
      */
     public function getFactors(): false|array {
@@ -176,7 +177,7 @@ class Homepage {
     }
 
     /**
-     * Renvoie tous les départements dont l'enseignant connecté fait partie, ou false
+     * Renvoie tous les départements dont l'enseignant connecté fait partie
      * @return false|array tableau contenant tous les départements dont l'enseignant connecté fait partie, false sinon
      */
     public function getDepTeacher(): false|array {
@@ -190,7 +191,7 @@ class Homepage {
     }
 
     /**
-     * Renvoie un tableau contenant les informations de chaque tutorat terminé de l'élève passé en paramètre, ou false
+     * Renvoie un tableau contenant les informations de chaque tutorat terminé de l'élève passé en paramètre
      * @param string $student le numéro de l'étudiant dont on récupère les informations
      * @return false|array tableau contenant, pour chaque tutorat, le numéro d'enseignant du tuteur, le numéro de l'élève et les dates, false sinon
      */
@@ -283,4 +284,61 @@ class Homepage {
     /*public function calculateScore(array $dictCriteria): float {
 
     }*/
+
+    /**
+     * Renvoie tous les stages que l'enseignant connecté a demandé à tutorer
+     * @return false|array tableau contenant le numéro d'étudiant de l'élève du stage dont l'enseignant connecté a fait la demande, false sinon
+     */
+    public function getRequests(): false|array {
+        $query = 'SELECT student_number
+                    FROM is_requested
+                    WHERE  id_teacher = :teacher';
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindParam(':teacher', $_SESSION['identifier']);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
+    /**
+     * Met à jour la table is_requested en fonction des stages demandés par l'enseignant connecté
+     * @param array $requests tableau contenant les numéro d'étudiant que l'enseignant souhaite tutorer
+     * @return true|string renvoie true si les insert et delete ont fonctionné, sinon l'erreur dans un string
+     */
+    public function updateRequests(array $requests): true|string {
+        $current_requests = $this->getRequests();
+        if(!$current_requests) $current_requests = array();
+
+        $to_add = array_diff($requests, $current_requests);
+        $to_delete = array_diff($current_requests, $requests);
+
+        foreach($to_add as $request) {
+            $query = 'INSERT INTO is_requested(id_teacher, student_number)
+                        VALUES(:teacher, :student)';
+            $stmt = $this->db->getConn()->prepare($query);
+            $stmt->bindParam(':teacher', $_SESSION['identifier']);
+            $stmt->bindParam(':student', $request);
+
+            try {
+                $stmt->execute();
+            } catch(PDOException $e) {
+                return $e->getMessage();
+            }
+        }
+
+        foreach($to_delete as $request) {
+            $query = 'DELETE FROM is_requested
+                        WHERE  id_teacher = :teacher
+                        AND student_number = :student';
+            $stmt = $this->db->getConn()->prepare($query);
+            $stmt->bindParam(':teacher', $_SESSION['identifier']);
+            $stmt->bindParam(':student', $request);
+
+            try {
+                $stmt->execute();
+            } catch(PDOException $e) {
+                return $e->getMessage();
+            }
+        }
+        return true;
+    }
 }

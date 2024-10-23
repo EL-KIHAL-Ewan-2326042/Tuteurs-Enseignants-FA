@@ -85,11 +85,14 @@ class Homepage {
                 <?
                 if(isset($_POST['selecStudentSubmitted'])) {
                     if(isset($_POST['selecStudent'])) {
-                        $_SESSION['selecStudent'] = $_POST['selecStudent'];
+                        $update = $this->model->updateRequests($_POST['selecStudent']);
                     } else {
-                        unset($_SESSION['selecStudent']);
+                        $update = $this->model->updateRequests(array());
                     }
+                    if(!$update || gettype($update) !== 'boolean') echo '<h6 class="red-text">Une erreur est survenue</h6>';
                 }
+
+                $requests = $this->model->getRequests();
 
                 if(!empty($_SESSION['selecDep'])):
                     $table = $this->model->getStudentsList($_SESSION['selecDep']);
@@ -178,7 +181,7 @@ class Homepage {
                                             <td> <? echo "<strong>" . round($row['relevance'], 2) . "</strong>/5" ?> </td>
                                             <td>
                                                 <label>
-                                                    <input type="checkbox" name="selecStudent[]" class="center-align filled-in" value="<?= $row['student_name'] ?>" <? if(isset($_SESSION['selecStudent']) && in_array($row['student_name'], $_SESSION['selecStudent'])): ?> checked="checked" <? endif; ?> />
+                                                    <input type="checkbox" name="selecStudent[]" class="center-align filled-in" value="<?= $row['student_number'] ?>" <? if($requests && in_array($row['student_number'], $requests)): ?> checked="checked" <? endif; ?> />
                                                     <span></span>
                                                 </label>
                                             </td>
