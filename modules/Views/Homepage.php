@@ -112,67 +112,55 @@ class Homepage {
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <script>
-                                        let addressTeach = [];
-                                        window.addEventListener('load', async function () {
-                                            const checkGoogleMaps = setInterval(async () => {
-                                                if (typeof google !== 'undefined' && google.maps && google.maps.Geocoder) {
-                                                    clearInterval(checkGoogleMaps);
-                                                    <? foreach($_SESSION['address'] as $address): ?>
-                                                        addressTeach.push(await geocodeAddress(<?= '"' . str_replace('_', "'", $address['address']) . '"' ?>));
-                                                    <? endforeach; ?>
-                                                    } else {
-                                                    console.log('L\'API Google Maps n\'est pas encore chargée.');
-                                                }
-                                            }, 100);
-                                        });
-                                    </script>
                                     <?
                                     foreach($table as $row): ?>
                                         <tr>
                                             <td><? echo $row["student_name"] . " " . $row["student_firstname"] ?></td>
                                             <td><? echo $row["internshipTeacher"] ?></td>
                                             <td>
-                                                <script>
-                                                    window.addEventListener('load', async function () {
+                                            <script>
+                                                window.addEventListener('load', async function () {
+                                                    let addressTeach = [];
+
+                                                    const geocodeAddresses = async () => {
                                                         const checkGoogleMaps = setInterval(async () => {
                                                             if (typeof google !== 'undefined' && google.maps && google.maps.Geocoder) {
                                                                 clearInterval(checkGoogleMaps);
+
+                                                                const addressTeachPromises = [
+                                                                    <? foreach($_SESSION['address'] as $address): ?>
+                                                                    geocodeAddress(<?= '"' . str_replace('_', "'", $address['address']) . '"' ?>),
+                                                                    <? endforeach; ?>
+                                                                ];
+
+                                                                addressTeach = await Promise.all(addressTeachPromises);
+
                                                                 const addressStudent = await geocodeAddress(<?= '"' . str_replace('_', "'", $row["address"]) . '"' ?>);
-                                                                let durations = [];
-                                                                for (const address of addressTeach) {
-                                                                    durations.push(await calculateDistance(addressStudent, address));
-                                                                }
-                                                                const durationValues = Array.from(durations, (x) => x.value);
-                                                                const durationMin = Math.min(durationValues);
+
+                                                                const durationPromises = addressTeach.map(teacherAddress => calculateDistance(addressStudent, teacherAddress));
+                                                                const durations = await Promise.all(durationPromises);
+
+                                                                const durationValues = durations.map(duration => duration.value);
+                                                                const durationMin = Math.min(...durationValues);
 
                                                                 if (durationMin) {
-                                                                    const form = document.createElement('form');
-                                                                    form.method = 'POST';
-                                                                    form.action = window.location.href;
-
-                                                                    const inputId = document.createElement('input');
-                                                                    inputId.type = 'hidden';
-                                                                    inputId.name = 'shortest_duration[]';
-                                                                    inputId.value = durationMin;
-
-                                                                    form.appendChild(inputId);
-
-                                                                    document.body.appendChild(form);
-                                                                    /*form.submit();
-                                                                    form.addEventListener('submit', function(event) {
-                                                                        event.preventDefault();
+                                                                    await fetch(window.location.href, {
+                                                                        method: 'POST',
+                                                                        headers: {
+                                                                            'Content-Type': 'application/x-www-form-urlencoded',
+                                                                        },
+                                                                        body: `shortest_duration[]=${durationMin}`
                                                                     });
-
-                                                                    form.dispatchEvent(new Event('submit'));*/
-
                                                                 }
                                                             } else {
-                                                                console.log('L\'API Google Maps n\'est pas encore chargée.');
+                                                                console.log('Google Maps API is not yet loaded.');
                                                             }
                                                         }, 100);
-                                                    });
-                                                </script>
+                                                    };
+
+                                                    await geocodeAddresses();
+                                                });
+                                            </script>
                                             </td>
                                             <td> <? echo str_replace('_', ' ', $row["internship_subject"]) ?> </td>
                                             <td> <? echo str_replace('_', ' ', $row["company_name"]) ?> </td>
