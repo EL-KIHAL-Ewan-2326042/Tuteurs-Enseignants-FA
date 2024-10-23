@@ -61,9 +61,13 @@ class Dashboard{
 
         if (($handle = fopen($csvFilePath, "r")) !== FALSE) {
             $headers = fgetcsv($handle, 1000, ",");
+            error_log("CSV headers: " . implode(",", $headers));
 
             if (!$this->validateHeaders($headers, $expectedHeaders)) {
-                echo "Les colonnes du fichier CSV ne correspondent pas aux colonnes attendues par la base de données.";
+                //echo "Les colonnes du fichier CSV ne correspondent pas aux colonnes attendues par la base de données.";
+                error_log("CSV headers do not match expected headers.");
+                error_log("Expected: " . implode(', ', $expectedHeaders));
+                error_log("Received: " . implode(', ', $headers));
                 fclose($handle);
                 return false;
             }
@@ -115,14 +119,14 @@ class Dashboard{
         $db = $this->db;
         $department = $_SESSION['role_department'];
 
+        ob_start();
+
         //envoyer les en-têtes pour le téléchargement
-        /**
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="' . $tableName . '_export.csv"');
         header('Pragma: no-cache');
         header('Expires: 0');
-        */
-        ob_start();
+
         $output = fopen('php://output', 'w');
 
         if ($output === false){
@@ -166,8 +170,8 @@ class Dashboard{
 
         fclose($output);
         $csvData = ob_get_clean();
-        file_put_contents("export_$tableName.csv",$csvData);
+        echo $csvData;
 
-        return true;
+        exit();
     }
 }

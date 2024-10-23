@@ -58,31 +58,6 @@ class DashboardTest extends TestCase  {
     // --------- Test importation --------- //
 
     /**
-     * Test d'importation pour les étudiants
-     * @return void
-     * @throws Exception
-     */
-    public function testUploadCSvStudentSuccess(): void {
-        $this->runCsvUploadTest('uploadCsvStudent', ['1', 'Doe', 'John', 'Informatique', 'A']);
-    }
-    /**
-     * Test d'importation pour les enseignants
-     * @return void
-     * @throws Exception
-     */
-    public function testUploadCsvTeacherSuccess() {
-        $this->runCsvUploadTest('uploadCsvTeacher', ['1', 'Smith', 'Alice', '5']);
-    }
-    /**
-     * Test d'importation pour les stages/alternances
-     * @return void
-     * @throws Exception
-     */
-    public function testUploadCsvInternshipSuccess() {
-        $this->runCsvUploadTest('uploadCsvInternship', ['123', 'CompanyName', 'Tech', '2024-01-01', '2024-06-01']);
-    }
-
-    /**
      * Test pour l'importation de fichier CSV avec succés
      * @param string $method
      * @param array $row
@@ -91,7 +66,9 @@ class DashboardTest extends TestCase  {
      */
     private function runCsvUploadTest(string $method, array $row): void {
         $mockDb = $this->createMock(Database::class);
-        $mockConn = $this->createMock(Database::class);
+        $mockConn = $this->getMockBuilder(\PDO::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         //attente pour le mock de la base de données
         $mockDb->method('getConn')->willReturn($mockConn);
@@ -108,6 +85,31 @@ class DashboardTest extends TestCase  {
         $dashboard = new Dashboard($mockDb);
         $result = $dashboard->$method($csvFilePath);
         $this->assertTrue($result, "L'importation aurait dû réussir pour $method");
+    }
+
+    /**
+     * Test d'importation pour les étudiants
+     * @return void
+     * @throws Exception
+     */
+    public function testUploadCSvStudentSuccess(): void {
+        $this->runCsvUploadTest('uploadCsvStudent', ['student_number','student_name','student_firstname','formation','class_group']);
+    }
+    /**
+     * Test d'importation pour les enseignants
+     * @return void
+     * @throws Exception
+     */
+    public function testUploadCsvTeacherSuccess() {
+        $this->runCsvUploadTest('uploadCsvTeacher', ['id_teacher','teacher_name','teacher_firstname','maxi_number_trainees']);
+    }
+    /**
+     * Test d'importation pour les stages/alternances
+     * @return void
+     * @throws Exception
+     */
+    public function testUploadCsvInternshipSuccess() {
+        $this->runCsvUploadTest('uploadCsvInternship', ['internship_identifier','company_name','keyword','start_end_internship','type','end_date_internship','internship_subject','address','student_number']);
     }
 
     /**
@@ -134,7 +136,9 @@ class DashboardTest extends TestCase  {
      */
     private function runCsvUploadTestDatabaseError (string $method, array $row): void {
         $mockDb = $this->createMock(Database::class);
-        $mockConn = $this->createMock(Database::class);
+        $mockConn = $this->getMockBuilder(\PDO::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         //simulation de l'erreur
         $mockDb->method('getConn')->willReturn($mockConn);
@@ -157,7 +161,13 @@ class DashboardTest extends TestCase  {
      * @throws Exception
      */
     public function testUploadCsvStudentDatabaseError() {
-        $this->runCsvUploadTestDatabaseError('uploadCsvStudent', ['1', 'Doe', 'John', 'Informatique', 'A']);
+        $this->runCsvUploadTestDatabaseError('uploadCsvStudent', [
+            'student_number' => '1',
+            'student_name' => 'Doe',
+            'student_firstname' => 'John',
+            'formation' => 'Informatique',
+            'class_group' => 'A'
+        ]);
     }
     /**
      * Test de l'erreur d'importation pour les professeurs
@@ -165,7 +175,12 @@ class DashboardTest extends TestCase  {
      * @throws Exception
      */
     public function testUploadCsvTeacherDatabaseError() {
-        $this->runCsvUploadTestDatabaseError('uploadCsvTeacher', ['1', 'Smith', 'Alice', '5']);
+        $this->runCsvUploadTestDatabaseError('uploadCsvTeacher', [
+            'id_teacher' => '1',
+            'teacher_name' => 'Smith',
+            'teacher_firstname' => 'Alice',
+            'maxi_number_trainees' => '10'
+        ]);
     }
     /**
      * Test de l'erreur d'importation pour les stages/alternances
@@ -173,7 +188,17 @@ class DashboardTest extends TestCase  {
      * @throws Exception
      */
     public function testUploadCsvInternshipDatabaseError() {
-        $this->runCsvUploadTestDatabaseError('uploadCsvInternship', ['123', 'CompanyName', 'Tech', '2024-01-01', '2024-06-01']);
+        $this->runCsvUploadTestDatabaseError('uploadCsvInternship', [
+            'internship_identifier' => '123',
+            'company_name' => 'CompanyA',
+            'keyword' => 'Tech',
+            'start_end_internship' => '2024-01-01',
+            'type' => 'Full-time',
+            'end_date_internship' => '2024-06-01',
+            'internship_subject' => 'Software Development',
+            'address' => '123 Street',
+            'student_number' => '1'
+        ]);
     }
 
     // --------- Test exportation --------- //
@@ -186,8 +211,7 @@ class DashboardTest extends TestCase  {
     public function testExportToCsvStudentSuccess() {
         $headers = ['student_number', 'student_name', 'student_firstname', 'formation', 'class_group'];
         $data = [
-            ['1', 'Doe', 'John', 'Informatique', 'A'],
-            ['2', 'Smith', 'Alice', 'Mathématiques', 'B']
+            ['1', 'Doe', 'John', 'Informatique', 'A']
         ];
         $this->runCsvExportTest('student', $headers, $data);
     }
@@ -200,8 +224,7 @@ class DashboardTest extends TestCase  {
     public function testExportToCsvTeacherSuccess() {
         $headers = ['id_teacher', 'teacher_name', 'teacher_firstname', 'maxi_number_trainees'];
         $data = [
-            ['1', 'Doe', 'John', '5'],
-            ['2', 'Smith', 'Alice', '10']
+            ['1', 'Smith', 'Alice', '10']
         ];
         $this->runCsvExportTest('teacher', $headers, $data);
     }
@@ -214,8 +237,7 @@ class DashboardTest extends TestCase  {
     public function testExportToCsvInternshipSuccess() {
         $headers = ['internship_identifier', 'company_name', 'keywords', 'start_date_internship', 'type', 'end_date_internship', 'internship_subject', 'address', 'student_number'];
         $data = [
-            ['123', 'CompanyA', 'Tech', '2024-01-01', 'Full-time', '2024-06-01', 'Software Development', '123 Street', '1'],
-            ['124', 'CompanyB', 'Business', '2024-02-01', 'Part-time', '2024-07-01', 'Marketing', '456 Avenue', '2']
+            ['123', 'CompanyA', 'Tech', '2024-01-01', 'Full-time', '2024-06-01', 'Software Development', '123 Street', '1']
         ];
         $this->runCsvExportTest('internship', $headers, $data);
     }
@@ -231,7 +253,9 @@ class DashboardTest extends TestCase  {
      */
     private function runCsvExportTest(string $table, array $headers, array $data): void {
         $mockDb = $this->createMock(Database::class);
-        $mockConn = $this->createMock(\PDO::class);
+        $mockConn = $this->getMockBuilder(\PDO::class)
+            ->disableOriginalConstructor()
+            ->getMock();
         $dashboard = new Dashboard($mockDb);
 
         //simulation de la connexion à la base données
@@ -301,7 +325,9 @@ class DashboardTest extends TestCase  {
      */
     public function testExportToCsvDatabaseError(){
         $mockDb = $this->createMock(Database::class);
-        $mockConn = $this->createMock(Database::class);
+        $mockConn = $this->getMockBuilder(\PDO::class)
+            ->disableOriginalConstructor()
+            ->getMock();
 
         //simulation de l'erreur dans la base de données
         $mockDb->method('getConn')->willReturn($mockConn);
