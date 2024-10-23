@@ -8,15 +8,13 @@ use PDO;
 
 class Dispatcher {
     /**
-     * Controlleur du Dispatcher
+     *
      * @return void
      */
-    public function show(): void {
-        $db = Database::getInstance();
-        $dispatcherModel = new \Blog\Models\Dispatcher($db);
-        $errorMessage = '';
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['Student_number']) && isset($_POST['Id_teacher']) && isset($_POST['Start_date']) && isset($_POST['End_date'])) {
+    public function association($db): string {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['Student_number']) && isset($_POST['Id_teacher']) && isset($_POST['Start_date']) && isset($_POST['End_date'])
+            && $_POST['Student_number'] !== '' && $_POST['Id_teacher'] !== '' && $_POST['Start_date'] !== '' && $_POST['End_date'] !== '') {
             $query = 'SELECT Teacher.Id_teacher FROM Teacher JOIN Teaches ON Teacher.Id_Teacher = Teaches.Id_Teacher
                     where Department_name = :Role_department';
             $stmt = $db->getConn()->prepare($query);
@@ -51,23 +49,33 @@ class Dispatcher {
                         $stmt->bindParam(':Start_date', $_POST['Start_date']);
                         $stmt->bindParam(':End_date', $_POST['End_date']);
                         $stmt->execute();
-                        $errorMessage = "Association " . $_POST['Id_teacher'] . " et " . $_POST['Student_number'] . " enregistré.";
+                        return "Association " . $_POST['Id_teacher'] . " et " . $_POST['Student_number'] . " enregistré.";
                     }
                     else {
-                        $errorMessage = "Cette association existe déjà";
+                        return "Cette association existe déjà";
                     }
                 }
                 else {
-                    $errorMessage = "Student_number ou Id_Teacher inexistant dans ce departement";
+                    return "Student_number ou Id_Teacher inexistant dans ce departement";
                 }
             } else {
-                $errorMessage = "Date format non valide (format YYYY-MM-DD)";
+                return "Date format non valide (format YYYY-MM-DD)";
             }
         }
         elseif ($_SERVER['REQUEST_METHOD'] === 'POST'){
-            $errorMessage = "Merci de remplir tout les champs";
+            return "Merci de remplir tout les champs";
         }
+        return '';
+    }
 
+    public function show(): void {
+        $db = Database::getInstance();
+        $dispatcherModel = new \Blog\Models\Dispatcher($db);
+        $errorMessage = '';
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['Student_number']) && isset($_POST['Id_teacher']) && isset($_POST['Start_date']) && isset($_POST['End_date'])){
+            $errorMessage = $this->association($db);
+        }
 
         $db = Database::getInstance();
         $title = "Dispatcher";

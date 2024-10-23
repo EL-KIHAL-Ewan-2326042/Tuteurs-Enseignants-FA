@@ -51,11 +51,12 @@ class Intramu {
         $db = $this->db;
         $query = 'SELECT role_name FROM has_role 
                   WHERE has_role.user_id = :user_id';
+
         $stmt = $db->getConn()->prepare($query);
-        $stmt->bindParam(':user_id', $_SESSION['identifier']);
+        $stmt->bindParam(':user_id', $identifier);
         $stmt->execute();
 
-        return $stmt->fetch($db->getConn()::FETCH_ASSOC);
+        return $stmt->fetchColumn();
     }
 
     /**
