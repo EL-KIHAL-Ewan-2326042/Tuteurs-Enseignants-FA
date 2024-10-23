@@ -90,9 +90,74 @@ class Homepage {
         return $stmt->fetchColumn();
     }
 
-    /*public function sortRows(array $table): array {
-
-    }*/
+    public function sortRows(array $table, int $mode): array {
+        if($mode === 1) {
+            usort($table, function ($a, $b) {
+                $rank = $b['relevance'] <=> $a['relevance'];
+                if ($rank === 0) {
+                    $requested = $b['requested'] <=> $a['requested'];
+                    if($requested === 0) {
+                        $lastName = $a['student_name'] <=> $b['student_name'];
+                        if ($lastName === 0) {
+                            return $a['student_firstname'] <=> $b['student_firstname'];
+                        }
+                        return $lastName;
+                    }
+                    return $requested;
+                }
+                return $rank;
+            });
+        } elseif($mode === 2) {
+            usort($table, function ($a, $b) {
+                $lastName = $a['student_name'] <=> $b['student_name'];
+                if ($lastName === 0) {
+                    $firstName = $a['student_firstname'] <=> $b['student_firstname'];
+                    if ($firstName === 0) {
+                        $requested = $b['requested'] <=> $a['requested'];
+                        if($requested === 0) {
+                            return $b['relevance'] <=> $a['relevance'];
+                        }
+                        return $requested;
+                    }
+                    return $firstName;
+                }
+                return $lastName;
+            });
+        } elseif($mode === 3) {
+            usort($table, function ($a, $b) {
+                
+                    $requested = $b['requested'] <=> $a['requested'];
+                    if($requested === 0) {
+                        $rank = $b['relevance'] <=> $a['relevance'];
+                        if ($rank === 0) {
+                            $lastName = $a['student_name'] <=> $b['student_name'];
+                            if ($lastName === 0) {
+                                return $a['student_firstname'] <=> $b['student_firstname'];
+                            }
+                            return $lastName;
+                        }
+                        return $rank;
+                    }
+                    return $requested;
+            });
+        } else {
+            usort($table, function ($a, $b) {
+                $requested = $b['requested'] <=> $a['requested'];
+                if($requested === 0) {
+                    $rank = $b['relevance'] <=> $a['relevance'];
+                    if ($rank === 0) {
+                        $lastName = $a['student_name'] <=> $b['student_name'];
+                        if ($lastName === 0) {
+                            return $a['student_firstname'] <=> $b['student_firstname'];
+                        }
+                        return $lastName;
+                    }
+                    return $rank;
+                }
+                return $requested;
+            });
+        }
+    }
 
     /**
      * Renvoie un tableau trié selon la note, le nom et le prénom de l'élève contenant tous les stages et leurs informations
@@ -101,7 +166,7 @@ class Homepage {
      * @param array $departments liste des départements dont on veut récupérer les stages des élèves
      * @return array tableau contenant les informations relatives à chaque stage, le nombre fois où l'enseignant connecté a été le tuteur de l'élève ainsi qu'une note représentant la pertinence du stage pour l'enseignant
      */
-    public function getStudentsList(array $departments): array {
+    public function getStudentsList(array $departments, int $mode): array {
         $studentsList = array();
         foreach($departments as $department) {
             $newList = $this->getStudentsPerDepartment($department);
@@ -130,23 +195,7 @@ class Homepage {
             $row['requested'] = in_array($row['student_number'], $requests);
         }
 
-        usort($studentsList, function ($a, $b) {
-            $requested = $b['requested'] <=> $a['requested'];
-            if($requested === 0) {
-                $rank = $b['relevance'] <=> $a['relevance'];
-                if ($rank === 0) {
-                    $lastName = $a['student_name'] <=> $b['student_name'];
-                    if ($lastName === 0) {
-                        return $a['student_firstname'] <=> $b['student_firstname'];
-                    }
-                    return $lastName;
-                }
-                return $rank;
-            }
-            return $requested;
-        });
-
-        return $studentsList;
+        return $this->sortRows($studentsList, $mode);
     }
 
     /**
