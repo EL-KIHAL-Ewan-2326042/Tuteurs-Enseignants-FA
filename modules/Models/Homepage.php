@@ -90,10 +90,25 @@ class Homepage {
         return $stmt->fetchColumn();
     }
 
-    public function sortRows(array $table, int $mode): array {
+    /**
+     * Renvoie le tableau passé en paramètre trié
+     * @param array $table tableau à trier
+     * @param int $mode mode de tri
+     * - 0 : choix de l'enseignant, par défaut
+     * - 1 : score
+     * - 2 : nom et prénom des élèves
+     * - 3 : sujet de stage
+     * @param bool $decreasing true si c'est croissant, false sinon
+     * @return array tableau trié
+     */
+    public function sortRows(array $table, int $mode = 0, bool $decreasing = false): array {
         if($mode === 1) {
-            usort($table, function ($a, $b) {
-                $rank = $b['relevance'] <=> $a['relevance'];
+            usort($table, function ($a, $b) use ($decreasing) {
+                if($decreasing) {
+                    $rank = $a['relevance'] <=> $b['relevance'];
+                } else {
+                    $rank = $b['relevance'] <=> $a['relevance'];
+                }
                 if ($rank === 0) {
                     $requested = $b['requested'] <=> $a['requested'];
                     if($requested === 0) {
@@ -108,8 +123,12 @@ class Homepage {
                 return $rank;
             });
         } elseif($mode === 2) {
-            usort($table, function ($a, $b) {
-                $lastName = $a['student_name'] <=> $b['student_name'];
+            usort($table, function ($a, $b) use ($decreasing) {
+                if($decreasing) {
+                    $lastName = $b['student_name'] <=> $a['student_name'];
+                } else {
+                    $lastName = $a['student_name'] <=> $b['student_name'];
+                }
                 if ($lastName === 0) {
                     $firstName = $a['student_firstname'] <=> $b['student_firstname'];
                     if ($firstName === 0) {
@@ -124,10 +143,15 @@ class Homepage {
                 return $lastName;
             });
         } elseif($mode === 3) {
-            usort($table, function ($a, $b) {
-                
+            usort($table, function ($a, $b) use ($decreasing) {
+                if($decreasing) {
+                    $subject = $a['internship_subject'] <=> $b['internship_subject'];
+                } else {
+                    $subject = $b['internship_subject'] <=> $a['internship_subject'];
+                }
+                if($subject === 0) {
                     $requested = $b['requested'] <=> $a['requested'];
-                    if($requested === 0) {
+                    if ($requested === 0) {
                         $rank = $b['relevance'] <=> $a['relevance'];
                         if ($rank === 0) {
                             $lastName = $a['student_name'] <=> $b['student_name'];
@@ -139,10 +163,16 @@ class Homepage {
                         return $rank;
                     }
                     return $requested;
+                }
+                return $subject;
             });
         } else {
-            usort($table, function ($a, $b) {
-                $requested = $b['requested'] <=> $a['requested'];
+            usort($table, function ($a, $b) use ($decreasing) {
+                if($decreasing) {
+                    $requested = $a['requested'] <=> $b['requested'];
+                } else {
+                    $requested = $b['requested'] <=> $a['requested'];
+                }
                 if($requested === 0) {
                     $rank = $b['relevance'] <=> $a['relevance'];
                     if ($rank === 0) {
@@ -157,6 +187,7 @@ class Homepage {
                 return $requested;
             });
         }
+        return $table;
     }
 
     /**
@@ -166,7 +197,7 @@ class Homepage {
      * @param array $departments liste des départements dont on veut récupérer les stages des élèves
      * @return array tableau contenant les informations relatives à chaque stage, le nombre fois où l'enseignant connecté a été le tuteur de l'élève ainsi qu'une note représentant la pertinence du stage pour l'enseignant
      */
-    public function getStudentsList(array $departments, int $mode): array {
+    public function getStudentsList(array $departments, int $mode = 0, bool $decreasing = false): array {
         $studentsList = array();
         foreach($departments as $department) {
             $newList = $this->getStudentsPerDepartment($department);
@@ -195,7 +226,7 @@ class Homepage {
             $row['requested'] = in_array($row['student_number'], $requests);
         }
 
-        return $this->sortRows($studentsList, $mode);
+        return $this->sortRows($studentsList, $mode, $decreasing);
     }
 
     /**
