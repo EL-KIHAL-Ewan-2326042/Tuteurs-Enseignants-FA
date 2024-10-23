@@ -33,20 +33,16 @@ class Dispatcher{
                                         </label>
                                     </p>
                                 </div>
-                                <div class="col s6">
-                                    <form action="#">
-                                        <p class="range-field" style="margin: 0;">
-                                            <input type="range" id="<?php echo $criteria['name_criteria']; ?>" min="0" max="5" value="<?php echo $criteria['coef']; ?>" />
-                                        </p>
-                                    </form>
-                                </div>
+                                <form class="col s6" action="#">
+                                    <p class="range-field" style="margin: 0;">
+                                        <input type="range" id="<?php echo $criteria['name_criteria']; ?>" min="0" max="5" value="<?php echo $criteria['coef']; ?>" />
+                                    </p>
+                                </form>
                             </div>
                             <?php
                         }
                         ?>
-
-                    <div class="col s12">
-                        <form action="./dispatcher" method="post" id="pushCoef">
+                        <form class="col s12" action="./dispatcher" method="post" id="pushCoef">
                             <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Enregister
                                 <i class="material-icons right">arrow_downward</i>
                             </button>
@@ -58,9 +54,8 @@ class Dispatcher{
                             </button>
                         </form>
                     </div>
-                </div>
-                <form action="./dispatcher" method="post" id="">
-                    <div class="col card-panel white z-depth-3 s12 m5" style="padding: 20px;">
+
+                    <form class="col card-panel white z-depth-3 s12 m5" style="padding: 20px;" action="./dispatcher" method="post" id="">
                         <div class="row">
                             <div class="input-field col s6">
                                 <input id="Id_teacher" name= "Id_teacher" type="text" class="validate">
@@ -82,13 +77,14 @@ class Dispatcher{
                             </div>
                         </div>
                         <p class="red-text"><?php echo $this->errorMessage?></p>
+
                         <div class="col s12">
                             <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Associé
                                 <i class="material-icons right">arrow_downward</i>
                             </button>
                         </div>
-                    </div>
-                </form>
+                     </form>
+                </div>
 
                 <div class="row card-panel white z-depth-3 s12 m6">
                     <div class="col s12">
