@@ -100,33 +100,32 @@ class Homepage {
 
                 if(!empty($_SESSION['selecDep'])):
                     $table = $this->model->getStudentsList($_SESSION['selecDep'], $_SESSION['identifier']);
+                    if(isset($_POST['sortSubmitted'])) {
+                        $_SESSION['sortBy'] = $_POST['sortBy'] ?? 0;
+                        $_SESSION['decreasing'] = $_POST['decreasing'] ?? false;
+                    }
+                    $table = $this->model->sortRows($table, $_SESSION['sortBy'] ?? 0, $_SESSION['decreasing'] ?? 0);
                     if(empty($table)):
                         echo "<h6 class='left-align'>Aucun stage disponible</h6>";
                     else: ?>
                         <form method="post" class="center-align">
-                            <div class="selection">
-                                <div class="formCell">
-                                    <label for="sortBy">Trier par:</label>
-                                    <div class="input-field">
-                                        <select id="sortBy" name="sortBy">
-                                            <option value=0 selected>Choix</option>
-                                            <option value=1>Total</option>
-                                            <option value=2>Élève</option>
-                                            <option value=3>Sujet</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="formCell">
-                                    <label for="decreasing">Trier par ordre:</label>
-                                    <div class="input-field">
-                                        <select id="decreasing" name="decreasing">
-                                            <option value=false selected>Croissant</option>
-                                            <option value=true>Décroissant</option>
-                                        </select>
-                                    </div>
-                                </div>
+                            <label for="sortBy">Trier par:</label>
+                            <div class="input-field">
+                                <select id="sortBy" name="sortBy">
+                                    <option value=0 <? if(!isset($_SESSION['sortBy']) || $_SESSION['sortBy'] === "0") echo "selected"; ?> >Choix</option>
+                                    <option value=1 <? if(isset($_SESSION['sortBy']) && $_SESSION['sortBy'] === "1") echo "selected"; ?> >Total</option>
+                                    <option value=2 <? if(isset($_SESSION['sortBy']) && $_SESSION['sortBy'] === "2") echo "selected"; ?> >Élève</option>
+                                    <option value=3 <? if(isset($_SESSION['sortBy']) && $_SESSION['sortBy'] === "3") echo "selected"; ?> >Sujet</option>
+                                </select>
                             </div>
-                            <input type="hidden" name="sort" value="1">
+                            <label for="decreasing">Trier par ordre:</label>
+                            <div class="input-field">
+                                <select id="decreasing" name="decreasing">
+                                    <option value="0" <? if(!isset($_SESSION['decreasing']) || $_SESSION['decreasing'] === "0") echo "selected"; ?> >Croissant</option>
+                                    <option value="1" <? if(isset($_SESSION['decreasing']) && $_SESSION['decreasing'] === "1") echo "selected"; ?> >Décroissant</option>
+                                </select>
+                            </div>
+                            <input type="hidden" name="sortSubmitted" value="1">
                             <button class="waves-effect waves-light btn" type="submit">Trier</button>
                         </form>
 

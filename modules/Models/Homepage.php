@@ -105,11 +105,7 @@ class Homepage {
     public function sortRows(array $table, int $mode = 0, bool $decreasing = false): array {
         if($mode === 1) {
             usort($table, function ($a, $b) use ($decreasing) {
-                if($decreasing) {
-                    $rank = $a['score'] <=> $b['score'];
-                } else {
-                    $rank = $b['score'] <=> $a['score'];
-                }
+                $rank = $b['score'] <=> $a['score'];
                 if ($rank === 0) {
                     $requested = $b['requested'] <=> $a['requested'];
                     if($requested === 0) {
@@ -121,15 +117,11 @@ class Homepage {
                     }
                     return $requested;
                 }
-                return $rank;
+                return $decreasing ? $rank*-1 : $rank;
             });
         } elseif($mode === 2) {
             usort($table, function ($a, $b) use ($decreasing) {
-                if($decreasing) {
-                    $lastName = $b['student_name'] <=> $a['student_name'];
-                } else {
-                    $lastName = $a['student_name'] <=> $b['student_name'];
-                }
+                $lastName = $a['student_name'] <=> $b['student_name'];
                 if ($lastName === 0) {
                     $firstName = $a['student_firstname'] <=> $b['student_firstname'];
                     if ($firstName === 0) {
@@ -139,17 +131,13 @@ class Homepage {
                         }
                         return $requested;
                     }
-                    return $firstName;
+                    return $decreasing ? $firstName*-1 : $firstName;
                 }
-                return $lastName;
+                return $decreasing ? $lastName*-1 : $lastName;
             });
         } elseif($mode === 3) {
             usort($table, function ($a, $b) use ($decreasing) {
-                if($decreasing) {
-                    $subject = $a['internship_subject'] <=> $b['internship_subject'];
-                } else {
-                    $subject = $b['internship_subject'] <=> $a['internship_subject'];
-                }
+                $subject = $a['internship_subject'] <=> $b['internship_subject'];
                 if($subject === 0) {
                     $requested = $b['requested'] <=> $a['requested'];
                     if ($requested === 0) {
@@ -165,15 +153,11 @@ class Homepage {
                     }
                     return $requested;
                 }
-                return $subject;
+                return $decreasing ? $subject*-1 : $subject;
             });
         } else {
             usort($table, function ($a, $b) use ($decreasing) {
-                if($decreasing) {
-                    $requested = $a['requested'] <=> $b['requested'];
-                } else {
-                    $requested = $b['requested'] <=> $a['requested'];
-                }
+                $requested = $a['requested'] <=> $b['requested'];
                 if($requested === 0) {
                     $rank = $b['score'] <=> $a['score'];
                     if ($rank === 0) {
@@ -185,7 +169,7 @@ class Homepage {
                     }
                     return $rank;
                 }
-                return $requested;
+                return $decreasing ? $requested : $requested*-1;
             });
         }
         return $table;
@@ -198,7 +182,7 @@ class Homepage {
      * @param array $departments liste des départements dont on veut récupérer les stages des élèves
      * @return array tableau contenant les informations relatives à chaque stage, le nombre fois où l'enseignant connecté a été le tuteur de l'élève ainsi qu'une note représentant la pertinence du stage pour l'enseignant
      */
-    public function getStudentsList(array $departments, string $identifier, int $mode = 0, bool $decreasing = false): array {
+    public function getStudentsList(array $departments, string $identifier): array {
         $studentsList = array();
         foreach($departments as $department) {
             $newList = $this->globalModel->getStudentsPerDepartment($department);
@@ -210,14 +194,16 @@ class Homepage {
         $requests = $this->getRequests();
         if(!$requests) $requests = array();
 
-        foreach($studentsList as &$row) {
+        $toDelete = array();
+
+        foreach($studentsList as $key => &$row) {
             $internships = $this->globalModel->getInternships($row['student_number']);
             if(!$internships) {
                 $row['internshipTeacher'] = 0;
             } else {
                 foreach($internships as $internshipInfo) {
                     if($row['start_date_internship'] === $internshipInfo['responsible_start_date'] && $row['end_date_internship'] === $internshipInfo['responsible_end_date']) {
-                        unset($row);
+                        array_push($toDelete, $key);
                         break;
                     }
                 }
@@ -231,7 +217,11 @@ class Homepage {
                                                         'Cohérence' => $this->globalModel->scoreDiscipSubject($row['student_number'], $identifier)));
         }
 
-        return $this->sortRows($studentsList, $mode, $decreasing);
+        for($i = count($toDelete)-1; $i >= 0; --$i){
+            array_splice($studentsList, $toDelete[$i], 1);
+        }
+
+        return $studentsList;
     }
 
     /**
