@@ -208,7 +208,7 @@ class Homepage {
 
         $requests = $this->getRequests();
 
-        foreach($studentsList as & $row) {
+        foreach($studentsList as &$row) {
             $internshipsResp = $this->getInternships($row['student_number']);
             if(!$internshipsResp) {
                 $row['internshipTeacher'] = 0;
@@ -245,20 +245,6 @@ class Homepage {
                     AND internship.start_date_internship > CURRENT_DATE';
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':dep', $department);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * Renvoie les critères et leurs coefficients associés pour l'enseignant connecté
-     * @return false|array tableau contenant chaque crtière et son coefficient, false sinon
-     */
-    public function getFactors(): false|array {
-        $query = 'SELECT name_criteria, coef
-                    FROM backup
-                    WHERE  user_id = :user_id';
-        $stmt = $this->db->getConn()->prepare($query);
-        $stmt->bindParam(':user_id', $_SESSION['identifier']);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -342,7 +328,7 @@ class Homepage {
         $result = $stmt2->fetch(PDO::FETCH_ASSOC);
 
         if(!$result) return 0;
-        return $result["rank"]*5;
+        return $result["rank"];
     }
 
     public function getCoef($identifier): array {
