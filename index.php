@@ -117,11 +117,13 @@ function createAction($uri,$layout): Closure {
             }
             $controller->show();
         };
-    } else {
-        return function() {
-            echo "Erreur 404 ...";
-        };
+    } elseif (!(class_exists($className))) {
+        $className = "Blog\\Controllers\\Error404";
     }
+
+    return function() use ($className) {
+        (new $className())->show();
+    };
 }
 
 $action = createAction($uri,$layout);

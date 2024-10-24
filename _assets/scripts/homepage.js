@@ -147,7 +147,7 @@ let directionsService, directionsRenderer;
  * @returns {Promise<void>}
  */
 async function initMap() {
-    if (!companyAddress || !teacherAddress) {
+    if (typeof companyAddress === 'undefined' || typeof teacherAddress === 'undefined') {
         return;
     }
 
@@ -212,7 +212,7 @@ async function initMap() {
 
     directionsRenderer.setMap(map);
 
-    await calculateDistance({ lat: companyLocation.lat, lng: companyLocation.lng }, { lat: teacherLocation.lat, lng: teacherLocation.lng });
+    await calculateDistance({ lat: companyLocation.lat, lng: companyLocation.lng }, { lat: teacherLocation.lat, lng: teacherLocation.lng }, 0);
 }
 
 /**
@@ -301,15 +301,20 @@ function geocodeAddress(address) {
  * Calcul la distance et la durée renvoyées pour la matrix
  * @returns {Promise<void>}
  */
-async function calculateDistance(origin, destination) {
+async function calculateDistance(origin, destination, type) {
     try {
         const response = await getDistanceMatrix(origin, destination);
         const result = response.rows[0].elements[0];
 
-        const duration = result.duration.text;
+        if (type === 0) {
+            await getRoute(origin, destination);
+        }
+        else if (type === 1) {
+            return result.duration;
+        }
 
-        await getRoute(origin, destination);
     } catch (error) {
         alert(error);
     }
 }
+
