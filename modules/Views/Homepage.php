@@ -3,7 +3,7 @@ namespace Blog\Views;
 
 class Homepage {
 
-    public function __construct(private readonly \Blog\Models\Homepage $model) { }
+    public function __construct(private readonly \Blog\Models\Homepage $model, private readonly \Blog\Models\GlobalModel $globalModel) { }
 
     /**
      * Vue de la homepage
@@ -32,7 +32,7 @@ class Homepage {
             </div>
             <div class="center">
                 <?php
-                if (isset($_SESSION['selected_student']) && isset($_SESSION['selected_student']['firstName']) && isset($_SESSION['selected_student']['lastName'])) {
+                if (isset($_SESSION['selected_student']['firstName']) && isset($_SESSION['selected_student']['lastName'])) {
                     echo '<h4 class="left-align"> Résultat pour: ' . $_SESSION['selected_student']['firstName'] . ' ' .  $_SESSION['selected_student']['lastName'] . '</h4>';
                 }
                 ?>
@@ -62,7 +62,7 @@ class Homepage {
                 }
             }
 
-            $departments = $this->model->getDepTeacher();
+            $departments = $this->globalModel->getDepTeacher($_SESSION['identifier']);
             if(!$departments): ?>
                 <h6 class="left-align">Vous ne faîtes partie d'aucun département</h6>
             <?
@@ -99,10 +99,39 @@ class Homepage {
                 }
 
                 if(!empty($_SESSION['selecDep'])):
-                    $table = $this->model->getStudentsList($_SESSION['selecDep']);
+                    $table = $this->model->getStudentsList($_SESSION['selecDep'], $_SESSION['identifier']);
                     if(empty($table)):
                         echo "<h6 class='left-align'>Aucun stage disponible</h6>";
                     else: ?>
+                        <form method="post" class="center-align">
+                            <div class="selection">
+                                <div class="formCell">
+                                    <label for="sortBy">Trier par:</label>
+                                    <div class="input-field">
+                                        <select id="sortBy" name="sortBy">
+                                            <option value=0 selected>Choix</option>
+                                            <option value=1>Total</option>
+                                            <option value=2>Élève</option>
+                                            <option value=3>Sujet</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="formCell">
+                                    <label for="decreasing">Trier par ordre:</label>
+                                    <div class="input-field">
+                                        <select id="decreasing" name="decreasing">
+                                            <option value=false selected>Croissant</option>
+                                            <option value=true>Décroissant</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" name="sort" value="1">
+                            <button class="waves-effect waves-light btn" type="submit">Trier</button>
+                        </form>
+
+                        <div class="row"></div>
+
                         <form method="post" class="center-align">
                             <div class="selection">
                                 <table class="highlight centered">
@@ -110,7 +139,7 @@ class Homepage {
                                     <tr>
                                         <th>ELEVE</th>
                                         <th>HISTORIQUE</th>
-                                        <th>POSITION</th>
+                                        <th>DISTANCE</th>
                                         <th>SUJET</th>
                                         <th>ENTREPRISE</th>
                                         <th>TOTAL</th>
@@ -123,16 +152,13 @@ class Homepage {
                                             <td><?= $row["student_name"] . " " . $row["student_firstname"] ?></td>
                                             <td>
                                                 <?php
-                                                $internshipCount = count($this->model->getInternships($row['student_number']));
                                                 echo $row['internshipTeacher'] > 0 ? 'Oui' : 'Non';
                                                 ?>
                                             </td>
-                                            <td id="position-<?= $row['student_number'] ?>">Calcul ...</td>
+                                            <td>~<?= $row['duration'] ?> minutes</td>
                                             <td><?= str_replace('_', ' ', $row["internship_subject"]) ?></td>
                                             <td><?= str_replace('_', ' ', $row["company_name"]) ?></td>
-                                            <td id="totalScore-<?= $row['student_number'] ?>">
-                                                <strong>Calcul ...</strong>
-                                            </td>
+                                            <td><strong><?= round($row['score'], 2) ?></strong>/5</td>
                                             <td>
                                                 <label class="center">
                                                     <input type="checkbox" name="selecStudent[]" class="center-align filled-in" value="<?= $row['student_number'] ?>" <?= $row['requested'] ? 'checked="checked"' : '' ?> />
@@ -140,103 +166,6 @@ class Homepage {
                                                 </label>
                                             </td>
                                         </tr>
-                                        <script>
-                                            window.addEventListener('load', async function () {
-                                                let durationMin;
-
-                                                function calculateScore(dictValues, dictCoef) {
-                                                    let totalScore = 0;
-                                                    let totalCoef = 0;
-
-                                                    for (let criteria in dictValues) {
-                                                        if (dictCoef.hasOwnProperty(criteria)) {
-                                                            const value = dictValues[criteria];
-                                                            let coef = dictCoef[criteria];
-
-                                                            switch (criteria) {
-                                                                case 'Distance':
-                                                                    const scoreDuration = (coef / (1 + 0.02 * value));
-                                                                    console.log("durée : ", scoreDuration, " - ", coef);
-                                                                    totalScore += scoreDuration;
-                                                                    break;
-
-                                                                case 'A été responsable':
-                                                                    const scoreInternship = (value >= 0) ? value * coef : 0;
-                                                                    console.log("asso : ", scoreInternship, " - ", coef);
-                                                                    totalScore += scoreInternship;
-                                                                    break;
-
-                                                                case 'Cohérence':
-                                                                    const scoreRelevance = value * coef;
-                                                                    console.log("cohérence : ", scoreRelevance, " - ", coef);
-                                                                    totalScore += scoreRelevance;
-                                                                    break;
-
-                                                                default:
-                                                                    totalScore += value * coef;
-                                                                    break;
-                                                            }
-
-                                                            totalCoef += coef;
-                                                        }
-                                                    }
-
-                                                    // Score max/normalisé sur 5, si on a un pb, on renvoie 0
-                                                    return Math.max(0, Math.min(5, (totalScore * 5) / totalCoef).toFixed(2)) || 0;
-                                                }
-
-                                                const geocodeAddresses = async () => {
-                                                    return new Promise((resolve, reject) => {
-                                                        const checkGoogleMaps = setInterval(async () => {
-                                                            if (typeof google !== 'undefined' && google.maps && google.maps.Geocoder) {
-                                                                clearInterval(checkGoogleMaps);
-
-                                                                try {
-                                                                    const addressTeachPromises = [
-                                                                        <? foreach ($_SESSION['address'] as $address): ?>
-                                                                        await geocodeAddress('<?= str_replace('_', "'", $address['address']) ?>'),
-                                                                        <? endforeach; ?>
-                                                                    ];
-
-                                                                    const addressTeach = await Promise.all(addressTeachPromises);
-                                                                    const addressStudent = await geocodeAddress('<?= str_replace('_', "'", $row["address"]) ?>');
-
-                                                                    const durationPromises = addressTeach.map(teacherAddress => calculateDistance(addressStudent, teacherAddress, 1));
-                                                                    const durations = await Promise.all(durationPromises);
-
-                                                                    const durationValues = durations.map(duration => duration.value);
-                                                                    durationMin = Math.min(...durationValues);
-
-                                                                    document.getElementById('position-<?= $row['student_number'] ?>').innerHTML = '~' + Math.floor(durationMin / 60) + ' minutes';
-                                                                    resolve(durationMin);
-                                                                } catch (error) {
-                                                                    reject('Error in geocoding: ' + error);
-                                                                }
-
-                                                            } else {
-                                                                console.log('Google Maps API is not yet loaded.');
-                                                            }
-                                                        }, 100);
-                                                    });
-                                                };
-
-                                                try {
-                                                    await geocodeAddresses();
-
-                                                    const dictValues = {
-                                                        'A été responsable': <? echo $row['internshipTeacher'] > 0 ? $row['internshipTeacher'] / $internshipCount : 0 ?>,
-                                                        'Distance': Math.floor(durationMin / 60),
-                                                        'Cohérence': <? echo round($row['relevance'], 2) ?>
-                                                    };
-
-                                                    const dictCoef = <?php echo json_encode($this->model->getCoef($_SESSION['identifier']), JSON_NUMERIC_CHECK) ?>;
-
-                                                    document.getElementById('totalScore-<?= $row['student_number'] ?>').innerHTML = calculateScore(dictValues, dictCoef) + '/5';
-                                                } catch (error) {
-                                                    console.error(error);
-                                                }
-                                            });
-                                        </script>
                                     <? endforeach; ?>
                                     </tbody>
                                 </table>
