@@ -88,35 +88,39 @@ class Dispatcher{
 
                 <div class="row card-panel white z-depth-3 s12 m6">
                     <div class="col s12">
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>Enseignant</th>
-                                <th>Eleve</th>
-                                <th>Score</th>
-                                <th>Associé</th>
-                            </tr>
-                            </thead>
-
-                            <tbody>
-                            <tr>
-                                <td>Alvin</td>
-                                <td>Eclair</td>
-                                <td>$0.87</td>
-                            </tr>
-                            <tr>
-                                <td>Alan</td>
-                                <td>Jellybean</td>
-                                <td>$3.76</td>
-                            </tr>
-                            </tbody>
-                        </table>
-
-                        <div class="row">
-                            <div class="col s6">
-                                <span> Tout cocher :</span>
+                        <form class="col s12" action="./dispatcher" method="post">
+                            <div class="selection">
+                                <table class="highlight centered">
+                                    <thead>
+                                    <tr>
+                                        <th>Enseignant</th>
+                                        <th>Eleve</th>
+                                        <th>Score</th>
+                                        <th>Associé</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <?php
+                                    foreach ($this->dispatcherModel->dispatcher(["A été responsable" => 1, "Distance"=>1, "Cohérence"=>1])[0] as $associate):
+                                    ?>
+                                    <tr>
+                                        <td><?php echo $associate['id_prof'] ?></td>
+                                        <td><?php echo $associate['id_eleve'] ?></td>
+                                        <td><?php echo $associate['score'] ?></td>
+                                        <td>
+                                            <label class="center">
+                                                <input type="checkbox" name="selectIs_responsible[]" class="center-align filled-in" value="<?= $associate ?>"/>
+                                                <span></span>
+                                            </label></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="col s6">
+                            <div class="col s12 center">
+                                <input type="hidden" name="selecStudentSubmitted" value="1">
+                                <button class="waves-effect waves-light btn" type="submit">Valider</button>
+                                <span> Tout cocher :</span>
                                 <p>
                                     <label>
                                         <input type="checkbox" class="filled-in" checked="checked" />
@@ -124,13 +128,7 @@ class Dispatcher{
                                     </label>
                                 </p>
                             </div>
-                        </div>
-
-                        <div class="col s12">
-                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Associé
-                                <i class="material-icons right">arrow_downward</i>
-                            </button>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
