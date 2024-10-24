@@ -5,6 +5,7 @@ namespace Controllers;
 use Blog\Controllers\Aboutus;
 use Blog\Views\Layout;
 use Blog\Views\Aboutus as AboutUsView;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -17,7 +18,7 @@ class AboutusTest extends TestCase {
     /**
      * Test de la méthode show() du contrôleur Aboutus
      * @return void
-     * @throws \PHPUnit\Framework\MockObject\Exception
+     * @throws Exception
      */
     public function testShow(){
         //Mock des classes layout et vue
