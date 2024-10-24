@@ -18,3 +18,15 @@ INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_tr
 INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('C45328794', 'LAWRENCES', 'Brittany', 5);
 INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('H48344613', 'IRWINS', 'Alisa', 2);
 INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('R41814241', 'MILESS', 'Aidan', 4);
+-- insert de prof de TC
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('A12345678', 'BENNETTS', 'Olivia', 3);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('B23456789', 'DAVISS', 'Michael', 4);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('C34567890', 'THOMPSONS', 'Emma', 2);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('D45678901', 'WALKERS', 'Ethan', 5);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('E56789012', 'MILLERS', 'Sophia', 3);
+-- insert de prof de GEA
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('F67890123', 'ROBERTSS', 'Lucas', 2);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('G78901234', 'HALLS', 'Mia', 4);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('H89012345', 'ALLENS', 'Aiden', 3);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('I90123456', 'YOUNGS', 'Zoe', 1);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('J01234567', 'WRIGHTS', 'Liam', 5);

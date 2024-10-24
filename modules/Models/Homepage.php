@@ -345,32 +345,70 @@ class Homepage {
         return $result["rank"]*5;
     }
 
-    /**
-     * Renvoie le score final normalisé sur 5 représentant l'intérêt d'un enseignant pour un stage en prenant en compte des critères et leurs coefficients associés
-     * Représente l'algorithme de calcul sur lequel le score final se base
-     * @param int $duration temps de trajet en voiture séparant le professeur et l'adresse du stage
-     * @param int $factorDuration coefficient associé au temps de trajet
-     * @param int $internshipTeacher nombre de fois où l'enseignant a été le tuteur de l'élève
-     * @param int $factorInternshipTeacher coefficient associé au nombre de fois où l'enseignant a été le tuteur de l'élève
-     * @param float $scoreRelevance score de pertinence renvoyé par la méthode 'scoreDiscipSujet()'
-     * @param int $factorRelevance coefficient associé au score de pertinence
-     * @param int $countInternship nombre total de stages et alternances effectués par l'élève
-     * @return float score final normalisé sur 5
-     */
-    public function calculateScore(int $duration, int $factorDuration, int $internshipTeacher, int $factorInternshipTeacher, float $scoreRelevance, int $factorRelevance, int $countInternship): float {
-        $scoreDuration = $factorDuration/(1+0.02*$duration);
-        $scoreRelevance *= $factorRelevance;
-        if ($internshipTeacher === 0) $scoreInternship = 0;
-        else $scoreInternship = $countInternship*$factorInternshipTeacher/$countInternship;
+    public function getCoef($identifier): array {
+        $dictCoef = [];
 
-        $score = $scoreDuration + $scoreInternship + $scoreRelevance;
-        if($score === 0.0) return 0.0;
-        return ($score * 5) / ($factorDuration + $factorInternshipTeacher + $factorRelevance);
+        $pdo = $this->db;
+
+        $query = "SELECT Name_criteria, Coef FROM Backup
+              WHERE user_id = :user_id";
+
+        $stmt2 = $pdo->getConn()->prepare($query);
+        $stmt2->bindValue(':user_id', $identifier);
+        $stmt2->execute();
+
+        $rows = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($rows as $row) {
+            $dictCoef[$row['name_criteria']] = $row['coef'];
+        }
+
+        return $dictCoef;
     }
 
-    /*public function calculateScore(array $dictCriteria): float {
+    /**
+     * Version PHP de l'algo JavaScript, inutilisé
+     * @param $dictValues
+     * @return float|int
+     */
+    public function calculateScore($dictValues) {
+        $dictCoef = $this->getCoef($_SESSION['identifier']);
 
-    }*/
+        $totalScore = 0;
+        $totalCoef = 0;
+        foreach ($dictValues as $criteria => $value) {
+            if (isset($dictCoef[$criteria])) {
+                $coef = $dictCoef[$criteria];
+
+                switch ($criteria) {
+                    case 'Distance':
+                        $scoreDuration = $coef / (1 + 0.02 * $value);
+                        $totalScore += $scoreDuration;
+                        break;
+
+                    case 'A été responsable':
+                        $scoreInternship = ($value > 0) ? $coef : 0;
+                        $totalScore += $scoreInternship;
+                        break;
+
+                    case 'Cohérence':
+                        $scoreRelevance = $value * $coef;
+                        $totalScore += $scoreRelevance;
+                        break;
+
+                    default:
+                        $totalScore += $value * $coef;
+                        break;
+                }
+
+                $totalCoef += $coef;
+            }
+        }
+
+        return ($totalScore * 5) / $totalCoef;
+    }
+
+
 
     /**
      * Renvoie tous les stages que l'enseignant connecté a demandé à tutorer

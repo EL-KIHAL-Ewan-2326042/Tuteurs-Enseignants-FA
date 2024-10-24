@@ -19,7 +19,6 @@ class Autoloader
      */
     static function autoload($class): void
     {
-
         if (str_contains($class, 'Blog')) {
             $replacements = [
                 '\\' => '/',
@@ -27,15 +26,24 @@ class Autoloader
             ];
 
             $filename = str_replace(array_keys($replacements), array_values($replacements), $class);
-            require 'modules/' . $filename . '.php';
+            $path = 'modules/' . $filename . '.php';
+
         } else {
             $class = strtoupper(substr($class, 0, 1)) . substr($class, 1);
-            if (strpos($class, 'Exception')) {
-                require '_assets/includes/exceptions/' . $class . '.php';
+
+            if (str_contains($class, 'Exception') !== false) {
+                $path = '_assets/includes/exceptions/' . $class . '.php';
             } else {
-                require '_assets/includes/' . $class . '.php';
+                $path = '_assets/includes/' . $class . '.php';
             }
+
+        }
+        if (file_exists($path)) {
+            require $path;
+        } else {
+            require 'modules/Controllers/Error404.php';
         }
     }
+
 
 }
