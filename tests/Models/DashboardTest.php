@@ -4,6 +4,9 @@ namespace Models;
 
 use Blog\Models\Dashboard;
 use Includes\Database;
+use PDO;
+use PDOException;
+use PDOStatement;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 
@@ -66,7 +69,7 @@ class DashboardTest extends TestCase  {
      */
     private function runCsvUploadTest(string $method, array $row): void {
         $mockDb = $this->createMock(Database::class);
-        $mockConn = $this->getMockBuilder(\PDO::class)
+        $mockConn = $this->getMockBuilder(PDO::class)
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -74,7 +77,7 @@ class DashboardTest extends TestCase  {
         $mockDb->method('getConn')->willReturn($mockConn);
 
         //simulation de la requête
-        $mockStmt = $this->createMock(\PDOStatement::class);
+        $mockStmt = $this->createMock(PDOStatement::class);
         $mockConn->method('prepare')->willReturn($mockStmt);
         $mockStmt->method('execute')->willReturn(true);
 
@@ -137,15 +140,15 @@ class DashboardTest extends TestCase  {
      */
     private function runCsvUploadTestDatabaseError (string $method, array $headers, array $row): void {
         $mockDb = $this->createMock(Database::class);
-        $mockConn = $this->getMockBuilder(\PDO::class)
+        $mockConn = $this->getMockBuilder(PDO::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         //simulation de l'erreur
         $mockDb->method('getConn')->willReturn($mockConn);
-        $mockStmt = $this->createMock(\PDOStatement::class);
+        $mockStmt = $this->createMock(PDOStatement::class);
         $mockConn->method('prepare')->willReturn($mockStmt);
-        $mockStmt->method('execute')->will($this->throwException(new \PDOException("Erreur d'insertion")));
+        $mockStmt->method('execute')->will($this->throwException(new PDOException("Erreur d'insertion")));
 
         //creation d'un fichier CSV temporaire
         $csvFilePath = $this->createTempCsv([$headers,$row]);
@@ -281,7 +284,7 @@ class DashboardTest extends TestCase  {
      */
     private function runCsvExportTest(string $table, array $headers, array $data): void {
         $mockDb = $this->createMock(Database::class);
-        $mockConn = $this->getMockBuilder(\PDO::class)
+        $mockConn = $this->getMockBuilder(PDO::class)
             ->disableOriginalConstructor()
             ->getMock();
         $dashboard = new Dashboard($mockDb);
@@ -290,7 +293,7 @@ class DashboardTest extends TestCase  {
         $mockDb->method('getConn')->willReturn($mockConn);
 
         //préparation de la requête
-        $mockStmt = $this->createMock(\PDOStatement::class);
+        $mockStmt = $this->createMock(PDOStatement::class);
         $mockConn->method('prepare')->willReturn($mockStmt);
         $mockStmt->method('execute')->willReturn(true);
         $mockStmt->method('fetchAll')->willReturn($data);
@@ -311,7 +314,6 @@ class DashboardTest extends TestCase  {
         $this->assertTrue($result,"L'exportation aurait dû réussir pour la table $table");
 
         //vérification de l'exportation
-        $exportedFilePath = "export_$table.csv";
         $this->assertFileExists($tempCsvPath,"L'exportation aurait dû réussir pour la table $table");
 
         //vérification du contenu
@@ -352,15 +354,15 @@ class DashboardTest extends TestCase  {
      */
     public function testExportToCsvDatabaseError(){
         $mockDb = $this->createMock(Database::class);
-        $mockConn = $this->getMockBuilder(\PDO::class)
+        $mockConn = $this->getMockBuilder(PDO::class)
             ->disableOriginalConstructor()
             ->getMock();
 
         //simulation de l'erreur dans la base de données
         $mockDb->method('getConn')->willReturn($mockConn);
-        $mockStmt = $this->createMock(\PDOStatement::class);
+        $mockStmt = $this->createMock(PDOStatement::class);
         $mockConn->method('prepare')->willReturn($mockStmt);
-        $mockStmt->method('execute')->will($this->throwException(new \PDOException("Erreur d'insertion")));
+        $mockStmt->method('execute')->will($this->throwException(new PDOException("Erreur d'insertion")));
 
         $csvFilePath = $this->tempDir . '/export_table.csv';
         $dashboard = new Dashboard($mockDb);
