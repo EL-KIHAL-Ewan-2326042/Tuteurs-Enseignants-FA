@@ -10,7 +10,7 @@ class Dashboard{
     public function showView(): void {
         ?>
         <main>
-            <?php if (isset($_SESSION['role']['role_name'])=='Admin_dep') {?>
+            <?php if (isset($_SESSION['role']) && in_array('Admin_dep', $_SESSION['role'])) {?>
                 <h3> Dashboard </h3>
 
                 <div class="card-panel white">
