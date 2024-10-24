@@ -109,7 +109,7 @@ class DashboardTest extends TestCase  {
      * @throws Exception
      */
     public function testUploadCsvInternshipSuccess() {
-        $this->runCsvUploadTest('uploadCsvInternship', ['internship_identifier','company_name','keyword','start_end_internship','type','end_date_internship','internship_subject','address','student_number']);
+        $this->runCsvUploadTest('uploadCsvInternship', ['internship_identifier','company_name','keywords','start_date_internship','type','end_date_internship','internship_subject','address','student_number']);
     }
 
     /**
@@ -130,11 +130,12 @@ class DashboardTest extends TestCase  {
     /**
      * Test d'erreur de base de données lors de l'importation
      * @param string $method
+     * @param array $headers
      * @param array $row
      * @return void
      * @throws Exception
      */
-    private function runCsvUploadTestDatabaseError (string $method, array $row): void {
+    private function runCsvUploadTestDatabaseError (string $method, array $headers, array $row): void {
         $mockDb = $this->createMock(Database::class);
         $mockConn = $this->getMockBuilder(\PDO::class)
             ->disableOriginalConstructor()
@@ -147,7 +148,7 @@ class DashboardTest extends TestCase  {
         $mockStmt->method('execute')->will($this->throwException(new \PDOException("Erreur d'insertion")));
 
         //creation d'un fichier CSV temporaire
-        $csvFilePath = $this->createTempCsv([$row]);
+        $csvFilePath = $this->createTempCsv([$headers,$row]);
 
         //execution
         $dashboard = new Dashboard($mockDb);
@@ -161,12 +162,20 @@ class DashboardTest extends TestCase  {
      * @throws Exception
      */
     public function testUploadCsvStudentDatabaseError() {
-        $this->runCsvUploadTestDatabaseError('uploadCsvStudent', [
-            'student_number' => '1',
-            'student_name' => 'Doe',
-            'student_firstname' => 'John',
-            'formation' => 'Informatique',
-            'class_group' => 'A'
+        $headers = [
+            'student_number',
+            'student_name',
+            'student_firstname',
+            'formation',
+            'class_group'
+        ] ;
+
+        $this->runCsvUploadTestDatabaseError('uploadCsvStudent', $headers, [
+            '1', //student_number
+            'Doe', //student_name
+            'John', //student_firstname
+            'Informatique', //formation
+            'A' //class_group
         ]);
     }
     /**
@@ -175,11 +184,18 @@ class DashboardTest extends TestCase  {
      * @throws Exception
      */
     public function testUploadCsvTeacherDatabaseError() {
-        $this->runCsvUploadTestDatabaseError('uploadCsvTeacher', [
-            'id_teacher' => '1',
-            'teacher_name' => 'Smith',
-            'teacher_firstname' => 'Alice',
-            'maxi_number_trainees' => '10'
+        $headers = [
+            'id_teacher',
+            'teacher_name',
+            'teacher_firstname',
+            'maxi_number_trainees'
+        ];
+
+        $this->runCsvUploadTestDatabaseError('uploadCsvTeacher', $headers, [
+            '1', //id_teacher
+            'Smith', //teacher_name
+            'Alice', //teacher_firstname
+            '10' //maxi_number_trainees
         ]);
     }
     /**
@@ -188,16 +204,28 @@ class DashboardTest extends TestCase  {
      * @throws Exception
      */
     public function testUploadCsvInternshipDatabaseError() {
-        $this->runCsvUploadTestDatabaseError('uploadCsvInternship', [
-            'internship_identifier' => '123',
-            'company_name' => 'CompanyA',
-            'keyword' => 'Tech',
-            'start_end_internship' => '2024-01-01',
-            'type' => 'Full-time',
-            'end_date_internship' => '2024-06-01',
-            'internship_subject' => 'Software Development',
-            'address' => '123 Street',
-            'student_number' => '1'
+        $headers = [
+            'internship_identifier',
+            'company_name',
+            'keywords',
+            'start_date_internship',
+            'type',
+            'end_date_internship',
+            'internship_subject',
+            'address',
+            'student_number'
+        ];
+
+        $this->runCsvUploadTestDatabaseError('uploadCsvInternship', $headers, [
+            '123', //internship_identifier
+            'CompanyA', //company_name
+            'Tech', //keywords
+            '2024-01-01', //start_date_internship
+            'Full-time', //type
+            '2024-06-01', //end_date_internship
+            'Software Development', //internship_subject
+            '123 Street', //address
+            '1' //student_number
         ]);
     }
 
@@ -211,7 +239,7 @@ class DashboardTest extends TestCase  {
     public function testExportToCsvStudentSuccess() {
         $headers = ['student_number', 'student_name', 'student_firstname', 'formation', 'class_group'];
         $data = [
-            ['1', 'Doe', 'John', 'Informatique', 'A']
+            ['1','Doe','John','Informatique','A']
         ];
         $this->runCsvExportTest('student', $headers, $data);
     }
@@ -224,20 +252,20 @@ class DashboardTest extends TestCase  {
     public function testExportToCsvTeacherSuccess() {
         $headers = ['id_teacher', 'teacher_name', 'teacher_firstname', 'maxi_number_trainees'];
         $data = [
-            ['1', 'Smith', 'Alice', '10']
+            ['1','Smith','Alice','10']
         ];
         $this->runCsvExportTest('teacher', $headers, $data);
     }
 
     /**
-     * Test de l'exportation CSV pour intership
+     * Test de l'exportation CSV pour internship
      * @return void
      * @throws Exception
      */
     public function testExportToCsvInternshipSuccess() {
         $headers = ['internship_identifier', 'company_name', 'keywords', 'start_date_internship', 'type', 'end_date_internship', 'internship_subject', 'address', 'student_number'];
         $data = [
-            ['123', 'CompanyA', 'Tech', '2024-01-01', 'Full-time', '2024-06-01', 'Software Development', '123 Street', '1']
+            ['123','CompanyA','Tech','2024-01-01','Full-time','2024-06-01','Software Development','123 Street','1']
         ];
         $this->runCsvExportTest('internship', $headers, $data);
     }
@@ -279,13 +307,12 @@ class DashboardTest extends TestCase  {
         }
 
         //exécution
-        //$headers = array_keys($data[0]);
         $result = $dashboard->exportToCsvByDepartment($table,$headers);
         $this->assertTrue($result,"L'exportation aurait dû réussir pour la table $table");
 
         //vérification de l'exportation
         $exportedFilePath = "export_$table.csv";
-        $this->assertFileExists($exportedFilePath,"L'exportation aurait dû réussir pour la table $table");
+        $this->assertFileExists($tempCsvPath,"L'exportation aurait dû réussir pour la table $table");
 
         //vérification du contenu
         $exportedData = file($tempCsvPath,FILE_IGNORE_NEW_LINES);
@@ -296,9 +323,9 @@ class DashboardTest extends TestCase  {
 
         //vérification des données
         foreach ($data as $index => $row) {
-            $this->assertEquals(implode(',',$row),$exportedData[$index + 1]);
+            $this->assertEquals(implode(',',$row),$exportedData[$index + 1], "Les données ne correspondent pas à celle attendues");
         }
-        unlink($exportedFilePath);
+        unlink($tempCsvPath);
     }
 
     /**
