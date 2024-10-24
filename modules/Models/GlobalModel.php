@@ -11,7 +11,12 @@ class GlobalModel {
         $this->db = $db;
     }
 
-    public function getDepTeacher($identifier): false|array {
+    /**
+     * Renvoie tous les départements de l'enseignant passé en paramètre
+     * @param string $identifier identifiant de l'enseignant
+     * @return false|array tableau contenant tous les départements dont l'enseignant connecté fait partie, false sinon
+     */
+    public function getDepTeacher(string $identifier): false|array {
         $query = 'SELECT department_name
                     FROM teaches
                     WHERE  id_teacher = :teacher';
@@ -20,6 +25,12 @@ class GlobalModel {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Renvoie un tableau contenant les stages des élèves du département passé en paramètre et leurs informations
+     * @param string $department le département duquel les élèves sélectionnés font partie
+     * @return false|array tableau contenant le numéro, le nom et le prénom de l'élève, ainsi que le nom de l'entreprise dans lequel il va faire son stage, le sujet et les dates, false sinon
+     */
     public function getStudentsPerDepartment(string $department): false|array {
         $query = 'SELECT *
                     FROM student
@@ -33,6 +44,12 @@ class GlobalModel {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Renvoie un tableau contenant les informations de chaque tutorat terminé de l'élève passé en paramètre
+     * @param string $student le numéro de l'étudiant dont on récupère les informations
+     * @return false|array tableau contenant, pour chaque tutorat, le numéro d'enseignant du tuteur, le numéro de l'élève et les dates, false sinon
+     */
     public function getInternships(string $student): false|array {
         $query = 'SELECT id_teacher, student_number, responsible_start_date, responsible_end_date
                     FROM is_responsible
@@ -43,6 +60,12 @@ class GlobalModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Renvoie un score associé à la pertinence entre le sujet de stage de l'élève et les disciplines enseignées par le professeur, tous deux passés en paramètre
+     * @param string $studentId numéro d'élève
+     * @param string $identifier identifiant de l'enseignant
+     * @return float score associé à la pertinence entre le sujet de stage et les disciplines enseignées par le professeur connecté
+     */
     public function scoreDiscipSubject(string $studentId, string $identifier): float {
         $query1 = 'SELECT discipline_name FROM is_taught WHERE id_teacher = :id';
         $stmt1 = $this->db->getConn()->prepare($query1);
