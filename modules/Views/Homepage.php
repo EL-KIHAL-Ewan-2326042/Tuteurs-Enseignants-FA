@@ -123,9 +123,8 @@ class Homepage {
                                             <td><?= $row["student_name"] . " " . $row["student_firstname"] ?></td>
                                             <td>
                                                 <?php
-                                                $internships = $this->model->getInternships($row['student_number']);
-                                                $internshipCount = count($internships);
-                                                echo $internshipCount > 0 ? 'Oui' : 'Non';
+                                                $internshipCount = count($this->model->getInternships($row['student_number']));
+                                                echo $row['internshipTeacher'] > 0 ? 'Oui' : 'Non';
                                                 ?>
                                             </td>
                                             <td id="position-<?= $row['student_number'] ?>">Calcul ...</td>
@@ -157,16 +156,19 @@ class Homepage {
                                                             switch (criteria) {
                                                                 case 'Distance':
                                                                     const scoreDuration = (coef / (1 + 0.02 * value));
+                                                                    console.log("durée : ", scoreDuration, " - ", coef);
                                                                     totalScore += scoreDuration;
                                                                     break;
 
                                                                 case 'A été responsable':
-                                                                    const scoreInternship = (value > 0) ? value * coef : 1;
+                                                                    const scoreInternship = (value >= 0) ? value * coef : 0;
+                                                                    console.log("asso : ", scoreInternship, " - ", coef);
                                                                     totalScore += scoreInternship;
                                                                     break;
 
                                                                 case 'Cohérence':
                                                                     const scoreRelevance = value * coef;
+                                                                    console.log("cohérence : ", scoreRelevance, " - ", coef);
                                                                     totalScore += scoreRelevance;
                                                                     break;
 
@@ -222,7 +224,7 @@ class Homepage {
                                                     await geocodeAddresses();
 
                                                     const dictValues = {
-                                                        'A été responsable': <? echo $internshipCount ?>,
+                                                        'A été responsable': <? echo $row['internshipTeacher'] > 0 ? $row['internshipTeacher'] / $internshipCount : 0 ?>,
                                                         'Distance': Math.floor(durationMin / 60),
                                                         'Cohérence': <? echo round($row['relevance'], 2) ?>
                                                     };
