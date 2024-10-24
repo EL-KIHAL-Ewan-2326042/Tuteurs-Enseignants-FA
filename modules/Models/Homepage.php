@@ -71,9 +71,9 @@ class Homepage {
     /**
      * renvoie l'adresse de l'entreprise de l'etudiant.
      * @param string $studentId le numero de l'etudiant
-     * @return string l'addresse de l'etudiant
+     * @return string|false l'addresse de l'etudiant, false si ce n'est pas le même étudiant
      */
-    public function getStudentAddress(string $studentId): string {
+    public function getStudentAddress(string $studentId): string|false {
         if ($studentId !== $_POST['student_id']) {
             return false;
         }
@@ -415,7 +415,7 @@ class Homepage {
      * @param array $requests tableau contenant les numéro d'étudiant que l'enseignant souhaite tutorer
      * @return true|string renvoie true si les insert et delete ont fonctionné, sinon l'erreur dans un string
      */
-    public function updateRequests(array $requests): true|string {
+    public function updateRequests(array $requests): bool|string {
         $current_requests = $this->getRequests();
         if(!$current_requests) $current_requests = array();
 
