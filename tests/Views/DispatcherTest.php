@@ -4,12 +4,11 @@ namespace Views;
 
 use Blog\Views\Dispatcher;
 use Blog\Models\Dispatcher as DispatcherModel;
-use Couchbase\View;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Classe de Dispatcher
+ * Classe de DispatcherTest
  *
  * Test de la vue Dispatcher : s'assure que la méthode showView()
  * fonctionne comme prévu
