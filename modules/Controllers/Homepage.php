@@ -4,6 +4,7 @@ namespace Blog\Controllers;
 use Blog\Views\Layout;
 use Includes\Database;
 use Blog\Views\Homepage as HomepageView;
+use Blog\Views\Homepage as HomepageModel;
 
 class Homepage {
     private Layout $layout;
