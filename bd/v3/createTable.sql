@@ -72,8 +72,8 @@ CREATE TABLE Department(
 CREATE TABLE Is_responsible(
     Id_teacher VARCHAR(10),
     Student_number VARCHAR(10),
-    Distance_minute INT NOT NULL,
-    Relevance_score INT NOT NULL,
+    Distance_minute INT,
+    Relevance_score INT,
     Responsible_start_date DATE NOT NULL,
     Responsible_end_date DATE NOT NULL,
     PRIMARY KEY(Id_teacher, Student_number),

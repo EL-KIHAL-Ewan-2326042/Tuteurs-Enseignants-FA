@@ -35,10 +35,14 @@ class Layout {
                 </a>
                 <ul class="right hide-on-med-and-down">
                     <li><a href="/homepage">ACCUEIL</a></li>
-                    <?php if (isset($_SESSION['role']) && in_array('Admin_dep', $_SESSION['role']))  { ?>
+                    <?php
+                    if (isset($_SESSION['role']) && (
+                            (is_array($_SESSION['role']) && in_array('Admin_dep', $_SESSION['role'])) ||
+                            ($_SESSION['role'] === 'Admin_dep')
+                        )) { ?>
                         <li><a href="/dashboard"> <?php echo 'DASHBOARD'; ?> </a></li>
                         <li><a href="/dispatcher"> <?php echo 'DISPATCHER'; ?> </a></li>
-                        <?php }?>
+                    <?php } ?>
                     <li><a href="/intramu"><?php
                             if (isset($_SESSION['identifier'])) {
                                 echo 'DECONNEXION';
@@ -53,10 +57,14 @@ class Layout {
         </nav>
         <ul class="sidenav" id="mobile-demo">
             <li><a href="/homepage">ACCUEIL</a></li>
-            <?php if (isset($_SESSION['role']) && in_array('Admin_dep', $_SESSION['role'])) { ?>
+            <?php
+            if (isset($_SESSION['role']) && (
+                    (is_array($_SESSION['role']) && in_array('Admin_dep', $_SESSION['role'])) ||
+                    ($_SESSION['role'] === 'Admin_dep')
+                )) { ?>
                 <li><a href="/dashboard"> <?php echo 'DASHBOARD'; ?> </a></li>
                 <li><a href="/dispatcher"> <?php echo 'DISPATCHER'; ?> </a></li>
-                <?php }?>
+            <?php } ?>
             <li><a href="/intramu"><?php
                     if (isset($_SESSION['identifier'])) {
                         echo 'DECONNEXION';
@@ -88,6 +96,8 @@ class Layout {
                 </div>
             </div>
         </footer>
+        <script src="/_assets/scripts/layout.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
         <?php
         if ($jsFilePath) {
             echo '<script src="' . $jsFilePath . '"></script>';
@@ -98,8 +108,6 @@ class Layout {
             echo '<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBS2OwTaG2rfupX3wA-DlTbsBEG9yDVKk&loading=async&libraries=marker&callback=initMap" async defer></script>';
         }
         ?>
-        <script src="/_assets/scripts/layout.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
         </body>
         </html>
         <?php

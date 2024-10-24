@@ -27,10 +27,15 @@ class Homepage {
      */
     public function show(): void {
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $db = Database::getInstance();
-            $homepageModel = new \Blog\Models\Homepage($db);
+        if (!isset($_SESSION['identifier'])) {
+            header('Location: /intramu');
+            return;
+        }
 
+        $db = Database::getInstance();
+        $homepageModel = new \Blog\Models\Homepage($db);
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_POST['action'])) {
                 if ($_POST['action'] === 'search' && isset($_POST['search'])) {
                     $results = $homepageModel->correspondTerms();
@@ -38,26 +43,25 @@ class Homepage {
                     echo json_encode($results);
                     return;
                 }
+
+                if ($_POST['action'] === 'select_student' && isset($_POST['student_id']) && isset($_POST['student_firstName']) && isset($_POST['student_lastName'])) {
+                    $studentId = $_POST['student_id'];
+                    $firstName = $_POST['student_firstName'];
+                    $secondName = $_POST['student_lastName'];
+                    $address = $homepageModel->getStudentAddress($studentId);
+
+                    $_SESSION['selected_student'] = [
+                        'id' => $studentId,
+                        'firstName' => $firstName,
+                        'lastName' => $secondName,
+                        'address' => $address
+                    ];
+                }
             }
 
-            if ($_POST['action'] === 'select_student' && isset($_POST['student_id']) && isset($_POST['student_firstName']) && isset($_POST['student_lastName'])) {
-                $studentId = $_POST['student_id'];
-                $firstName = $_POST['student_firstName'];
-                $secondName = $_POST['student_lastName'];
-                $address = $homepageModel->getStudentAddress($studentId);
-
-                $_SESSION['selected_student'] = [
-                    'id' => $studentId,
-                    'firstName' => $firstName,
-                    'lastName' => $secondName,
-                    'address' => $address
-                ];
+            if (isset($_POST['durationMin'])) {
+                echo 'ici';
             }
-        }
-
-        if (!isset($_SESSION['identifier'])) {
-            header('Location: /intramu');
-            return;
         }
 
         $title = "Accueil";
