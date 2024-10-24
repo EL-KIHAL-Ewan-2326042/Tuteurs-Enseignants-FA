@@ -6,7 +6,7 @@ use Blog\Views\Dashboard;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Classe de Dashboard
+ * Classe de DashboardTest
  *
  * Test de la vue Dashboard : s'assure que la méthode showView()
  * fonctionne comme prévu
