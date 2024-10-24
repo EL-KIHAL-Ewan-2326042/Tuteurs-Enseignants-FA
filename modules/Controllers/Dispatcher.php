@@ -73,11 +73,16 @@ class Dispatcher {
         $dispatcherModel = new \Blog\Models\Dispatcher($db);
         $errorMessage = '';
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['Student_number']) && isset($_POST['Id_teacher']) && isset($_POST['Start_date']) && isset($_POST['End_date'])){
-            $errorMessage = $this->association($db);
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if (isset($_POST['Student_number']) && isset($_POST['Id_teacher']) && isset($_POST['Start_date']) && isset($_POST['End_date'])) {
+                $errorMessage = $this->association($db);
+            }
+
+            if (isset($_POST["ici"])) {
+
+            }
         }
 
-        $db = Database::getInstance();
         $title = "Dispatcher";
         $cssFilePath = '_assets/styles/dispatcher.css';
         $jsFilePath = '_assets/scripts/dispatcher.js';
