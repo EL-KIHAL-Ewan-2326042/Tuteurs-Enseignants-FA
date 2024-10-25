@@ -6,11 +6,12 @@ use PDO;
 use PDOException;
 
 class Homepage {
-
     private Database $db;
+    private \Blog\Models\GlobalModel $globalModel;
 
-    public function __construct(Database $db) {
+    public function __construct(Database $db, \Blog\Models\GlobalModel $globalModel){
         $this->db = $db;
+        $this->globalModel = $globalModel;
     }
 
     /**
@@ -98,17 +99,13 @@ class Homepage {
      * - 1 : score
      * - 2 : nom et prénom des élèves
      * - 3 : sujet de stage
-     * @param bool $decreasing true si c'est croissant, false sinon
+     * @param bool $decreasing true si c'est décroissant, false sinon
      * @return array tableau trié
      */
     public function sortRows(array $table, int $mode = 0, bool $decreasing = false): array {
         if($mode === 1) {
             usort($table, function ($a, $b) use ($decreasing) {
-                if($decreasing) {
-                    $rank = $a['relevance'] <=> $b['relevance'];
-                } else {
-                    $rank = $b['relevance'] <=> $a['relevance'];
-                }
+                $rank = $b['score'] <=> $a['score'];
                 if ($rank === 0) {
                     $requested = $b['requested'] <=> $a['requested'];
                     if($requested === 0) {
@@ -120,39 +117,31 @@ class Homepage {
                     }
                     return $requested;
                 }
-                return $rank;
+                return $decreasing ? $rank*-1 : $rank;
             });
         } elseif($mode === 2) {
             usort($table, function ($a, $b) use ($decreasing) {
-                if($decreasing) {
-                    $lastName = $b['student_name'] <=> $a['student_name'];
-                } else {
-                    $lastName = $a['student_name'] <=> $b['student_name'];
-                }
+                $lastName = $a['student_name'] <=> $b['student_name'];
                 if ($lastName === 0) {
                     $firstName = $a['student_firstname'] <=> $b['student_firstname'];
                     if ($firstName === 0) {
                         $requested = $b['requested'] <=> $a['requested'];
                         if($requested === 0) {
-                            return $b['relevance'] <=> $a['relevance'];
+                            return $b['score'] <=> $a['score'];
                         }
                         return $requested;
                     }
-                    return $firstName;
+                    return $decreasing ? $firstName*-1 : $firstName;
                 }
-                return $lastName;
+                return $decreasing ? $lastName*-1 : $lastName;
             });
         } elseif($mode === 3) {
             usort($table, function ($a, $b) use ($decreasing) {
-                if($decreasing) {
-                    $subject = $a['internship_subject'] <=> $b['internship_subject'];
-                } else {
-                    $subject = $b['internship_subject'] <=> $a['internship_subject'];
-                }
+                $subject = $a['internship_subject'] <=> $b['internship_subject'];
                 if($subject === 0) {
                     $requested = $b['requested'] <=> $a['requested'];
                     if ($requested === 0) {
-                        $rank = $b['relevance'] <=> $a['relevance'];
+                        $rank = $b['score'] <=> $a['score'];
                         if ($rank === 0) {
                             $lastName = $a['student_name'] <=> $b['student_name'];
                             if ($lastName === 0) {
@@ -164,17 +153,13 @@ class Homepage {
                     }
                     return $requested;
                 }
-                return $subject;
+                return $decreasing ? $subject*-1 : $subject;
             });
         } else {
             usort($table, function ($a, $b) use ($decreasing) {
-                if($decreasing) {
-                    $requested = $a['requested'] <=> $b['requested'];
-                } else {
-                    $requested = $b['requested'] <=> $a['requested'];
-                }
+                $requested = $a['requested'] <=> $b['requested'];
                 if($requested === 0) {
-                    $rank = $b['relevance'] <=> $a['relevance'];
+                    $rank = $b['score'] <=> $a['score'];
                     if ($rank === 0) {
                         $lastName = $a['student_name'] <=> $b['student_name'];
                         if ($lastName === 0) {
@@ -184,7 +169,7 @@ class Homepage {
                     }
                     return $rank;
                 }
-                return $requested;
+                return $decreasing ? $requested : $requested*-1;
             });
         }
         return $table;
@@ -197,86 +182,46 @@ class Homepage {
      * @param array $departments liste des départements dont on veut récupérer les stages des élèves
      * @return array tableau contenant les informations relatives à chaque stage, le nombre fois où l'enseignant connecté a été le tuteur de l'élève ainsi qu'une note représentant la pertinence du stage pour l'enseignant
      */
-    public function getStudentsList(array $departments, int $mode = 0, bool $decreasing = false): array {
+    public function getStudentsList(array $departments, string $identifier): array {
         $studentsList = array();
         foreach($departments as $department) {
-            $newList = $this->getStudentsPerDepartment($department);
+            $newList = $this->globalModel->getStudentsPerDepartment($department);
             if($newList) $studentsList = array_merge($studentsList, $newList);
         }
 
         $studentsList = array_unique($studentsList, 0);
 
         $requests = $this->getRequests();
+        if(!$requests) $requests = array();
 
-        foreach($studentsList as &$row) {
-            $internshipsResp = $this->getInternships($row['student_number']);
-            if(!$internshipsResp) {
+        $toDelete = array();
+
+        foreach($studentsList as $key => &$row) {
+            $internships = $this->globalModel->getInternships($row['student_number']);
+            if(!$internships) {
                 $row['internshipTeacher'] = 0;
             } else {
-                foreach($internshipsResp as $internshipInfo) {
+                foreach($internships as $internshipInfo) {
                     if($row['start_date_internship'] === $internshipInfo['responsible_start_date'] && $row['end_date_internship'] === $internshipInfo['responsible_end_date']) {
-                        unset($row);
+                        array_push($toDelete, $key);
                         break;
                     }
                 }
                 if(!isset($row)) continue;
-                $row['internshipTeacher'] = $this->getInternshipTeacher($internshipsResp);
+                $row['internshipTeacher'] = $this->getInternshipTeacher($internships);
             }
-            $row['relevance'] = $this->scoreDiscipSubject($row['student_number']);
             $row['requested'] = in_array($row['student_number'], $requests);
+            $row['duration'] = $this->globalModel->getDistance($row['student_number'], $identifier);
+            $row['score'] = $this->calculateScore(array('Distance' => $row['duration'],
+                                                        'A été responsable' => $row['internshipTeacher'] > 0 ? $row['internshipTeacher']/count($internships) : 0,
+                                                        'Cohérence' => $this->globalModel->scoreDiscipSubject($row['student_number'], $identifier)));
         }
 
-        return $this->sortRows($studentsList, $mode, $decreasing);
-    }
+        for($i = count($toDelete)-1; $i >= 0; --$i){
+            array_splice($studentsList, $toDelete[$i], 1);
+        }
 
-    /**
-     * Renvoie un tableau contenant les stages des élèves du département passé en paramètre et leurs informations
-     * @param string $department le département duquel les élèves sélectionnés font partie
-     * @return false|array tableau contenant le numéro, le nom et le prénom de l'élève, ainsi que le nom de l'entreprise dans lequel il va faire son stage, le sujet et les dates, false sinon
-     */
-    public function getStudentsPerDepartment(string $department): false|array {
-        $query = 'SELECT student.student_number, student_name, student_firstname, company_name, address, internship_subject, start_date_internship, end_date_internship
-                    FROM student
-                    JOIN study_at
-                    ON student.student_number = study_at.student_number
-                    JOIN internship
-                    ON student.student_number = internship.student_number
-                    WHERE department_name = :dep
-                    AND internship.start_date_internship > CURRENT_DATE';
-        $stmt = $this->db->getConn()->prepare($query);
-        $stmt->bindParam(':dep', $department);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * Renvoie tous les départements dont l'enseignant connecté fait partie
-     * @return false|array tableau contenant tous les départements dont l'enseignant connecté fait partie, false sinon
-     */
-    public function getDepTeacher(): false|array {
-        $query = 'SELECT department_name
-                    FROM teaches
-                    WHERE  id_teacher = :teacher';
-        $stmt = $this->db->getConn()->prepare($query);
-        $stmt->bindParam(':teacher', $_SESSION['identifier']);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    /**
-     * Renvoie un tableau contenant les informations de chaque tutorat terminé de l'élève passé en paramètre
-     * @param string $student le numéro de l'étudiant dont on récupère les informations
-     * @return false|array tableau contenant, pour chaque tutorat, le numéro d'enseignant du tuteur, le numéro de l'élève et les dates, false sinon
-     */
-    public function getInternships(string $student): false|array {
-        $query = 'SELECT id_teacher, student_number, responsible_start_date, responsible_end_date
-                    FROM is_responsible
-                    WHERE student_number = :student
-                    AND responsible_end_date < CURRENT_DATE';
-        $stmt = $this->db->getConn()->prepare($query);
-        $stmt->bindParam(':student', $student);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $studentsList;
     }
 
     /**
@@ -290,45 +235,6 @@ class Homepage {
             if($row['id_teacher'] == $_SESSION['identifier']) ++$internshipTeacher;
         }
         return $internshipTeacher;
-    }
-
-    /**
-     * Renvoie un score associé à la pertinence entre le sujet de stage de l'élève passé en paramètre et les disciplines enseignées par le professeur connecté
-     * @param string $studentId numéro d'élève
-     * @return float score associé à la pertinence entre le sujet de stage et les disciplines enseignées par le professeur connecté
-     */
-    public function scoreDiscipSubject(string $studentId): float {
-        $query1 = 'SELECT discipline_name FROM is_taught WHERE id_teacher = :id';
-        $stmt1 = $this->db->getConn()->prepare($query1);
-        $stmt1->bindParam(':id', $_SESSION['identifier']);
-        $stmt1->execute();
-        $result = $stmt1->fetchAll(PDO::FETCH_ASSOC);
-        $searchTerm = "";
-
-        for($i = 0; $i < count($result); $i++) {
-            $searchTerm .= $result[$i]['discipline_name'];
-            if($i < count($result) - 1) $searchTerm .= '_';
-        }
-
-        $pdo = $this->db;
-        $searchTerm = trim($searchTerm);
-        $tsQuery = implode(' | ', explode('_', $searchTerm));
-
-        $query2 = "SELECT student_number, keywords, ts_rank_cd(to_tsvector('french', keywords), to_tsquery('french', :searchTerm), 32) AS rank
-                    FROM internship
-                    WHERE to_tsquery('french', :searchTerm) @@ to_tsvector('french', keywords)
-                    AND student_number = :studentId
-                    AND start_date_internship > CURRENT_DATE";
-
-        $stmt2 = $pdo->getConn()->prepare($query2);
-        $stmt2->bindValue(':searchTerm', $tsQuery);
-        $stmt2->bindValue(':studentId', $studentId);
-        $stmt2->execute();
-
-        $result = $stmt2->fetch(PDO::FETCH_ASSOC);
-
-        if(!$result) return 0;
-        return $result["rank"];
     }
 
     public function getCoef($identifier): array {
