@@ -268,7 +268,7 @@ class Homepage {
      * @param string $student le numéro de l'étudiant dont on récupère les informations
      * @return false|array tableau contenant, pour chaque tutorat, le numéro d'enseignant du tuteur, le numéro de l'élève et les dates, false sinon
      */
-    public function getInternships(string $student): false|array {
+    public function getInternships(string $student): ?array {
         $query = 'SELECT id_teacher, student_number, responsible_start_date, responsible_end_date
                     FROM is_responsible
                     WHERE student_number = :student
