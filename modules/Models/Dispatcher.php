@@ -14,6 +14,11 @@ class Dispatcher{
         $this->db = $db;
         $this->globalModel = $globalModel;
     }
+
+    /**
+     * Renvoie les criteres de tri associe a un utilisateur
+     * @return false|array
+     */
     public function getCriteria(): false|array
     {
         $db = $this->db;
@@ -26,102 +31,23 @@ class Dispatcher{
         return $stmt->fetchAll();
     }
 
-    public function  getCoef($identifier): array {
-        $dictCoef = [];
-
-        $pdo = $this->db;
-
-        $query = "SELECT Name_criteria, Coef FROM Backup
-              WHERE user_id = :user_id";
-
-        $stmt2 = $pdo->getConn()->prepare($query);
-        $stmt2->bindValue(':user_id', $identifier);
-        $stmt2->execute();
-
-        $rows = $stmt2->fetchAll(PDO::FETCH_ASSOC);
-
-        foreach ($rows as $row) {
-            $dictCoef[$row['name_criteria']] = $row['coef'];
-        }
-
-        return $dictCoef;
-    }
-    public function getDepTeacher($identifier): false|array {
-        $query = 'SELECT department_name
-                    FROM teaches
-                    WHERE  id_teacher = :teacher';
-        $stmt = $this->db->getConn()->prepare($query);
-        $stmt->bindParam(':teacher', $identifier);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    public function getStudentsPerDepartment(string $department): false|array {
-        $query = 'SELECT *
-                    FROM student
-                    JOIN study_at
-                    ON student.student_number = study_at.student_number
-                    JOIN internship
-                    ON student.student_number = internship.student_number
-                    WHERE department_name = :dep
-                    AND internship.start_date_internship > CURRENT_DATE';
-        $stmt = $this->db->getConn()->prepare($query);
-        $stmt->bindParam(':dep', $department);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-    public function getInternships(string $student): false|array {
-        $query = 'SELECT id_teacher, student_number, responsible_start_date, responsible_end_date
-                    FROM is_responsible
-                    WHERE student_number = :student
-                    AND responsible_end_date < CURRENT_DATE';
-        $stmt = $this->db->getConn()->prepare($query);
-        $stmt->bindParam(':student', $student);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
-
-    public function scoreDiscipSubject(string $studentId, string $identifier): float {
-        $query1 = 'SELECT discipline_name FROM is_taught WHERE id_teacher = :id';
-        $stmt1 = $this->db->getConn()->prepare($query1);
-        $stmt1->bindParam(':id', $identifier);
-        $stmt1->execute();
-        $result = $stmt1->fetchAll(PDO::FETCH_ASSOC);
-        $searchTerm = "";
-
-        for($i = 0; $i < count($result); $i++) {
-            $searchTerm .= $result[$i]['discipline_name'];
-            if($i < count($result) - 1) $searchTerm .= '_';
-        }
-
-        $pdo = $this->db;
-        $searchTerm = trim($searchTerm);
-        $tsQuery = implode(' | ', explode('_', $searchTerm));
-
-        $query2 = "SELECT student_number, keywords, ts_rank_cd(to_tsvector('french', keywords), to_tsquery('french', :searchTerm), 32) AS rank
-                    FROM internship
-                    WHERE to_tsquery('french', :searchTerm) @@ to_tsvector('french', keywords)
-                    AND student_number = :studentId
-                    AND start_date_internship > CURRENT_DATE";
-
-        $stmt2 = $pdo->getConn()->prepare($query2);
-        $stmt2->bindValue(':searchTerm', $tsQuery);
-        $stmt2->bindValue(':studentId', $studentId);
-        $stmt2->execute();
-
-        $result = $stmt2->fetch(PDO::FETCH_ASSOC);
-
-        if(!$result) return 0;
-        return $result["rank"]*5;
-    }
-
+    /**
+     * Renvoie pour un professeur un couple avec tous les etudiants de son departement
+     * @param $identifier l'identifiant du professeur
+     * @param $dictCoef dictionnaire cle->nom_critere et valeur->coef
+     * @return array|array[] array contenant id_prof, id_eleve et le score associe
+     */
     public function calculateRelevanceTeacherStudents($identifier, $dictCoef): array
     {
         $studentsList = array();
+        // On recupere la liste des departement de l'eleve
         $departments = $this->globalModel->getDepTeacher($identifier);
         foreach($departments as $listDepTeacher) {
             foreach($listDepTeacher as $department) {
+                // Pour chaque departement, on recupere les eleve
                 $newList = $this->globalModel->getStudentsPerDepartment($department);
                 if ($newList)  {
+                    // Les eleves sont rajoutes dans la liste finale
                     $studentsList = array_merge($studentsList, $newList);
                 }
             }
@@ -129,6 +55,7 @@ class Dispatcher{
 
         $result = array();
 
+        // Pour chaque relation tuteur-etudiant, on calcul leur score qu'on met dans un array final
         foreach($studentsList as $student) {
             $distanceMin = $this->globalModel->getDistance($student['student_number'], $identifier);
             $relevance= $this->globalModel->scoreDiscipSubject($student['student_number'], $identifier);
@@ -167,6 +94,7 @@ class Dispatcher{
                     $totalCoef += $coef;
                 }
             }
+            // Score normalise sur 5
             $scoreFinal = ($totalScore * 5) / $totalCoef;
 
             $newList = ["id_prof" => $identifier, "id_eleve" => $student['student_number'], "score" => round($scoreFinal, 2), "type" => $student['type']];
@@ -182,6 +110,11 @@ class Dispatcher{
         return [[]];
     }
 
+    /**
+     * S'occupe de trouver la meilleure combinaison possible tuteur-stage et le renvoie sous forme de tableau
+     * @param array $dicoCoef dictionnaire cle->nom_critere et valeur->coef
+     * @return array|array[] resultat final sous forme de matrixe
+     */
     public function dispatcher(array $dicoCoef): array
     {
         $db = $this->db;
