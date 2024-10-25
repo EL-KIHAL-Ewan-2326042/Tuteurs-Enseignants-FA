@@ -11,7 +11,6 @@ class Dispatcher {
      *
      * @return void
      */
-
     public function association($db): string {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['Student_number']) && isset($_POST['Id_teacher']) && isset($_POST['Start_date']) && isset($_POST['End_date'])
             && $_POST['Student_number'] !== '' && $_POST['Id_teacher'] !== '' && $_POST['Start_date'] !== '' && $_POST['End_date'] !== '') {
@@ -70,7 +69,8 @@ class Dispatcher {
 
     public function show(): void {
         $db = Database::getInstance();
-        $dispatcherModel = new \Blog\Models\Dispatcher($db);
+        $globalModel = new \Blog\Models\GlobalModel($db);
+        $dispatcherModel = new \Blog\Models\Dispatcher($db, $globalModel);
         $errorMessage = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {

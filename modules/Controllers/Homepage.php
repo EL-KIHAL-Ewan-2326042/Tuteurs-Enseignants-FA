@@ -34,7 +34,8 @@ class Homepage {
         }
 
         $db = Database::getInstance();
-        $homepageModel = new \Blog\Models\Homepage($db);
+        $globalModel = new \Blog\Models\GlobalModel($db);
+        $homepageModel = new \Blog\Models\Homepage($db, $globalModel);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_POST['action'])) {
