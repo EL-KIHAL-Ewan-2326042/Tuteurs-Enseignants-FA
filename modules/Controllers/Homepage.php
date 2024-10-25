@@ -20,7 +20,8 @@ class Homepage {
         }
 
         $db = Database::getInstance();
-        $homepageModel = new \Blog\Models\Homepage($db);
+        $globalModel = new \Blog\Models\GlobalModel($db);
+        $homepageModel = new \Blog\Models\Homepage($db, $globalModel);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_POST['action'])) {
@@ -55,7 +56,7 @@ class Homepage {
         $cssFilePath = '/_assets/styles/homepage.css';
         $jsFilePath = '/_assets/scripts/homepage.js';
 
-        $view = new \Blog\Views\Homepage($homepageModel);
+        $view = new \Blog\Views\Homepage($homepageModel, $globalModel);
 
         $layout = new Layout();
         $layout->renderTop($title, $cssFilePath);
