@@ -132,7 +132,7 @@ class Homepage {
                         <div class="row"></div>
 
                         <form method="post" class="center-align">
-                            <div class="selection">
+                            <div class="scrollable-table-container">
                                 <table class="highlight centered">
                                     <thead>
                                     <tr>
@@ -172,8 +172,6 @@ class Homepage {
                             <input type="hidden" name="selecStudentSubmitted" value="1">
                             <button class="waves-effect waves-light btn" type="submit">Valider</button>
                         </form>
-
-
                     <? endif;
                 endif;
             endif; ?>

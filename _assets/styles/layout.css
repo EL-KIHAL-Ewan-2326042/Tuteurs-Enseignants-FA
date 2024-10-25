@@ -33,6 +33,7 @@ a.brand-logo {
 
 /* Ajustements Main */
 
+
 main {
     display: flex;
     flex: 1 0 auto;
@@ -40,9 +41,18 @@ main {
     align-items: center;
     margin-top: 40px;
     margin-bottom: 40px;
+    overflow-y: auto;
 }
 
 /* Ajustements Footer */
+
+footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: var(--main-color);
+    color: var(--text-color);
+}
 
 .page-footer {
     background-color: var(--main-color);
