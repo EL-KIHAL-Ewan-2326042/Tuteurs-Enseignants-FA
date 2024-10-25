@@ -4,9 +4,22 @@
 namespace Blog\Controllers;
 
 use Blog\Views\Layout;
+use Blog\Views\Error404 as Error404View;
 
-class Error404
-{
+class Error404 {
+
+    private Layout $layout;
+    private Error404View $view;
+
+    /**
+     * Constructeur de la classe Error404 (controller)
+     * @param Layout $layout Instance de la classe Layout
+     * @param Error404View $view Instance de la classe Error404View
+     */
+    public function __construct(Layout $layout, Error404View $view) {
+        $this->layout = $layout;
+        $this->view = $view;
+    }
 
     /**
      * Controlleur de la page Erreur 404
@@ -18,11 +31,8 @@ class Error404
         $cssFilePath = '/_assets/styles/erreur404.css';
         $jsFilePath = '';
 
-        $view = new \Blog\Views\Error404();
-
-        $layout = new Layout();
-        $layout->renderTop($title, $cssFilePath);
-        $view->showView();
-        $layout->renderBottom($jsFilePath);
+        $this->layout->renderTop($title, $cssFilePath);
+        $this->view->showView();
+        $this->layout->renderBottom($jsFilePath);
     }
 }
