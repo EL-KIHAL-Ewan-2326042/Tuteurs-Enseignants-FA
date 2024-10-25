@@ -39,6 +39,7 @@ class DashboardTest extends TestCase {
      * et simule le téléchargement d'un fichier csv
      * @return void
      * @throws Exception
+     * @throws \Exception
      */
     public function testShow(){
         //Mock des classes layout et vue

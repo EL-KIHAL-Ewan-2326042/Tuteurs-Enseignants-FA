@@ -342,7 +342,7 @@ class DashboardTest extends TestCase  {
         $dashboard = new Dashboard($mockDb);
 
         //exécution
-        $result = $dashboard->exportToCsvByDepartment('unknown_table',[],$this->tempDir . '/file.csv');
+        $result = $dashboard->exportToCsvByDepartment('unknown_table',[]);
         $this->assertFalse($result,"L'exportation aurait dû échouer avec une table inconnue");
     }
 
@@ -353,6 +353,7 @@ class DashboardTest extends TestCase  {
      * @throws \Exception
      */
     public function testExportToCsvDatabaseError(){
+        //Mock de la base de donnéeset de la connexion
         $mockDb = $this->createMock(Database::class);
         $mockConn = $this->getMockBuilder(PDO::class)
             ->disableOriginalConstructor()
@@ -364,11 +365,10 @@ class DashboardTest extends TestCase  {
         $mockConn->method('prepare')->willReturn($mockStmt);
         $mockStmt->method('execute')->will($this->throwException(new PDOException("Erreur d'insertion")));
 
-        $csvFilePath = $this->tempDir . '/export_table.csv';
         $dashboard = new Dashboard($mockDb);
 
         //exécution
-        $result = $dashboard->exportToCsvByDepartment('student', ['id', 'name'], $csvFilePath);
+        $result = $dashboard->exportToCsvByDepartment('student', ['id', 'name']);
 
         //vérification
         $this->assertFalse($result,"L'exportation aurait dû échouer suite à une erreur de base données.");
