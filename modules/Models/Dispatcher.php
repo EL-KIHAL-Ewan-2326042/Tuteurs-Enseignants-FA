@@ -2,15 +2,15 @@
 
 namespace Blog\Models;
 
-use Includes\Database;
+use Includes;
 use PDO;
 use PDOException;
 
 class Dispatcher{
-    private Database $db;
+    private Includes\Database $db;
     private \Blog\Models\GlobalModel $globalModel;
 
-    public function __construct(Database $db, \Blog\Models\GlobalModel $globalModel){
+    public function __construct(Includes\Database $db, \Blog\Models\GlobalModel $globalModel){
         $this->db = $db;
         $this->globalModel = $globalModel;
     }

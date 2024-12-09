@@ -8,16 +8,13 @@ use Blog\Views\Homepage as HomepageModel;
 
 class Homepage {
     private Layout $layout;
-    private HomepageView $view;
 
     /**
      * Constructeur de la classe Homepage (controller)
      * @param Layout $layout Instance de la classe Layout
-     * @param HomepageView $view Instance de la classe HomepageView
      */
-    public function __construct(Layout $layout, HomepageView $view) {
+    public function __construct(Layout $layout) {
         $this->layout = $layout;
-        $this->view = $view;
     }
 
     /**
@@ -36,6 +33,7 @@ class Homepage {
         $db = Database::getInstance();
         $globalModel = new \Blog\Models\GlobalModel($db);
         $homepageModel = new \Blog\Models\Homepage($db, $globalModel);
+        $view = new \Blog\Views\Homepage($homepageModel, $globalModel);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_POST['action'])) {
@@ -71,7 +69,7 @@ class Homepage {
         $jsFilePath = '/_assets/scripts/homepage.js';
 
         $this->layout->renderTop($title, $cssFilePath);
-        $this->view->showView();
+        $view->showView();
         $this->layout->renderBottom($jsFilePath);
     }
 }
