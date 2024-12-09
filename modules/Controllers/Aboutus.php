@@ -7,16 +7,13 @@ use Blog\Views\Aboutus as AboutUsView;
 class Aboutus {
 
     private Layout $layout;
-    private AboutUsView $view;
 
     /**
      * Constructeur de la classe Aboutus (controller)
      * @param Layout $layout Instance de la classe Layout
-     * @param AboutUsView $view Instance de la classe AboutUsView
      */
-    public function __construct(Layout $layout, AboutUsView $view) {
+    public function __construct(Layout $layout) {
         $this->layout = $layout;
-        $this->view = $view;
     }
 
     /**
@@ -24,13 +21,13 @@ class Aboutus {
      * @return void
      */
     public function show(): void {
-
         $title = "A Propos";
         $cssFilePath = '';
         $jsFilePath = '';
+        $view = new \Blog\Views\Aboutus();
 
-        $this->layout->renderTop($title,$cssFilePath);
-        $this->view->showView();
+        $this->layout->renderTop($title, $cssFilePath);
+        $view->showView();
         $this->layout->renderBottom($jsFilePath);
     }
 }

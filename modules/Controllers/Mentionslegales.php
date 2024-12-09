@@ -10,16 +10,13 @@ use Blog\Views\Mentionslegales as MentionLegView;
  */
 class Mentionslegales{
     private Layout $layout;
-    private MentionLegView $view;
 
     /**
      * Constructeur de la classe Mentionslegales (contrôleur)
      * @param Layout $layout Instance de la classe Layout
-     * @param MentionLegView $view Instance de la classe MentionLegView
      */
-    public function __construct(Layout $layout, MentionLegView $view){
+    public function __construct(Layout $layout){
         $this->layout = $layout;
-        $this->view = $view;
     }
 
     /**
@@ -30,9 +27,10 @@ class Mentionslegales{
         $title = "Mentions légales";
         $cssFilePath = '_assets/styles/mentionLeg.css';
         $jsFilePath = '';
+        $view = new \Blog\Views\Mentionslegales();
 
         $this->layout->renderTop($title, $cssFilePath);
-        $this->view->showView();
+        $view->showView();
         $this->layout->renderBottom($jsFilePath);
     }
 }

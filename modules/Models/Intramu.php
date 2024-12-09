@@ -2,6 +2,7 @@
 namespace Blog\Models;
 
 use Includes\Database;
+use PDO;
 use PDOException;
 
 class Intramu {
@@ -44,28 +45,30 @@ class Intramu {
      * @param string $identifier l'identifiant de l'utilisateur
      * @return false|mixed renvoie le rôle dans la DB
      */
-    public function getRole(string $identifier) {
-        if ($_SESSION['identifier'] !== $identifier) {
-            return false;
+        public function getRole(string $identifier): mixed
+        {
+            if ($_SESSION['identifier'] !== $identifier) {
+                return false;
+            }
+
+            $db = $this->db;
+            $query = 'SELECT role_name FROM has_role 
+                      WHERE has_role.user_id = :user_id';
+
+            $stmt = $db->getConn()->prepare($query);
+            $stmt->bindParam(':user_id', $identifier);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
         }
-
-        $db = $this->db;
-        $query = 'SELECT role_name FROM has_role 
-                  WHERE has_role.user_id = :user_id';
-
-        $stmt = $db->getConn()->prepare($query);
-        $stmt->bindParam(':user_id', $identifier);
-        $stmt->execute();
-
-        return $stmt->fetchColumn();
-    }
 
     /**
      * renvoie le role_department de l'utilisateur selon son identifiant
      * @param string $identifier l'identifiant de l'utilisateur
      * @return false|mixed renvoie le rôle dans la DB
      */
-    public function getRole_department(string $identifier) {
+    public function getRole_department(string $identifier): mixed
+    {
         if ($_SESSION['identifier'] !== $identifier) {
             return false;
         }
