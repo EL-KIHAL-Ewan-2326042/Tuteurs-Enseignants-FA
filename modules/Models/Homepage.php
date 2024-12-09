@@ -251,6 +251,13 @@ class Homepage {
 
         $rows = $stmt2->fetchAll(PDO::FETCH_ASSOC);
 
+        if (!$rows) {
+            foreach (['Distance', 'A été responsable', 'Cohérence'] as $criteria) {
+                $dictCoef[$criteria] = 1;
+            }
+            return $dictCoef;
+        }
+
         foreach ($rows as $row) {
             $dictCoef[$row['name_criteria']] = $row['coef'];
         }
@@ -261,9 +268,9 @@ class Homepage {
     /**
      * Version PHP de l'algo JavaScript, inutilisé
      * @param $dictValues
-     * @return float|int
+     * @return float
      */
-    public function calculateScore($dictValues) {
+    public function calculateScore($dictValues): float {
         $dictCoef = $this->getCoef($_SESSION['identifier']);
 
         $totalScore = 0;
