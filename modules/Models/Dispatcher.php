@@ -34,10 +34,10 @@ class Dispatcher{
     /**
      * Renvoie pour un professeur un couple avec tous les etudiants de son departement
      * @param $identifier l'identifiant du professeur
-     * @param $dictCoef dictionnaire cle->nom_critere et valeur->coef
+     * @param $dictCoef array cle->nom_critere et valeur->coef
      * @return array|array[] array contenant id_prof, id_eleve et le score associe
      */
-    public function calculateRelevanceTeacherStudents($identifier, $dictCoef): array
+    public function calculateRelevanceTeacherStudents($identifier, array $dictCoef): array
     {
         $studentsList = array();
         // On recupere la liste des departement de l'eleve
@@ -119,45 +119,48 @@ class Dispatcher{
     {
         $db = $this->db;
 
-        $query = 'SELECT Teacher.Id_teacher, 
-                      MAX(maxi_number_trainees) AS Max_trainees, 
-                      COUNT(Is_responsible.Student_number) AS Current_count
-                FROM Teacher
-                JOIN Teaches ON Teacher.Id_Teacher = Teaches.Id_Teacher
-                LEFT JOIN Is_responsible ON Teacher.Id_Teacher = Is_responsible.Id_Teacher
-                WHERE Department_name = :Role_departement
-                GROUP BY Teacher.Id_teacher';
+        $roleDepartments = $_SESSION['role_department'];
+        $placeholders = implode(',', array_fill(0, count($roleDepartments), '?'));
+
+        $query = "SELECT Teacher.Id_teacher, 
+                  MAX(maxi_number_trainees) AS Max_trainees, 
+                  COUNT(Is_responsible.Student_number) AS Current_count
+                  FROM Teacher
+                  JOIN has_role ON Teacher.Id_Teacher = Has_role.user_id
+                  LEFT JOIN Is_responsible ON Teacher.Id_Teacher = Is_responsible.Id_Teacher
+                  WHERE Role_department IN ($placeholders)
+                  GROUP BY Teacher.Id_teacher";
 
         $stmt = $db->getConn()->prepare($query);
-        $stmt->bindParam(':Role_departement', $_SESSION['role_department']);
-        $stmt->execute();
+        $stmt->execute($roleDepartments);
 
         $teacherData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $listTeacherMax = [];
-        $listteacherIntership = [];
+        $listTeacherIntership = [];
         foreach ($teacherData as $teacher) {
             $listTeacherMax[$teacher['id_teacher']] = $teacher['max_trainees'];
-            $listteacherIntership[$teacher['id_teacher']] = $teacher['current_count'] ?: 0;
+            $listTeacherIntership[$teacher['id_teacher']] = $teacher['current_count'] ?: 0;
         }
 
-        $query = 'SELECT Is_responsible.Student_number FROM Is_responsible JOIN Study_at ON Study_at.Student_number = Is_responsible.Student_number 
-                    WHERE Department_name = :Role_departement';
+        $query = "SELECT Is_responsible.Student_number 
+              FROM Is_responsible 
+              JOIN Study_at ON Study_at.Student_number = Is_responsible.Student_number 
+              WHERE Department_name IN ($placeholders)";
         $stmt = $db->getConn()->prepare($query);
-        $stmt->bindParam(':Role_departement', $_SESSION['role_department']);
-        $stmt->execute();
+        $stmt->execute($roleDepartments);
+
         $responsibleStudents = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         $listFinal = [];
         $listStart = [];
         $listEleveFinal = [];
 
-        foreach ($listteacherIntership as $teacherId => $currentCount) {
+        foreach ($listTeacherIntership as $teacherId => $currentCount) {
             foreach ($this->calculateRelevanceTeacherStudents($teacherId, $dicoCoef) as $association) {
                 if (!in_array($association['id_eleve'], $responsibleStudents)) {
                     $listStart[] = $association;
-                }
-                else {
+                } else {
                     $listEleveFinal[] = $association['id_eleve'];
                 }
             }
@@ -167,25 +170,24 @@ class Dispatcher{
             return [[], []];
         }
 
-        $assignedCounts = $listteacherIntership;
+        $assignedCounts = $listTeacherIntership;
 
         while (!empty($listStart)) {
             usort($listStart, fn($a, $b) => $b['score'] <=> $a['score']);
             $topCandidate = $listStart[0];
 
-            if ($assignedCounts[$topCandidate['id_prof']] < $listTeacherMax[$topCandidate['id_prof']] && !in_array($topCandidate['id_eleve'], $listEleveFinal)) {
+            if ($assignedCounts[$topCandidate['id_prof']] < $listTeacherMax[$topCandidate['id_prof']] &&
+                !in_array($topCandidate['id_eleve'], $listEleveFinal)) {
                 $listFinal[] = $topCandidate;
                 $listEleveFinal[] = $topCandidate['id_eleve'];
                 $assignedCounts[$topCandidate['id_prof']] += ($topCandidate['type'] === 'Intership') ? 2 : 1;
-
             }
             array_shift($listStart);
-
-
         }
 
         return [$listFinal, $assignedCounts];
     }
+
 
     /**
      * <#> à faire : verif dans la fonction algo2 que la valeur défaut ne casse pas tout

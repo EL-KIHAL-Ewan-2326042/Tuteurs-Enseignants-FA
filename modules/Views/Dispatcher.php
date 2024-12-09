@@ -35,7 +35,7 @@ class Dispatcher{
                                 </div>
                                 <form class="col s6" action="#">
                                     <p class="range-field" style="margin: 0;">
-                                        <input type="range" id="<?php echo $criteria['name_criteria']; ?>" min="0" max="5" value="<?php echo $criteria['coef']; ?>" />
+                                        <input type="range" name="coef[<?php echo $criteria['name_criteria']; ?>]" id="<?php echo $criteria['name_criteria']; ?>" min="0" max="5" value="<?php echo $criteria['coef']; ?>" />
                                     </p>
                                 </form>
                             </div>
@@ -43,13 +43,13 @@ class Dispatcher{
                         }
                         ?>
                         <form class="col s12" action="./dispatcher" method="post" id="pushCoef">
-                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Enregister
+                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action" value="save">Enregister
                                 <i class="material-icons right">arrow_downward</i>
                             </button>
-                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Générer
+                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action" value="generate">Générer
                                 <i class="material-icons right">send</i>
                             </button>
-                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Charger
+                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action" value="load">Charger
                                 <i class="material-icons right">arrow_upward</i>
                             </button>
                         </form>
@@ -64,7 +64,11 @@ class Dispatcher{
                             <div class="input-field col s6">
                                 <input id="Student_number" name="Student_number" type="text" class="validate">
                                 <label for="Student_number">Student_number</label>
-                            </div>
+                            </div><form class="col s6" action="#">
+                                    <p class="range-field" style="margin: 0;">
+                                        <input type="range" id="<?php echo $criteria['name_criteria']; ?>" min="0" max="5" value="<?php echo $criteria['coef']; ?>" />
+                                    </p>
+                                </form>
                         </div>
                         <div class="row">
                             <div class="input-field col s6">
@@ -86,53 +90,55 @@ class Dispatcher{
                      </form>
                 </div>
 
-                <div class="row card-panel white z-depth-3 s12 m6">
-                    <div class="col s12">
-                        <form class="col s12" action="./dispatcher" method="post">
-                            <div class="selection">
-                                <table class="highlight centered">
-                                    <thead>
-                                    <tr>
-                                        <th>Enseignant</th>
-                                        <th>Eleve</th>
-                                        <th>Score</th>
-                                        <th>Associé</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    <?php
-                                    foreach ($this->dispatcherModel->dispatcher(["A été responsable" => 1, "Distance"=>1, "Cohérence"=>1])[0] as $associate):
-                                    ?>
-                                    <tr>
-                                        <td><?php echo $associate['id_prof'] ?></td>
-                                        <td><?php echo $associate['id_eleve'] ?></td>
-                                        <td><?php echo $associate['score'] ?></td>
-                                        <td>
-                                            <label class="center">
-                                                <input type="checkbox" name="id_prof[]" class="center-align filled-in" value="<?= $associate['id_prof'] ?>"/>
-                                                <span></span>
-                                                <input type="hidden" name="id_eleve[]" class="center-align filled-in" value="<?= $associate['id_eleve'] ?>"/>
-                                                <input type="hidden" name="score[]" class="center-align filled-in" value="<?= $associate['score'] ?>"/>
-                                            </label></td>
+                <?php if (isset($_POST['action']) && $_POST['action'] === 'generate'): ?>
+                    <div class="row card-panel white z-depth-3 s12 m6">
+                        <div class="col s12">
+                            <form class="col s12" action="./dispatcher" method="post">
+                                <div class="selection">
+                                    <table class="highlight centered">
+                                        <thead>
+                                        <tr>
+                                            <th>Enseignant</th>
+                                            <th>Eleve</th>
+                                            <th>Score</th>
+                                            <th>Associé</th>
                                         </tr>
-                                    <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="col s12 center">
-                                <input type="hidden" name="selecStudentSubmitted" value="1">
-                                <button class="waves-effect waves-light btn" type="submit">Valider</button>
-                                <span> Tout cocher :</span>
-                                <p>
-                                    <label>
-                                        <input type="checkbox" class="filled-in" checked="checked" />
-                                        <span></span>
-                                    </label>
-                                </p>
-                            </div>
-                        </form>
+                                        </thead>
+                                        <tbody>
+                                        <?php
+                                        foreach ($this->dispatcherModel->dispatcher(["A été responsable" => 1, "Distance" => 1, "Cohérence" => 1])[0] as $associate):
+                                            ?>
+                                            <tr>
+                                                <td><?php echo $associate['id_prof'] ?></td>
+                                                <td><?php echo $associate['id_eleve'] ?></td>
+                                                <td><?php echo $associate['score'] ?></td>
+                                                <td>
+                                                    <label class="center">
+                                                        <input type="checkbox" name="id_prof[]" class="center-align filled-in" value="<?= $associate['id_prof'] ?>"/>
+                                                        <span></span>
+                                                        <input type="hidden" name="id_eleve[]" class="center-align filled-in" value="<?= $associate['id_eleve'] ?>"/>
+                                                        <input type="hidden" name="score[]" class="center-align filled-in" value="<?= $associate['score'] ?>"/>
+                                                    </label></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="col s12 center">
+                                    <input type="hidden" name="selecStudentSubmitted" value="1">
+                                    <button class="waves-effect waves-light btn" type="submit">Valider</button>
+                                    <span> Tout cocher :</span>
+                                    <p>
+                                        <label>
+                                            <input type="checkbox" class="filled-in" checked="checked" />
+                                            <span></span>
+                                        </label>
+                                    </p>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                </div>
+                <?php endif; ?>
             </div>
         </main>
         <?php
