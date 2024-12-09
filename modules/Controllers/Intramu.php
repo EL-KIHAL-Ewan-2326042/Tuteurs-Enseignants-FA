@@ -2,12 +2,28 @@
 namespace Blog\Controllers;
 
 use Blog\Views\Layout;
-use Database;
+use Includes\Database;
+use Blog\Views\Intramu as IntramuView;
+use Blog\Models\Intramu as IntramuModel;
 
 /**
  * Contrôleur de la page de connexion
  */
 class Intramu {
+    private Layout $layout;
+    private IntramuView $view;
+    private IntramuModel $model;
+    /**
+     * Constructeur de la classe Intramu (contrôleur)
+     * @param Layout $layout Instance de la classe Layout
+     * @param IntramuView $view Instance de la classe IntramuView
+     * @param IntramuModel $model Instance de la classe IntramuModel
+     */
+    public function __construct(Layout $layout, IntramuView $view, IntramuModel $model) {
+        $this->layout = $layout;
+        $this->view = $view;
+        $this->model = $model;
+    }
 
     /**
      * Liaison entre la vue et le layout et affichage
@@ -49,11 +65,9 @@ class Intramu {
         $cssFilePath = '_assets/styles/login.css';
         $jsFilePath = '';
 
-        $view = new \Blog\Views\Intramu($errorMessage);
-
-        $layout = new Layout();
-        $layout->renderTop($title, $cssFilePath);
-        $view->showView();
-        $layout->renderBottom($jsFilePath);
+        $this->view = new IntramuView($errorMessage);
+        $this->layout->renderTop($title, $cssFilePath);
+        $this->view->showView();
+        $this->layout->renderBottom($jsFilePath);
     }
 }

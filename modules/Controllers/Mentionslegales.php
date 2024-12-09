@@ -3,8 +3,24 @@
 namespace Blog\Controllers;
 
 use Blog\Views\Layout;
+use Blog\Views\Mentionslegales as MentionLegView;
 
-class Mentionslegales {
+/**
+ * Contrôleur de la page mentions légales
+ */
+class Mentionslegales{
+    private Layout $layout;
+    private MentionLegView $view;
+
+    /**
+     * Constructeur de la classe Mentionslegales (contrôleur)
+     * @param Layout $layout Instance de la classe Layout
+     * @param MentionLegView $view Instance de la classe MentionLegView
+     */
+    public function __construct(Layout $layout, MentionLegView $view){
+        $this->layout = $layout;
+        $this->view = $view;
+    }
 
     /**
      * Controlleur de la page mentions légales
@@ -15,11 +31,8 @@ class Mentionslegales {
         $cssFilePath = '_assets/styles/mentionLeg.css';
         $jsFilePath = '';
 
-        $view = new \Blog\Views\Mentionslegales();
-
-        $layout = new Layout();
-        $layout->renderTop($title, $cssFilePath);
-        $view->showView();
-        $layout->renderBottom($jsFilePath);
+        $this->layout->renderTop($title, $cssFilePath);
+        $this->view->showView();
+        $this->layout->renderBottom($jsFilePath);
     }
 }

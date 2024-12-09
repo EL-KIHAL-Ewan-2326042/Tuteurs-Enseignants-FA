@@ -2,8 +2,22 @@
 namespace Blog\Controllers;
 
 use Blog\Views\Layout;
+use Blog\Views\Aboutus as AboutUsView;
 
 class Aboutus {
+
+    private Layout $layout;
+    private AboutUsView $view;
+
+    /**
+     * Constructeur de la classe Aboutus (controller)
+     * @param Layout $layout Instance de la classe Layout
+     * @param AboutUsView $view Instance de la classe AboutUsView
+     */
+    public function __construct(Layout $layout, AboutUsView $view) {
+        $this->layout = $layout;
+        $this->view = $view;
+    }
 
     /**
      * Controlleur de la page a propos
@@ -15,11 +29,8 @@ class Aboutus {
         $cssFilePath = '';
         $jsFilePath = '';
 
-        $view = new \Blog\Views\Aboutus();
-
-        $layout = new Layout();
-        $layout->renderTop($title, $cssFilePath);
-        $view->showView();
-        $layout->renderBottom($jsFilePath);
+        $this->layout->renderTop($title,$cssFilePath);
+        $this->view->showView();
+        $this->layout->renderBottom($jsFilePath);
     }
 }
