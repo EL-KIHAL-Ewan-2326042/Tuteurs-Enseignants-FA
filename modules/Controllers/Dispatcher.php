@@ -3,12 +3,11 @@
 namespace Blog\Controllers;
 
 use Blog\Views\Layout;
-use Database;
+use Includes\Database;
 use PDO;
 
 class Dispatcher {
     /**
-     *
      * @return void
      */
     public function association($db, $dispatcherModel): string {
