@@ -100,6 +100,12 @@ class GlobalModel {
         return $result["rank"]*5;
     }
 
+    /**
+     * Calcul de distance entre un eleve et un professeur
+     * @param string $idStudent l'identifiant de l'eleve
+     * @param string $idTeacher l'identifiant du professeur
+     * @return int distance en minute entre les deux
+     */
     public function getDistance(string $idStudent, string $idTeacher): int {
         $query = 'SELECT Address FROM Internship WHERE Student_number = :idStudent';
         $stmt1 = $this->db->getConn()->prepare($query);
@@ -117,6 +123,7 @@ class GlobalModel {
 
         $minDuration = PHP_INT_MAX;
 
+        // On cherche l'addresse avec la distance la plus courte
         foreach ($addressesTeacher as $address) {
             $latLngTeacher = $this->geocodeAddress($address['address']);
 
@@ -133,6 +140,13 @@ class GlobalModel {
 
         return (int) $minDuration;
     }
+
+    /**
+     * Requete a l'api de google pour renvoyer la distance entre deux points
+     * @param array $latLngStudent lattitude et longitude de l'origine
+     * @param array $latLngTeacher longitude et longitude de l'origine
+     * @return float|int|null distance en minute ou decimal. Renvoie null si erreur
+     */
     private function calculateDuration(array $latLngStudent, array $latLngTeacher): float|int|null
     {
         $apiKey = 'AIzaSyCBS2OwTaG2rfupX3wA-DlTbsBEG9yDVKk';
@@ -147,6 +161,11 @@ class GlobalModel {
         return null;
     }
 
+    /**
+     * Geocode une addresse
+     * @param string $address
+     * @return array|null contient lattitude et longitude
+     */
     private function geocodeAddress(string $address): ?array
     {
         $apiKey = 'AIzaSyCBS2OwTaG2rfupX3wA-DlTbsBEG9yDVKk';
