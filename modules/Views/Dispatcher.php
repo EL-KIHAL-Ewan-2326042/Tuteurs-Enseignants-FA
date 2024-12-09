@@ -109,8 +109,10 @@ class Dispatcher{
                                         <td><?php echo $associate['score'] ?></td>
                                         <td>
                                             <label class="center">
-                                                <input type="checkbox" name="selectIs_responsible[]" class="center-align filled-in" value="<?= $associate ?>"/>
+                                                <input type="checkbox" name="id_prof[]" class="center-align filled-in" value="<?= $associate['id_prof'] ?>"/>
                                                 <span></span>
+                                                <input type="hidden" name="id_eleve[]" class="center-align filled-in" value="<?= $associate['id_eleve'] ?>"/>
+                                                <input type="hidden" name="score[]" class="center-align filled-in" value="<?= $associate['score'] ?>"/>
                                             </label></td>
                                         </tr>
                                     <?php endforeach; ?>
