@@ -3,26 +3,19 @@ namespace Blog\Controllers;
 
 use Blog\Views\Layout;
 use Includes\Database;
-use Blog\Views\Intramu as IntramuView;
-use Blog\Models\Intramu as IntramuModel;
 
 /**
  * Contrôleur de la page de connexion
  */
 class Intramu {
     private Layout $layout;
-    private IntramuView $view;
-    private IntramuModel $model;
+
     /**
      * Constructeur de la classe Intramu (contrôleur)
      * @param Layout $layout Instance de la classe Layout
-     * @param IntramuView $view Instance de la classe IntramuView
-     * @param IntramuModel $model Instance de la classe IntramuModel
      */
-    public function __construct(Layout $layout, IntramuView $view, IntramuModel $model) {
+    public function __construct(Layout $layout) {
         $this->layout = $layout;
-        $this->view = $view;
-        $this->model = $model;
     }
 
     /**
@@ -34,7 +27,8 @@ class Intramu {
     public function show(): void {
         if (isset($_SESSION['identifier'])) {
             unset($_SESSION['identifier']);
-            unset($_SESSION['role']);
+            unset($_SESSION['role_name']);
+            unset($_SESSION['role_department']);
             header('Location: /homepage');
             exit();
         }
@@ -50,8 +44,7 @@ class Intramu {
 
             if ($loginModel->doLogsExist($identifierLogs, $passwordLogs)) {
                 $_SESSION['identifier'] = $identifierLogs;
-
-                $_SESSION['role'] = $loginModel->getRole($identifierLogs);
+                $_SESSION['role_name'] = $loginModel->getRole($identifierLogs);
                 $_SESSION['role_department'] = $loginModel->getRole_department($identifierLogs);
                 $_SESSION['address'] = $loginModel->getAddress($identifierLogs);
                 header('Location: /homepage');
@@ -64,10 +57,10 @@ class Intramu {
         $title = "Connexion";
         $cssFilePath = '_assets/styles/login.css';
         $jsFilePath = '';
+        $view = new \Blog\Views\Intramu($errorMessage);
 
-        $this->view = new IntramuView($errorMessage);
         $this->layout->renderTop($title, $cssFilePath);
-        $this->view->showView();
+        $view->showView();
         $this->layout->renderBottom($jsFilePath);
     }
 }
