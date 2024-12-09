@@ -77,8 +77,9 @@ $intramuModel = new \Blog\Models\Intramu($db);
 $intramuController = new \Blog\Controllers\Intramu($layout,$intramuView,$intramuModel);
 
 //Instanciation de classes nécessaires pour Homepage
-$homepageModel = new \Blog\Models\Homepage($db);
-$homepageView = new \Blog\Views\Homepage($homepageModel);
+$globalModel = new \Blog\Models\GlobalModel($db);
+$homepageModel = new \Blog\Models\Homepage($db, $globalModel);
+$homepageView = new \Blog\Views\Homepage($homepageModel, $globalModel);
 $homepageController = new \Blog\Controllers\Homepage($layout,$homepageView);
 
 //Instanciation de classe nécessaires pour Mentionslegales
@@ -110,8 +111,9 @@ function createAction($uri,$layout): Closure {
                 $controller = new $className($layout,$view,$model);
             } else if ($className === 'Blog\Controllers\Homepage'){
                 $db = \Includes\Database::getInstance();
-                $model = new \Blog\Models\Homepage($db);
-                $view = new \Blog\Views\Homepage($model);
+                $global = new \Blog\Models\GlobalModel($db);
+                $model = new \Blog\Models\Homepage($db, $global);
+                $view = new \Blog\Views\Homepage($model, $global);
                 $controller = new $className($layout,$view);
             } else {
                 $view = "Blog\\Views\\$controllerName";

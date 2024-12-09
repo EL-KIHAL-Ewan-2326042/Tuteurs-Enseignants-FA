@@ -2,7 +2,7 @@
 
 namespace Blog\Models;
 
-use Database;
+use Includes\Database;
 use PDO;
 use PDOException;
 
