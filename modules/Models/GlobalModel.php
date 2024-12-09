@@ -2,7 +2,7 @@
 
 namespace Blog\Models;
 
-use Database;
+use Includes\Database;
 use PDO;
 
 class GlobalModel {
@@ -67,6 +67,60 @@ class GlobalModel {
      * @return float score associé à la pertinence entre le sujet de stage et les disciplines enseignées par le professeur connecté
      */
     public function scoreDiscipSubject(string $studentId, string $identifier): float {
+        $query1 = "SELECT student_number, keywords
+                    FROM internship
+                    WHERE student_number = :studentId
+                    AND start_date_internship > CURRENT_DATE";
+        $stmt1 = $this->db->getConn()->prepare($query1);
+        $stmt1->bindParam(':studentId', $studentId);
+        $stmt1->execute();
+        $result = $stmt1->fetchAll(PDO::FETCH_ASSOC);
+        $searchTerm1 = "";
+
+        for ($i = 0; $i < count($result); ++$i) {
+            $searchTerm1 .= $result[$i]["keywords"];
+            if ($i < count($result) - 1) $searchTerm1 .= " ";
+        }
+
+        $pdo = $this->db;
+        $searchTerm1 = trim($searchTerm1);
+        $tsQuery1 = implode(' | ', explode(' ', $searchTerm1));
+        $tsQuery1 = implode(' & ', explode('_', $tsQuery1));
+
+        $query2 = "SELECT discipline_name FROM is_taught WHERE id_teacher = :id";
+        $stmt2 = $this->db->getConn()->prepare($query2);
+        $stmt2->bindParam(':id', $identifier);
+        $stmt2->execute();
+        $result = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+        $searchTerm2 = "";
+
+        for($i = 0; $i < count($result); ++$i) {
+            $searchTerm2 .= $result[$i]['discipline_name'];
+            if($i < count($result) - 1) $searchTerm2 .= ' ';
+        }
+
+        $searchTerm2 = trim($searchTerm2);
+        $tsQuery2 = implode(' | ', explode(' ', $searchTerm2));
+        $tsQuery2 = implode(' & ', explode('_', $tsQuery2));
+
+        $query3 = "SELECT to_tsquery('french', :searchTerm1) AS keywords, to_tsquery('french', :searchTerm2) AS discip";
+        $stmt3 = $this->db->getConn()->prepare($query3);
+        $stmt3->BindValue(':searchTerm1', $tsQuery1);
+        $stmt3->bindValue(':searchTerm2', $tsQuery2);
+        $stmt3->execute();
+
+        $result = $stmt3->fetch(PDO::FETCH_ASSOC);
+
+        echo $tsQuery1 . " - ";
+        echo $tsQuery2 . " -- ";
+        if ($result) {
+            echo $result['keywords'] . " ||| ";
+            echo $result['discip'] . " ||| ";
+        }
+
+        if (!$result) return 0;
+        return 0.5*5;
+
         $query1 = 'SELECT discipline_name FROM is_taught WHERE id_teacher = :id';
         $stmt1 = $this->db->getConn()->prepare($query1);
         $stmt1->bindParam(':id', $identifier);
@@ -83,7 +137,7 @@ class GlobalModel {
         $searchTerm = trim($searchTerm);
         $tsQuery = implode(' | ', explode('_', $searchTerm));
 
-        $query2 = "SELECT student_number, keywords, ts_rank_cd(to_tsvector('french', keywords), to_tsquery('french', :searchTerm), 32) AS rank
+        $query2 = "SELECT student_number, keywords, to_tsvector('french', keywords) key, to_tsquery('french', :searchTerm) search, ts_rank_cd(to_tsvector('french', keywords), to_tsquery('french', :searchTerm), 32) AS rank
                     FROM internship
                     WHERE to_tsquery('french', :searchTerm) @@ to_tsvector('french', keywords)
                     AND student_number = :studentId
@@ -95,6 +149,11 @@ class GlobalModel {
         $stmt2->execute();
 
         $result = $stmt2->fetch(PDO::FETCH_ASSOC);
+
+        if ($result) {
+            echo $result['key'] . " ||| ";
+            echo $result['search'] . " ||| ";
+        }
 
         if (!$result) return 0;
         return $result["rank"]*5;

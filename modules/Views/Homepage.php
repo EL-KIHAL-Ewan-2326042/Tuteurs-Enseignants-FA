@@ -175,6 +175,9 @@ class Homepage {
                     <? endif;
                 endif;
             endif; ?>
+            <?
+            echo $this->globalModel->scoreDiscipSubject("Y26472238", $_SESSION['identifier']);
+            ?>
             <script>
                 <? if(isset($_SESSION['address'])): ?>
                     const teacherAddress = "<?= $_SESSION['address'][0]['address']; ?>";
