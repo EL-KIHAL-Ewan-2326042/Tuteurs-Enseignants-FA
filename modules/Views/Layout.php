@@ -38,10 +38,7 @@ class Layout {
                 <ul class="right hide-on-med-and-down">
                     <li><a href="/homepage">ACCUEIL</a></li>
                     <?php
-                    if (isset($_SESSION['role_name']) && (
-                            (is_array($_SESSION['role_name']) && in_array('Admin_dep', $_SESSION['role_name'])) ||
-                            ($_SESSION['role_name'] === 'Admin_dep')
-                        )) { ?>
+                    if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep') { ?>
                         <li><a href="/dashboard"> <?php echo 'DASHBOARD'; ?> </a></li>
                         <li><a href="/dispatcher"> <?php echo 'DISPATCHER'; ?> </a></li>
                     <?php } ?>
@@ -60,10 +57,7 @@ class Layout {
         <ul class="sidenav" id="mobile-demo">
             <li><a href="/homepage">ACCUEIL</a></li>
             <?php
-            if (isset($_SESSION['role_name']) && (
-                    (is_array($_SESSION['role_name']) && in_array('Admin_dep', $_SESSION['role_name'])) ||
-                    ($_SESSION['role_name'] === 'Admin_dep')
-                )) { ?>
+            if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep') { ?>
                 <li><a href="/dashboard"> <?php echo 'DASHBOARD'; ?> </a></li>
                 <li><a href="/dispatcher"> <?php echo 'DISPATCHER'; ?> </a></li>
             <?php } ?>
