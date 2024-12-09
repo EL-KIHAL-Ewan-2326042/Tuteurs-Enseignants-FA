@@ -6,7 +6,6 @@ class Aboutus{
     /**
      * Vue de la page a propos
      */
-
     public function showView(){
         ?>
         <main>
