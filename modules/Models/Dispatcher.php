@@ -124,11 +124,11 @@ class Dispatcher{
 
         $query = "SELECT Teacher.Id_teacher, 
                   MAX(maxi_number_trainees) AS Max_trainees, 
-                  COUNT(Is_responsible.Student_number) AS Current_count
+                  COUNT(internship.Student_number) AS Current_count
                   FROM Teacher
                   JOIN has_role ON Teacher.Id_Teacher = Has_role.user_id
-                  LEFT JOIN Is_responsible ON Teacher.Id_Teacher = Is_responsible.Id_Teacher
-                  WHERE Role_department IN ($placeholders)
+                  LEFT JOIN internship ON Teacher.Id_Teacher = internship.Id_Teacher
+                  WHERE department_name IN ($placeholders)
                   GROUP BY Teacher.Id_teacher";
 
         $stmt = $db->getConn()->prepare($query);
@@ -143,9 +143,9 @@ class Dispatcher{
             $listTeacherIntership[$teacher['id_teacher']] = $teacher['current_count'] ?: 0;
         }
 
-        $query = "SELECT Is_responsible.Student_number 
-              FROM Is_responsible 
-              JOIN Study_at ON Study_at.Student_number = Is_responsible.Student_number 
+        $query = "SELECT internship.Student_number 
+              FROM internship
+              JOIN Study_at ON Study_at.Student_number = internship.Student_number 
               WHERE Department_name IN ($placeholders)";
         $stmt = $db->getConn()->prepare($query);
         $stmt->execute($roleDepartments);
@@ -223,7 +223,7 @@ class Dispatcher{
      * @return array|false
      */
     public function createListAssociate() {
-        $query = 'SELECT Is_responsible.Student_number, Is_responsible.Id_teacher FROM Is_responsible JOIN Study_at ON Is_responsible.Student_number = Study_at.Student_number
+        $query = 'SELECT internship.Student_number, internship.Id_teacher FROM internship JOIN Study_at ON internship.Student_number = Study_at.Student_number
                     where Department_name = :Role_department';
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':Role_department', $_SESSION['role_department']);
@@ -236,7 +236,7 @@ class Dispatcher{
      * @return string Valeur confirmant l'insertion
      */
     public function insertResponsible() {
-        $query = 'INSERT INTO Is_responsible (Id_teacher, Student_number, responsible_start_date, responsible_end_date) VALUES (:Id_teacher, :Student_number, :Start_date, :End_date)';
+        $query = 'INSERT INTO internship (Id_teacher, Student_number, responsible_start_date, responsible_end_date) VALUES (:Id_teacher, :Student_number, :Start_date, :End_date)';
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':Student_number', $_POST['Student_number']);
         $stmt->bindParam(':Id_teacher', $_POST['Id_teacher']);
@@ -259,7 +259,7 @@ class Dispatcher{
             $stmt->execute();
             $DateIntership = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            $query = 'INSERT INTO Is_responsible (Id_teacher, Student_number, Relevance_score, responsible_start_date, responsible_end_date) VALUES (:Id_teacher, :Student_number, :score, :Start_date, :End_date)';
+            $query = 'INSERT INTO internship (Id_teacher, Student_number, Relevance_score, responsible_start_date, responsible_end_date) VALUES (:Id_teacher, :Student_number, :score, :Start_date, :End_date)';
             $stmt = $this->db->getConn()->prepare($query);
             $stmt->bindParam(':Student_number', $_POST['id_eleve'][$i]);
             $stmt->bindParam(':Id_teacher', $_POST['id_prof'][$i]);

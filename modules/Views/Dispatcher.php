@@ -64,28 +64,23 @@ class Dispatcher{
                             <div class="input-field col s6">
                                 <input id="Student_number" name="Student_number" type="text" class="validate">
                                 <label for="Student_number">Student_number</label>
-                            </div><form class="col s6" action="#">
-                                    <p class="range-field" style="margin: 0;">
-                                        <input type="range" id="<?php echo $criteria['name_criteria']; ?>" min="0" max="5" value="<?php echo $criteria['coef']; ?>" />
-                                    </p>
-                                </form>
-                        </div>
-                        <div class="row">
-                            <div class="input-field col s6">
-                                <input id="Start_date" name="Start_date" type="text" class="validate">
-                                <label for="Start_date">Date de début</label>
                             </div>
-                            <div class="input-field col s6">
-                                <input id="End_date" name="End_date" type="text" class="validate">
-                                <label for="End_date">Date de fin</label>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    <input id="Start_date" name="Start_date" type="text" class="validate">
+                                    <label for="Start_date">Date de début</label>
+                                </div>
+                                <div class="input-field col s6">
+                                    <input id="End_date" name="End_date" type="text" class="validate">
+                                    <label for="End_date">Date de fin</label>
+                                </div>
                             </div>
-                        </div>
-                        <p class="red-text"><?php echo $this->errorMessage?></p>
-
-                        <div class="col s12">
-                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Associé
-                                <i class="material-icons right">arrow_downward</i>
-                            </button>
+                            <p class="red-text"><?php echo $this->errorMessage?></p>
+                            <div class="col s12">
+                                <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Associer
+                                    <i class="material-icons right">arrow_downward</i>
+                                </button>
+                            </div>
                         </div>
                      </form>
                 </div>
