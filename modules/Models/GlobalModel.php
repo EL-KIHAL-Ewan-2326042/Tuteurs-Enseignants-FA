@@ -17,7 +17,7 @@ class GlobalModel {
      * @return false|array tableau contenant tous les départements dont l'enseignant connecté fait partie, false sinon
      */
     public function getDepTeacher(string $identifier): false|array {
-        $query = 'SELECT department_name
+        $query = 'SELECT DISTINCT department_name
                     FROM has_role
                     WHERE user_id = :teacher';
         $stmt = $this->db->getConn()->prepare($query);
