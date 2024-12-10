@@ -18,8 +18,8 @@ class GlobalModel {
      */
     public function getDepTeacher(string $identifier): false|array {
         $query = 'SELECT department_name
-                    FROM teaches
-                    WHERE  id_teacher = :teacher';
+                    FROM has_role
+                    WHERE user_id = :teacher';
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':teacher', $identifier);
         $stmt->execute();
@@ -52,7 +52,7 @@ class GlobalModel {
      */
     public function getInternships(string $student): false|array {
         $query = 'SELECT id_teacher, student_number, responsible_start_date, responsible_end_date
-                    FROM is_responsible
+                    FROM internship
                     WHERE student_number = :student';
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':student', $student);
