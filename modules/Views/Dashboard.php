@@ -71,17 +71,23 @@ class Dashboard{
             <div class="card-panel white">
                 <h4>Exporter :</h4>
                 <form action="/dashboard" method="POST">
-                    <div class="input-field">
-                        <input id="export_table" name="export_table" type="text" class="validate" required>
-                        <label for="export_table">Nom de la table</label>
-                        <span class="helper-text" data-error="wrong" data-success="right">Ecrire le nom de la table désirée</span>
+                    <div>
+                        <select name="export_list" required>
+                            <option value="" disabled selected>Choisissez la liste à exporter</option>
+                            <option value="student">Etudiants</option>
+                            <option value="teacher">Professeurs</option>
+                            <option value="internship">Entreprises</option>
+                        </select>
+                        <label>Choisissez la liste à exporter</label>
                     </div>
-                    <button class="btn waves-effect waves-light" type="submit">Exporter
-                        <i class="material-icons right">send</i>
-                    </button>
+                    <div class="input-field">
+                        <button class="btn waves-effect waves-light" type="submit">Exporter
+                            <i class="material-icons right">send</i>
+                        </button>
+                    </div>
                 </form>
             </div>
-    </main>
+        </main>
 <?php
     }
 }

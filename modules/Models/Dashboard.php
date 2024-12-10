@@ -19,6 +19,25 @@ class Dashboard{
     }
 
     /**
+     * Récupère les colonnes d'une table donnée dans la base de données
+     * @param string $tableName
+     * @return array
+     * @throws Exception
+     */
+    public function getTableColumn(string $tableName): array {
+        try {
+            $query = "DESCRIBE $tableName";
+            $stmt = $this->db->getConn()->prepare($query);
+            $stmt->execute();
+            $columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            return $columns ?: [];
+        } catch (PDOException $e) {
+            error_log("Erreur lors de l'importation : " . $e->getMessage());
+            throw new Exception("Impossible de récupérer les colonnes pour la table $tableName.");
+        }
+    }
+
+    /**
      * Importation des données depuis un fichier CSV vers la base de données
      * (pour la table Student)
      * @param string $csvFilePath
@@ -55,31 +74,26 @@ class Dashboard{
      * @param string $tableName
      * @param array $expectedHeaders
      * @return bool
+     * @throws Exception
      */
-    private function uploadCsv(string $csvFilePath, string $tableName, array $expectedHeaders): bool {
+    private function uploadCsv(string $csvFilePath, string $tableName): bool {
         $db = $this->db;
 
         if (($handle = fopen($csvFilePath, "r")) !== FALSE) {
             $headers = fgetcsv($handle, 1000, ",");
             error_log("CSV headers: " . implode(",", $headers));
 
-            if (!$this->validateHeaders($headers, $expectedHeaders)) {
+            if (!$this->validateHeaders($headers, $tableName)) {
                 //echo "Les colonnes du fichier CSV ne correspondent pas aux colonnes attendues par la base de données.";
                 error_log("CSV headers do not match expected headers.");
-                error_log("Expected: " . implode(', ', $expectedHeaders));
-                error_log("Received: " . implode(', ', $headers));
                 fclose($handle);
                 return false;
             }
 
             try {
                 while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                    if (count($data) !== count($expectedHeaders)) {
-                        echo "Le nombre de colonnes dans le fichier CSV ne correspond pas aux attentes.";
-                        continue; // Passer à la ligne suivante
-                    }
-
-                    $query = "INSERT INTO $tableName (" . implode(',', $expectedHeaders) . ") VALUES (" . implode(',', array_map(fn($i) => ":column$i", range(1, count($expectedHeaders)))) . ")";
+                    $tableColumns = $this->getTableColumn($tableName);
+                    $query = "INSERT INTO $tableName (" . implode(',', $tableColumns) . ") VALUES (" . implode(',', array_map(fn($i) => ":column$i", range(1, count($tableColumns)))) . ")";
                     $stmt = $db->getConn()->prepare($query);
                     foreach ($data as $index => $value) {
                         $stmt->bindValue(":column" . ($index + 1), $value);
@@ -100,11 +114,13 @@ class Dashboard{
      * Vérifie que les colonnes du fichier CSV correspondent aux colonnes attendues
      * dans la base de données
      * @param array $headers
-     * @param array $expectedHeaders
+     * @param string $tableName
      * @return bool
+     * @throws Exception
      */
-    private function validateHeaders(array $headers, array $expectedHeaders): bool {
-        return $headers === $expectedHeaders;
+    private function validateHeaders(array $headers, string $tableName): bool {
+        $tableColumns = $this->getTableColumn($tableName);
+        return $headers === $tableColumns;
     }
 
     /**
