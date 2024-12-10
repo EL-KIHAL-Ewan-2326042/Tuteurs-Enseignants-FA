@@ -35,7 +35,7 @@ class Dispatcher{
      * Renvoie pour un professeur un couple avec tous les etudiants de son departement
      * @param $identifier l'identifiant du professeur
      * @param $dictCoef array cle->nom_critere et valeur->coef
-     * @return array|array[] array contenant id_prof, id_eleve et le score associe
+     * @return array|array[] array contenant id_prof, id_eleve et le Score associe
      */
     public function calculateRelevanceTeacherStudents($identifier, array $dictCoef): array
     {
@@ -55,10 +55,10 @@ class Dispatcher{
 
         $result = array();
 
-        // Pour chaque relation tuteur-etudiant, on calcul leur score qu'on met dans un array final
+        // Pour chaque relation tuteur-etudiant, on calcul leur Score qu'on met dans un array final
         foreach($studentsList as $student) {
             $distanceMin = $this->globalModel->getDistance($student['student_number'], $identifier);
-            $relevance= $this->globalModel->scoreDiscipSubject($student['student_number'], $identifier);
+            $relevance= $this->globalModel->ScoreDiscipSubject($student['student_number'], $identifier);
 
             $dictValues = array(
                 "A été responsable" => $this->globalModel->getInternships($student['student_number']),
@@ -73,18 +73,18 @@ class Dispatcher{
 
                     switch ($criteria) {
                         case 'Distance':
-                            $scoreDuration = $coef / (1 + 0.02 * $value);
-                            $totalScore += $scoreDuration;
+                            $ScoreDuration = $coef / (1 + 0.02 * $value);
+                            $totalScore += $ScoreDuration;
                             break;
 
                         case 'A été responsable':
-                            $scoreInternship = ($value > 0) ? $coef : 0;
-                            $totalScore += $scoreInternship;
+                            $ScoreInternship = ($value > 0) ? $coef : 0;
+                            $totalScore += $ScoreInternship;
                             break;
 
                         case 'Cohérence':
-                            $scoreRelevance = $value * $coef;
-                            $totalScore += $scoreRelevance;
+                            $ScoreRelevance = $value * $coef;
+                            $totalScore += $ScoreRelevance;
                             break;
 
                         default:
@@ -95,9 +95,9 @@ class Dispatcher{
                 }
             }
             // Score normalise sur 5
-            $scoreFinal = ($totalScore * 5) / $totalCoef;
+            $ScoreFinal = ($totalScore * 5) / $totalCoef;
 
-            $newList = ["id_prof" => $identifier, "id_eleve" => $student['student_number'], "score" => round($scoreFinal, 2), "type" => $student['type']];
+            $newList = ["id_teacher" => $identifier, "student_number" => $student['student_number'], "score" => round($ScoreFinal, 2), "type" => $student['type']];
 
             if (!empty($newList)) {
                 $result[] = $newList;
@@ -117,6 +117,7 @@ class Dispatcher{
      */
     public function dispatcher(array $dicoCoef): array
     {
+
         $db = $this->db;
 
         $roleDepartments = $_SESSION['role_department'];
@@ -126,12 +127,13 @@ class Dispatcher{
                   MAX(maxi_number_trainees) AS Max_trainees, 
                   COUNT(internship.Student_number) AS Current_count
                   FROM Teacher
-                  JOIN has_role ON Teacher.Id_Teacher = Has_role.user_id
-                  LEFT JOIN internship ON Teacher.Id_Teacher = internship.Id_Teacher
+                  JOIN has_role ON Teacher.Id_teacher = Has_role.user_id
+                  LEFT JOIN internship ON Teacher.Id_teacher = internship.Id_teacher
                   WHERE department_name IN ($placeholders)
                   GROUP BY Teacher.Id_teacher";
 
         $stmt = $db->getConn()->prepare($query);
+
         $stmt->execute($roleDepartments);
 
         $teacherData = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -158,10 +160,10 @@ class Dispatcher{
 
         foreach ($listTeacherIntership as $teacherId => $currentCount) {
             foreach ($this->calculateRelevanceTeacherStudents($teacherId, $dicoCoef) as $association) {
-                if (!in_array($association['id_eleve'], $responsibleStudents)) {
+                if (!in_array($association['student_number'], $responsibleStudents)) {
                     $listStart[] = $association;
                 } else {
-                    $listEleveFinal[] = $association['id_eleve'];
+                    $listEleveFinal[] = $association['student_number'];
                 }
             }
         }
@@ -176,11 +178,11 @@ class Dispatcher{
             usort($listStart, fn($a, $b) => $b['score'] <=> $a['score']);
             $topCandidate = $listStart[0];
 
-            if ($assignedCounts[$topCandidate['id_prof']] < $listTeacherMax[$topCandidate['id_prof']] &&
-                !in_array($topCandidate['id_eleve'], $listEleveFinal)) {
+            if ($assignedCounts[$topCandidate['id_teacher']] < $listTeacherMax[$topCandidate['id_teacher']] &&
+                !in_array($topCandidate['student_number'], $listEleveFinal)) {
                 $listFinal[] = $topCandidate;
-                $listEleveFinal[] = $topCandidate['id_eleve'];
-                $assignedCounts[$topCandidate['id_prof']] += ($topCandidate['type'] === 'Intership') ? 2 : 1;
+                $listEleveFinal[] = $topCandidate['student_number'];
+                $assignedCounts[$topCandidate['id_teacher']] += ($topCandidate['type'] === 'Internship') ? 2 : 1;
             }
             array_shift($listStart);
         }
@@ -195,7 +197,7 @@ class Dispatcher{
      * @return array|false
      */
     public function createListTeacher() {
-        $query = 'SELECT Teacher.Id_teacher FROM Teacher JOIN Teaches ON Teacher.Id_Teacher = Teaches.Id_Teacher
+        $query = 'SELECT Teacher.Id_teacher FROM Teacher JOIN Teaches ON Teacher.Id_teacher = Teaches.Id_teacher
                     where Department_name = :Role_department';
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':Role_department', $_SESSION['role_department']);
@@ -255,15 +257,15 @@ class Dispatcher{
             $query = 'SELECT Start_date_internship, End_date_internship FROM Internship
                     where Student_number = :Student_number';
             $stmt = $this->db->getConn()->prepare($query);
-            $stmt->bindParam(':Student_number', $_POST['id_eleve'][$i]);
+            $stmt->bindParam(':Student_number', $_POST['Student_number'][$i]);
             $stmt->execute();
             $DateIntership = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            $query = 'INSERT INTO internship (Id_teacher, Student_number, Relevance_score, responsible_start_date, responsible_end_date) VALUES (:Id_teacher, :Student_number, :score, :Start_date, :End_date)';
+            $query = 'INSERT INTO internship (Id_teacher, Student_number, Relevance_Score, responsible_start_date, responsible_end_date) VALUES (:Id_teacher, :Student_number, :Score, :Start_date, :End_date)';
             $stmt = $this->db->getConn()->prepare($query);
-            $stmt->bindParam(':Student_number', $_POST['id_eleve'][$i]);
-            $stmt->bindParam(':Id_teacher', $_POST['id_prof'][$i]);
-            $stmt->bindParam(':score', $_POST['score'][$i]);
+            $stmt->bindParam(':Student_number', $_POST['Student_number'][$i]);
+            $stmt->bindParam(':Id_teacher', $_POST['Id_teacher'][$i]);
+            $stmt->bindParam(':Score', $_POST['Score'][$i]);
             $stmt->bindParam(':Start_date', $DateIntership[0]['start_date_internship']);
             $stmt->bindParam(':End_date', $DateIntership[0]['end_date_internship']);
             $stmt->execute();
