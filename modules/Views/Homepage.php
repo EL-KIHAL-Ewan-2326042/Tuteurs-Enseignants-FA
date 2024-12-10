@@ -42,9 +42,38 @@ class Homepage {
                 echo "<p>Cet étudiant n'a pas de stage ...</p>";
             }
             else {
-                ?>
-                <div id="map"></div>
-                <?php
+                $internshipInfos = $this->model->getCompanyAndSubject($_SESSION['selected_student']['id']);
+                if ($internshipInfos) {
+                    $internships = $this->globalModel->getInternships($_SESSION['selected_student']['id']);
+                    $nbInternships = $this->model->getInternshipTeacher($internships);
+                    $distance = $this->globalModel->getDistance($_SESSION['selected_student']['id'], $_SESSION['identifier']);
+                    $score = $this->model->calculateScore(array('Distance' => $distance,
+                        'A été responsable' => $nbInternships > 0 ? $nbInternships/count($internships) : 0,
+                        'Cohérence' => $this->globalModel->scoreDiscipSubject($_SESSION['selected_student']['id'], $_SESSION['identifier'])));
+                    ?>
+                    <div id="map"></div>
+                    <form method="post" class="center-align">
+                        <div class="scrollable-table-container">
+                            <table class="highlight centered">
+                                <tbody>
+                                    <tr>
+                                        <td><?= $nbInternships > 0 ? 'Oui' : 'Non' ?></td>
+                                        <td>~<?= $distance ?> minutes</td>
+                                        <td><?= str_replace('_', ' ', $internshipInfos["internship_subject"]) ?></td>
+                                        <td><?= str_replace('_', ' ', $internshipInfos["company_name"]) ?></td>
+                                        <td><strong><?= round($score, 2) ?></strong>/5</td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <input type="hidden" name="selecStudentSubmitted" value="1">
+                        <button class="waves-effect waves-light btn" type="submit">Valider</button>
+                    </form>
+                    <?php
+                } else {
+                    echo "<p>Cet étudiant n'a pas de stage ...</p>";
+                }
             }
             ?>
 
