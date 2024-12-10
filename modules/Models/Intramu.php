@@ -84,7 +84,7 @@ class Intramu {
         }
 
         $db = $this->db;
-        $query = 'SELECT Role_department FROM has_role 
+        $query = 'SELECT department_name FROM has_role 
               WHERE has_role.user_id = :user_id';
 
         $stmt = $db->getConn()->prepare($query);

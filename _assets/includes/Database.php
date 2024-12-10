@@ -6,7 +6,7 @@ class Database {
     private string $host = "postgresql-tutormap.alwaysdata.net";
     private string $user = "tutormap";
     private string $pass = "8exs7JcEpGVfsI";
-    private string $dbname = "tutormap_v1";
+    private string $dbname = "tutormap_v4";
     private PDO $conn;
 
     /**
