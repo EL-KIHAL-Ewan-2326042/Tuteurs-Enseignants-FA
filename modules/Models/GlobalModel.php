@@ -17,9 +17,9 @@ class GlobalModel {
      * @return false|array tableau contenant tous les départements dont l'enseignant connecté fait partie, false sinon
      */
     public function getDepTeacher(string $identifier): false|array {
-        $query = 'SELECT department_name
-                    FROM teaches
-                    WHERE  id_teacher = :teacher';
+        $query = 'SELECT DISTINCT department_name
+                    FROM has_role
+                    WHERE user_id = :teacher';
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':teacher', $identifier);
         $stmt->execute();
@@ -52,7 +52,7 @@ class GlobalModel {
      */
     public function getInternships(string $student): false|array {
         $query = 'SELECT id_teacher, student_number, responsible_start_date, responsible_end_date
-                    FROM is_responsible
+                    FROM internship
                     WHERE student_number = :student';
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':student', $student);
@@ -67,37 +67,73 @@ class GlobalModel {
      * @return float score associé à la pertinence entre le sujet de stage et les disciplines enseignées par le professeur connecté
      */
     public function scoreDiscipSubject(string $studentId, string $identifier): float {
-        $query1 = 'SELECT discipline_name FROM is_taught WHERE id_teacher = :id';
-        $stmt1 = $this->db->getConn()->prepare($query1);
-        $stmt1->bindParam(':id', $identifier);
+        $pdo = $this->db;
+
+        $query1 = "SELECT student_number, keywords
+                    FROM internship
+                    WHERE student_number = :studentId
+                    AND start_date_internship > CURRENT_DATE";
+        $stmt1 = $pdo->getConn()->prepare($query1);
+        $stmt1->bindParam(':studentId', $studentId);
         $stmt1->execute();
         $result = $stmt1->fetchAll(PDO::FETCH_ASSOC);
-        $searchTerm = "";
+        $searchTerm1 = "";
 
-        for($i = 0; $i < count($result); $i++) {
-            $searchTerm .= $result[$i]['discipline_name'];
-            if($i < count($result) - 1) $searchTerm .= '_';
+        for ($i = 0; $i < count($result); ++$i) {
+            $searchTerm1 .= $result[$i]["keywords"];
+            if ($i < count($result) - 1) $searchTerm1 .= " ";
         }
 
-        $pdo = $this->db;
-        $searchTerm = trim($searchTerm);
-        $tsQuery = implode(' | ', explode('_', $searchTerm));
+        $searchTerm1 = trim($searchTerm1);
+        $tsQuery1 = implode(' | ', explode(' ', $searchTerm1));
+        $tsQuery1 = implode(' & ', explode('_', $tsQuery1));
 
-        $query2 = "SELECT student_number, keywords, ts_rank_cd(to_tsvector('french', keywords), to_tsquery('french', :searchTerm), 32) AS rank
-                    FROM internship
-                    WHERE to_tsquery('french', :searchTerm) @@ to_tsvector('french', keywords)
-                    AND student_number = :studentId
-                    AND start_date_internship > CURRENT_DATE";
-
+        $query2 = "SELECT discipline_name FROM is_taught WHERE id_teacher = :id";
         $stmt2 = $pdo->getConn()->prepare($query2);
-        $stmt2->bindValue(':searchTerm', $tsQuery);
-        $stmt2->bindValue(':studentId', $studentId);
+        $stmt2->bindParam(':id', $identifier);
         $stmt2->execute();
+        $result = $stmt2->fetchAll(PDO::FETCH_ASSOC);
+        $searchTerm2 = "";
 
-        $result = $stmt2->fetch(PDO::FETCH_ASSOC);
+        for($i = 0; $i < count($result); ++$i) {
+            $searchTerm2 .= $result[$i]['discipline_name'];
+            if($i < count($result) - 1) $searchTerm2 .= ' ';
+        }
 
-        if (!$result) return 0;
-        return $result["rank"]*5;
+        $searchTerm2 = trim($searchTerm2);
+        $tsQuery2 = implode(' | ', explode(' ', $searchTerm2));
+        $tsQuery2 = implode(' & ', explode('_', $tsQuery2));
+
+        $query3 = "SELECT to_tsquery('french', :searchTerm1) AS internship, to_tsquery('french', :searchTerm2) AS discip";
+        $stmt3 = $pdo->getConn()->prepare($query3);
+        $stmt3->BindValue(':searchTerm1', $tsQuery1);
+        $stmt3->bindValue(':searchTerm2', $tsQuery2);
+        $stmt3->execute();
+
+        $result = $stmt3->fetch(PDO::FETCH_ASSOC);
+
+        $internship = explode(' | ', $result['internship']);
+        $disciplines = explode(' | ', $result['discip']);
+
+        if (count($internship) === 0 || count($disciplines) === 0) return 0;
+
+        $score = 0;
+
+        foreach ($internship as $subject) {
+            $subj = explode(' & ', $subject);
+            foreach ($disciplines as $discipline) {
+                if ($subject == $discipline) $score += 1/count($internship);
+                else {
+                    foreach ($subj as $sub) {
+                        foreach (explode(' & ', $discipline) as $discip) {
+                            if ($discip == $sub) $score += 1/(count($internship)*count($subj));
+                        }
+                    }
+                } if ($score === 1) break;
+            } if ($score === 1) break;
+        }
+
+        return $score;
     }
 
     /**
