@@ -14,7 +14,7 @@ class Dashboard{
             <div class="card-panel white">
                 <h4>Importer :</h4>
                 <div class="row">
-                    <h5> Table étudiant (student) : </h5>
+                    <h5> Rajouter des étudiants : </h5>
                     <form action="/dashboard" method="POST" enctype="multipart/form-data">
                         <div class="file-field input-field">
                             <div class="btn">
@@ -32,7 +32,7 @@ class Dashboard{
                 </div>
 
                 <div class="row">
-                    <h5> Table professeur (teacher) : </h5>
+                    <h5> Rajouter des professeurs : </h5>
                     <form action="/dashboard" method="POST" enctype="multipart/form-data">
                         <div class="file-field input-field">
                             <div class="btn">
@@ -50,7 +50,7 @@ class Dashboard{
                 </div>
 
                 <div class="row">
-                    <h5> Table entreprise (internship) : </h5>
+                    <h5> Rajouter des entreprises : </h5>
                     <form action="/dashboard" method="POST" enctype="multipart/form-data">
                         <div class="file-field input-field">
                             <div class="btn">
