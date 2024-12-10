@@ -18,6 +18,8 @@ class Dispatcher{
         ?>
         <main>
             <div class="col">
+                <h3 class="center-align">Répartiteur de tuteurs enseignants</h3>
+
                 <div class="row" >
                     <div class="col card-panel white z-depth-3 s12 m6" style="padding: 20px; margin-right: 10px">
                         <?php
@@ -85,6 +87,8 @@ class Dispatcher{
                      </form>
                 </div>
 
+                <?php
+                ?>
                 <?php if (isset($_POST['action']) && $_POST['action'] === 'generate'): ?>
                     <div class="row card-panel white z-depth-3 s12 m6">
                         <div class="col s12">
@@ -101,25 +105,28 @@ class Dispatcher{
                                         </thead>
                                         <tbody>
                                         <?php
-                                        foreach ($this->dispatcherModel->dispatcher(["A été responsable" => 1, "Distance" => 1, "Cohérence" => 1])[0] as $associate):
+                                        $dictCoef = ["A été responsable" => 1, "Distance" => 1, "Cohérence" => 1];
+                                        $resultDispatchList = $this->dispatcherModel->dispatcher($dictCoef)[0];
+                                        foreach ($resultDispatchList as $resultDispatch):
                                             ?>
                                             <tr>
-                                                <td><?php echo $associate['id_prof'] ?></td>
-                                                <td><?php echo $associate['id_eleve'] ?></td>
-                                                <td><?php echo $associate['score'] ?></td>
+                                                <td><?='1' .  $resultDispatch['Id_teacher'] ?></td>
+                                                <td><?='2' .   $resultDispatch['Student_number'] ?></td>
+                                                <td><?='3' .   $resultDispatch['Score'] ?></td>
                                                 <td>
                                                     <label class="center">
-                                                        <input type="checkbox" name="id_prof[]" class="center-align filled-in" value="<?= $associate['id_prof'] ?>"/>
+                                                        <input type="checkbox" name="id_prof[]" class="center-align filled-in" value="<?= $resultDispatch['Teacher_id'] ?>"/>
                                                         <span></span>
-                                                        <input type="hidden" name="id_eleve[]" class="center-align filled-in" value="<?= $associate['id_eleve'] ?>"/>
-                                                        <input type="hidden" name="score[]" class="center-align filled-in" value="<?= $associate['score'] ?>"/>
-                                                    </label></td>
+                                                        <input type="hidden" name="id_eleve[]" class="center-align filled-in" value="<?= $resultDispatch['Student_number'] ?>"/>
+                                                        <input type="hidden" name="score[]" class="center-align filled-in" value="<?= $resultDispatch['Score'] ?>"/>
+                                                    </label>
+                                                </td>
                                             </tr>
                                         <?php endforeach; ?>
                                         </tbody>
                                     </table>
                                 </div>
-                                <div class="col s12 center">
+                                <div class="row s12 center">
                                     <input type="hidden" name="selecStudentSubmitted" value="1">
                                     <button class="waves-effect waves-light btn" type="submit">Valider</button>
                                     <span> Tout cocher :</span>
