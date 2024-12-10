@@ -37,15 +37,24 @@ class Dashboard {
             if($_SERVER["REQUEST_METHOD"] == "POST") {
                 if (isset($_FILES['csv_file_student'])){
                     $csvFile = $_FILES['csv_file_student']['tmp_name'];
-                    $model->uploadCsvStudent($csvFile);
+                    if (!$model->uploadCsvStudent($csvFile)) {
+                        echo "Échec de l'importation du fichier CSV pour les étudiants.";
+                    }
+
                 } elseif (isset($_FILES['csv_file_teacher'])){
                     $csvFile = $_FILES['csv_file_teacher']['tmp_name'];
-                    $model->uploadCsvTeacher($csvFile);
+                    if (!$model->uploadCsvTeacher($csvFile)) {
+                        echo "Échec de l'importation du fichier CSV pour les enseignants.";
+                    }
+
                 } elseif (isset($_FILES['csv_file_internship'])){
                     $csvFile = $_FILES['csv_file_internship']['tmp_name'];
-                    $model->uploadCsvInternship($csvFile);
-                } elseif (isset($_POST['export_table'])) {
-                    $table = $_POST['export_table'];
+                    if (!$model->uploadCsvInternship($csvFile)) {
+                        echo "Échec de l'importation du fichier CSV pour les stages.";
+                    }
+
+                } elseif (isset($_POST['export_list'])) {
+                    $table = $_POST['export_list'];
 
                     //en-têtes spécifiques de chaque table
                     $headers = match ($table) {
@@ -74,7 +83,11 @@ class Dashboard {
                         echo "Table inconnue pour l'export.";
                         return;
                     }
-                    $model->exportToCsvByDepartment($table, $headers);
+                    try {
+                        $model->exportToCsvByDepartment($table, $headers);
+                    } catch (Exception $e) {
+                        echo "Erreur lors de l'exportation : " . $e->getMessage();
+                    }
 
                 } else {
                     echo "Aucun fichier CSV n'est reconnu.";
