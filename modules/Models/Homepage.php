@@ -180,6 +180,7 @@ class Homepage {
      * Les stages sélectionnés sont uniquement ceux des élèves faisant partie d'au moins un des départements passés en paramètre
      * Les stages n'ont pas encore débuté et n'ont aucun tuteur attribué
      * @param array $departments liste des départements dont on veut récupérer les stages des élèves
+     * @param string $identifier identifiant de l'enseignant
      * @return array tableau contenant les informations relatives à chaque stage, le nombre fois où l'enseignant connecté a été le tuteur de l'élève ainsi qu'une note représentant la pertinence du stage pour l'enseignant
      */
     public function getStudentsList(array $departments, string $identifier): array {
@@ -235,6 +236,17 @@ class Homepage {
             if($row['id_teacher'] == $_SESSION['identifier']) ++$internshipTeacher;
         }
         return $internshipTeacher;
+    }
+
+    public function getCompanyAndSubject(string $student): array {
+        $query = 'SELECT company_name, internship_subject
+                    FROM internship
+                    WHERE student_number = :student
+                    AND responsible_start_date > CURRENT_DATE';
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindParam(':student', $student);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
     public function getCoef($identifier): array {
