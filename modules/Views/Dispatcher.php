@@ -35,7 +35,7 @@ class Dispatcher{
                                 </div>
                                 <form class="col s6" action="#">
                                     <p class="range-field" style="margin: 0;">
-                                        <input type="range" name="coef[<?php echo $criteria['name_criteria']; ?>]" id="<?php echo $criteria['name_criteria']; ?>" min="0" max="5" value="<?php echo $criteria['coef']; ?>" />
+                                        <label for="<?php echo $criteria['name_criteria']; ?>"></label><input type="range" name="coef[<?php echo $criteria['name_criteria']; ?>]" id="<?php echo $criteria['name_criteria']; ?>" min="0" max="5" value="<?php echo $criteria['coef']; ?>" />
                                     </p>
                                 </form>
                             </div>
