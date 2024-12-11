@@ -26,8 +26,12 @@ class Dashboard{
      */
     public function getTableColumn(string $tableName): array {
         try {
-            $query = "DESCRIBE $tableName";
+            $query = "
+                SELECT column_name
+                FROM information_schema.columns
+                WHERE table_name = :table_name";
             $stmt = $this->db->getConn()->prepare($query);
+            $stmt->bindParam(':table_name', $tableName);
             $stmt->execute();
             $columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
             return $columns ?: [];
@@ -38,10 +42,39 @@ class Dashboard{
     }
 
     /**
+     * Vérifie que la table existe et qu'elle contient des colonnes
+     * @param string $tableName
+     * @return bool
+     */
+    public function isValidTable(string $tableName): bool {
+        try {
+            return !empty($this->getTableColumn($tableName));
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Récupère les en-têtes d'un fichier CSV
+     * @param string $csvFilePath
+     * @return array
+     * @throws Exception
+     */
+    public function getCsvHeaders(string $csvFilePath): array {
+        if (($handle = fopen($csvFilePath, "r")) !== FALSE) {
+            $headers = fgetcsv($handle,1000,",");
+            fclose($handle);
+            return $headers ?: [];
+        }
+        throw new Exception("Impossible de lire le fichier CSV");
+    }
+
+    /**
      * Importation des données depuis un fichier CSV vers la base de données
      * (pour la table Student)
      * @param string $csvFilePath
      * @return bool
+     * @throws Exception
      */
     public function uploadCsvStudent(string $csvFilePath): bool {
         return $this->uploadCsv($csvFilePath, 'student', ['student_number','student_name','student_firstname','formation','class_group']);
@@ -52,6 +85,7 @@ class Dashboard{
      * (pour la table Teacher)
      * @param string $csvFilePath
      * @return bool
+     * @throws Exception
      */
     public function uploadCsvTeacher(string $csvFilePath): bool {
         return $this->uploadCsv($csvFilePath, 'teacher', ['id_teacher','teacher_name','teacher_firstname','maxi_number_trainees']);
@@ -62,6 +96,7 @@ class Dashboard{
      * (pour la table Internship)
      * @param string $csvFilePath
      * @return bool
+     * @throws Exception
      */
     public function uploadCsvInternship(string $csvFilePath): bool {
         return $this->uploadCsv($csvFilePath, 'internship', ['internship_identifier','company_name','keywords','start_date_internship','type','end_date_internship','internship_subject','address','student_number']);
@@ -76,7 +111,7 @@ class Dashboard{
      * @return bool
      * @throws Exception
      */
-    private function uploadCsv(string $csvFilePath, string $tableName): bool {
+    public function uploadCsv(string $csvFilePath, string $tableName): bool {
         $db = $this->db;
 
         if (($handle = fopen($csvFilePath, "r")) !== FALSE) {
@@ -84,15 +119,14 @@ class Dashboard{
             error_log("CSV headers: " . implode(",", $headers));
 
             if (!$this->validateHeaders($headers, $tableName)) {
-                //echo "Les colonnes du fichier CSV ne correspondent pas aux colonnes attendues par la base de données.";
-                error_log("CSV headers do not match expected headers.");
+                error_log("Les colonnes du fichier CSV ne correspondent pas aux colonnes attendues par la $tableName");
                 fclose($handle);
                 return false;
             }
 
             try {
+                $tableColumns = $this->getTableColumn($tableName);
                 while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                    $tableColumns = $this->getTableColumn($tableName);
                     $query = "INSERT INTO $tableName (" . implode(',', $tableColumns) . ") VALUES (" . implode(',', array_map(fn($i) => ":column$i", range(1, count($tableColumns)))) . ")";
                     $stmt = $db->getConn()->prepare($query);
                     foreach ($data as $index => $value) {
@@ -118,7 +152,7 @@ class Dashboard{
      * @return bool
      * @throws Exception
      */
-    private function validateHeaders(array $headers, string $tableName): bool {
+    public function validateHeaders(array $headers, string $tableName): bool {
         $tableColumns = $this->getTableColumn($tableName);
         return $headers === $tableColumns;
     }
