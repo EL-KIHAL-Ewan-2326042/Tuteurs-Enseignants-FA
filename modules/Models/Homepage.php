@@ -180,6 +180,7 @@ class Homepage {
      * Les stages sélectionnés sont uniquement ceux des élèves faisant partie d'au moins un des départements passés en paramètre
      * Les stages n'ont pas encore débuté et n'ont aucun tuteur attribué
      * @param array $departments liste des départements dont on veut récupérer les stages des élèves
+     * @param string $identifier identifiant de l'enseignant
      * @return array tableau contenant les informations relatives à chaque stage, le nombre fois où l'enseignant connecté a été le tuteur de l'élève ainsi qu'une note représentant la pertinence du stage pour l'enseignant
      */
     public function getStudentsList(array $departments, string $identifier): array {
@@ -210,7 +211,7 @@ class Homepage {
                 if(!isset($row)) continue;
                 $row['internshipTeacher'] = $this->getInternshipTeacher($internships);
             }
-            $row['requested'] = in_array($row['student_number'], $requests);
+            $row['requested'] = in_array($row['internship_identifier'], $requests);
             $row['duration'] = $this->globalModel->getDistance($row['student_number'], $identifier);
             $row['score'] = $this->calculateScore(array('Distance' => $row['duration'],
                                                         'A été responsable' => $row['internshipTeacher'] > 0 ? $row['internshipTeacher']/count($internships) : 0,
@@ -235,6 +236,27 @@ class Homepage {
             if($row['id_teacher'] == $_SESSION['identifier']) ++$internshipTeacher;
         }
         return $internshipTeacher;
+    }
+
+    public function getInternshipStudent(string $student): false|array {
+        $query = 'SELECT internship_identifier, company_name, internship_subject, id_teacher
+                    FROM internship
+                    WHERE student_number = :student
+                    AND start_date_internship > CURRENT_DATE';
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindParam(':student', $student);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function getDepStudent(string $student): false|array {
+        $query = 'SELECT department_name
+                    FROM study_at
+                    WHERE student_number = :student';
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindParam(':student', $student);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public function getCoef($identifier): array {
@@ -314,7 +336,7 @@ class Homepage {
      * @return false|array tableau contenant le numéro d'étudiant de l'élève du stage dont l'enseignant connecté a fait la demande, false sinon
      */
     public function getRequests(): false|array {
-        $query = 'SELECT student_number
+        $query = 'SELECT internship_identifier
                     FROM is_requested
                     WHERE  id_teacher = :teacher';
         $stmt = $this->db->getConn()->prepare($query);
@@ -325,7 +347,7 @@ class Homepage {
 
     /**
      * Met à jour la table is_requested en fonction des stages demandés par l'enseignant connecté
-     * @param array $requests tableau contenant les numéro d'étudiant que l'enseignant souhaite tutorer
+     * @param array $requests tableau contenant les numéro de stage que l'enseignant souhaite tutorer
      * @return true|string renvoie true si les insert et delete ont fonctionné, sinon l'erreur dans un string
      */
     public function updateRequests(array $requests): bool|string {
@@ -336,11 +358,11 @@ class Homepage {
         $to_delete = array_diff($current_requests, $requests);
 
         foreach($to_add as $request) {
-            $query = 'INSERT INTO is_requested(id_teacher, student_number)
-                        VALUES(:teacher, :student)';
+            $query = 'INSERT INTO is_requested(id_teacher, internship_identifier)
+                        VALUES(:teacher, :internship)';
             $stmt = $this->db->getConn()->prepare($query);
             $stmt->bindParam(':teacher', $_SESSION['identifier']);
-            $stmt->bindParam(':student', $request);
+            $stmt->bindParam(':internship', $request);
 
             try {
                 $stmt->execute();
@@ -352,10 +374,10 @@ class Homepage {
         foreach($to_delete as $request) {
             $query = 'DELETE FROM is_requested
                         WHERE  id_teacher = :teacher
-                        AND student_number = :student';
+                        AND internship_identifier = :internship';
             $stmt = $this->db->getConn()->prepare($query);
             $stmt->bindParam(':teacher', $_SESSION['identifier']);
-            $stmt->bindParam(':student', $request);
+            $stmt->bindParam(':internship', $request);
 
             try {
                 $stmt->execute();

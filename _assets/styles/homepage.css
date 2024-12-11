@@ -31,7 +31,11 @@ main a:hover {
     color: var(--main-color);
 }
 
-main form {
+.btn {
+    z-index: 0;
+}
+
+.table {
     max-width: 85%;
 }
 
@@ -52,10 +56,10 @@ main form {
 }
 
 thead {
-    background-color: #246D9A80;
+    background-color: #91B5CC;
     position: sticky;
     top: 0;
-    z-index: 2;
+    z-index: 1;
 }
 
 main table {

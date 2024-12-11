@@ -38,7 +38,9 @@ class GlobalModel {
                     ON student.student_number = study_at.student_number
                     JOIN internship
                     ON student.student_number = internship.student_number
-                    WHERE department_name = :dep';
+                    WHERE department_name = :dep
+                    AND id_teacher IS NULL
+                    AND start_date_internship > CURRENT_DATE';
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':dep', $department);
         $stmt->execute();
