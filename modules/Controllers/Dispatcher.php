@@ -36,30 +36,37 @@ class Dispatcher {
     }
 
     public function show(): void {
-        $db = Database::getInstance();
-        $globalModel = new \Blog\Models\GlobalModel($db);
-        $dispatcherModel = new \Blog\Models\Dispatcher($db, $globalModel);
-        $errorMessage = '';
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (isset($_POST['Internship_identifier']) && isset($_POST['Id_teacher'])) {
-                $errorMessage = $this->association($db, $dispatcherModel);
+        if (isset($_SESSION['role_name']) && (
+                (is_array($_SESSION['role_name']) && in_array('Admin_dep', $_SESSION['role_name'])) ||
+                ($_SESSION['role_name'] === 'Admin_dep'))) {
+            $db = Database::getInstance();
+            $globalModel = new \Blog\Models\GlobalModel($db);
+            $dispatcherModel = new \Blog\Models\Dispatcher($db, $globalModel);
+            $errorMessage = '';
+
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                if (isset($_POST['Internship_identifier']) && isset($_POST['Id_teacher'])) {
+                    $errorMessage = $this->association($db, $dispatcherModel);
+                }
+                if (isset($_POST['id_teacher'])) {
+                    $dispatcherModel->insertIs_responsible();
+                }
             }
-            if (isset($_POST['id_teacher'])) {
-                $dispatcherModel->insertIs_responsible();
-            }
+
+
+            $title = "Dispatcher";
+            $cssFilePath = '_assets/styles/dispatcher.css';
+            $jsFilePath = '_assets/scripts/dispatcher.js';
+            $view = new \Blog\Views\Dispatcher($dispatcherModel, $errorMessage);
+
+            $layout = new Layout();
+            $layout->renderTop($title, $cssFilePath);
+            $view->showView();
+            $layout->renderBottom($jsFilePath);
         }
-
-
-        $title = "Dispatcher";
-        $cssFilePath = '_assets/styles/dispatcher.css';
-        $jsFilePath = '_assets/scripts/dispatcher.js';
-        $view = new \Blog\Views\Dispatcher($dispatcherModel, $errorMessage);
-
-        $layout = new Layout();
-        $layout->renderTop($title, $cssFilePath);
-        $view->showView();
-        $layout->renderBottom($jsFilePath);
-
+        else {
+            header('Location: /homepage');
+        }
     }
 }
