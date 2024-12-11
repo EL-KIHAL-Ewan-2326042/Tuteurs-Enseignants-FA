@@ -107,7 +107,6 @@ class Dashboard{
      * pour une table donnée
      * @param string $csvFilePath
      * @param string $tableName
-     * @param array $expectedHeaders
      * @return bool
      * @throws Exception
      */
@@ -127,9 +126,19 @@ class Dashboard{
             try {
                 $tableColumns = $this->getTableColumn($tableName);
                 while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+                    if (count($data) !== count($tableColumns)) {
+                        error_log("Données CSV non valides : nombre de colonnes incorrect.");
+                        continue;
+                    }
+
                     $query = "INSERT INTO $tableName (" . implode(',', $tableColumns) . ") VALUES (" . implode(',', array_map(fn($i) => ":column$i", range(1, count($tableColumns)))) . ")";
                     $stmt = $db->getConn()->prepare($query);
                     foreach ($data as $index => $value) {
+                        error_log("Value type at column $index: " . gettype($value));
+                        if (is_array($value)) {
+                            error_log("Value type at column $index: " . json_encode($value));
+                            $value = implode(',', $value);
+                        }
                         $stmt->bindValue(":column" . ($index + 1), $value);
                     }
                     $stmt->execute();
@@ -153,9 +162,15 @@ class Dashboard{
      * @throws Exception
      */
     public function validateHeaders(array $headers, string $tableName): bool {
-        $tableColumns = $this->getTableColumn($tableName);
-        return $headers === $tableColumns;
+        $tableColumns = array_map('strtolower', $this->getTableColumn($tableName));
+        $csvHeaders = array_map('strtolower', $headers);
+        if (array_diff($csvHeaders, $tableColumns)) {
+            throw new Exception("Les colonnes CSV ne correspondent pas à la table $tableName.");
+        }
+
+        return empty(array_diff($csvHeaders, $tableColumns));
     }
+
 
     /**
      * Exportation des données de la base de données vers un fichier CSV
@@ -185,28 +200,63 @@ class Dashboard{
 
         fputcsv($output, $headers);
 
-        $query = "SELECT " . implode(',',array_map(fn($headers) => "$tableName.$headers", $headers)). " FROM $tableName";
+        if (empty($headers)) {
+            throw new Exception("Les en-têtes sont manquants ou invalides pour la table $tableName.");
+        }
+
+        // Convertir explicitement chaque valeur en chaîne
+        $query = "SELECT " . implode(',', array_map(fn($header) => "$tableName." . (string)$header, $headers)) . " FROM $tableName";
 
         //condition filtrant par département
         $query .= match ($tableName) {
+//            'teaches', 'department', 'study_at' => " WHERE department_name = :department",
+//            'is_requested' => " JOIN study_at ON is_requested.student_number = study_at.student_number WHERE study_at.department_name = :department",
+//            'is_taught' => " JOIN teaches ON is_taught.id_teacher = teaches.id_teacher WHERE teaches.department_name = :department",
+//            'is_responsible' => " JOIN study_at ON is_responsible.student_number = study_at.student_number WHERE study_at.department_name = :department",
+//            'discipline' => " JOIN is_taught ON discipline.discipline_name = is_taught.discipline_name JOIN teaches ON is_taught.id_teacher = teaches.id_teacher WHERE teaches.department_name = :department",
+//            'address_type' => " JOIN has_address ON address_type.type = has_address.type JOIN teaches ON has_address.id_teacher = teaches.id_teacher WHERE teaches.department_name = :department",
+//            'addr_name' => " JOIN has_address ON addr_name.address = has_address.address JOIN teaches ON has_address.id_teacher = teaches.id_teacher WHERE teaches.department_name = :department",
+//            'has_address' => " JOIN teaches ON has_address.id_teacher = teaches.id_teacher WHERE teaches.department_name = :department",
+//            'has_role' => " WHERE role_department = :department",
+//            'role' => " JOIN has_role ON role.role_name = has_role.role_name WHERE role_department = :department",
+//            'user_connect' => " JOIN has_role ON user_connect.user_id = has_role.user_id WHERE role_department = :department",
+//            'backup' => " JOIN has_role ON backup.user_id = has_role.user_id WHERE role_department = :department",
+//            'distribution_criteria' => " JOIN backup ON distribution_criteria.name_criteria = backup.name_criteria JOIN has_role ON backup.user_id = has_role.user_id WHERE role_department = :department",
+
+            'internship' => " JOIN student ON internship.student_number = student.student_number JOIN study_at ON study_at.student_number = student.student_number WHERE study_at.department_name = :department",
             'student' => " JOIN study_at ON student.student_number = study_at.student_number WHERE study_at.department_name = :department",
-            'teacher' => " JOIN teaches ON teacher.id_teacher = teaches.id_teacher WHERE teaches.department_name = :department",
-            'internship' => " JOIN study_at ON internship.student_number = study_at.student_number WHERE study_at.department_name = :department",
-            'teaches', 'department', 'study_at' => " WHERE department_name = :department",
-            'is_requested' => " JOIN study_at ON is_requested.student_number = study_at.student_number WHERE study_at.department_name = :department",
-            'is_taught' => " JOIN teaches ON is_taught.id_teacher = teaches.id_teacher WHERE teaches.department_name = :department",
-            'is_responsible' => " JOIN study_at ON is_responsible.student_number = study_at.student_number WHERE study_at.department_name = :department",
-            'discipline' => " JOIN is_taught ON discipline.discipline_name = is_taught.discipline_name JOIN teaches ON is_taught.id_teacher = teaches.id_teacher WHERE teaches.department_name = :department",
-            'address_type' => " JOIN has_address ON address_type.type = has_address.type JOIN teaches ON has_address.id_teacher = teaches.id_teacher WHERE teaches.department_name = :department",
-            'addr_name' => " JOIN has_address ON addr_name.address = has_address.address JOIN teaches ON has_address.id_teacher = teaches.id_teacher WHERE teaches.department_name = :department",
-            'has_address' => " JOIN teaches ON has_address.id_teacher = teaches.id_teacher WHERE teaches.department_name = :department",
-            'has_role' => " WHERE role_department = :department",
-            'role' => " JOIN has_role ON role.role_name = has_role.role_name WHERE role_department = :department",
-            'user_connect' => " JOIN has_role ON user_connect.user_id = has_role.user_id WHERE role_department = :department",
-            'backup' => " JOIN has_role ON backup.user_id = has_role.user_id WHERE role_department = :department",
-            'distribution_criteria' => " JOIN backup ON distribution_criteria.name_criteria = backup.name_criteria JOIN has_role ON backup.user_id = has_role.user_id WHERE role_department = :department",
+            'teacher' => " JOIN has_role ON teacher.id_teacher = has_role.user_id JOIN department ON department.department_name = has_role.department_name WHERE department.department_name = :department",
+//            'is_requested',
+//            'discipline',
+//            'is_taught',
+//            'distance',
+//            'type_address',
+//            'has_address',
+//            'role',
+//            'has_role',
+//            'department',
+//            'study_at',
+//            'user_connect',
+//            'addr_name',
+//            '_backup_',
+//            'id_backup',
+//            'distribution_criteria',
+
+
+
+
             default => throw new Exception("Table non reconnue : " . $tableName),
         };
+
+        // Vérifier et logger la valeur de $department
+        if (is_array($department)) {
+            error_log("Department is an array: " . json_encode($department));
+            // Si c'est un tableau, vous pouvez choisir de récupérer un seul élément (par exemple le premier)
+            $department = $department[0] ?? '';  // ou une autre logique selon votre cas
+        }
+
+        error_log("Department value: " . $department);  // Vérifier la valeur finale
+
 
         //préparation et exécution de la requête
         $stmt = $db->getConn()->prepare($query);
@@ -214,9 +264,24 @@ class Dashboard{
         $stmt->execute();
 
         //écriture des données récupérées
-        while ($row =$stmt->fetch(PDO::FETCH_ASSOC)) {
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+
+            foreach ($row as $key => $value) {
+
+                if (is_array($value)) {
+                    $value = array_map(function ($item){
+                        return is_array($item) ? implode(',', $item) : $item;
+                    }, $value);
+                    $row[$key] = implode(',', $value);
+                } elseif (is_object($value)) {
+                    $row[$key] = json_encode($value);
+                } elseif (is_null($value)) {
+                    $row[$key] = '';
+                }
+            }
             fputcsv($output, $row);
         }
+
 
         fclose($output);
         $csvData = ob_get_clean();
