@@ -145,26 +145,13 @@ class Dispatcher{
             $listTeacherIntership[$teacher['id_teacher']] = $teacher['current_count'] ?: 0;
         }
 
-        $query = "SELECT internship.Student_number 
-              FROM internship
-              JOIN Study_at ON Study_at.Student_number = internship.Student_number 
-              WHERE Department_name IN ($placeholders)";
-        $stmt = $db->getConn()->prepare($query);
-        $stmt->execute($roleDepartments);
-
-        $responsibleStudents = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
         $listFinal = [];
         $listStart = [];
         $listEleveFinal = [];
 
         foreach ($listTeacherIntership as $teacherId => $currentCount) {
             foreach ($this->calculateRelevanceTeacherStudents($teacherId, $dicoCoef) as $association) {
-                if (!in_array($association['student_number'], $responsibleStudents)) {
-                    $listStart[] = $association;
-                } else {
-                    $listEleveFinal[] = $association['student_number'];
-                }
+               $listStart[] = $association;
             }
         }
 
