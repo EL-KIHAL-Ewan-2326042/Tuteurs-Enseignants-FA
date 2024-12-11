@@ -13,9 +13,28 @@ class Dashboard{
             <h3> Dashboard </h3>
             <div class="card-panel white">
                 <h4>Importer :</h4>
+<!--                <div class="row">-->
+<!--                    <h5> Rajouter des étudiants : </h5>-->
+<!--                    <form action="/dashboard" method="POST" enctype="multipart/form-data">-->
+<!--                        <div class="file-field input-field">-->
+<!--                            <div class="btn">-->
+<!--                                <span>Fichier CSV</span>-->
+<!--                                <input type="file" name="csv_file_student" id="csv_file_student" accept=".csv" multiple>-->
+<!--                            </div>-->
+<!--                            <div class="file-path-wrapper">-->
+<!--                                <input class="file-path validate" type="text" placeholder="Choisissez un fichier CSV" required>-->
+<!--                            </div>-->
+<!--                            <button class="btn waves-effect waves-light" type="submit" name="submit_student">Valider-->
+<!--                                <i class="material-icons right">send</i>-->
+<!--                            </button>-->
+<!--                        </div>-->
+<!--                    </form>-->
+<!--                </div>-->
+
                 <div class="row">
                     <h5> Rajouter des étudiants : </h5>
                     <form action="/dashboard" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="table_name" value="student"> <!-- Champ caché pour spécifier la table -->
                         <div class="file-field input-field">
                             <div class="btn">
                                 <span>Fichier CSV</span>

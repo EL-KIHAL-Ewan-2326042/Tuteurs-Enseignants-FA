@@ -37,21 +37,35 @@ class Dashboard {
                 ($_SESSION['role_name'] === 'Admin_dep'))) {
 
             if($_SERVER["REQUEST_METHOD"] == "POST") {
-                if (isset($_FILES['csv_file_student'])) {
-                    $csvFile = $_FILES['csv_file_student']['tmp_name'];
-                    $tableName = $_POST['table_name'];
+                if (isset($_FILES['csv_file_student']) || isset($_FILES['csv_file_teacher']) || isset($_FILES['csv_file_internship'])) {
+                    // Récupération du nom de la table à partir du champ caché
+                    $tableName = $_POST['table_name'] ?? null;
+
 
                     if ($tableName && $model->isValidTable($tableName)) {
                         try {
-                            $csvHeaders = $model->getCsvHeaders($csvFile);
-                            if(!$model->validateHeaders($csvHeaders,$tableName)) {
-                                echo "Les en-têtes du fichier CSV ne correspondent pas à la structure de la table $tableName.";
-                                return;
+                            $csvFile = null;
+                            // Déterminer quel fichier CSV a été téléchargé
+                            if (isset($_FILES['student'])) {
+                                $csvFile = $_FILES['student']['tmp_name'];
+                            } elseif (isset($_FILES['teacher'])) {
+                                $csvFile = $_FILES['teacher']['tmp_name'];
+                            } elseif (isset($_FILES['internship'])) {
+                                $csvFile = $_FILES['internship']['tmp_name'];
                             }
 
-                            if (!$model->uploadCsv($csvFile,$tableName)) {
-                                echo "Échec de l'importation du fichier CSV pour les étudiants.";
+                            if ($csvFile) {
+                                $csvHeaders = $model->getCsvHeaders($csvFile);
+                                if (!$model->validateHeaders($csvHeaders, $tableName)) {
+                                    echo "Les en-têtes du fichier CSV ne correspondent pas à la structure de la table $tableName.";
+                                    return;
+                                }
+
+                                if (!$model->uploadCsv($csvFile, $tableName)) {
+                                    echo "Échec de l'importation du fichier CSV pour les étudiants.";
+                                }
                             }
+                            
                         } catch (Exception $e) {
                             echo "Erreur lors de l'importation : " . $e->getMessage();
                         }
