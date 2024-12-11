@@ -115,7 +115,6 @@ class Dashboard{
 
         if (($handle = fopen($csvFilePath, "r")) !== FALSE) {
             $headers = fgetcsv($handle, 1000, ",");
-            error_log("CSV headers: " . implode(",", $headers));
 
             if (!$this->validateHeaders($headers, $tableName)) {
                 error_log("Les colonnes du fichier CSV ne correspondent pas aux colonnes attendues par la $tableName");
@@ -125,6 +124,11 @@ class Dashboard{
 
             try {
                 $tableColumns = $this->getTableColumn($tableName);
+                error_log("Nom de la table pour l'importation : " . $tableName);
+                error_log("En-têtes du fichier CSV : " . implode(", ", $headers));
+                error_log("Colonnes de la table $tableName : " . implode(", ", $tableColumns));
+
+
                 while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                     if (count($data) !== count($tableColumns)) {
                         error_log("Données CSV non valides : nombre de colonnes incorrect.");
@@ -209,6 +213,7 @@ class Dashboard{
 
         //condition filtrant par département
         $query .= match ($tableName) {
+            //requetes pour les tables de l'ancienne BD
 //            'teaches', 'department', 'study_at' => " WHERE department_name = :department",
 //            'is_requested' => " JOIN study_at ON is_requested.student_number = study_at.student_number WHERE study_at.department_name = :department",
 //            'is_taught' => " JOIN teaches ON is_taught.id_teacher = teaches.id_teacher WHERE teaches.department_name = :department",
@@ -248,15 +253,11 @@ class Dashboard{
             default => throw new Exception("Table non reconnue : " . $tableName),
         };
 
-        // Vérifier et logger la valeur de $department
+        //vérification de la valeur de $department
         if (is_array($department)) {
             error_log("Department is an array: " . json_encode($department));
-            // Si c'est un tableau, vous pouvez choisir de récupérer un seul élément (par exemple le premier)
-            $department = $department[0] ?? '';  // ou une autre logique selon votre cas
+            $department = $department[0] ?? '';
         }
-
-        error_log("Department value: " . $department);  // Vérifier la valeur finale
-
 
         //préparation et exécution de la requête
         $stmt = $db->getConn()->prepare($query);
@@ -265,20 +266,6 @@ class Dashboard{
 
         //écriture des données récupérées
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-
-            foreach ($row as $key => $value) {
-
-                if (is_array($value)) {
-                    $value = array_map(function ($item){
-                        return is_array($item) ? implode(',', $item) : $item;
-                    }, $value);
-                    $row[$key] = implode(',', $value);
-                } elseif (is_object($value)) {
-                    $row[$key] = json_encode($value);
-                } elseif (is_null($value)) {
-                    $row[$key] = '';
-                }
-            }
             fputcsv($output, $row);
         }
 
