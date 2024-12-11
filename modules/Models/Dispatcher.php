@@ -117,7 +117,6 @@ class Dispatcher{
      */
     public function dispatcher(array $dicoCoef): array
     {
-
         $db = $this->db;
 
         $roleDepartments = $_SESSION['role_department'];
@@ -133,7 +132,6 @@ class Dispatcher{
                   GROUP BY Teacher.Id_teacher";
 
         $stmt = $db->getConn()->prepare($query);
-
         $stmt->execute($roleDepartments);
 
         $teacherData = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -184,11 +182,14 @@ class Dispatcher{
      * @return array|false
      */
     public function createListTeacher() {
-        $query = 'SELECT Teacher.Id_teacher FROM Teacher JOIN Teaches ON Teacher.Id_teacher = Teaches.Id_teacher
-                    where Department_name = :Role_department';
+        $roleDepartments = $_SESSION['role_department'];
+        $placeholders = implode(',', array_fill(0, count($roleDepartments), '?'));
+
+        $query = "SELECT Teacher.Id_teacher FROM Teacher JOIN Has_role ON Teacher.Id_Teacher = Has_role.User_id
+                    where Department_name IN ($placeholders)";
+
         $stmt = $this->db->getConn()->prepare($query);
-        $stmt->bindParam(':Role_department', $_SESSION['role_department']);
-        $stmt->execute();
+        $stmt->execute($roleDepartments);
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
@@ -197,12 +198,15 @@ class Dispatcher{
      * retourne un array composé de la liste des eleves inscrit dans le departement de l'admin de la BD, à défaut false
      * @return array|false
      */
-    public function createListStudent() {
-        $query = 'SELECT Student.Student_number FROM Student JOIN Study_at ON Student.Student_number = Study_at.Student_number
-                    where Department_name = :Role_department';
+
+    public function createListInternship() {
+        $roleDepartments = $_SESSION['role_department'];
+        $placeholders = implode(',', array_fill(0, count($roleDepartments), '?'));
+
+        $query = "SELECT Internship.Internship_identifier FROM Internship JOIN Study_at ON Internship.Student_number = Study_at.Student_number
+                    where Department_name IN ($placeholders)";
         $stmt = $this->db->getConn()->prepare($query);
-        $stmt->bindParam(':Role_department', $_SESSION['role_department']);
-        $stmt->execute();
+        $stmt->execute($roleDepartments);
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
 
@@ -212,12 +216,14 @@ class Dispatcher{
      * @return array|false
      */
     public function createListAssociate() {
-        $query = 'SELECT internship.Student_number, internship.Id_teacher FROM internship JOIN Study_at ON internship.Student_number = Study_at.Student_number
-                    where Department_name = :Role_department';
+        $roleDepartments = $_SESSION['role_department'];
+        $placeholders = implode(',', array_fill(0, count($roleDepartments), '?'));
+
+        $query = "SELECT internship.Id_teacher, internship.Internship_identifier FROM internship JOIN Study_at ON internship.Student_number = Study_at.Student_number
+                    WHERE Department_name IN ($placeholders) AND internship.Id_teacher IS NOT NULL";
         $stmt = $this->db->getConn()->prepare($query);
-        $stmt->bindParam(':Role_department', $_SESSION['role_department']);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+        $stmt->execute($roleDepartments);
+        return $stmt->fetchAll(PDO::FETCH_NUM);
     }
 
     /**
@@ -225,14 +231,12 @@ class Dispatcher{
      * @return string Valeur confirmant l'insertion
      */
     public function insertResponsible() {
-        $query = 'INSERT INTO internship (Id_teacher, Student_number, responsible_start_date, responsible_end_date) VALUES (:Id_teacher, :Student_number, :Start_date, :End_date)';
+        $query = 'UPDATE internship SET Id_teacher = :Id_teacher WHERE Internship_identifier = :Internship_identifier';
         $stmt = $this->db->getConn()->prepare($query);
-        $stmt->bindParam(':Student_number', $_POST['Student_number']);
+        $stmt->bindParam(':Internship_identifier', $_POST['Internship_identifier']);
         $stmt->bindParam(':Id_teacher', $_POST['Id_teacher']);
-        $stmt->bindParam(':Start_date', $_POST['Start_date']);
-        $stmt->bindParam(':End_date', $_POST['End_date']);
         $stmt->execute();
-        return "Association " . $_POST['Id_teacher'] . " et " . $_POST['Student_number'] . " enregistré.";
+        return "Association " . $_POST['Id_teacher'] . " et " . $_POST['Internship_identifier'] . " enregistrée.";
     }
 
     /**
