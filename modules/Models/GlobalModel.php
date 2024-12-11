@@ -145,7 +145,6 @@ class GlobalModel {
      * @return int distance en minute entre les deux
      */
     public function getDistance(string $idStudent, string $idTeacher): int {
-        return 50;
 
         $query = 'SELECT Address FROM Internship WHERE Student_number = :idStudent';
         $stmt1 = $this->db->getConn()->prepare($query);
@@ -182,45 +181,56 @@ class GlobalModel {
     }
 
     /**
-     * Requete a l'api de google pour renvoyer la distance entre deux points
-     * @param array $latLngStudent lattitude et longitude de l'origine
-     * @param array $latLngTeacher longitude et longitude de l'origine
-     * @return float|int|null distance en minute ou decimal. Renvoie null si erreur
+     * Calcule la durée entre deux points avec OSRM
+     * @param array $latLngStudent Latitude et longitude de l'origine
+     * @param array $latLngTeacher Latitude et longitude de la destination
+     * @return float|int|null Durée en minutes, ou null en cas d'erreur
      */
     private function calculateDuration(array $latLngStudent, array $latLngTeacher): float|int|null
     {
-        $apiKey = 'AIzaSyCBS2OwTaG2rfupX3wA-DlTbsBEG9yDVKk';
-        $url = "https://maps.googleapis.com/maps/api/directions/json?origin={$latLngStudent['lat']},{$latLngStudent['lng']}&destination={$latLngTeacher['lat']},{$latLngTeacher['lng']}&key=" . $apiKey;
+        $url = "http://router.project-osrm.org/route/v1/driving/{$latLngStudent['lng']},{$latLngStudent['lat']};{$latLngTeacher['lng']},{$latLngTeacher['lat']}?overview=false&alternatives=false&steps=false";
 
-        $response = file_get_contents($url);
+        $options = [
+            "http" => [
+                "header" => "User-Agent: MonApplication/1.0 (contact@monapplication.com)"
+            ]
+        ];
+
+        $context = stream_context_create($options);
+        $response = file_get_contents($url, false, $context);
         $data = json_decode($response, true);
 
-        if ($data['status'] === 'OK') {
-            return $data['routes'][0]['legs'][0]['duration']['value'] / 60;
+        if (isset($data['routes'][0]['duration'])) {
+            return round($data['routes'][0]['duration'] / 60);
         }
         return null;
     }
 
     /**
-     * Geocode une addresse
+     * Géocode une adresse
      * @param string $address
-     * @return array|null contient lattitude et longitude
+     * @return array|null Contient latitude et longitude
      */
     private function geocodeAddress(string $address): ?array
     {
-        $apiKey = 'AIzaSyCBS2OwTaG2rfupX3wA-DlTbsBEG9yDVKk';
-        $url = "https://maps.googleapis.com/maps/api/geocode/json?address=" . urlencode($address) . "&key=" . $apiKey;
+        $url = "https://nominatim.openstreetmap.org/search?format=json&q=" . urlencode($address);
 
-        $response = file_get_contents($url);
+        $options = [
+            "http" => [
+                "header" => "User-Agent: MonApplication/1.0 (contact@monapplication.com)"
+            ]
+        ];
+
+        $context = stream_context_create($options);
+        $response = file_get_contents($url, false, $context);
         $data = json_decode($response, true);
 
-        if ($data['status'] === 'OK') {
+        if (!empty($data)) {
             return [
-                'lat' => $data['results'][0]['geometry']['location']['lat'],
-                'lng' => $data['results'][0]['geometry']['location']['lng']
+                'lat' => $data[0]['lat'],
+                'lng' => $data[0]['lon']
             ];
         }
         return null;
     }
-
 }

@@ -139,182 +139,148 @@ function selectStudent(studentId, studentFirstName, studentLastName) {
  * Partie2: Map Intéractive
  */
 
-let companyLocation, teacherLocation;
-let directionsService, directionsRenderer;
-
 /**
- * Appellé lors du chargement de la homepage, initialise la map selon l'addresse du professeur et du stage
+ * Initialise la carte en fonction des adresses du professeur et de l'entreprise
  * @returns {Promise<void>}
  */
 async function initMap() {
-    if (typeof companyAddress === 'undefined' || typeof teacherAddress === 'undefined') {
+    const mapElement = document.getElementById("map");
+
+    if (!mapElement) {
+        console.error("Élément de la carte introuvable");
         return;
     }
 
-    companyLocation = await geocodeAddress(companyAddress);
-    teacherLocation = await geocodeAddress(teacherAddress);
+    if (typeof companyAddress === "undefined" || typeof teacherAddress === "undefined") {
+        console.error("'companyAddress' ou 'teacherAddress' est indéfini.");
+        return;
+    }
 
-    const centerPoint = { lat: teacherLocation.lat, lng: teacherLocation.lng };
-
-    const map = new google.maps.Map(document.getElementById("map"), {
-        center: centerPoint,
-        zoom: 13,
-        mapId: "HOMEPAGE"
-    });
-
-    directionsService = new google.maps.DirectionsService();
-    directionsRenderer = new google.maps.DirectionsRenderer({
-        suppressMarkers: true
-    });
-
-
-    const companyMarker = new google.maps.marker.AdvancedMarkerElement ({
-        map,
-        position: companyLocation,
-        title: "Company",
-        content: document.createElement('div'),
-    });
-
-    const teacherMarker = new google.maps.marker.AdvancedMarkerElement ({
-        map,
-        position: teacherLocation,
-        title: "Teacher",
-        content: document.createElement('div'),
-    });
-
-    companyMarker.content.innerHTML = `
-    <div style="
-        background-color: white;
-        padding: 5px;
-        border: 1px solid black;
-        border-radius: 4px;
-        font-size: 16px;
-        color: black;
-        text-align: center;
-    ">
-        Entreprise
-    </div>
-    `;
-
-    teacherMarker.content.innerHTML = `
-    <div style="
-        background-color: white;
-        padding: 5px;
-        border: 1px solid black;
-        border-radius: 4px;
-        font-size: 16px;
-        color: black;
-        text-align: center;
-    ">
-        Domicile
-    </div>
-    `;
-
-    directionsRenderer.setMap(map);
-
-    await calculateDistance({ lat: companyLocation.lat, lng: companyLocation.lng }, { lat: teacherLocation.lat, lng: teacherLocation.lng }, 0);
-}
-
-/**
- * Calcul la durée du trajet entre un point d'origine et la destination
- * @param origin
- * @param destination
- * @returns {Promise<unknown>}
- */
-function getDistanceMatrix(origin, destination) {
-    return new Promise((resolve, reject) => {
-        const service = new google.maps.DistanceMatrixService();
-        service.getDistanceMatrix(
-            {
-                origins: [origin],
-                destinations: [destination],
-                travelMode: google.maps.TravelMode.DRIVING,
-                unitSystem: google.maps.UnitSystem.METRIC,
-            },
-            (response, status) => {
-                if (status === 'OK') {
-                    resolve(response);
-                } else {
-                    reject('Erreur: ' + status);
-                }
-            }
-        );
-    });
-}
-
-/**
- * Permet d'avoir la route la plus optimale, en voiture, entre le point d'origine et de destination
- * @param origin
- * @param destination
- * @returns {Promise<unknown>}
- */
-function getRoute(origin, destination) {
-    return new Promise((resolve, reject) => {
-        directionsService.route(
-            {
-                origin: origin,
-                destination: destination,
-                travelMode: 'DRIVING',
-                drivingOptions: {
-                    departureTime: new Date(),
-                    trafficModel: 'pessimistic'
-                },
-            },
-            (response, status) => {
-                if (status === 'OK') {
-                    directionsRenderer.setDirections(response);
-                    resolve(response);
-                } else {
-                    if (status === 'UNKNOWN_ERROR') {
-                        reject('Distance trop loin pour être calculée');
-                    }
-                    else {
-                        reject('Erreur lors du calcul des routes: ' + status);
-                    }
-                }
-            }
-        );
-    });
-}
-
-/**
- * Geocode une adresse en lattitude et longitude
- * @param address
- * @returns {Promise<unknown>}
- */
-function geocodeAddress(address) {
-    const geocoder = new google.maps.Geocoder();
-
-    return new Promise((resolve, reject) => {
-        geocoder.geocode({ 'address': address }, (results, status) => {
-            if (status === 'OK') {
-                const location = results[0].geometry.location;
-                resolve({ lat: location.lat(), lng: location.lng() });
-            } else {
-                reject('Geocoding failed: ' + status);
-            }
-        });
-    });
-}
-
-/**
- * Calcul la distance et la durée renvoyées pour la matrix
- * @returns {Promise<void>}
- */
-async function calculateDistance(origin, destination, type) {
     try {
-        const response = await getDistanceMatrix(origin, destination);
-        const result = response.rows[0].elements[0];
+        const companyLocation = await geocodeAddress(companyAddress);
+        const teacherLocation = await geocodeAddress(teacherAddress);
 
-        if (type === 0) {
-            await getRoute(origin, destination);
-        }
-        else if (type === 1) {
-            return result.duration;
-        }
+        const map = new ol.Map({
+            target: mapElement,
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM(),
+                }),
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([
+                    (companyLocation.lon + teacherLocation.lon) / 2,
+                    (companyLocation.lat + teacherLocation.lat) / 2,
+                ]),
+                zoom: 6,
+            }),
+        });
 
+        const companyMarker = new ol.Overlay({
+            position: ol.proj.fromLonLat([companyLocation.lon, companyLocation.lat]),
+            element: createMarkerElement("Entreprise"),
+        });
+        const teacherMarker = new ol.Overlay({
+            position: ol.proj.fromLonLat([teacherLocation.lon, teacherLocation.lat]),
+            element: createMarkerElement("Professeur"),
+        });
+
+        map.addOverlay(companyMarker);
+        map.addOverlay(teacherMarker);
+
+        await calculateDistance(companyLocation, teacherLocation, map);
     } catch (error) {
-        alert(error);
+        console.error("Erreur lors de l'initialisation de la carte :", error);
     }
 }
 
+/**
+ * Géocode une adresse
+ * @param {string} address Adresse à géocoder
+ * @returns {Promise<Object>} Localisation géocodée { lat, lon }
+ */
+async function geocodeAddress(address) {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+        address
+    )}&format=json&limit=1`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.length > 0 && data[0].lat && data[0].lon) {
+            return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+        } else {
+            throw new Error("Le géocodage n'a retourné aucun résultat.");
+        }
+    } catch (error) {
+        console.error("Erreur de géocodage :", error);
+        throw error;
+    }
+}
+
+/**
+ * Calcule et affiche la route entre deux points
+ * @param {Object} origin Coordonnées de l'origine { lat, lon }
+ * @param {Object} destination Coordonnées de la destination { lat, lon }
+ * @param {Object} map Instance de la carte OpenLayers
+ */
+async function calculateDistance(origin, destination, map) {
+    const url = `https://router.project-osrm.org/route/v1/driving/${origin.lon},${origin.lat};${destination.lon},${destination.lat}?overview=full&geometries=geojson`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.routes && data.routes.length > 0) {
+            const route = data.routes[0];
+
+            console.log(`Distance : ${route.distance} mètres`);
+            console.log(`Durée : ${route.duration} secondes`);
+
+            // Afficher la route sur la carte
+            const routeCoords = route.geometry.coordinates.map((coord) =>
+                ol.proj.fromLonLat(coord)
+            );
+
+            const routeLayer = new ol.layer.Vector({
+                source: new ol.source.Vector({
+                    features: [
+                        new ol.Feature({
+                            geometry: new ol.geom.LineString(routeCoords),
+                        }),
+                    ],
+                }),
+                style: new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: "red",
+                        width: 3,
+                    }),
+                }),
+            });
+
+            map.addLayer(routeLayer);
+        } else {
+            console.error("Aucun itinéraire trouvé.");
+        }
+    } catch (error) {
+        console.error("Erreur lors de la récupération de l'itinéraire :", error);
+    }
+}
+
+/**
+ * Crée un élément de marqueur
+ * @param {string} label Étiquette du marqueur
+ * @returns {HTMLElement} Élément du marqueur
+ */
+function createMarkerElement(label) {
+    const marker = document.createElement("div");
+    marker.className = "marker";
+    marker.textContent = label;
+    marker.style.backgroundColor = "blue";
+    marker.style.color = "white";
+    marker.style.padding = "5px";
+    marker.style.borderRadius = "50%";
+    marker.style.textAlign = "center";
+    return marker;
+}
