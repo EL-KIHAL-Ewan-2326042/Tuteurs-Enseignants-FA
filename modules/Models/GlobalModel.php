@@ -143,6 +143,8 @@ class GlobalModel {
      * @return int distance en minute entre les deux
      */
     public function getDistance(string $idStudent, string $idTeacher): int {
+        return 50;
+
         $query = 'SELECT Address FROM Internship WHERE Student_number = :idStudent';
         $stmt1 = $this->db->getConn()->prepare($query);
         $stmt1->bindParam(':idStudent', $idStudent);

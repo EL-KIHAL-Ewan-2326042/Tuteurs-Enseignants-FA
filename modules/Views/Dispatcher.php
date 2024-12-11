@@ -1,12 +1,11 @@
 <?php
-
 namespace Blog\Views;
 
 /**
  * Vue du Dispatcher
  * @return void
  */
-class Dispatcher{
+class Dispatcher {
 
     /**
      * @param \Blog\Models\Dispatcher $dispatcherModel
@@ -14,41 +13,50 @@ class Dispatcher{
      */
     public function __construct(private readonly \Blog\Models\Dispatcher $dispatcherModel, private readonly string $errorMessage) {
     }
+
     public function showView(): void {
         ?>
         <main>
             <div class="col">
                 <h3 class="center-align">Répartiteur de tuteurs enseignants</h3>
 
-                <div class="row" >
+                <div class="row" id="forms-section">
                     <div class="col card-panel white z-depth-3 s12 m6" style="padding: 20px; margin-right: 10px">
-                        <?php
-                        $listCriteria = $this->dispatcherModel->getCriteria();
-                        foreach ($listCriteria as $criteria) {
-                            ?>
-                            <div class="row">
-                                <div class="col s6">
-                                    <p>
-                                        <label>
-                                            <input type="checkbox" class="filled-in" checked="checked" />
-                                            <span><?php echo $criteria['name_criteria']; ?></span>
-                                        </label>
-                                    </p>
-                                </div>
-                                <form class="col s6" action="#">
-                                    <p class="range-field" style="margin: 0;">
-                                        <input type="range" name="coef[<?php echo $criteria['name_criteria']; ?>]" id="<?php echo $criteria['name_criteria']; ?>" min="0" max="5" value="<?php echo $criteria['coef']; ?>" />
-                                    </p>
-                                </form>
-                            </div>
-                            <?php
-                        }
-                        ?>
                         <form class="col s12" action="./dispatcher" method="post" id="pushCoef">
+                            <?php
+                            $listCriteria = $this->dispatcherModel->getCriteria();
+                            foreach ($listCriteria as $criteria) {
+                                ?>
+                                <div class="row">
+                                    <div class="col s6">
+                                        <p>
+                                            <label>
+                                                <input type="checkbox" class="filled-in criteria-checkbox"
+                                                       name="criteria_enabled[<?php echo $criteria['name_criteria']; ?>]"
+                                                       data-coef-input-id="<?php echo $criteria['name_criteria']; ?>"
+                                                       checked="checked" />
+                                                <span><?php echo $criteria['name_criteria']; ?></span>
+                                            </label>
+                                        </p>
+                                    </div>
+                                    <div class="col s6">
+                                        <div class="input-field" style="margin: 0;">
+                                            <input type="number" name="coef[<?php echo $criteria['name_criteria']; ?>]"
+                                                   id="<?php echo $criteria['name_criteria']; ?>"
+                                                   min="0" max="100"
+                                                   value="<?php echo $criteria['coef']; ?>"
+                                                   class="coef-input">
+                                            <label for="<?php echo $criteria['name_criteria']; ?>">Coefficient</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php
+                            }
+                            ?>
                             <button class="btn waves-effect waves-light button-margin" type="submit" name="action" value="save">Enregister
                                 <i class="material-icons right">arrow_downward</i>
                             </button>
-                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action" value="generate">Générer
+                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action" value="generate" id="generate-btn">Générer
                                 <i class="material-icons right">send</i>
                             </button>
                             <button class="btn waves-effect waves-light button-margin" type="submit" name="action" value="load">Charger
@@ -57,10 +65,10 @@ class Dispatcher{
                         </form>
                     </div>
 
-                    <form class="col card-panel white z-depth-3 s12 m5" style="padding: 20px;" action="./dispatcher" method="post" id="">
+                    <form class="col card-panel white z-depth-3 s12 m5" style="padding: 20px;" action="./dispatcher" method="post" id="associate-form">
                         <div class="row">
                             <div class="input-field col s6">
-                                <input id="Id_teacher" name= "Id_teacher" type="text" class="validate">
+                                <input id="Id_teacher" name="Id_teacher" type="text" class="validate">
                                 <label for="Id_teacher">Id_teacher</label>
                             </div>
                             <div class="input-field col s6">
@@ -77,18 +85,20 @@ class Dispatcher{
                                     <label for="End_date">Date de fin</label>
                                 </div>
                             </div>
-                            <p class="red-text"><?php echo $this->errorMessage?></p>
+                            <p class="red-text"><?php echo $this->errorMessage; ?></p>
                             <div class="col s12">
                                 <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Associer
                                     <i class="material-icons right">arrow_downward</i>
                                 </button>
                             </div>
                         </div>
-                     </form>
+                    </form>
                 </div>
 
-                <?php
-                ?>
+                <div id="loading-section" class="center-align" style="display: none;">
+                    <p>Chargement en cours, veuillez patienter...</p>
+                </div>
+
                 <?php if (isset($_POST['action']) && $_POST['action'] === 'generate'): ?>
                     <div class="row card-panel white z-depth-3 s12 m6">
                         <div class="col s12">
@@ -100,25 +110,25 @@ class Dispatcher{
                                             <th>Enseignant</th>
                                             <th>Eleve</th>
                                             <th>Score</th>
-                                            <th>Associé</th>
+                                            <th>Associer</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         <?php
-                                        $dictCoef = ["A été responsable" => 1, "Distance" => 1, "Cohérence" => 1];
+                                        $dictCoef = $_POST['coef'];
                                         $resultDispatchList = $this->dispatcherModel->dispatcher($dictCoef)[0];
                                         foreach ($resultDispatchList as $resultDispatch):
                                             ?>
                                             <tr>
-                                                <td><?='1' .  $resultDispatch['Id_teacher'] ?></td>
-                                                <td><?='2' .   $resultDispatch['Student_number'] ?></td>
-                                                <td><?='3' .   $resultDispatch['Score'] ?></td>
+                                                <td><?= $resultDispatch['id_teacher']; ?></td>
+                                                <td><?= $resultDispatch['student_number']; ?></td>
+                                                <td><?= $resultDispatch['score']; ?></td>
                                                 <td>
                                                     <label class="center">
-                                                        <input type="checkbox" name="id_prof[]" class="center-align filled-in" value="<?= $resultDispatch['Teacher_id'] ?>"/>
+                                                        <input type="checkbox" name="id_prof[]" class="center-align filled-in" value="<?= $resultDispatch['id_teacher']; ?>" />
                                                         <span></span>
-                                                        <input type="hidden" name="id_eleve[]" class="center-align filled-in" value="<?= $resultDispatch['Student_number'] ?>"/>
-                                                        <input type="hidden" name="score[]" class="center-align filled-in" value="<?= $resultDispatch['Score'] ?>"/>
+                                                        <input type="hidden" name="id_eleve[]" class="center-align filled-in" value="<?= $resultDispatch['student_number']; ?>" />
+                                                        <input type="hidden" name="score[]" class="center-align filled-in" value="<?= $resultDispatch['score']; ?>" />
                                                     </label>
                                                 </td>
                                             </tr>
@@ -143,6 +153,36 @@ class Dispatcher{
                 <?php endif; ?>
             </div>
         </main>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const checkboxes = document.querySelectorAll('.criteria-checkbox');
+
+                checkboxes.forEach(checkbox => {
+                    checkbox.addEventListener('change', function () {
+                        const coefInput = document.getElementById(this.dataset.coefInputId);
+                        if (this.checked) {
+                            coefInput.removeAttribute('disabled');
+                        } else {
+                            coefInput.setAttribute('disabled', 'disabled');
+                        }
+                    });
+                });
+
+                document.querySelectorAll('.coef-input').forEach(input => {
+                    input.addEventListener('input', function () {
+                        const value = parseInt(this.value);
+                        if (value > 100) {
+                            this.value = 100;
+                        } else if (value < 0) {
+                            this.value = 0;
+                        }
+                    });
+                });
+            });
+        </script>
+
+
         <?php
     }
 }
