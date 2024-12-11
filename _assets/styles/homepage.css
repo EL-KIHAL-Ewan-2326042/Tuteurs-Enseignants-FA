@@ -31,7 +31,7 @@ main a:hover {
     color: var(--main-color);
 }
 
-main form {
+.table {
     max-width: 85%;
 }
 
