@@ -18,8 +18,6 @@ class Dispatcher {
             $listAssociate = $dispatcherModel->createListAssociate();
 
             if (in_array($_POST['Id_teacher'], $listTeacher) && in_array($_POST['Internship_identifier'], $listStudent)){
-                print_r($listAssociate);
-                print_r([$_POST['Id_teacher'], $_POST['Internship_identifier']]);
                 if (!(in_array([$_POST['Id_teacher'], $_POST['Internship_identifier']], $listAssociate))) {
                     return $dispatcherModel->insertResponsible();
                 }
