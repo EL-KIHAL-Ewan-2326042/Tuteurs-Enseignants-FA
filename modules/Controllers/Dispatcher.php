@@ -11,30 +11,22 @@ class Dispatcher {
      * @return void
      */
     public function association($db, $dispatcherModel): string {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['Student_number']) && isset($_POST['Id_teacher']) && isset($_POST['Start_date']) && isset($_POST['End_date'])
-            && $_POST['Student_number'] !== '' && $_POST['Id_teacher'] !== '' && $_POST['Start_date'] !== '' && $_POST['End_date'] !== '') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['Internship_identifier']) && isset($_POST['Id_teacher']) && $_POST['Internship_identifier'] !== '' && $_POST['Id_teacher'] !== '') {
 
             $listTeacher = $dispatcherModel->createListTeacher();
-            $listStudent = $dispatcherModel->createListStudent();
+            $listStudent = $dispatcherModel->createListInternship();
             $listAssociate = $dispatcherModel->createListAssociate();
 
-
-            if (preg_match("/^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$/", $_POST['Start_date']) && preg_match("/^[0-9]{4}-[0-1][0-9]-[0-3][0-9]$/", $_POST['Start_date'])) {
-                if (in_array($_POST['Id_teacher'], $listTeacher) && in_array($_POST['Student_number'], $listStudent)){
-                    print_r($listAssociate);
-                    print_r([$_POST['Id_teacher'], $_POST['Student_number']]);
-                    if (!(in_array([$_POST['Id_teacher'], $_POST['Student_number']], $listAssociate))) {
-                        return $dispatcherModel->msgSave();
-                    }
-                    else {
-                        return "Cette association existe déjà";
-                    }
+            if (in_array($_POST['Id_teacher'], $listTeacher) && in_array($_POST['Internship_identifier'], $listStudent)){
+                if (!(in_array([$_POST['Id_teacher'], $_POST['Internship_identifier']], $listAssociate))) {
+                    return $dispatcherModel->insertResponsible();
                 }
                 else {
-                    return "Student_number ou Id_Teacher inexistant dans ce departement";
+                    return "Cette association existe déjà";
                 }
-            } else {
-                return "Date format non valide (format YYYY-MM-DD)";
+            }
+            else {
+                return "Internship_identifier ou Id_Teacher inexistant dans ce departement";
             }
         }
         elseif ($_SERVER['REQUEST_METHOD'] === 'POST'){
@@ -50,10 +42,10 @@ class Dispatcher {
         $errorMessage = '';
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (isset($_POST['Student_number']) && isset($_POST['Id_teacher']) && isset($_POST['Start_date']) && isset($_POST['End_date'])) {
+            if (isset($_POST['Internship_identifier']) && isset($_POST['Id_teacher'])) {
                 $errorMessage = $this->association($db, $dispatcherModel);
             }
-            if (isset($_POST['id_prof'])) {
+            if (isset($_POST['id_teacher'])) {
                 $dispatcherModel->insertIs_responsible();
             }
         }

@@ -3,3 +3,7 @@
 .button-margin {
     margin-top: var(--medium-spacing);
 }
+
+h3, h4 {
+    color: var(--main-color);
+}
