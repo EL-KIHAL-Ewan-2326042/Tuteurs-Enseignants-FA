@@ -47,11 +47,12 @@ main {
 /* Ajustements Footer */
 
 footer {
-    position: fixed;
+    position: sticky;
     bottom: 0;
     width: 100%;
     background-color: var(--main-color);
     color: var(--text-color);
+    z-index: 2;
 }
 
 .page-footer {
