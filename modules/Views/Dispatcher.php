@@ -35,7 +35,7 @@ class Dispatcher{
                                 </div>
                                 <form class="col s6" action="#">
                                     <p class="range-field" style="margin: 0;">
-                                        <input type="range" name="coef[<?php echo $criteria['name_criteria']; ?>]" id="<?php echo $criteria['name_criteria']; ?>" min="0" max="5" value="<?php echo $criteria['coef']; ?>" />
+                                        <label for="<?php echo $criteria['name_criteria']; ?>"></label><input type="range" name="coef[<?php echo $criteria['name_criteria']; ?>]" id="<?php echo $criteria['name_criteria']; ?>" min="0" max="5" value="<?php echo $criteria['coef']; ?>" />
                                     </p>
                                 </form>
                             </div>
@@ -62,18 +62,8 @@ class Dispatcher{
                                 <label for="Id_teacher">Id_teacher</label>
                             </div>
                             <div class="input-field col s6">
-                                <input id="Student_number" name="Student_number" type="text" class="validate">
-                                <label for="Student_number">Student_number</label>
-                            </div>
-                            <div class="row">
-                                <div class="input-field col s6">
-                                    <input id="Start_date" name="Start_date" type="text" class="validate">
-                                    <label for="Start_date">Date de début</label>
-                                </div>
-                                <div class="input-field col s6">
-                                    <input id="End_date" name="End_date" type="text" class="validate">
-                                    <label for="End_date">Date de fin</label>
-                                </div>
+                                <input id="Internship_identifier" name="Internship_identifier" type="text" class="validate">
+                                <label for="Internship_identifier">Internship_identifier</label>
                             </div>
                             <p class="red-text"><?php echo $this->errorMessage?></p>
                             <div class="col s12">
