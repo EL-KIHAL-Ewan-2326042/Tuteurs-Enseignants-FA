@@ -13,7 +13,7 @@ class GlobalModel {
 
     /**
      * Renvoie tous les départements de l'enseignant passé en paramètre
-     * @param string $identifier identifiant de l'enseignant
+     * @param string $teacher_id identifiant de l'enseignant
      * @return false|array tableau contenant tous les départements dont l'enseignant connecté fait partie, false sinon
      */
     public function getDepTeacher(string $teacher_id): false|array {
@@ -31,7 +31,7 @@ class GlobalModel {
      * @param string $department le département duquel les élèves sélectionnés font partie
      * @return false|array tableau contenant le numéro, le nom et le prénom de l'élève, ainsi que le nom de l'entreprise dans lequel il va faire son stage, le sujet et le numéro du stage, false sinon
      */
-    public function getStudentsPerDepartment(string $department): false|array {
+    public function getInternshipsPerDepartment(string $department): false|array {
         $query = 'SELECT internship_identifier, company_name, internship_subject, internship.student_number AS student_number, id_teacher, student_name, student_firstname
                     FROM internship
                     JOIN student ON internship.student_number = student.student_number
@@ -144,7 +144,7 @@ class GlobalModel {
     /**
      * Calcul de distance entre un eleve et un professeur
      * @param string $internship_identifier l'identifiant du stage
-     * @param string $idTeacher l'identifiant du professeur
+     * @param string $id_teacher l'identifiant du professeur
      * @return int distance en minute entre les deux
      */
     public function getDistance(string $internship_identifier, string $id_teacher): int {
