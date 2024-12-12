@@ -40,15 +40,27 @@ class Dispatcher {
         if (isset($_SESSION['role_name']) && (
                 (is_array($_SESSION['role_name']) && in_array('Admin_dep', $_SESSION['role_name'])) ||
                 ($_SESSION['role_name'] === 'Admin_dep'))) {
+
             $db = Database::getInstance();
             $globalModel = new \Blog\Models\GlobalModel($db);
             $dispatcherModel = new \Blog\Models\Dispatcher($db, $globalModel);
             $errorMessage = '';
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                if (isset($_POST['action']) && $_POST['action'] === 'save') {
+
+                    $coefficients = [];
+                    foreach ($_POST['coef'] as $criteria => $coef) {
+                        $coefficients[$criteria] = $coef;
+                    }
+
+                    $dispatcherModel->saveCoefficients($coefficients, $_SESSION['identifier']);
+                }
+
                 if (isset($_POST['Internship_identifier']) && isset($_POST['Id_teacher'])) {
                     $errorMessage = $this->association($db, $dispatcherModel);
                 }
+
                 if (isset($_POST['id_teacher'])) {
                     $dispatcherModel->insertIs_responsible();
                 }

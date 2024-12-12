@@ -2,6 +2,7 @@
 
 namespace Blog\Models;
 
+use Exception;
 use Includes;
 use PDO;
 use PDOException;
@@ -13,22 +14,6 @@ class Dispatcher{
     public function __construct(Includes\Database $db, \Blog\Models\GlobalModel $globalModel){
         $this->db = $db;
         $this->globalModel = $globalModel;
-    }
-
-    /**
-     * Renvoie les criteres de tri associe a un utilisateur
-     * @return false|array
-     */
-    public function getCriteria(): false|array
-    {
-        $db = $this->db;
-
-        $query = 'SELECT * FROM Backup where user_id = :user_id';
-        $stmt = $db->getConn()->prepare($query);
-        $stmt->bindParam(':user_id', $_SESSION['identifier']);
-        $stmt->execute();
-
-        return $stmt->fetchAll();
     }
 
     /**
@@ -261,5 +246,77 @@ class Dispatcher{
             $stmt->bindParam(':End_date', $DateIntership[0]['end_date_internship']);
             $stmt->execute();
         }
+    }
+
+    /**
+     * Charger les coefficients ou la liste des sauvegardes
+     * @param string $user_id
+     * @param int|null $id_backup Optionnel, l'ID de sauvegarde à charger. Null pour toutes les sauvegardes.
+     * @return array|null Renvoie les coefficients ou les sauvegardes disponibles.
+     */
+    public function loadCoefficients(string $user_id, ?int $id_backup = null): ?array {
+        try {
+            if ($id_backup === null) {
+                $query = "SELECT DISTINCT id_backup FROM backup WHERE user_id = :user_id ORDER BY id_backup DESC";
+                $stmt = $this->db->getConn()->prepare($query);
+                $stmt->bindParam(':user_id', $user_id);
+                $stmt->execute();
+                return $stmt->fetchAll(PDO::FETCH_COLUMN);
+            } else {
+                $query = "SELECT name_criteria, coef FROM backup WHERE user_id = :user_id AND id_backup = :id_backup";
+                $stmt = $this->db->getConn()->prepare($query);
+                $stmt->bindParam(':user_id', $user_id);
+                $stmt->bindParam(':id_backup', $id_backup);
+                $stmt->execute();
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+
+    /**
+     * Sauvegarder les coefficients dans la base de donnée
+     * @param array $coefficients
+     * @param string $user_id
+     * @return bool
+     */
+    public function saveCoefficients(array $coefficients, string $user_id): bool {
+        try {
+            $query = "SELECT MAX(id_backup) FROM backup WHERE user_id = :user_id";
+            $stmt = $this->db->getConn()->prepare($query);
+            $stmt->bindParam(':user_id', $user_id);
+            $stmt->execute();
+            $id_backup = $stmt->fetch(PDO::FETCH_COLUMN);
+
+            echo $id_backup;
+            foreach ($coefficients as $nameCriteria => $coef) {
+                $query = "INSERT INTO backup (user_id, name_criteria, id_backup, coef) VALUES (:user_id, :name_criteria, :id_backup, :coef)";
+                $stmt = $this->db->getConn()->prepare($query);
+                $stmt->bindParam(':user_id', $user_id);
+                $stmt->bindParam(':name_criteria', $nameCriteria);
+                $stmt->bindParam(':id_backup', $id_backup);
+                $stmt->bindParam(':coef', $coef);
+                $stmt->execute();
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    public function getDefaultCoef() {
+        $query = "SELECT name_criteria FROM distribution_criteria";
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->execute();
+        $defaultCriteria = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($defaultCriteria as &$criteria) {
+            $criteria['coef'] = 1;
+        }
+
+        return $defaultCriteria;
     }
 }
