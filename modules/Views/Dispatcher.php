@@ -24,7 +24,30 @@ class Dispatcher {
                     <div class="col card-panel white z-depth-3 s12 m6" style="padding: 20px; margin-right: 10px">
                         <form class="col s12" action="./dispatcher" method="post" id="pushCoef">
                             <?php
-                            $listCriteria = $this->dispatcherModel->getCriteria();
+                            $saves = $this->dispatcherModel->loadCoefficients($_SESSION['identifier']);
+                            if ($saves) {
+                                echo '<div class="row"><div class="col s12"><label for="save-selector">Choisir une sauvegarde:</label>';
+                                echo '<select id="save-selector" name="id_backup">';
+                                echo '<option value="new">Nouvelle sauvegarde</option>';
+                                foreach ($saves as $id_backup) {
+                                    echo '<option value="' . $id_backup . '">Sauvegarde #' . $id_backup . '</option>';
+                                }
+                                echo '</select></div></div>';
+                            }
+
+                            $id_backup = $_POST['id_backup'] ?? 'new';
+
+                            if ($id_backup === 'new') {
+                                $defaultCriteria = $this->dispatcherModel->getDefaultCoef();
+                                $listCriteria = [];
+
+                                foreach ($defaultCriteria as $key => $value) {
+                                    $listCriteria[$key] = $value;
+                                }
+                            } else {
+                                $listCriteria = $this->dispatcherModel->loadCoefficients($_SESSION['identifier'], (int)$id_backup);
+                            }
+
                             foreach ($listCriteria as $criteria) {
                                 ?>
                                 <div class="row">
@@ -35,25 +58,21 @@ class Dispatcher {
                                                        name="criteria_enabled[<?php echo $criteria['name_criteria']; ?>]"
                                                        data-coef-input-id="<?php echo $criteria['name_criteria']; ?>"
                                                        checked="checked" />
-                                                <span><?php echo $criteria['name_criteria']; ?></span>
+                                                <span><?= $criteria['name_criteria']; ?></span>
                                             </label>
                                         </p>
                                     </div>
                                     <div class="col s6">
                                         <div class="input-field" style="margin: 0;">
-                                            <input type="number" name="coef[<?php echo $criteria['name_criteria']; ?>]"
-                                                   id="<?php echo $criteria['name_criteria']; ?>"
-                                                   min="0" max="100"
-                                                   value="<?php echo $criteria['coef']; ?>"
-                                                   class="coef-input">
-                                            <label for="<?php echo $criteria['name_criteria']; ?>">Coefficient</label>
+                                            <input type="number" name="coef[<?= $criteria['name_criteria']; ?>]" id="<?= $criteria['name_criteria']; ?>" min="0" max="100" value="<?= $criteria['coef']; ?>">
+                                            <label for="<?= $criteria['name_criteria']; ?>">Coefficient</label>
                                         </div>
                                     </div>
                                 </div>
                                 <?php
                             }
                             ?>
-                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action" value="save">Enregister
+                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action" value="save">Enregistrer
                                 <i class="material-icons right">arrow_downward</i>
                             </button>
                             <button class="btn waves-effect waves-light button-margin" type="submit" name="action" value="generate" id="generate-btn">Générer
@@ -75,7 +94,7 @@ class Dispatcher {
                                 <input id="Internship_identifier" name="Internship_identifier" type="text" class="validate">
                                 <label for="Internship_identifier">Internship_identifier</label>
                             </div>
-                            <p class="red-text"><?php echo $this->errorMessage; ?></p>
+                            <p class="red-text"><?= $this->errorMessage; ?></p>
                             <div class="col s12">
                                 <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Associer
                                     <i class="material-icons right">arrow_downward</i>
@@ -171,8 +190,6 @@ class Dispatcher {
                 });
             });
         </script>
-
-
         <?php
     }
 }
