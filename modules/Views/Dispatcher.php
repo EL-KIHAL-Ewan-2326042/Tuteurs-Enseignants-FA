@@ -22,20 +22,26 @@ class Dispatcher {
 
                 <div class="row" id="forms-section">
                     <div class="col card-panel white z-depth-3 s12 m6" style="padding: 20px; margin-right: 10px">
-                        <form class="col s12" action="./dispatcher" method="post" id="pushCoef">
+                        <form class="col s12" action="./dispatcher" method="post" id="pushCoef" onsubmit="showLoading();">
                             <?php
-                            $saves = $this->dispatcherModel->loadCoefficients($_SESSION['identifier']);
-                            if ($saves) {
-                                echo '<div class="row"><div class="col s12"><label for="save-selector">Choisir une sauvegarde:</label>';
-                                echo '<select id="save-selector" name="id_backup">';
-                                echo '<option value="new">Nouvelle sauvegarde</option>';
-                                foreach ($saves as $id_backup) {
-                                    echo '<option value="' . $id_backup . '">Sauvegarde #' . $id_backup . '</option>';
-                                }
-                                echo '</select></div></div>';
-                            }
+                            $saves = $this->dispatcherModel->showCoefficients($_SESSION['identifier']);
+                            if ($saves): ?>
+                                <label for="save-selector">Choisir une sauvegarde:</label>
+                                <div class="input-field">
+                                    <select id="save-selector" name="save-selector">
+                                        <option>Choisir une sauvegarde</option>
+                                        <?php foreach ($saves as $save): ?>
+                                            <option value="<?php echo $save['id_backup']; ?>">
+                                                Sauvegarde #<?= $save['id_backup']; ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            <?php endif; ?>
 
-                            $id_backup = $_POST['id_backup'] ?? 'new';
+
+                            <?php
+                            $id_backup = $_POST['save-selector'] ?? 'new';
 
                             if ($id_backup === 'new') {
                                 $defaultCriteria = $this->dispatcherModel->getDefaultCoef();
@@ -63,8 +69,8 @@ class Dispatcher {
                                         </p>
                                     </div>
                                     <div class="col s6">
-                                        <div class="input-field" style="margin: 0;">
-                                            <input type="number" name="coef[<?= $criteria['name_criteria']; ?>]" id="<?= $criteria['name_criteria']; ?>" min="0" max="100" value="<?= $criteria['coef']; ?>">
+                                        <div class="input-field">
+                                            <input type="number" name="coef[<?= $criteria['name_criteria']; ?>]" id="<?= $criteria['name_criteria']; ?>" min="1" max="100" value="<?= $criteria['coef']; ?>">
                                             <label for="<?= $criteria['name_criteria']; ?>">Coefficient</label>
                                         </div>
                                     </div>
@@ -77,9 +83,6 @@ class Dispatcher {
                             </button>
                             <button class="btn waves-effect waves-light button-margin" type="submit" name="action" value="generate" id="generate-btn">Générer
                                 <i class="material-icons right">send</i>
-                            </button>
-                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action" value="load">Charger
-                                <i class="material-icons right">arrow_upward</i>
                             </button>
                         </form>
                     </div>
@@ -142,19 +145,24 @@ class Dispatcher {
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
+                                            <tr>
+                                                <td></td>
+                                                <td></td>
+                                                <td><span>Tout cocher: </span></td>
+                                                <td><p>
+                                                        <label>
+                                                            <input type="checkbox" class="filled-in" name="select-all" />
+                                                            <span></span>
+                                                        </label>
+                                                    </p>
+                                                </td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
-                                <div class="row s12 center">
+                                <div class="col s12 center">
                                     <input type="hidden" name="selecStudentSubmitted" value="1">
                                     <button class="waves-effect waves-light btn" type="submit">Valider</button>
-                                    <span> Tout cocher :</span>
-                                    <p>
-                                        <label>
-                                            <input type="checkbox" class="filled-in" checked="checked" />
-                                            <span></span>
-                                        </label>
-                                    </p>
                                 </div>
                             </form>
                         </div>
@@ -165,7 +173,28 @@ class Dispatcher {
 
         <script>
             document.addEventListener('DOMContentLoaded', function () {
+                const selects = document.querySelectorAll('select');
+                M.FormSelect.init(selects);
+
+                const saveSelector = document.getElementById('save-selector');
+                if (saveSelector) {
+                    saveSelector.addEventListener('change', function () {
+                        const form = this.closest('form');
+                        form.submit();
+                    });
+                }
+
                 const checkboxes = document.querySelectorAll('.criteria-checkbox');
+                const selectAllCheckbox = document.querySelector('input[type="checkbox"][name="select-all"]');
+
+                if (selectAllCheckbox) {
+                    selectAllCheckbox.addEventListener('change', function () {
+                        const isChecked = this.checked;
+                        document.querySelectorAll('input[type="checkbox"][name="id_prof[]"]').forEach(checkbox => {
+                            checkbox.checked = isChecked;
+                        });
+                    });
+                }
 
                 checkboxes.forEach(checkbox => {
                     checkbox.addEventListener('change', function () {
@@ -189,6 +218,16 @@ class Dispatcher {
                     });
                 });
             });
+
+            function showLoading() {
+                const loadingSection = document.getElementById('loading-section');
+                const formsSection = document.getElementById('forms-section');
+
+                if (loadingSection && formsSection) {
+                    loadingSection.style.display = 'block';
+                    formsSection.style.display = 'none';
+                }
+            }
         </script>
         <?php
     }
