@@ -57,8 +57,8 @@ class Dispatcher{
 
         // Pour chaque relation tuteur-etudiant, on calcul leur Score qu'on met dans un array final
         foreach($studentsList as $student) {
-            $distanceMin = $this->globalModel->getDistance($student['student_number'], $identifier);
-            $relevance= $this->globalModel->ScoreDiscipSubject($student['student_number'], $identifier);
+            $distanceMin = $this->globalModel->getDistance($student['internship_identifier'], $identifier);
+            $relevance= $this->globalModel->scoreDiscipSubject($student['internship_identifier'], $identifier);
 
             $dictValues = array(
                 "A été responsable" => $this->globalModel->getInternships($student['student_number']),
