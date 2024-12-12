@@ -11,7 +11,7 @@ class Dispatcher {
      * @param \Blog\Models\Dispatcher $dispatcherModel
      * @param string $errorMessage
      */
-    public function __construct(private readonly \Blog\Models\Dispatcher $dispatcherModel, private readonly string $errorMessage) {
+    public function __construct(private readonly \Blog\Models\Dispatcher $dispatcherModel, private readonly string $errorMessage1,private readonly string $errorMessage2) {
     }
 
     public function showView(): void {
@@ -53,6 +53,7 @@ class Dispatcher {
                                 <?php
                             }
                             ?>
+                            <p class="red-text"><?php echo $this->errorMessage2; ?></p>
                             <button class="btn waves-effect waves-light button-margin" type="submit" name="action" value="save">Enregister
                                 <i class="material-icons right">arrow_downward</i>
                             </button>
@@ -75,7 +76,7 @@ class Dispatcher {
                                 <input id="Internship_identifier" name="Internship_identifier" type="text" class="validate">
                                 <label for="Internship_identifier">Internship_identifier</label>
                             </div>
-                            <p class="red-text"><?php echo $this->errorMessage; ?></p>
+                            <p class="red-text"><?php echo $this->errorMessage1; ?></p>
                             <div class="col s12">
                                 <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Associer
                                     <i class="material-icons right">arrow_downward</i>
@@ -103,6 +104,7 @@ class Dispatcher {
                                             <th>Associer</th>
                                         </tr>
                                         </thead>
+
                                         <tbody>
                                         <?php
                                         $dictCoef = $_POST['coef'];
@@ -115,10 +117,10 @@ class Dispatcher {
                                                 <td><?= $resultDispatch['score']; ?></td>
                                                 <td>
                                                     <label class="center">
-                                                        <input type="checkbox" name="id_prof[]" class="center-align filled-in" value="<?= $resultDispatch['id_teacher']; ?>" />
+                                                        <input type="checkbox" id="id_prof[]" name="id_prof[]" class="center-align filled-in" value="<?= $resultDispatch['id_teacher']; ?>" />
                                                         <span></span>
-                                                        <input type="hidden" name="id_eleve[]" class="center-align filled-in" value="<?= $resultDispatch['internship_identifier']; ?>" />
-                                                        <input type="hidden" name="score[]" class="center-align filled-in" value="<?= $resultDispatch['score']; ?>" />
+                                                        <input type="hidden" id="internship_id[]" name="internship_id[]" class="center-align filled-in" value="<?= $resultDispatch['internship_identifier']; ?>" />
+                                                        <input type="hidden" id="score[]" name="score[]" class="center-align filled-in" value="<?= $resultDispatch['score']; ?>" />
                                                     </label>
                                                 </td>
                                             </tr>
@@ -127,7 +129,7 @@ class Dispatcher {
                                     </table>
                                 </div>
                                 <div class="row s12 center">
-                                    <input type="hidden" name="selecStudentSubmitted" value="1">
+                                    <input type="hidden" id=selectStudentSubmitted" name="selectStudentSubmitted" value="1">
                                     <button class="waves-effect waves-light btn" type="submit">Valider</button>
                                     <span> Tout cocher :</span>
                                     <p>

@@ -241,25 +241,19 @@ class Dispatcher{
 
     /**
      * Fonction recupérant les valeurs du post de la viewDispacher servant à la suite de l'algorithme de repartition final
-     * @return void
+     * @return string Valeur confirmant l'insertion
      */
     public function insertIs_responsible() {
-        for ($i = 0; $i<count($_POST['id_eleve']); $i++ ) {
-            $query = 'SELECT Start_date_internship, End_date_internship FROM Internship
-                    where Student_number = :Student_number';
+        $messagereturn = "";
+        for ($i = 0; $i<count($_POST['id_prof']); $i++ ) {
+            $query = 'UPDATE internship SET Id_teacher = :id_prof, Relevance_score = :Score WHERE Internship_identifier = :Internship_identifier';
             $stmt = $this->db->getConn()->prepare($query);
-            $stmt->bindParam(':Student_number', $_POST['Student_number'][$i]);
+            $stmt->bindParam(':Internship_id', $_POST['internships_id'][$i]);
+            $stmt->bindParam(':id_prof', $_POST['id_prof'][$i]);
+            $stmt->bindParam(':Score', $_POST['score'][$i]);
             $stmt->execute();
-            $DateIntership = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            $query = 'INSERT INTO internship (Id_teacher, Student_number, Relevance_Score, responsible_start_date, responsible_end_date) VALUES (:Id_teacher, :Student_number, :Score, :Start_date, :End_date)';
-            $stmt = $this->db->getConn()->prepare($query);
-            $stmt->bindParam(':Student_number', $_POST['Student_number'][$i]);
-            $stmt->bindParam(':Id_teacher', $_POST['Id_teacher'][$i]);
-            $stmt->bindParam(':Score', $_POST['Score'][$i]);
-            $stmt->bindParam(':Start_date', $DateIntership[0]['start_date_internship']);
-            $stmt->bindParam(':End_date', $DateIntership[0]['end_date_internship']);
-            $stmt->execute();
+            $messagereturn .= "Association " . $_POST['id_prof'] . " et " . $_POST['Internship_id'] . " enregistrée.\n";
         }
+        return $messagereturn;
     }
 }

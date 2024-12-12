@@ -10,7 +10,7 @@ class Dispatcher {
     /**
      * @return void
      */
-    public function association($db, $dispatcherModel): string {
+    public function association_direct($dispatcherModel): string {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['Internship_identifier']) && isset($_POST['Id_teacher']) && $_POST['Internship_identifier'] !== '' && $_POST['Id_teacher'] !== '') {
 
             $listTeacher = $dispatcherModel->createListTeacher();
@@ -35,6 +35,30 @@ class Dispatcher {
         return '';
     }
 
+    /**
+     * @return void
+     */
+    public function association_after_sort($dispatcherModel): string {
+        $listTeacher = $dispatcherModel->createListTeacher();
+        $listStudent = $dispatcherModel->createListInternship();
+        $listAssociate = $dispatcherModel->createListAssociate();
+        print_r($listAssociate);
+        print_r($_POST['id_prof']);
+        print_r($_POST['internship_id']);
+        print_r($_POST['score']);
+        if (in_array($_POST['id_prof'], $listTeacher) && in_array($_POST['internship_id'], $listStudent)){
+            if (!(in_array([$_POST['id_prof'], $_POST['internship_id']], $listAssociate))) {
+                return $dispatcherModel->insertIs_responsible();
+            }
+            else {
+                return "Cette association existe déjà";
+            }
+        }
+        else {
+            return "Internship_identifier ou Id_Teacher inexistant dans ce departement";
+        }
+    }
+
     public function show(): void {
 
         if (isset($_SESSION['role_name']) && (
@@ -43,14 +67,15 @@ class Dispatcher {
             $db = Database::getInstance();
             $globalModel = new \Blog\Models\GlobalModel($db);
             $dispatcherModel = new \Blog\Models\Dispatcher($db, $globalModel);
-            $errorMessage = '';
+            $errorMessage1 = '';
+            $errorMessage2 = '';
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (isset($_POST['Internship_identifier']) && isset($_POST['Id_teacher'])) {
-                    $errorMessage = $this->association($db, $dispatcherModel);
+                    $errorMessage1 = $this->association_direct($dispatcherModel);
                 }
-                if (isset($_POST['id_teacher'])) {
-                    $dispatcherModel->insertIs_responsible();
+                if (isset($_POST['selectStudentSubmitted']) && isset($_POST['id_prof'])) {
+                    $errorMessage2 = $this->association_after_sort($dispatcherModel);
                 }
             }
 
@@ -58,7 +83,7 @@ class Dispatcher {
             $title = "Dispatcher";
             $cssFilePath = '_assets/styles/dispatcher.css';
             $jsFilePath = '_assets/scripts/dispatcher.js';
-            $view = new \Blog\Views\Dispatcher($dispatcherModel, $errorMessage);
+            $view = new \Blog\Views\Dispatcher($dispatcherModel, $errorMessage1, $errorMessage2);
 
             $layout = new Layout();
             $layout->renderTop($title, $cssFilePath);
