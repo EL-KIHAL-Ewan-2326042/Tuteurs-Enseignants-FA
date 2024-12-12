@@ -186,7 +186,7 @@ class Homepage {
     public function getStudentsList(array $departments, string $identifier): array {
         $studentsList = array();
         foreach($departments as $department) {
-            $newList = $this->globalModel->getStudentsPerDepartment($department);
+            $newList = $this->globalModel->getInternshipsPerDepartment($department);
             if($newList) $studentsList = array_merge($studentsList, $newList);
         }
 
@@ -203,10 +203,7 @@ class Homepage {
                 $row['internshipTeacher'] = 0;
             } else {
                 foreach($internships as $internshipInfo) {
-                    if($row['start_date_internship'] === $internshipInfo['responsible_start_date'] && $row['end_date_internship'] === $internshipInfo['responsible_end_date']) {
-                        array_push($toDelete, $key);
-                        break;
-                    }
+                    array_push($toDelete, $key);
                 }
                 if(!isset($row)) continue;
                 $row['internshipTeacher'] = $this->getInternshipTeacher($internships);

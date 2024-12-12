@@ -32,23 +32,23 @@ class Dispatcher{
     }
 
     /**
-     * Renvoie pour un professeur un couple avec tous les etudiants de son departement
+     * Renvoie pour un professeur un couple avec tous les stages de son departement
      * @param $identifier l'identifiant du professeur
      * @param $dictCoef array cle->nom_critere et valeur->coef
      * @return array|array[] array contenant id_prof, id_eleve et le Score associe
      */
     public function calculateRelevanceTeacherStudents($identifier, array $dictCoef): array
     {
-        $studentsList = array();
+        $internshipList = array();
         // On recupere la liste des departement de l'eleve
         $departments = $this->globalModel->getDepTeacher($identifier);
         foreach($departments as $listDepTeacher) {
             foreach($listDepTeacher as $department) {
                 // Pour chaque departement, on recupere les eleve
-                $newList = $this->globalModel->getStudentsPerDepartment($department);
+                $newList = $this->globalModel->getInternshipsPerDepartment($department);
                 if ($newList)  {
                     // Les eleves sont rajoutes dans la liste finale
-                    $studentsList = array_merge($studentsList, $newList);
+                    $internshipList = array_merge($internshipList, $newList);
                 }
             }
         }
@@ -56,12 +56,12 @@ class Dispatcher{
         $result = array();
 
         // Pour chaque relation tuteur-etudiant, on calcul leur Score qu'on met dans un array final
-        foreach($studentsList as $student) {
-            $distanceMin = $this->globalModel->getDistance($student['student_number'], $identifier);
-            $relevance= $this->globalModel->ScoreDiscipSubject($student['student_number'], $identifier);
+        foreach($internshipList as $internship) {
+            $distanceMin = $this->globalModel->getDistance($internship['internship_identifier'], $identifier);
+            $relevance= $this->globalModel->ScoreDiscipSubject($internship['internship_identifier'], $identifier);
 
             $dictValues = array(
-                "A été responsable" => $this->globalModel->getInternships($student['student_number']),
+                "A été responsable" => $this->globalModel->getInternships($internship['internship_identifier']),
                 "Distance" => $distanceMin,
                 "Cohérence" => round($relevance, 2));
 
@@ -97,7 +97,7 @@ class Dispatcher{
             // Score normalise sur 5
             $ScoreFinal = ($totalScore * 5) / $totalCoef;
 
-            $newList = ["id_teacher" => $identifier, "student_number" => $student['student_number'], "score" => round($ScoreFinal, 2), "type" => $student['type']];
+            $newList = ["id_teacher" => $identifier, "internship_identifier" => $internship['internship_identifier'], "score" => round($ScoreFinal, 2), "type" => $internship['type']];
 
             if (!empty($newList)) {
                 $result[] = $newList;
@@ -164,9 +164,9 @@ class Dispatcher{
             $topCandidate = $listStart[0];
 
             if ($assignedCounts[$topCandidate['id_teacher']] < $listTeacherMax[$topCandidate['id_teacher']] &&
-                !in_array($topCandidate['student_number'], $listEleveFinal)) {
+                !in_array($topCandidate['internship_identifier'], $listEleveFinal)) {
                 $listFinal[] = $topCandidate;
-                $listEleveFinal[] = $topCandidate['student_number'];
+                $listEleveFinal[] = $topCandidate['internship_identifier'];
                 $assignedCounts[$topCandidate['id_teacher']] += ($topCandidate['type'] === 'Internship') ? 2 : 1;
             }
             array_shift($listStart);
