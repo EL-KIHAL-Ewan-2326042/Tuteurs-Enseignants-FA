@@ -147,7 +147,6 @@ async function initMap() {
     const mapElement = document.getElementById("map");
 
     if (!mapElement) {
-        console.error("Élément de la carte introuvable");
         return;
     }
 
@@ -182,7 +181,7 @@ async function initMap() {
         });
         const teacherMarker = new ol.Overlay({
             position: ol.proj.fromLonLat([teacherLocation.lon, teacherLocation.lat]),
-            element: createMarkerElement("Professeur"),
+            element: createMarkerElement("Vous"),
         });
 
         map.addOverlay(companyMarker);
