@@ -36,6 +36,34 @@ class Homepage {
                     unset($_SESSION['selected_student']);
                 }
 
+                if(isset($_POST['searchedStudentSubmitted'])) {
+
+                    if(isset($_POST['searchedStudent'])) {
+                        $update = $this->model->updateRequests([$_POST['searchedStudent']], $_SESSION['identifier']);
+
+                    } else {
+                        $update = $this->model->updateRequests(array(), $_SESSION['identifier']);
+                    }
+
+                    if(!$update || gettype($update) !== 'boolean') {
+                        echo '<h6 class="red-text">Une erreur est survenue</h6>';
+                    }
+                }
+
+                if(isset($_POST['selecStudentSubmitted'])) {
+
+                    if(isset($_POST['selecStudent'])) {
+                        $update = $this->model->updateRequests($_POST['selecStudent'], $_SESSION['identifier']);
+
+                    } else {
+                        $update = $this->model->updateRequests(array(), $_SESSION['identifier']);
+                    }
+
+                    if(!$update || gettype($update) !== 'boolean') {
+                        echo '<h6 class="red-text">Une erreur est survenue</h6>';
+                    }
+                }
+
                 if (isset($_SESSION['selected_student']['firstName']) && isset($_SESSION['selected_student']['lastName'])) {
                     echo '<h4 class="left-align"> Résultat pour: ' . $_SESSION['selected_student']['firstName'] . ' ' .  $_SESSION['selected_student']['lastName'] . '</h4>' . '</div>';
                 if (!isset($_SESSION['selected_student']['address']) || $_SESSION['selected_student']['address'] === '') {
@@ -45,39 +73,11 @@ class Homepage {
                     $internshipInfos = $this->model->getInternshipStudent($_SESSION['selected_student']['id']);
                     if ($internshipInfos) {
                         $internships = $this->globalModel->getInternships($_SESSION['selected_student']['id']);
-                        $nbInternships = $this->model->getInternshipTeacher($internships);
-                        $distance = $this->globalModel->getDistance($_SESSION['selected_student']['id'], $_SESSION['identifier']);
+                        $nbInternships = $this->model->getInternshipTeacher($internships, $_SESSION['identifier']);
+                        $distance = $this->globalModel->getDistance($internshipInfos['internship_identifier'], $_SESSION['identifier']);
                         $score = $this->model->calculateScore(array('Distance' => $distance,
                             'A été responsable' => $nbInternships > 0 ? $nbInternships/count($internships) : 0,
-                            'Cohérence' => $this->globalModel->scoreDiscipSubject($_SESSION['selected_student']['id'], $_SESSION['identifier'])));
-
-                        if(isset($_POST['searchedStudentSubmitted'])) {
-
-                            if(isset($_POST['searchedStudent'])) {
-                                $update = $this->model->updateRequests([$_POST['searchedStudent']]);
-
-                            } else {
-                                $update = $this->model->updateRequests(array());
-                            }
-
-                            if(!$update || gettype($update) !== 'boolean') {
-                                echo '<h6 class="red-text">Une erreur est survenue</h6>';
-                            }
-                        }
-
-                        if(isset($_POST['selecStudentSubmitted'])) {
-
-                            if(isset($_POST['selecStudent'])) {
-                                $update = $this->model->updateRequests($_POST['selecStudent']);
-
-                            } else {
-                                $update = $this->model->updateRequests(array());
-                            }
-
-                            if(!$update || gettype($update) !== 'boolean') {
-                                echo '<h6 class="red-text">Une erreur est survenue</h6>';
-                            }
-                        }
+                            'Cohérence' => $this->globalModel->scoreDiscipSubject($internshipInfos["internship_identifier"], $_SESSION['identifier'])));
 
                         ?>
                         <div id="map"></div>
@@ -131,7 +131,7 @@ class Homepage {
                                                     } else {
                                                         ?>
                                                         <label class="center">
-                                                            <input type="checkbox" name="searchedStudent" class="center-align filled-in" value="<?= $internshipInfos["internship_identifier"] ?>" <?= in_array($internshipInfos["internship_identifier"], $this->model->getRequests()) ? 'checked="checked"' : '' ?> />
+                                                            <input type="checkbox" name="searchedStudent" class="center-align filled-in" value="<?= $internshipInfos["internship_identifier"] ?>" <?= in_array($internshipInfos["internship_identifier"], $this->model->getRequests($_SESSION['identifier'])) ? 'checked="checked"' : '' ?> />
                                                             <span></span>
                                                         </label>
                                                         <?
