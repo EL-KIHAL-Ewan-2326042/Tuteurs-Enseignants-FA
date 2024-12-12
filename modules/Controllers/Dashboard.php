@@ -37,33 +37,44 @@ class Dashboard {
                 ($_SESSION['role_name'] === 'Admin_dep'))) {
 
             if($_SERVER["REQUEST_METHOD"] == "POST") {
-                if (isset($_FILES['csv_file_student']) || isset($_FILES['csv_file_teacher']) || isset($_FILES['csv_file_internship'])) {
-                    // Récupération du nom de la table à partir du champ caché
+                if (isset($_FILES['student']) || isset($_FILES['teacher']) || isset($_FILES['internship'])) {
                     $tableName = $_POST['table_name'] ?? null;
-
 
                     if ($tableName && $model->isValidTable($tableName)) {
                         try {
                             $csvFile = null;
-                            // Déterminer quel fichier CSV a été téléchargé
                             if (isset($_FILES['student'])) {
                                 $csvFile = $_FILES['student']['tmp_name'];
                             } elseif (isset($_FILES['teacher'])) {
                                 $csvFile = $_FILES['teacher']['tmp_name'];
                             } elseif (isset($_FILES['internship'])) {
                                 $csvFile = $_FILES['internship']['tmp_name'];
+                            } else {
+                                echo "Aucun fichier CSV valide détecté";
                             }
 
                             if ($csvFile) {
                                 $csvHeaders = $model->getCsvHeaders($csvFile);
+
+                                if (mime_content_type($csvFile) !== 'text/plain') {
+                                    echo "Le fichier uploadé n'est pas un CSV valide.";
+                                    return;
+                                }
+
                                 if (!$model->validateHeaders($csvHeaders, $tableName)) {
                                     echo "Les en-têtes du fichier CSV ne correspondent pas à la structure de la table $tableName.";
                                     return;
                                 }
 
-                                if (!$model->uploadCsv($csvFile, $tableName)) {
-                                    echo "Échec de l'importation du fichier CSV pour les étudiants.";
+                                if ($model->uploadCsv($csvFile, $tableName)) {
+                                    echo "L'importation du fichier CSV pour la table $tableName a été réalisée avec succès.";
+                                } else {
+                                    echo "Une erreur est survenue lors de l'importation pour la table $tableName.";
+
+                                    error_log("CSV Headers: " . implode(", ", $csvHeaders));
+
                                 }
+
                             }
                             
                         } catch (Exception $e) {

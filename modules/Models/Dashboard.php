@@ -30,13 +30,14 @@ class Dashboard{
                 SELECT column_name
                 FROM information_schema.columns
                 WHERE table_name = :table_name";
+
             $stmt = $this->db->getConn()->prepare($query);
             $stmt->bindParam(':table_name', $tableName);
             $stmt->execute();
+
             $columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
             return $columns ?: [];
         } catch (PDOException $e) {
-            error_log("Erreur lors de l'importation : " . $e->getMessage());
             throw new Exception("Impossible de récupérer les colonnes pour la table $tableName.");
         }
     }
@@ -77,7 +78,7 @@ class Dashboard{
      * @throws Exception
      */
     public function uploadCsvStudent(string $csvFilePath): bool {
-        return $this->uploadCsv($csvFilePath, 'student', ['student_number','student_name','student_firstname','formation','class_group']);
+        return $this->uploadCsv($csvFilePath, 'student');
     }
 
     /**
@@ -88,7 +89,7 @@ class Dashboard{
      * @throws Exception
      */
     public function uploadCsvTeacher(string $csvFilePath): bool {
-        return $this->uploadCsv($csvFilePath, 'teacher', ['id_teacher','teacher_name','teacher_firstname','maxi_number_trainees']);
+        return $this->uploadCsv($csvFilePath, 'teacher');
     }
 
     /**
@@ -99,7 +100,7 @@ class Dashboard{
      * @throws Exception
      */
     public function uploadCsvInternship(string $csvFilePath): bool {
-        return $this->uploadCsv($csvFilePath, 'internship', ['internship_identifier','company_name','keywords','start_date_internship','type','end_date_internship','internship_subject','address','student_number']);
+        return $this->uploadCsv($csvFilePath, 'internship');
     }
 
     /**
@@ -117,17 +118,14 @@ class Dashboard{
             $headers = fgetcsv($handle, 1000, ",");
 
             if (!$this->validateHeaders($headers, $tableName)) {
-                error_log("Les colonnes du fichier CSV ne correspondent pas aux colonnes attendues par la $tableName");
+                error_log("NOM DE LA TABLES ET ENTETE " . $headers . " " . $tableName);
                 fclose($handle);
                 return false;
             }
 
             try {
                 $tableColumns = $this->getTableColumn($tableName);
-                error_log("Nom de la table pour l'importation : " . $tableName);
-                error_log("En-têtes du fichier CSV : " . implode(", ", $headers));
-                error_log("Colonnes de la table $tableName : " . implode(", ", $tableColumns));
-
+                error_log("Table Columns: " . implode(", ", $tableColumns));
 
                 while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
                     if (count($data) !== count($tableColumns)) {
@@ -137,20 +135,35 @@ class Dashboard{
 
                     $query = "INSERT INTO $tableName (" . implode(',', $tableColumns) . ") VALUES (" . implode(',', array_map(fn($i) => ":column$i", range(1, count($tableColumns)))) . ")";
                     $stmt = $db->getConn()->prepare($query);
+
+                    error_log("REQUETE  " . $query);
+
                     foreach ($data as $index => $value) {
-                        error_log("Value type at column $index: " . gettype($value));
-                        if (is_array($value)) {
-                            error_log("Value type at column $index: " . json_encode($value));
+
+
+                        if (empty($value)) {
+                            $value = null;
+                        } elseif (is_array($value)) {
                             $value = implode(',', $value);
                         }
+                        error_log("BIND: :column" . ($index + 1) . " -> " . var_export($value, true));
+
                         $stmt->bindValue(":column" . ($index + 1), $value);
                     }
+
                     $stmt->execute();
+
+                    if ($stmt->errorCode() !== '00000') {
+                        $errorInfo = $stmt->errorInfo();
+                        error_log("Erreur lors de l'exécution de la requête : " . implode(', ', $errorInfo));
+                    } else {
+                        error_log("Requête exécutée avec succès");
+                    }
+
                 }
                 fclose($handle);
                 return true;
             } catch (PDOException $e) {
-                error_log("Erreur lors de l'importation : " . $e->getMessage());
                 return false;
             }
         }
@@ -169,9 +182,13 @@ class Dashboard{
         $tableColumns = array_map('strtolower', $this->getTableColumn($tableName));
         $csvHeaders = array_map('strtolower', $headers);
         if (array_diff($csvHeaders, $tableColumns)) {
+            error_log("LES COLONNES DE LA TABLE ".$tableColumns[1]." NOM DE LA TABLE " . $tableName. " ENTETE DU CSV " . $csvHeaders[1]);
+            error_log("Entêtes CSV : " . implode(', ', $headers));
+            error_log("Colonnes Table : " . implode(', ', $tableColumns));
+
+
             throw new Exception("Les colonnes CSV ne correspondent pas à la table $tableName.");
         }
-
         return empty(array_diff($csvHeaders, $tableColumns));
     }
 
@@ -208,7 +225,6 @@ class Dashboard{
             throw new Exception("Les en-têtes sont manquants ou invalides pour la table $tableName.");
         }
 
-        // Convertir explicitement chaque valeur en chaîne
         $query = "SELECT " . implode(',', array_map(fn($header) => "$tableName." . (string)$header, $headers)) . " FROM $tableName";
 
         //condition filtrant par département
@@ -247,15 +263,11 @@ class Dashboard{
 //            'id_backup',
 //            'distribution_criteria',
 
-
-
-
             default => throw new Exception("Table non reconnue : " . $tableName),
         };
 
-        //vérification de la valeur de $department
+
         if (is_array($department)) {
-            error_log("Department is an array: " . json_encode($department));
             $department = $department[0] ?? '';
         }
 
