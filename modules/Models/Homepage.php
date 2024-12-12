@@ -187,7 +187,7 @@ class Homepage {
         // on récupère pour chaque élève des départements de $departments les informations de leur prochain stage s'ils ont en un et s'ils n'ont pas encore de tuteur
         $studentsList = array();
         foreach($departments as $department) {
-            $newList = $this->globalModel->getStudentsPerDepartment($department);
+            $newList = $this->globalModel->getInternshipsPerDepartment($department);
             if($newList) $studentsList = array_merge($studentsList, $newList);
         }
 
