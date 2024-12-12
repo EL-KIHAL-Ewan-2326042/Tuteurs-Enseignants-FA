@@ -98,7 +98,7 @@ class Dispatcher {
                                         <thead>
                                         <tr>
                                             <th>Enseignant</th>
-                                            <th>Eleve</th>
+                                            <th>N° Stage</th>
                                             <th>Score</th>
                                             <th>Associer</th>
                                         </tr>
@@ -111,13 +111,13 @@ class Dispatcher {
                                             ?>
                                             <tr>
                                                 <td><?= $resultDispatch['id_teacher']; ?></td>
-                                                <td><?= $resultDispatch['student_number']; ?></td>
+                                                <td><?= $resultDispatch['internship_identifier']; ?></td>
                                                 <td><?= $resultDispatch['score']; ?></td>
                                                 <td>
                                                     <label class="center">
                                                         <input type="checkbox" name="id_prof[]" class="center-align filled-in" value="<?= $resultDispatch['id_teacher']; ?>" />
                                                         <span></span>
-                                                        <input type="hidden" name="id_eleve[]" class="center-align filled-in" value="<?= $resultDispatch['student_number']; ?>" />
+                                                        <input type="hidden" name="id_eleve[]" class="center-align filled-in" value="<?= $resultDispatch['internship_identifier']; ?>" />
                                                         <input type="hidden" name="score[]" class="center-align filled-in" value="<?= $resultDispatch['score']; ?>" />
                                                     </label>
                                                 </td>
