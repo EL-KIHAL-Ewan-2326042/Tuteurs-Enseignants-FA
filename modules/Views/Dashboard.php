@@ -14,12 +14,13 @@ class Dashboard{
             <div class="card-panel white">
                 <h4>Importer :</h4>
 
+                <!--Importation de nouveaux étudiants-->
                 <div class="row">
                     <h5> Rajouter des étudiants : </h5>
                     <form action="/dashboard" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="table_name" value="student">
                         <div class="file-field input-field">
-                            <div class="btn btn-behind">
+                            <div class="btn">
                                 <span>Fichier CSV</span>
                                 <input type="file" name="student" id="student" accept=".csv" multiple>
                             </div>
@@ -33,12 +34,13 @@ class Dashboard{
                     </form>
                 </div>
 
+                <!--Importation de nouveaux professeurs-->
                 <div class="row">
                     <h5> Rajouter des professeurs : </h5>
                     <form action="/dashboard" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="table_name" value="teacher">
                         <div class="file-field input-field">
-                            <div class="btn btn-behind">
+                            <div class="btn">
                                 <span>Fichier CSV</span>
                                 <input type="file" name="teacher" id="teacher" accept=".csv" multiple>
                             </div>
@@ -52,12 +54,13 @@ class Dashboard{
                     </form>
                 </div>
 
+                <!--Importation de nouveaux stages-->
                 <div class="row">
                     <h5> Rajouter des stages : </h5>
                     <form action="/dashboard" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="table_name" value="internship">
                         <div class="file-field input-field">
-                            <div class="btn btn-behind">
+                            <div class="btn">
                                 <span>Fichier CSV</span>
                                 <input type="file" name="internship" id="internship" accept=".csv" multiple>
                             </div>
@@ -72,6 +75,7 @@ class Dashboard{
                 </div>
             </div>
 
+            <!--Exportation des tables : Etudiants/Professeurs/Stages-->
             <div class="card-panel white">
                 <h4>Exporter :</h4>
                 <form action="/dashboard" method="POST">
@@ -85,7 +89,7 @@ class Dashboard{
                         <label>Choisissez la liste à exporter</label>
                     </div>
                     <div class="input-field">
-                        <button class="btn waves-effect waves-light btn-behind" type="submit">Exporter
+                        <button class="btn waves-effect waves-light" type="submit">Exporter
                             <i class="material-icons right">send</i>
                         </button>
                     </div>

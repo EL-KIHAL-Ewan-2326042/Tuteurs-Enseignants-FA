@@ -24,19 +24,24 @@ class Dashboard {
      * @return void
      */
     public function show(): void {
+        //définition de variables
         $title = "Dashboard";
         $cssFilePath = '_assets/styles/dashboard.css';
         $jsFilePath = '_assets/scripts/dashboard.js';
+
+        //récupération de l'instance de la base de données et des classes associées
         $db = \Includes\Database::getInstance();
         $model = new \Blog\Models\Dashboard($db);
         $view = new \Blog\Views\Dashboard();
 
-
+        //vérification du rôle de l'utilisateur
         if (isset($_SESSION['role_name']) && (
                 (is_array($_SESSION['role_name']) && in_array('Admin_dep', $_SESSION['role_name'])) ||
                 ($_SESSION['role_name'] === 'Admin_dep'))) {
 
+            //traitement des requêtes POST
             if($_SERVER["REQUEST_METHOD"] == "POST") {
+                //gestion de l'importation de fichiers CSV spécifiques
                 if (isset($_FILES['student']) || isset($_FILES['teacher']) || isset($_FILES['internship'])) {
                     $tableName = $_POST['table_name'] ?? null;
 
@@ -54,6 +59,7 @@ class Dashboard {
                             }
 
                             if ($csvFile) {
+                                //validation du fichier et correspondances des en-têtes
                                 $csvHeaders = $model->getCsvHeaders($csvFile);
 
                                 if (mime_content_type($csvFile) !== 'text/plain') {
@@ -66,23 +72,21 @@ class Dashboard {
                                     return;
                                 }
 
+                                //importation des données dans la table
                                 if ($model->uploadCsv($csvFile, $tableName)) {
-                                    echo "L'importation du fichier CSV pour la table $tableName a été réalisée avec succès.";
+                                    echo "L'importation du fichier CSV pour la table $tableName a été réalisée avec succès!";
                                 } else {
                                     echo "Une erreur est survenue lors de l'importation pour la table $tableName.";
-
-                                    error_log("CSV Headers: " . implode(", ", $csvHeaders));
-
                                 }
-
                             }
-                            
                         } catch (Exception $e) {
                             echo "Erreur lors de l'importation : " . $e->getMessage();
                         }
                     } else {
                         echo "Table non valide ou non reconnue.";
                     }
+
+                //gestion de l'exportation des fichiers CSV
                 } elseif (isset($_POST['export_list'])) {
                     $tableName = $_POST['export_list'];
 
@@ -101,11 +105,13 @@ class Dashboard {
                 }
             }
 
+            //affichage de la vue Dashboard
             $this->layout->renderTop($title, $cssFilePath);
             $view->showView();
             $this->layout->renderBottom($jsFilePath);
         }
 
+        //redirection de l'utilisateur si il n'a pas les autorisations
         else {
             header('Location: /homepage');
         }

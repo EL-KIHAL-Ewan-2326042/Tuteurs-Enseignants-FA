@@ -1,9 +1,9 @@
+/* Spécification du style pour la balise <main> */
 main {
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
 }
-
 
 h3,h4 {
     color: #00558B;
@@ -19,27 +19,22 @@ h3,h4 {
     padding: 20px;
 }
 
-
-.card-panel select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 10px;
+/* Style des options dans le menu déroulant du select */
+.dropdown-content li>a, .dropdown-content li>span{
+    padding: 15px;
+    color: #00558B;
 }
-
-.card-panel select option {
-    padding: 5px;
-    background-color: #f0f0f0;
-}
-
 
 .row {
     margin: 20px;
 }
 
+/* Style des boutons de la page */
 .btn{
     background-color : #00558B;
 }
 
+/* Style au survol de la souris sur pour les boutons de la page */
 .btn:hover{
     background-color: #E8CE7E;
 }
