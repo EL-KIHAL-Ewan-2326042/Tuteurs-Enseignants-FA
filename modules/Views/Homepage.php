@@ -15,7 +15,7 @@ class Homepage {
             <h3 class="center-align">Répartiteur de tuteurs enseignants</h3>
 
             <div class="card-panel white">
-                <form class="col" id="searchForm" onsubmit="return false;" method="POST">
+                <form class="col table" id="searchForm" onsubmit="return false;" method="POST">
                     <label for="searchType">Type de recherche:</label>
                     <div class="input-field">
                         <select id="searchType" name="searchType">
@@ -32,19 +32,139 @@ class Homepage {
             </div>
             <div class="center">
                 <?php
+                if(isset($_POST['cancel'])) {
+                    unset($_SESSION['selected_student']);
+                }
+
                 if (isset($_SESSION['selected_student']['firstName']) && isset($_SESSION['selected_student']['lastName'])) {
-                    echo '<h4 class="left-align"> Résultat pour: ' . $_SESSION['selected_student']['firstName'] . ' ' .  $_SESSION['selected_student']['lastName'] . '</h4>';
+                    echo '<h4 class="left-align"> Résultat pour: ' . $_SESSION['selected_student']['firstName'] . ' ' .  $_SESSION['selected_student']['lastName'] . '</h4>' . '</div>';
+                if (!isset($_SESSION['selected_student']['address']) || $_SESSION['selected_student']['address'] === '') {
+                    echo "<p>Cet étudiant n'a pas de stage ...</p>";
+                }
+                else {
+                    $internshipInfos = $this->model->getInternshipStudent($_SESSION['selected_student']['id']);
+                    if ($internshipInfos) {
+                        $internships = $this->globalModel->getInternships($_SESSION['selected_student']['id']);
+                        $nbInternships = $this->model->getInternshipTeacher($internships);
+                        $distance = $this->globalModel->getDistance($_SESSION['selected_student']['id'], $_SESSION['identifier']);
+                        $score = $this->model->calculateScore(array('Distance' => $distance,
+                            'A été responsable' => $nbInternships > 0 ? $nbInternships/count($internships) : 0,
+                            'Cohérence' => $this->globalModel->scoreDiscipSubject($_SESSION['selected_student']['id'], $_SESSION['identifier'])));
+
+                        if(isset($_POST['searchedStudentSubmitted'])) {
+
+                            if(isset($_POST['searchedStudent'])) {
+                                $update = $this->model->updateRequests([$_POST['searchedStudent']]);
+
+                            } else {
+                                $update = $this->model->updateRequests(array());
+                            }
+
+                            if(!$update || gettype($update) !== 'boolean') {
+                                echo '<h6 class="red-text">Une erreur est survenue</h6>';
+                            }
+                        }
+
+                        if(isset($_POST['selecStudentSubmitted'])) {
+
+                            if(isset($_POST['selecStudent'])) {
+                                $update = $this->model->updateRequests($_POST['selecStudent']);
+
+                            } else {
+                                $update = $this->model->updateRequests(array());
+                            }
+
+                            if(!$update || gettype($update) !== 'boolean') {
+                                echo '<h6 class="red-text">Une erreur est survenue</h6>';
+                            }
+                        }
+
+                        ?>
+                        <div id="map"></div>
+                        <?
+                        $inDep = false;
+                        foreach ($this->model->getDepStudent($_SESSION['selected_student']['id']) as $dep) {
+                            if (in_array($dep, $this->globalModel->getDepTeacher($_SESSION['identifier']))) {
+                                $inDep = true;
+                                break;
+                            }
+                        }
+                        if (!$internshipInfos['id_teacher'] && $inDep) {
+                            echo '<form method="post" class="center-align table">';
+                        }
+                        ?>
+                            <div class=
+                                 <?
+                                 echo '"scrollable-table-container';
+                                 if ($internshipInfos['id_teacher'] || !$inDep) echo ' center-align table"';
+                                 else echo '"';
+                                 ?> >
+                                <table class="highlight centered">
+                                    <thead>
+                                    <tr>
+                                        <th>HISTORIQUE</th>
+                                        <th>DISTANCE</th>
+                                        <th>SUJET</th>
+                                        <th>ENTREPRISE</th>
+                                        <th>TOTAL</th>
+                                        <th>CHOIX</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><?= $nbInternships > 0 ? 'Oui' : 'Non' ?></td>
+                                            <td>~<?= $distance ?> minutes</td>
+                                            <td><?= str_replace('_', ' ', $internshipInfos["internship_subject"]) ?></td>
+                                            <td><?= str_replace('_', ' ', $internshipInfos["company_name"]) ?></td>
+                                            <td><strong><?= round($score, 2) ?></strong>/5</td>
+                                            <td>
+                                                <?
+                                                if (!$inDep) {
+                                                    echo "<strong>" . $_SESSION['selected_student']['firstName'] . ' ' .  $_SESSION['selected_student']['lastName'] . "</strong> ne fait partie d'aucun de vos départements";
+                                                } else {
+                                                    if ($internshipInfos['id_teacher']) {
+                                                        if ($internshipInfos['id_teacher'] === $_SESSION['identifier']) {
+                                                            echo "Vous êtes déjà le tuteur de " . "<strong>" . $_SESSION['selected_student']['firstName'] . ' ' .  $_SESSION['selected_student']['lastName'] . "</strong> !";
+                                                        } else {
+                                                            echo "<strong>" . $_SESSION['selected_student']['firstName'] . ' ' .  $_SESSION['selected_student']['lastName'] . "</strong> a déjà <strong>" . $internshipInfos['id_teacher'] . "</strong> comme tuteur.";
+                                                        }
+                                                    } else {
+                                                        ?>
+                                                        <label class="center">
+                                                            <input type="checkbox" name="searchedStudent" class="center-align filled-in" value="<?= $internshipInfos["internship_identifier"] ?>" <?= in_array($internshipInfos["internship_identifier"], $this->model->getRequests()) ? 'checked="checked"' : '' ?> />
+                                                            <span></span>
+                                                        </label>
+                                                        <?
+                                                    }
+                                                }
+                                                ?>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?
+                        if (!$internshipInfos['id_teacher'] && $inDep) {
+                            ?>
+                            <div class="row"></div>
+                            <input type="hidden" name="searchedStudentSubmitted" value="1">
+                            <button class="waves-effect waves-light btn" type="submit">Valider</button>
+                            <?php
+                            echo "</form>";
+                        }
+                        echo '<div class="row"></div>';
+                    } else {
+                        echo "<p>Cet étudiant n'a pas de stage ...</p>";
+                    }
                 }
                 ?>
-            </div>
-            <?php
-            if (!isset($_SESSION['selected_student']['address']) || $_SESSION['selected_student']['address'] === '') {
-                echo "<p>Cet étudiant n'a pas de stage ...</p>";
-            }
-            else {
-                ?>
-                <div id="map"></div>
-                <?php
+                <form method="post" class="center-align table">
+                    <input type="hidden" name="cancel" value="1">
+                    <button class="waves-effect waves-light btn" type="submit">Annuler</button>
+                </form>
+            <?
+            } else {
+                echo '</div>';
             }
             ?>
 
@@ -67,7 +187,7 @@ class Homepage {
                 <h6 class="left-align">Vous ne faîtes partie d'aucun département</h6>
             <?
             else: ?>
-                <form method="post" class="center-align">
+                <form method="post" class="center-align table">
                     <div class="selection">
                         <?
                         foreach($departments as $dep): ?>
@@ -77,6 +197,7 @@ class Homepage {
                         </label>
                         <? endforeach; ?>
                     </div>
+                    <div class="row"></div>
                     <input type="hidden" name="selecDepSubmitted" value="1">
                     <button class="waves-effect waves-light btn" type="submit">Afficher</button>
                 </form>
@@ -84,20 +205,6 @@ class Homepage {
                 <div class="row"></div>
 
                 <?
-                if(isset($_POST['selecStudentSubmitted'])) {
-
-                    if(isset($_POST['selecStudent'])) {
-                        $update = $this->model->updateRequests($_POST['selecStudent']);
-
-                    } else {
-                        $update = $this->model->updateRequests(array());
-                    }
-
-                    if(!$update || gettype($update) !== 'boolean') {
-                        echo '<p class="red-text">Une erreur est survenue</p>';
-                    }
-                }
-
                 if(!empty($_SESSION['selecDep'])):
                     $table = $this->model->getStudentsList($_SESSION['selecDep'], $_SESSION['identifier']);
                     if(isset($_POST['sortSubmitted'])) {
@@ -108,7 +215,7 @@ class Homepage {
                     if(empty($table)):
                         echo "<h6 class='left-align'>Aucun stage disponible</h6>";
                     else: ?>
-                        <form method="post" class="center-align">
+                        <form method="post" class="center-align table">
                             <label for="sortBy">Trier par:</label>
                             <div class="input-field">
                                 <select id="sortBy" name="sortBy">
@@ -131,7 +238,7 @@ class Homepage {
 
                         <div class="row"></div>
 
-                        <form method="post" class="center-align">
+                        <form method="post" class="center-align table">
                             <div class="scrollable-table-container">
                                 <table class="highlight centered">
                                     <thead>
@@ -160,7 +267,7 @@ class Homepage {
                                             <td><strong><?= round($row['score'], 2) ?></strong>/5</td>
                                             <td>
                                                 <label class="center">
-                                                    <input type="checkbox" name="selecStudent[]" class="center-align filled-in" value="<?= $row['student_number'] ?>" <?= $row['requested'] ? 'checked="checked"' : '' ?> />
+                                                    <input type="checkbox" name="selecStudent[]" class="center-align filled-in" value="<?= $row['internship_identifier'] ?>" <?= $row['requested'] ? 'checked="checked"' : '' ?> />
                                                     <span></span>
                                                 </label>
                                             </td>
@@ -169,6 +276,7 @@ class Homepage {
                                     </tbody>
                                 </table>
                             </div>
+                            <div class="row"></div>
                             <input type="hidden" name="selecStudentSubmitted" value="1">
                             <button class="waves-effect waves-light btn" type="submit">Valider</button>
                         </form>

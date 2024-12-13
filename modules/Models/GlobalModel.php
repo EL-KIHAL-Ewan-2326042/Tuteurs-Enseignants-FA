@@ -16,12 +16,12 @@ class GlobalModel {
      * @param string $identifier identifiant de l'enseignant
      * @return false|array tableau contenant tous les départements dont l'enseignant connecté fait partie, false sinon
      */
-    public function getDepTeacher(string $identifier): false|array {
+    public function getDepTeacher(string $teacher_id): false|array {
         $query = 'SELECT DISTINCT department_name
                     FROM has_role
-                    WHERE user_id = :teacher';
+                    WHERE user_id = :teacher_id';
         $stmt = $this->db->getConn()->prepare($query);
-        $stmt->bindParam(':teacher', $identifier);
+        $stmt->bindParam(':teacher_id', $teacher_id);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -31,16 +31,15 @@ class GlobalModel {
      * @param string $department le département duquel les élèves sélectionnés font partie
      * @return false|array tableau contenant le numéro, le nom et le prénom de l'élève, ainsi que le nom de l'entreprise dans lequel il va faire son stage, le sujet et les dates, false sinon
      */
-    public function getStudentsPerDepartment(string $department): false|array {
+    public function getInternshipsPerDepartment(string $department): false|array {
         $query = 'SELECT *
-                    FROM student
-                    JOIN study_at
-                    ON student.student_number = study_at.student_number
-                    JOIN internship
-                    ON student.student_number = internship.student_number
-                    WHERE department_name = :dep';
+                    FROM Internship
+                    JOIN Student ON Internship.student_number = Student.student_number
+                    JOIN study_at ON student.student_number = study_at.student_number
+                    WHERE department_name = :department_name
+                    AND id_teacher IS NULL';
         $stmt = $this->db->getConn()->prepare($query);
-        $stmt->bindParam(':dep', $department);
+        $stmt->bindParam(':department_name', $department);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
@@ -51,7 +50,7 @@ class GlobalModel {
      * @return false|array tableau contenant, pour chaque tutorat, le numéro d'enseignant du tuteur, le numéro de l'élève et les dates, false sinon
      */
     public function getInternships(string $student): false|array {
-        $query = 'SELECT id_teacher, student_number, responsible_start_date, responsible_end_date
+        $query = 'SELECT id_teacher, student_number, Start_date_internship, End_date_internship
                     FROM internship
                     WHERE student_number = :student';
         $stmt = $this->db->getConn()->prepare($query);
@@ -142,20 +141,33 @@ class GlobalModel {
      * @param string $idTeacher l'identifiant du professeur
      * @return int distance en minute entre les deux
      */
-    public function getDistance(string $idStudent, string $idTeacher): int {
-        $query = 'SELECT Address FROM Internship WHERE Student_number = :idStudent';
+    public function getDistance(string $internship_identifier, string $id_teacher): int {
+
+        $query = 'SELECT * from Distance WHERE internship_identifier = :idInternship AND id_teacher = :idTeacher';
+        $stmt0 = $this->db->getConn()->prepare($query);
+        $stmt0->bindParam(':idTeacher', $id_teacher);
+        $stmt0->bindParam(':idInternship', $internship_identifier);
+        $stmt0->execute();
+
+        $minDuration = $stmt0->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($minDuration) {
+            return $minDuration[0]['distance'];
+        }
+
+        $query = 'SELECT Address FROM Internship WHERE internship_identifier = :internship_identifier';
         $stmt1 = $this->db->getConn()->prepare($query);
-        $stmt1->bindParam(':idStudent', $idStudent);
+        $stmt1->bindParam(':internship_identifier', $internship_identifier);
         $stmt1->execute();
-        $addressStudent = $stmt1->fetch(PDO::FETCH_ASSOC);
+        $addressInternship = $stmt1->fetch(PDO::FETCH_ASSOC);
 
         $query = 'SELECT Address FROM Has_address WHERE Id_teacher = :idTeacher';
         $stmt2 = $this->db->getConn()->prepare($query);
-        $stmt2->bindParam(':idTeacher', $idTeacher);
+        $stmt2->bindParam(':idTeacher', $id_teacher);
         $stmt2->execute();
         $addressesTeacher = $stmt2->fetchAll(PDO::FETCH_ASSOC);
 
-        $latLngStudent = $this->geocodeAddress($addressStudent['address']);
+        $latLngStudent = $this->geocodeAddress($addressInternship['address']);
 
         $minDuration = PHP_INT_MAX;
 
@@ -170,53 +182,81 @@ class GlobalModel {
             $duration = $this->calculateDuration($latLngStudent, $latLngTeacher);
 
             if ($duration < $minDuration) {
-                $minDuration = $duration;
+                (int) $minDuration = $duration;
             }
         }
 
-        return (int) $minDuration;
+        $query = 'INSERT INTO Distance VALUES (:id_teacher, :id_internship, :distance)';
+        $stmt3 = $this->db->getConn()->prepare($query);
+        $stmt3->bindParam(':id_teacher', $id_teacher);
+        $stmt3->bindParam(':id_internship', $internship_identifier);
+        $stmt3->bindParam(':distance', $minDuration);
+        $stmt3->execute();
+
+        return $minDuration;
     }
 
     /**
-     * Requete a l'api de google pour renvoyer la distance entre deux points
-     * @param array $latLngStudent lattitude et longitude de l'origine
-     * @param array $latLngTeacher longitude et longitude de l'origine
-     * @return float|int|null distance en minute ou decimal. Renvoie null si erreur
+     * Calcule la durée entre deux points avec OSRM
+     * @param array $latLngStudent Latitude et longitude de l'origine
+     * @param array $latLngTeacher Latitude et longitude de la destination
+     * @return float|int|null Durée en minutes, ou null en cas d'erreur
      */
     private function calculateDuration(array $latLngStudent, array $latLngTeacher): float|int|null
     {
-        $apiKey = 'AIzaSyCBS2OwTaG2rfupX3wA-DlTbsBEG9yDVKk';
-        $url = "https://maps.googleapis.com/maps/api/directions/json?origin={$latLngStudent['lat']},{$latLngStudent['lng']}&destination={$latLngTeacher['lat']},{$latLngTeacher['lng']}&key=" . $apiKey;
+        $url = "http://router.project-osrm.org/route/v1/driving/{$latLngStudent['lng']},{$latLngStudent['lat']};{$latLngTeacher['lng']},{$latLngTeacher['lat']}?overview=false&alternatives=false&steps=false";
 
-        $response = file_get_contents($url);
+        $options = [
+            "http" => [
+                "header" => "User-Agent: MonApplication/1.0 (contact@monapplication.com)"
+            ]
+        ];
+
+        $context = stream_context_create($options);
+        $response = file_get_contents($url, false, $context);
         $data = json_decode($response, true);
 
-        if ($data['status'] === 'OK') {
-            return $data['routes'][0]['legs'][0]['duration']['value'] / 60;
+        if (isset($data['routes'][0]['duration'])) {
+            $duration = round($data['routes'][0]['duration'] / 60);
         }
-        return null;
+        else {
+            return null;
+        }
+
+        if ($duration >= 9223372036854775807) {
+            return 60;
+        }
+        else {
+            return $duration;
+        }
+
     }
 
     /**
-     * Geocode une addresse
+     * Géocode une adresse
      * @param string $address
-     * @return array|null contient lattitude et longitude
+     * @return array|null Contient latitude et longitude
      */
     private function geocodeAddress(string $address): ?array
     {
-        $apiKey = 'AIzaSyCBS2OwTaG2rfupX3wA-DlTbsBEG9yDVKk';
-        $url = "https://maps.googleapis.com/maps/api/geocode/json?address=" . urlencode($address) . "&key=" . $apiKey;
+        $url = "https://nominatim.openstreetmap.org/search?format=json&q=" . urlencode($address);
 
-        $response = file_get_contents($url);
+        $options = [
+            "http" => [
+                "header" => "User-Agent: MonApplication/1.0 (contact@monapplication.com)"
+            ]
+        ];
+
+        $context = stream_context_create($options);
+        $response = file_get_contents($url, false, $context);
         $data = json_decode($response, true);
 
-        if ($data['status'] === 'OK') {
+        if (!empty($data)) {
             return [
-                'lat' => $data['results'][0]['geometry']['location']['lat'],
-                'lng' => $data['results'][0]['geometry']['location']['lng']
+                'lat' => $data[0]['lat'],
+                'lng' => $data[0]['lon']
             ];
         }
         return null;
     }
-
 }
