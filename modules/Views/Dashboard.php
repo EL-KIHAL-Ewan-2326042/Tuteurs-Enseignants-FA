@@ -13,13 +13,16 @@ class Dashboard{
             <h3> Dashboard </h3>
             <div class="card-panel white">
                 <h4>Importer :</h4>
+
+                <!--Importation de nouveaux étudiants-->
                 <div class="row">
-                    <h5> Table étudiant (student) : </h5>
+                    <h5> Rajouter des étudiants : </h5>
                     <form action="/dashboard" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="table_name" value="student">
                         <div class="file-field input-field">
                             <div class="btn">
                                 <span>Fichier CSV</span>
-                                <input type="file" name="csv_file_student" id="csv_file_student" accept=".csv" multiple>
+                                <input type="file" name="student" id="student" accept=".csv" multiple>
                             </div>
                             <div class="file-path-wrapper">
                                 <input class="file-path validate" type="text" placeholder="Choisissez un fichier CSV" required>
@@ -31,13 +34,15 @@ class Dashboard{
                     </form>
                 </div>
 
+                <!--Importation de nouveaux professeurs-->
                 <div class="row">
-                    <h5> Table professeur (teacher) : </h5>
+                    <h5> Rajouter des professeurs : </h5>
                     <form action="/dashboard" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="table_name" value="teacher">
                         <div class="file-field input-field">
                             <div class="btn">
                                 <span>Fichier CSV</span>
-                                <input type="file" name="csv_file_teacher" id="csv_file_teacher" accept=".csv" multiple>
+                                <input type="file" name="teacher" id="teacher" accept=".csv" multiple>
                             </div>
                             <div class="file-path-wrapper">
                                 <input class="file-path validate" type="text" placeholder="Choisissez un fichier CSV" required>
@@ -49,13 +54,15 @@ class Dashboard{
                     </form>
                 </div>
 
+                <!--Importation de nouveaux stages-->
                 <div class="row">
-                    <h5> Table entreprise (internship) : </h5>
+                    <h5> Rajouter des stages : </h5>
                     <form action="/dashboard" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="table_name" value="internship">
                         <div class="file-field input-field">
                             <div class="btn">
                                 <span>Fichier CSV</span>
-                                <input type="file" name="csv_file_internship" id="csv_file_internship" accept=".csv" multiple>
+                                <input type="file" name="internship" id="internship" accept=".csv" multiple>
                             </div>
                             <div class="file-path-wrapper">
                                 <input class="file-path validate" type="text" placeholder="Choisissez un fichier CSV" required>
@@ -68,20 +75,27 @@ class Dashboard{
                 </div>
             </div>
 
+            <!--Exportation des tables : Etudiants/Professeurs/Stages-->
             <div class="card-panel white">
                 <h4>Exporter :</h4>
                 <form action="/dashboard" method="POST">
-                    <div class="input-field">
-                        <input id="export_table" name="export_table" type="text" class="validate" required>
-                        <label for="export_table">Nom de la table</label>
-                        <span class="helper-text" data-error="wrong" data-success="right">Ecrire le nom de la table désirée</span>
+                    <div>
+                        <select name="export_list" required>
+                            <option value="" disabled selected>Choisissez la liste à exporter</option>
+                            <option value="student">Etudiants</option>
+                            <option value="teacher">Professeurs</option>
+                            <option value="internship">Stages</option>
+                        </select>
+                        <label>Choisissez la liste à exporter</label>
                     </div>
-                    <button class="btn waves-effect waves-light" type="submit">Exporter
-                        <i class="material-icons right">send</i>
-                    </button>
+                    <div class="input-field">
+                        <button class="btn waves-effect waves-light" type="submit">Exporter
+                            <i class="material-icons right">send</i>
+                        </button>
+                    </div>
                 </form>
             </div>
-    </main>
+        </main>
 <?php
     }
 }
