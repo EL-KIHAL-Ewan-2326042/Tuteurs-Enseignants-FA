@@ -61,31 +61,33 @@ class Dispatcher {
                             } else {
                                 $listCriteria = $this->dispatcherModel->loadCoefficients($_SESSION['identifier'], (int)$id_backup);
                             }
+                            ?>
 
-                            foreach ($listCriteria as $criteria) {
-                                ?>
+                            <?php foreach ($listCriteria as $criteria): ?>
                                 <div class="row">
                                     <div class="col s6">
                                         <p>
                                             <label>
+                                                <input type="hidden" name="is_checked[<?php echo $criteria['name_criteria']; ?>]" value="0">
                                                 <input type="checkbox" class="filled-in criteria-checkbox"
                                                        name="criteria_enabled[<?php echo $criteria['name_criteria']; ?>]"
                                                        data-coef-input-id="<?php echo $criteria['name_criteria']; ?>"
-                                                       checked="checked" />
+                                                       <?php if ($criteria['is_checked']): ?>checked="checked"<?php endif; ?> />
                                                 <span><?= $criteria['name_criteria']; ?></span>
                                             </label>
                                         </p>
                                     </div>
                                     <div class="col s6">
                                         <div class="input-field">
-                                            <input type="number" name="coef[<?= $criteria['name_criteria']; ?>]" id="<?= $criteria['name_criteria']; ?>" min="1" max="100" value="<?= $criteria['coef']; ?>">
+                                            <input type="number" name="coef[<?= $criteria['name_criteria']; ?>]" id="<?= $criteria['name_criteria']; ?>"
+                                                   min="1" max="100" value="<?= $criteria['coef']; ?>" />
                                             <label for="<?= $criteria['name_criteria']; ?>">Coefficient</label>
                                         </div>
                                     </div>
                                 </div>
-                                <?php
-                            }
-                            ?>
+                            <?php endforeach; ?>
+
+
                             <p class="red-text"><?php echo $this->errorMessage2; ?></p>
                             <button class="btn waves-effect waves-light button-margin" type="submit" name="action-save" value="<?= $id_backup ?>">Enregister
                                 <i class="material-icons right">arrow_downward</i>
@@ -141,6 +143,7 @@ class Dispatcher {
                                             header('location: ./dispatcher');
                                         }
                                         $dictCoef = $_POST['coef'];
+
                                         $resultDispatchList = $this->dispatcherModel->dispatcher($dictCoef)[0];
                                         foreach ($resultDispatchList as $resultDispatch):
                                             ?>
@@ -210,12 +213,19 @@ class Dispatcher {
                 }
 
                 checkboxes.forEach(checkbox => {
+                    const hiddenInput = document.querySelector(`input[name="is_checked[${checkbox.dataset.coefInputId}]"]`);
+
+                    if (checkbox.checked) {
+                        hiddenInput.value = '1';
+                    } else {
+                        hiddenInput.value = '0';
+                    }
+
                     checkbox.addEventListener('change', function () {
-                        const coefInput = document.getElementById(this.dataset.coefInputId);
                         if (this.checked) {
-                            coefInput.removeAttribute('disabled');
+                            hiddenInput.value = '1';
                         } else {
-                            coefInput.setAttribute('disabled', 'disabled');
+                            hiddenInput.value = '0';
                         }
                     });
                 });
@@ -229,6 +239,13 @@ class Dispatcher {
                             this.value = 0;
                         }
                     });
+                });
+            });
+
+            document.querySelectorAll('.criteria-checkbox').forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    const hiddenInput = document.querySelector(`input[name="is_checked[${this.dataset.coefInputId}]"]`);
+                    hiddenInput.value = this.checked ? '1' : '0';
                 });
             });
 
