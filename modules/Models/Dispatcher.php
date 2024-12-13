@@ -303,6 +303,7 @@ class Dispatcher{
             }
 
             return true;
+            // TODO Si l'exception correspond au max d'id_backup
         } catch (\Exception $e) {
             return false;
         }

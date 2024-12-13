@@ -237,7 +237,6 @@ async function calculateDistance(origin, destination, map) {
             console.log(`Distance : ${route.distance} mètres`);
             console.log(`Durée : ${route.duration} secondes`);
 
-            // Afficher la route sur la carte
             const routeCoords = route.geometry.coordinates.map((coord) =>
                 ol.proj.fromLonLat(coord)
             );
