@@ -3,7 +3,9 @@
 namespace Blog\Controllers;
 
 use Blog\Views\Layout;
+use Includes\Database;
 use Blog\Views\Dashboard as DashboardView;
+use Blog\Models\Dashboard as DashboardModel;
 use Exception;
 
 class Dashboard {
@@ -20,72 +22,96 @@ class Dashboard {
     /**
      * Contrôleur de la Dashboard
      * @return void
-     * @throws Exception
      */
     public function show(): void {
+        //définition de variables
         $title = "Dashboard";
         $cssFilePath = '_assets/styles/dashboard.css';
-        $jsFilePath = '';
-        $db = \Includes\Database::getInstance();
-        $view = new \Blog\Views\Dashboard();
-        $model = new \Blog\Models\Dashboard($db);
+        $jsFilePath = '_assets/scripts/dashboard.js';
 
+        //récupération de l'instance de la base de données et des classes associées
+        $db = \Includes\Database::getInstance();
+        $model = new \Blog\Models\Dashboard($db);
+        $view = new \Blog\Views\Dashboard();
+
+        //vérification du rôle de l'utilisateur
         if (isset($_SESSION['role_name']) && (
                 (is_array($_SESSION['role_name']) && in_array('Admin_dep', $_SESSION['role_name'])) ||
                 ($_SESSION['role_name'] === 'Admin_dep'))) {
 
+            //traitement des requêtes POST
             if($_SERVER["REQUEST_METHOD"] == "POST") {
-                if (isset($_FILES['csv_file_student'])){
-                    $csvFile = $_FILES['csv_file_student']['tmp_name'];
-                    $model->uploadCsvStudent($csvFile);
-                } elseif (isset($_FILES['csv_file_teacher'])){
-                    $csvFile = $_FILES['csv_file_teacher']['tmp_name'];
-                    $model->uploadCsvTeacher($csvFile);
-                } elseif (isset($_FILES['csv_file_internship'])){
-                    $csvFile = $_FILES['csv_file_internship']['tmp_name'];
-                    $model->uploadCsvInternship($csvFile);
-                } elseif (isset($_POST['export_table'])) {
-                    $table = $_POST['export_table'];
+                //gestion de l'importation de fichiers CSV spécifiques
+                if (isset($_FILES['student']) || isset($_FILES['teacher']) || isset($_FILES['internship'])) {
+                    $tableName = $_POST['table_name'] ?? null;
 
-                    //en-têtes spécifiques de chaque table
-                    $headers = match ($table) {
-                        'student' => ['student_number','student_name','student_firstname','formation','class_group'],
-                        'teacher' => ['id_teacher','teacher_name','teacher_firstname','maxi_number_trainees'],
-                        'internship' => ['internship_identifier','company_name','keywords','start_date_internship','type','end_date_internship','internship_subject','address','student_number'],
-                        'teaches' => ['id_teacher','department_name'],
-                        'department' => ['department_name','address'],
-                        'study_at' => ['student_number','department_name'],
-                        'is_requested' => ['id_teacher','student_number'],
-                        'is_taught' => ['id_teacher','discipline_name'],
-                        'is_responsible' => ['id_teacher','student_number','distance_minute','relevance_score','responsible_start_date','responsible_end_date'],
-                        'discipline' => ['discipline_name'],
-                        'address_type' => ['type'],
-                        'addr_name' => ['address'],
-                        'has_address' => ['id_teacher','address','type'],
-                        'has_role' => ['user_id','role_name','role_department'],
-                        'role' => ['role_name'],
-                        'user_connect' => ['user_id','user_pass'],
-                        'backup' => ['user_id','name_criteria','coef','num_backup'],
-                        'distribution_criteria' => ['name_criteria'],
-                        default => null
-                    };
+                    if ($tableName && $model->isValidTable($tableName)) {
+                        try {
+                            $csvFile = null;
+                            if (isset($_FILES['student'])) {
+                                $csvFile = $_FILES['student']['tmp_name'];
+                            } elseif (isset($_FILES['teacher'])) {
+                                $csvFile = $_FILES['teacher']['tmp_name'];
+                            } elseif (isset($_FILES['internship'])) {
+                                $csvFile = $_FILES['internship']['tmp_name'];
+                            } else {
+                                echo "Aucun fichier CSV valide détecté";
+                            }
 
-                    if($headers === null) {
-                        echo "Table inconnue pour l'export.";
-                        return;
+                            if ($csvFile) {
+                                //validation du fichier et correspondances des en-têtes
+                                $csvHeaders = $model->getCsvHeaders($csvFile);
+
+                                if (mime_content_type($csvFile) !== 'text/plain') {
+                                    echo "Le fichier uploadé n'est pas un CSV valide.";
+                                    return;
+                                }
+
+                                if (!$model->validateHeaders($csvHeaders, $tableName)) {
+                                    echo "Les en-têtes du fichier CSV ne correspondent pas à la structure de la table $tableName.";
+                                    return;
+                                }
+
+                                //importation des données dans la table
+                                if ($model->uploadCsv($csvFile, $tableName)) {
+                                    echo "L'importation du fichier CSV pour la table $tableName a été réalisée avec succès!";
+                                } else {
+                                    echo "Une erreur est survenue lors de l'importation pour la table $tableName.";
+                                }
+                            }
+                        } catch (Exception $e) {
+                            echo "Erreur lors de l'importation : " . $e->getMessage();
+                        }
+                    } else {
+                        echo "Table non valide ou non reconnue.";
                     }
-                    $model->exportToCsvByDepartment($table, $headers);
 
+                //gestion de l'exportation des fichiers CSV
+                } elseif (isset($_POST['export_list'])) {
+                    $tableName = $_POST['export_list'];
+
+                    if ($model->isValidTable($tableName)) {
+                        try {
+                            $headers = $model->getTableColumn($tableName);
+                            $model->exportToCsvByDepartment($tableName, $headers);
+                        } catch (Exception $e) {
+                            echo "Erreur lors de l'exportation : " . $e->getMessage();
+                        }
+                    } else {
+                        echo "Table inconnue pour l'export";
+                    }
                 } else {
                     echo "Aucun fichier CSV n'est reconnu.";
                 }
             }
 
+            //affichage de la vue Dashboard
             $this->layout->renderTop($title, $cssFilePath);
             $view->showView();
             $this->layout->renderBottom($jsFilePath);
         }
 
+        //redirection de l'utilisateur si il n'a pas les autorisations
         else {
             header('Location: /homepage');
         }
