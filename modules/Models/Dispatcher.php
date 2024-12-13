@@ -23,11 +23,11 @@ class Dispatcher{
     public function calculateRelevanceTeacherStudents($identifier, array $dictCoef): array
     {
         $internshipList = array();
-        // On recupere la liste des departement de l'eleve
+        // On recupere la liste des departement du prof
         $departments = $this->globalModel->getDepTeacher($identifier);
         foreach($departments as $listDepTeacher) {
             foreach($listDepTeacher as $department) {
-                // Pour chaque departement, on recupere les eleve
+                // Pour chaque departement, on recupere les stage
                 $newList = $this->globalModel->getInternshipsPerDepartment($department);
                 if ($newList)  {
                     // Les eleves sont rajoutes dans la liste finale
@@ -107,7 +107,11 @@ class Dispatcher{
 
         $query = "SELECT Teacher.Id_teacher, 
                   MAX(maxi_number_trainees) AS Max_trainees, 
-                  COUNT(internship.Student_number) AS Current_count
+                  SUM(CASE 
+                        WHEN internship.type = 'alternance' THEN 2 
+                        WHEN internship.type = 'Internship' THEN 1 
+                        ELSE 0
+                        END) AS Current_count
                   FROM Teacher
                   JOIN has_role ON Teacher.Id_teacher = Has_role.user_id
                   LEFT JOIN internship ON Teacher.Id_teacher = internship.Id_teacher
@@ -123,7 +127,7 @@ class Dispatcher{
         $listTeacherIntership = [];
         foreach ($teacherData as $teacher) {
             $listTeacherMax[$teacher['id_teacher']] = $teacher['max_trainees'];
-            $listTeacherIntership[$teacher['id_teacher']] = $teacher['current_count'] ?: 0;
+            $listTeacherIntership[$teacher['id_teacher']] = $teacher['current_count'];
         }
 
         $listFinal = [];
@@ -145,13 +149,21 @@ class Dispatcher{
         while (!empty($listStart)) {
             usort($listStart, fn($a, $b) => $b['score'] <=> $a['score']);
             $topCandidate = $listStart[0];
-
             if ($assignedCounts[$topCandidate['id_teacher']] < $listTeacherMax[$topCandidate['id_teacher']] &&
-                !in_array($topCandidate['internship_identifier'], $listEleveFinal)) {
-                $listFinal[] = $topCandidate;
-                $listEleveFinal[] = $topCandidate['internship_identifier'];
-                $assignedCounts[$topCandidate['id_teacher']] += ($topCandidate['type'] === 'Internship') ? 2 : 1;
+                !in_array($topCandidate['internship_identifier'], $listEleveFinal) && $topCandidate['type'] === 'Internship') {
+                if ($topCandidate['type'] = 'Internship' && $listTeacherMax[$topCandidate['id_teacher']] - $assignedCounts[$topCandidate['id_teacher']] > 1)  {
+                    $listFinal[] = $topCandidate;
+                    $listEleveFinal[] = $topCandidate['internship_identifier'];
+                    $assignedCounts[$topCandidate['id_teacher']] += 1;
+                }
+                elseif ($topCandidate['type'] = 'alternance' && $listTeacherMax[$topCandidate['id_teacher']] - $assignedCounts[$topCandidate['id_teacher']] > 2){
+                    $listFinal[] = $topCandidate;
+                    $listEleveFinal[] = $topCandidate['internship_identifier'];
+                    $assignedCounts[$topCandidate['id_teacher']] += 2;
+                }
+                else array_shift($listStart);
             }
+            else
             array_shift($listStart);
         }
 
