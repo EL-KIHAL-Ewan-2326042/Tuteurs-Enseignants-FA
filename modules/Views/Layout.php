@@ -21,6 +21,7 @@ class Layout {
                 <link rel="icon" type="image/x-icon" href="/favicon.ico">
                 <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
                 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+                <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/css/ol.css" type="text/css">
                 <link href="/_assets/styles/layout.css" rel="stylesheet">
                 <?php
                 echo '<link href="' . $cssFilePath . '" rel="stylesheet">';
@@ -101,7 +102,11 @@ class Layout {
         $currentUri = $_SERVER['REQUEST_URI'];
 
         if ($currentUri === '/' || $currentUri === '/homepage') {
-            echo '<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCBS2OwTaG2rfupX3wA-DlTbsBEG9yDVKk&loading=async&libraries=marker&callback=initMap" async defer></script>';
+            echo '<script 
+            src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/build/ol.js" 
+            async defer 
+            onload="initMap()">
+          </script>';
         }
         ?>
         </body>
