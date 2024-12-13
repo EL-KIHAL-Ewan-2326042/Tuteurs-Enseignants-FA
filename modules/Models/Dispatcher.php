@@ -243,17 +243,13 @@ class Dispatcher{
      * Fonction recupérant les valeurs du post de la viewDispacher servant à la suite de l'algorithme de repartition final
      * @return string Valeur confirmant l'insertion
      */
-    public function insertIs_responsible() {
-        $messagereturn = "";
-        for ($i = 0; $i<count($_POST['id_prof']); $i++ ) {
-            $query = 'UPDATE internship SET Id_teacher = :id_prof, Relevance_score = :Score WHERE Internship_identifier = :Internship_identifier';
-            $stmt = $this->db->getConn()->prepare($query);
-            $stmt->bindParam(':Internship_id', $_POST['internships_id'][$i]);
-            $stmt->bindParam(':id_prof', $_POST['id_prof'][$i]);
-            $stmt->bindParam(':Score', $_POST['score'][$i]);
-            $stmt->execute();
-            $messagereturn .= "Association " . $_POST['id_prof'] . " et " . $_POST['Internship_id'] . " enregistrée.\n";
-        }
-        return $messagereturn;
+    public function insertIs_responsible(String $id_prof, String $Internship_id, float $Score) {
+        $query = 'UPDATE internship SET Id_teacher = :id_prof, Relevance_score = :Score WHERE Internship_identifier = :Internship_id';
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindParam(':id_prof', $id_prof);
+        $stmt->bindParam(':Score', $Score);
+        $stmt->bindParam(':Internship_id', $Internship_id);
+        $stmt->execute();
+        return "Association " . $id_prof . " et " . $Internship_id . " enregistrée. <br>";
     }
 }

@@ -104,7 +104,6 @@ class Dispatcher {
                                             <th>Associer</th>
                                         </tr>
                                         </thead>
-
                                         <tbody>
                                         <?php
                                         $dictCoef = $_POST['coef'];
@@ -117,10 +116,8 @@ class Dispatcher {
                                                 <td><?= $resultDispatch['score']; ?></td>
                                                 <td>
                                                     <label class="center">
-                                                        <input type="checkbox" id="id_prof[]" name="id_prof[]" class="center-align filled-in" value="<?= $resultDispatch['id_teacher']; ?>" />
+                                                        <input type="checkbox" id="listTupleAssociate[]" name="listTupleAssociate[]" class="center-align filled-in" value="<?= $resultDispatch['id_teacher'] . "$". $resultDispatch['internship_identifier'] . "$". $resultDispatch['score']; ?>" />
                                                         <span></span>
-                                                        <input type="hidden" id="internship_id[]" name="internship_id[]" class="center-align filled-in" value="<?= $resultDispatch['internship_identifier']; ?>" />
-                                                        <input type="hidden" id="score[]" name="score[]" class="center-align filled-in" value="<?= $resultDispatch['score']; ?>" />
                                                     </label>
                                                 </td>
                                             </tr>
