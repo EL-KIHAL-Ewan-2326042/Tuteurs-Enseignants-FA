@@ -241,11 +241,10 @@ class Dispatcher{
      * @param string $user_id
      * @return array|null Renvoie les coefficients ou les sauvegardes disponibles.
      */
-    public function showCoefficients(string $user_id): ?array {
+    public function showCoefficients(): ?array {
         try {
-            $query = "SELECT DISTINCT id_backup FROM backup WHERE user_id = :user_id ORDER BY id_backup DESC";
+            $query = "SELECT DISTINCT id_backup FROM id_backup";
             $stmt = $this->db->getConn()->prepare($query);
-            $stmt->bindParam(':user_id', $user_id);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (\Exception $e) {
@@ -273,23 +272,45 @@ class Dispatcher{
      * @param string $user_id
      * @return bool
      */
-    public function saveCoefficients(array $coefficients, string $user_id): bool {
+    public function saveCoefficients(array $coefficients, string $user_id, int $id_backup = 0): bool {
         try {
-            $query = "SELECT MAX(id_backup) FROM backup WHERE user_id = :user_id";
-            $stmt = $this->db->getConn()->prepare($query);
-            $stmt->bindParam(':user_id', $user_id);
-            $stmt->execute();
-            $id_backup = $stmt->fetch(PDO::FETCH_COLUMN);
+            if ($id_backup === 0) {
+                $query = "SELECT MAX(id_backup) FROM id_backup";
+                $stmt = $this->db->getConn()->prepare($query);
+                $stmt->execute();
+                $max_id_backup = $stmt->fetchColumn();
 
-            $id_backup += 1;
-            foreach ($coefficients as $nameCriteria => $coef) {
-                $query = "INSERT INTO backup (user_id, name_criteria, id_backup, coef) VALUES (:user_id, :name_criteria, :id_backup, :coef)";
+                $query = "SELECT MAX(id_backup) FROM backup WHERE user_id = :user_id";
                 $stmt = $this->db->getConn()->prepare($query);
                 $stmt->bindParam(':user_id', $user_id);
-                $stmt->bindParam(':name_criteria', $nameCriteria);
-                $stmt->bindParam(':id_backup', $id_backup);
-                $stmt->bindParam(':coef', $coef);
                 $stmt->execute();
+                $id_backup = $stmt->fetch(PDO::FETCH_COLUMN);
+
+                if ($id_backup + 1 !== $max_id_backup) {
+                    $id_backup += 1;
+                }
+
+                $query = "INSERT INTO backup (user_id, name_criteria, id_backup, coef) VALUES (:user_id, :name_criteria, :id_backup, :coef)";
+                foreach ($coefficients as $nameCriteria => $coef) {
+                    $stmt = $this->db->getConn()->prepare($query);
+                    $stmt->bindParam(':user_id', $user_id);
+                    $stmt->bindParam(':name_criteria', $nameCriteria);
+                    $stmt->bindParam(':id_backup', $id_backup);
+                    $stmt->bindParam(':coef', $coef);
+                    $stmt->execute();
+                }
+            }
+
+            else {
+                $query = "UPDATE backup SET coef = :coef WHERE user_id = :user_id AND id_backup = :id_backup AND name_criteria = :name_criteria";
+                foreach ($coefficients as $nameCriteria => $coef) {
+                    $stmt = $this->db->getConn()->prepare($query);
+                    $stmt->bindParam(':user_id', $user_id);
+                    $stmt->bindParam('id_backup', $id_backup);
+                    $stmt->bindParam(':name_criteria', $nameCriteria);
+                    $stmt->bindParam(':coef', $coef);
+                    $stmt->execute();
+                }
             }
 
             return true;

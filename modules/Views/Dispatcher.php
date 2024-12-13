@@ -10,6 +10,7 @@ class Dispatcher {
     /**
      * @param \Blog\Models\Dispatcher $dispatcherModel
      * @param string $errorMessage
+     * @param string $errorMessage2
      */
     public function __construct(private readonly \Blog\Models\Dispatcher $dispatcherModel, private readonly string $errorMessage1,private readonly string $errorMessage2) {
     }
@@ -25,11 +26,11 @@ class Dispatcher {
                     <div class="col card-panel white z-depth-3 s12 m6" style="padding: 20px; margin-right: 10px">
                         <form class="col s12" action="./dispatcher" method="post" id="pushCoef" onsubmit="showLoading();">
                             <?php
-                            $saves = $this->dispatcherModel->showCoefficients($_SESSION['identifier']);
+                            $saves = $this->dispatcherModel->showCoefficients();
                             if ($saves): ?>
                                 <div class="input-field">
                                     <select id="save-selector" name="save-selector">
-                                        <?php if (isset($_POST['save-selector']) && $_POST['save-selector'] !== 'default'):?>
+                                        <?php if (isset($_POST['save-selector']) && $_POST['save-selector'] !== 'new'):?>
                                             <option value='new'>Sauvegarde #<?= $_POST['save-selector']?></option>
                                         <?php else:?>
                                             <option value='new'>Choisir une sauvegarde</option>
@@ -44,7 +45,7 @@ class Dispatcher {
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                        <?php endif; ?>
+                    <?php endif; ?>
 
 
                             <?php
@@ -86,7 +87,7 @@ class Dispatcher {
                             }
                             ?>
                             <p class="red-text"><?php echo $this->errorMessage2; ?></p>
-                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action" value="save">Enregister
+                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action-save" value="<?= $id_backup ?>">Enregister
                                 <i class="material-icons right">arrow_downward</i>
                             </button>
                             <button class="btn waves-effect waves-light button-margin" type="submit" name="action" value="generate" id="generate-btn">Générer
@@ -118,6 +119,7 @@ class Dispatcher {
                 <div id="loading-section" class="center-align" style="display: none;">
                     <p>Chargement en cours, veuillez patienter...</p>
                 </div>
+                    <?php endif?>
 
                 <?php if (isset($_POST['action']) && $_POST['action'] === 'generate'): ?>
                     <div class="row card-panel white z-depth-3 s12 m6">
@@ -201,7 +203,7 @@ class Dispatcher {
                 if (selectAllCheckbox) {
                     selectAllCheckbox.addEventListener('change', function () {
                         const isChecked = this.checked;
-                        document.querySelectorAll('input[type="checkbox"][name="id_prof[]"]').forEach(checkbox => {
+                        document.querySelectorAll('input[type="checkbox"][name="listTupleAssociate[]"').forEach(checkbox => {
                             checkbox.checked = isChecked;
                         });
                     });
@@ -241,7 +243,6 @@ class Dispatcher {
             }
         </script>
 
-
-        <?php
+<?php
     }
 }

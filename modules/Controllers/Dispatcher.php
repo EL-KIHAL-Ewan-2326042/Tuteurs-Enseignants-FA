@@ -74,14 +74,14 @@ class Dispatcher {
             $errorMessage2 = '';
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                if (isset($_POST['action']) && $_POST['action'] === 'save') {
+                if (isset($_POST['action-save'])) {
 
                     $coefficients = [];
                     foreach ($_POST['coef'] as $criteria => $coef) {
                         $coefficients[$criteria] = $coef;
                     }
 
-                    $dispatcherModel->saveCoefficients($coefficients, $_SESSION['identifier']);
+                    $dispatcherModel->saveCoefficients($coefficients, $_SESSION['identifier'], $_POST['action-save']);
                 }
 
                 if (isset($_POST['Internship_identifier']) && isset($_POST['Id_teacher'])) {
