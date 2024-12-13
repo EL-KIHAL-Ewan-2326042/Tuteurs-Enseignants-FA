@@ -20,30 +20,37 @@ class Dispatcher {
             <div class="col">
                 <h3 class="center-align">Répartiteur de tuteurs enseignants</h3>
 
+                <?php if (!isset($_POST['action']) || $_POST['action'] !== 'generate'): ?>
                 <div class="row" id="forms-section">
                     <div class="col card-panel white z-depth-3 s12 m6" style="padding: 20px; margin-right: 10px">
                         <form class="col s12" action="./dispatcher" method="post" id="pushCoef" onsubmit="showLoading();">
                             <?php
                             $saves = $this->dispatcherModel->showCoefficients($_SESSION['identifier']);
                             if ($saves): ?>
-                                <label for="save-selector">Choisir une sauvegarde:</label>
                                 <div class="input-field">
                                     <select id="save-selector" name="save-selector">
-                                        <option>Choisir une sauvegarde</option>
+                                        <?php if (isset($_POST['save-selector']) && $_POST['save-selector'] !== 'default'):?>
+                                            <option value='new'>Sauvegarde #<?= $_POST['save-selector']?></option>
+                                        <?php else:?>
+                                            <option value='new'>Choisir une sauvegarde</option>
+                                        <?php endif;?>
                                         <?php foreach ($saves as $save): ?>
+                                        <?php if ($save['id_backup'] == $_POST['save-selector']) {
+                                            continue;
+                                            }?>
                                             <option value="<?php echo $save['id_backup']; ?>">
                                                 Sauvegarde #<?= $save['id_backup']; ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
                                 </div>
-                            <?php endif; ?>
+                        <?php endif; ?>
 
 
                             <?php
-                            $id_backup = $_POST['save-selector'] ?? 'new';
+                            $id_backup = $_POST['save-selector'] ?? 'default';
 
-                            if ($id_backup === 'new') {
+                            if ($id_backup === 'default' || $id_backup === 'new') {
                                 $defaultCriteria = $this->dispatcherModel->getDefaultCoef();
                                 $listCriteria = [];
 
@@ -106,6 +113,7 @@ class Dispatcher {
                         </div>
                     </form>
                 </div>
+                <?php endif; ?>
 
                 <div id="loading-section" class="center-align" style="display: none;">
                     <p>Chargement en cours, veuillez patienter...</p>
@@ -127,6 +135,10 @@ class Dispatcher {
                                         </thead>
                                         <tbody>
                                         <?php
+                                        if (!isset($_POST['coef'])) {
+                                            header('location: ./dispatcher');
+                                        }
+
                                         $dictCoef = $_POST['coef'];
                                         $resultDispatchList = $this->dispatcherModel->dispatcher($dictCoef)[0];
                                         foreach ($resultDispatchList as $resultDispatch):
@@ -163,6 +175,8 @@ class Dispatcher {
                                 <div class="col s12 center">
                                     <input type="hidden" name="selecStudentSubmitted" value="1">
                                     <button class="waves-effect waves-light btn" type="submit">Valider</button>
+                                    <input type="hidden" name="restartDispatcherButton" value="1">
+                                    <button class="waves-effect waves-light btn" type="submit">Recommencer</button>
                                 </div>
                             </form>
                         </div>
