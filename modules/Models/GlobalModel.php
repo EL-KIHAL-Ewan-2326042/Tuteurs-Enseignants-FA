@@ -186,6 +186,10 @@ class GlobalModel {
             }
         }
 
+        if (!$minDuration) {
+            return 60;
+        }
+
         $query = 'INSERT INTO Distance VALUES (:id_teacher, :id_internship, :distance)';
         $stmt3 = $this->db->getConn()->prepare($query);
         $stmt3->bindParam(':id_teacher', $id_teacher);
@@ -204,6 +208,7 @@ class GlobalModel {
      */
     private function calculateDuration(array $latLngStudent, array $latLngTeacher): float|int|null
     {
+        return 60;
         $url = "http://router.project-osrm.org/route/v1/driving/{$latLngStudent['lng']},{$latLngStudent['lat']};{$latLngTeacher['lng']},{$latLngTeacher['lat']}?overview=false&alternatives=false&steps=false";
 
         $options = [

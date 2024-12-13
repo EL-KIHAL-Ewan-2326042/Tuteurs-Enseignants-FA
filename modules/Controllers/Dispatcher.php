@@ -73,16 +73,17 @@ class Dispatcher {
             $errorMessage1 = '';
             $errorMessage2 = '';
 
-            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                if (isset($_POST['action-save'])) {
-
-                    $coefficients = [];
-                    foreach ($_POST['coef'] as $criteria => $coef) {
-                        $coefficients[$criteria] = $coef;
-                    }
-
-                    $dispatcherModel->saveCoefficients($coefficients, $_SESSION['identifier'], $_POST['action-save']);
+            if (isset($_POST['action-save']) && $_POST['action-save'] !== 'default') {
+                $coefficients = [];
+                foreach ($_POST['coef'] as $criteria => $coef) {
+                    $coefficients[$criteria] = [
+                        'coef' => $coef,
+                        'is_checked' => $_POST['is_checked'][$criteria] ?? 0,
+                        'name_criteria' => $criteria
+                    ];
                 }
+
+                $dispatcherModel->saveCoefficients($coefficients, $_SESSION['identifier'], (int)$_POST['action-save']);
 
                 if (isset($_POST['Internship_identifier']) && isset($_POST['Id_teacher'])) {
                     $errorMessage1 = $this->association_direct($dispatcherModel);
