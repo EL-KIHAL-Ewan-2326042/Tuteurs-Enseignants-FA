@@ -10,7 +10,7 @@ class Dispatcher {
     /**
      * @return void
      */
-    public function association($db, $dispatcherModel): string {
+    public function association_direct($dispatcherModel): string {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['Internship_identifier']) && isset($_POST['Id_teacher']) && $_POST['Internship_identifier'] !== '' && $_POST['Id_teacher'] !== '') {
 
             $listTeacher = $dispatcherModel->createListTeacher();
@@ -35,6 +35,33 @@ class Dispatcher {
         return '';
     }
 
+    /**
+     * @return void
+     */
+    public function association_after_sort($dispatcherModel): string {
+        $listTeacher = $dispatcherModel->createListTeacher();
+        $listInternship = $dispatcherModel->createListInternship();
+        $listAssociate = $dispatcherModel->createListAssociate();
+
+        $returnMessage = '';
+        foreach($_POST['listTupleAssociate'] as $tupleAssociate){
+            $tmp = explode("$", $tupleAssociate);
+            print_r($tmp);
+            if (in_array($tmp[0], $listTeacher) && in_array($tmp[1], $listInternship)){
+                if (!(in_array([$tmp[0], $tmp[1]], $listAssociate))) {
+                    $returnMessage .= $dispatcherModel->insertIs_responsible($tmp[0], $tmp[1], floatval($tmp[2]));
+                }
+                else {
+                    $returnMessage .= "Cette association existe déjà<br>";
+                }
+            }
+            else {
+                $returnMessage .=  $tmp[0] . "ou" . $tmp[1] . "inexistant dans ce departement<br>";
+            }
+        }
+        return $returnMessage;
+    }
+
     public function show(): void {
 
         if (isset($_SESSION['role_name']) && (
@@ -43,14 +70,25 @@ class Dispatcher {
             $db = Database::getInstance();
             $globalModel = new \Blog\Models\GlobalModel($db);
             $dispatcherModel = new \Blog\Models\Dispatcher($db, $globalModel);
-            $errorMessage = '';
+            $errorMessage1 = '';
+            $errorMessage2 = '';
 
             if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                if (isset($_POST['Internship_identifier']) && isset($_POST['Id_teacher'])) {
-                    $errorMessage = $this->association($db, $dispatcherModel);
+                if (isset($_POST['action']) && $_POST['action'] === 'save') {
+
+                    $coefficients = [];
+                    foreach ($_POST['coef'] as $criteria => $coef) {
+                        $coefficients[$criteria] = $coef;
+                    }
+
+                    $dispatcherModel->saveCoefficients($coefficients, $_SESSION['identifier']);
                 }
-                if (isset($_POST['id_teacher'])) {
-                    $dispatcherModel->insertIs_responsible();
+
+                if (isset($_POST['Internship_identifier']) && isset($_POST['Id_teacher'])) {
+                    $errorMessage1 = $this->association_direct($dispatcherModel);
+                }
+                if (isset($_POST['selectStudentSubmitted']) && isset($_POST['listTupleAssociate'])) {
+                    $errorMessage2 = $this->association_after_sort($dispatcherModel);
                 }
             }
 
@@ -58,7 +96,7 @@ class Dispatcher {
             $title = "Dispatcher";
             $cssFilePath = '_assets/styles/dispatcher.css';
             $jsFilePath = '_assets/scripts/dispatcher.js';
-            $view = new \Blog\Views\Dispatcher($dispatcherModel, $errorMessage);
+            $view = new \Blog\Views\Dispatcher($dispatcherModel, $errorMessage1, $errorMessage2);
 
             $layout = new Layout();
             $layout->renderTop($title, $cssFilePath);
