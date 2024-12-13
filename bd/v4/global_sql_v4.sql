@@ -152,6 +152,7 @@ CREATE TABLE Backup(
     Name_criteria VARCHAR(50),
     Id_backup INT,
     Coef INT,
+    Is_checked BOOLEAN DEFAULT TRUE,
     PRIMARY KEY(User_id, Name_criteria, Id_backup),
     FOREIGN KEY(User_id) REFERENCES User_connect(User_id),
     FOREIGN KEY(Name_criteria) REFERENCES Distribution_criteria(Name_criteria),
