@@ -40,23 +40,26 @@ class Dispatcher {
      */
     public function association_after_sort($dispatcherModel): string {
         $listTeacher = $dispatcherModel->createListTeacher();
-        $listStudent = $dispatcherModel->createListInternship();
+        $listInternship = $dispatcherModel->createListInternship();
         $listAssociate = $dispatcherModel->createListAssociate();
-        print_r($listAssociate);
-        print_r($_POST['id_prof']);
-        print_r($_POST['internship_id']);
-        print_r($_POST['score']);
-        if (in_array($_POST['id_prof'], $listTeacher) && in_array($_POST['internship_id'], $listStudent)){
-            if (!(in_array([$_POST['id_prof'], $_POST['internship_id']], $listAssociate))) {
-                return $dispatcherModel->insertIs_responsible();
+
+        $returnMessage = '';
+        foreach($_POST['listTupleAssociate'] as $tupleAssociate){
+            $tmp = explode("$", $tupleAssociate);
+            print_r($tmp);
+            if (in_array($tmp[0], $listTeacher) && in_array($tmp[1], $listInternship)){
+                if (!(in_array([$tmp[0], $tmp[1]], $listAssociate))) {
+                    $returnMessage .= $dispatcherModel->insertIs_responsible($tmp[0], $tmp[1], floatval($tmp[2]));
+                }
+                else {
+                    $returnMessage .= "Cette association existe déjà<br>";
+                }
             }
             else {
-                return "Cette association existe déjà";
+                $returnMessage .=  $tmp[0] . "ou" . $tmp[1] . "inexistant dans ce departement<br>";
             }
         }
-        else {
-            return "Internship_identifier ou Id_Teacher inexistant dans ce departement";
-        }
+        return $returnMessage;
     }
 
     public function show(): void {
@@ -74,7 +77,7 @@ class Dispatcher {
                 if (isset($_POST['Internship_identifier']) && isset($_POST['Id_teacher'])) {
                     $errorMessage1 = $this->association_direct($dispatcherModel);
                 }
-                if (isset($_POST['selectStudentSubmitted']) && isset($_POST['id_prof'])) {
+                if (isset($_POST['selectStudentSubmitted']) && isset($_POST['listTupleAssociate'])) {
                     $errorMessage2 = $this->association_after_sort($dispatcherModel);
                 }
             }
