@@ -52,7 +52,7 @@ class Dispatcher {
                     $returnMessage .= $dispatcherModel->insertIs_responsible($tmp[0], $tmp[1], floatval($tmp[2]));
                 }
                 else {
-                    $returnMessage .= "Cette association existe déjà<br>";
+                    $returnMessage .= $tmp[0] . " et " . $tmp[1] . "Cette association existe déjà<br>";
                 }
             }
             else {

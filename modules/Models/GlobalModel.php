@@ -204,6 +204,7 @@ class GlobalModel {
      */
     private function calculateDuration(array $latLngStudent, array $latLngTeacher): float|int|null
     {
+        return 60;
         $url = "http://router.project-osrm.org/route/v1/driving/{$latLngStudent['lng']},{$latLngStudent['lat']};{$latLngTeacher['lng']},{$latLngTeacher['lat']}?overview=false&alternatives=false&steps=false";
 
         $options = [
