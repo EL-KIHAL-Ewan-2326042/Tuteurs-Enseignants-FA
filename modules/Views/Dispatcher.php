@@ -147,13 +147,17 @@ class Dispatcher {
                                             return isset($_POST['criteria_enabled'][$key]);
                                         }, ARRAY_FILTER_USE_BOTH);
 
+                                        if (empty($dictCoef)) {
+                                            header('location: ./dispatcher');
+                                        }
+
                                         $resultDispatchList = $this->dispatcherModel->dispatcher($dictCoef)[0];
                                         foreach ($resultDispatchList as $resultDispatch):
                                             ?>
                                             <tr>
                                                 <td><?= $resultDispatch['id_teacher']; ?></td>
                                                 <td><?= $resultDispatch['internship_identifier']; ?></td>
-                                                <td><?= $resultDispatch['score']; ?></td>
+                                                <td><strong><?= $resultDispatch['score']; ?></strong>/5</td>
                                                 <td>
                                                     <label class="center">
                                                         <input type="checkbox" id="listTupleAssociate[]" name="listTupleAssociate[]" class="center-align filled-in" value="<?= $resultDispatch['id_teacher'] . "$". $resultDispatch['internship_identifier'] . "$". $resultDispatch['score']; ?>" />

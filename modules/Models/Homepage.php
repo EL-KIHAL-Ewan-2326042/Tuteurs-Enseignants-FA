@@ -322,9 +322,18 @@ class Homepage {
                         break;
 
                     case 'A été responsable':
-                        $scoreInternship = ($value > 0) ? $coef : 0;
-                        $totalScore += $scoreInternship;
+                        $numberOfInternships = $value;
+                        $baselineScore = 0.7 * $coef;
+
+                        if ($numberOfInternships > 0) {
+                            $ScoreInternship = $coef * min(1, log(1 + $numberOfInternships, 2));
+                        } else {
+                            $ScoreInternship = $baselineScore;
+                        }
+
+                        $totalScore += $ScoreInternship;
                         break;
+
 
                     case 'Cohérence':
                         $scoreRelevance = $value * $coef;
@@ -340,7 +349,7 @@ class Homepage {
             }
         }
 
-        return ($totalScore * 5) / $totalCoef;
+        return (($totalScore * 5) / $totalCoef);
     }
 
 

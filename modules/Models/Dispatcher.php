@@ -62,7 +62,16 @@ class Dispatcher{
                             break;
 
                         case 'A été responsable':
-                            $ScoreInternship = ($value > 0) ? $coef : 0;
+                            $numberOfInternships = count($value);
+
+                            $baselineScore = 0.7 * $coef;
+
+                            if ($numberOfInternships > 0) {
+                                $ScoreInternship = $coef * min(1, log(1 + $numberOfInternships, 2));
+                            } else {
+                                $ScoreInternship = $baselineScore;
+                            }
+
                             $totalScore += $ScoreInternship;
                             break;
 
@@ -81,7 +90,7 @@ class Dispatcher{
             // Score normalise sur 5
             $ScoreFinal = ($totalScore * 5) / $totalCoef;
 
-            $newList = ["id_teacher" => $identifier, "internship_identifier" => $internship['internship_identifier'], "score" => round($ScoreFinal, 2), "type" => $internship['type']];
+            $newList = ["id_teacher" => $identifier, "internship_identifier" => $internship['internship_identifier'], "score" => (int)round($ScoreFinal, 2), "type" => $internship['type']];
 
             if (!empty($newList)) {
                 $result[] = $newList;
@@ -275,7 +284,6 @@ class Dispatcher{
      */
     public function saveCoefficients(array $data, string $user_id, int $id_backup = 0): bool {
         try {
-            print_r($data);
             $query = "UPDATE backup 
                   SET coef = :coef, is_checked = :is_checked 
                   WHERE user_id = :user_id AND id_backup = :id_backup AND name_criteria = :name_criteria";
@@ -296,7 +304,8 @@ class Dispatcher{
         }
     }
 
-    public function getDefaultCoef() {
+    public function getDefaultCoef(): array
+    {
         $query = "SELECT name_criteria FROM distribution_criteria";
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->execute();

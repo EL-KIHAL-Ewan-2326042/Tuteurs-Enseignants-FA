@@ -58,7 +58,6 @@ thead, tbody tr {
 
 tbody {
     width: 100%;
-    max-height: 27rem;
     overflow-y: auto;
     display: block;
 }
