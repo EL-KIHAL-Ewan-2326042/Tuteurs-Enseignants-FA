@@ -142,7 +142,10 @@ class Dispatcher {
                                         if (!isset($_POST['coef'])) {
                                             header('location: ./dispatcher');
                                         }
-                                        $dictCoef = $_POST['coef'];
+
+                                        $dictCoef = array_filter($_POST['coef'], function ($coef, $key) {
+                                            return isset($_POST['criteria_enabled'][$key]);
+                                        }, ARRAY_FILTER_USE_BOTH);
 
                                         $resultDispatchList = $this->dispatcherModel->dispatcher($dictCoef)[0];
                                         foreach ($resultDispatchList as $resultDispatch):
