@@ -46,7 +46,6 @@ class Dispatcher {
         $returnMessage = '';
         foreach($_POST['listTupleAssociate'] as $tupleAssociate){
             $tmp = explode("$", $tupleAssociate);
-            print_r($tmp);
             if (in_array($tmp[0], $listTeacher) && in_array($tmp[1], $listInternship)){
                 if (!(in_array([$tmp[0], $tmp[1]], $listAssociate))) {
                     $returnMessage .= $dispatcherModel->insertIs_responsible($tmp[0], $tmp[1], floatval($tmp[2]));
@@ -84,15 +83,14 @@ class Dispatcher {
                 }
 
                 $dispatcherModel->saveCoefficients($coefficients, $_SESSION['identifier'], (int)$_POST['action-save']);
-
-                if (isset($_POST['Internship_identifier']) && isset($_POST['Id_teacher'])) {
-                    $errorMessage1 = $this->association_direct($dispatcherModel);
-                }
-                if (isset($_POST['selectStudentSubmitted']) && isset($_POST['listTupleAssociate'])) {
-                    $errorMessage2 = $this->association_after_sort($dispatcherModel);
-                }
             }
 
+            if (isset($_POST['Internship_identifier']) && isset($_POST['Id_teacher'])) {
+                $errorMessage1 = $this->association_direct($dispatcherModel);
+            }
+            if (isset($_POST['selectStudentSubmitted']) && isset($_POST['listTupleAssociate'])) {
+                $errorMessage2 = $this->association_after_sort($dispatcherModel);
+            }
 
             $title = "Dispatcher";
             $cssFilePath = '_assets/styles/dispatcher.css';

@@ -32,7 +32,7 @@ class GlobalModel {
      * @return false|array tableau contenant le numéro, le nom et le prénom de l'élève, ainsi que le nom de l'entreprise dans lequel il va faire son stage, le sujet et le numéro du stage, false sinon
      */
     public function getInternshipsPerDepartment(string $department): false|array {
-        $query = 'SELECT internship_identifier, company_name, internship_subject, internship.student_number AS student_number, id_teacher, student_name, student_firstname
+        $query = 'SELECT internship_identifier, company_name, internship_subject, internship.student_number, internship.type AS student_number, id_teacher, student_name, student_firstname, type
                     FROM internship
                     JOIN student ON internship.student_number = student.student_number
                     JOIN study_at ON internship.student_number = study_at.student_number
@@ -151,12 +151,11 @@ class GlobalModel {
 
         $query = 'SELECT * from Distance WHERE internship_identifier = :idInternship AND id_teacher = :idTeacher';
         $stmt0 = $this->db->getConn()->prepare($query);
-        $stmt0->bindParam(':idTeacher', $id_teacher);
         $stmt0->bindParam(':idInternship', $internship_identifier);
+        $stmt0->bindParam(':idTeacher', $id_teacher);
         $stmt0->execute();
 
         $minDuration = $stmt0->fetchAll(PDO::FETCH_ASSOC);
-
         if ($minDuration) {
             return $minDuration[0]['distance'];
         }
@@ -196,7 +195,11 @@ class GlobalModel {
             return 60;
         }
 
-        $query = 'INSERT INTO Distance VALUES (:id_teacher, :id_internship, :distance)';
+        $query = 'INSERT INTO Distance (id_teacher, internship_identifier, distance)
+                  VALUES (:id_teacher, :id_internship, :distance)
+                  ON CONFLICT (id_teacher, internship_identifier)
+                  DO UPDATE SET distance = EXCLUDED.distance;';
+
         $stmt3 = $this->db->getConn()->prepare($query);
         $stmt3->bindParam(':id_teacher', $id_teacher);
         $stmt3->bindParam(':id_internship', $internship_identifier);
