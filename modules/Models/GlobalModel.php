@@ -192,6 +192,10 @@ class GlobalModel {
             }
         }
 
+        if (!$minDuration) {
+            return 60;
+        }
+
         $query = 'INSERT INTO Distance VALUES (:id_teacher, :id_internship, :distance)';
         $stmt3 = $this->db->getConn()->prepare($query);
         $stmt3->bindParam(':id_teacher', $id_teacher);
