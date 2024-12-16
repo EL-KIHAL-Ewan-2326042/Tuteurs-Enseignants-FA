@@ -1,7 +1,7 @@
 <?php
 namespace Blog\Views;
 
-class Homepage {
+class   Homepage {
 
     public function __construct(private readonly \Blog\Models\Homepage $model, private readonly \Blog\Models\GlobalModel $globalModel) { }
 
@@ -75,10 +75,6 @@ class Homepage {
                         $internships = $this->globalModel->getInternships($_SESSION['selected_student']['id']);
                         $nbInternships = $this->model->getInternshipTeacher($internships, $_SESSION['identifier']);
                         $distance = $this->globalModel->getDistance($internshipInfos['internship_identifier'], $_SESSION['identifier']);
-                        $score = $this->model->calculateScore(
-                                array('Distance' => $distance,
-                            'A été responsable' => $nbInternships > 0 ? $nbInternships/count($internships) : 0,
-                            'Cohérence' => $this->globalModel->scoreDiscipSubject($internshipInfos["internship_identifier"], $_SESSION['identifier'])));
                         ?>
                         <div id="map"></div>
                         <div class="row"></div>
@@ -103,7 +99,6 @@ class Homepage {
                                     <th>DISTANCE</th>
                                     <th>SUJET</th>
                                     <th>ENTREPRISE</th>
-                                    <th>TOTAL</th>
                                     <th>CHOIX</th>
                                 </tr>
                                 </thead>
@@ -113,7 +108,6 @@ class Homepage {
                                         <td>~<?= $distance ?> minutes</td>
                                         <td><?= str_replace('_', ' ', $internshipInfos["internship_subject"]) ?></td>
                                         <td><?= str_replace('_', ' ', $internshipInfos["company_name"]) ?></td>
-                                        <td><strong><?= (int)$score ?></strong>/5</td>
                                         <td>
                                             <?
                                             if (!$inDep) {
@@ -245,7 +239,6 @@ class Homepage {
                                     <th>DISTANCE</th>
                                     <th>SUJET</th>
                                     <th>ENTREPRISE</th>
-                                    <th>TOTAL</th>
                                     <th>CHOIX</th>
                                 </tr>
                                 </thead>
@@ -261,7 +254,6 @@ class Homepage {
                                         <td>~<?= $row['duration'] ?> minutes</td>
                                         <td><?= str_replace('_', ' ', $row["internship_subject"]) ?></td>
                                         <td><?= str_replace('_', ' ', $row["company_name"]) ?></td>
-                                        <td><strong><?= (int)$row['score'] ?></strong>/5</td>
                                         <td>
                                             <label class="center">
                                                 <input type="checkbox" name="selecStudent[]" class="center-align filled-in" value="<?= $row['internship_identifier'] ?>" <?= $row['requested'] ? 'checked="checked"' : '' ?> />
