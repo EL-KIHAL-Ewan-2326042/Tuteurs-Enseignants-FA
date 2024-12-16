@@ -7,3 +7,18 @@
 h3, h4 {
     color: var(--main-color);
 }
+
+/* Style des boutons de la page */
+.btn{
+    background-color : #00558B;
+}
+
+/* Style au survol de la souris sur pour les boutons de la page */
+.btn:hover{
+    background-color: #E8CE7E;
+}
+
+input[type="checkbox"].filled-in:checked + span:after {
+    background-color: #00558B !important;
+    border-color: #00558B !important;
+}

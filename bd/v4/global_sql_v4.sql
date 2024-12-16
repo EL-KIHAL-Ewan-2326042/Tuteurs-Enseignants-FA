@@ -152,6 +152,7 @@ CREATE TABLE Backup(
     Name_criteria VARCHAR(50),
     Id_backup INT,
     Coef INT,
+    Is_checked BOOLEAN DEFAULT TRUE,
     PRIMARY KEY(User_id, Name_criteria, Id_backup),
     FOREIGN KEY(User_id) REFERENCES User_connect(User_id),
     FOREIGN KEY(Name_criteria) REFERENCES Distribution_criteria(Name_criteria),
@@ -205,6 +206,57 @@ CREATE TRIGGER check_distance_assignment
     BEFORE INSERT ON Distance
     FOR EACH ROW
     EXECUTE FUNCTION check_distance_assignment();
+
+
+CREATE OR REPLACE FUNCTION insert_backup()
+RETURNS TRIGGER AS $$
+    DECLARE
+        name_criteria TEXT;
+        num integer;
+    BEGIN
+        for name_criteria IN
+            SELECT Distribution_criteria.name_criteria FROM Distribution_criteria
+            LOOP
+            FOR num IN
+                SELECT Id_backup.id_backup FROM Id_backup
+                LOOP
+                INSERT INTO backup (user_id, name_Criteria, id_backup, coef) VALUES (NEW.user_id, name_criteria, num, 1);
+            END LOOP;
+        END LOOP;
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER insert_backup
+    AFTER INSERT ON user_connect
+    FOR EACH ROW
+    EXECUTE FUNCTION insert_backup();
+
+CREATE OR REPLACE FUNCTION create_addr_for_insert_internship()
+RETURNS TRIGGER AS $$
+    BEGIN
+        IF (SELECT Address FROM Addr_name WHERE Address = NEW.Address) IS NULL THEN
+            INSERT INTO Addr_name (Address) VALUES (NEW.address);
+        END IF;
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER create_addr_for_insert_internship
+    BEFORE INSERT ON Internship
+    FOR EACH ROW
+    EXECUTE FUNCTION create_addr_for_insert_internship();
+
+
+INSERT INTO Distribution_criteria (Name_criteria) VALUES ('A été responsable');
+INSERT INTO Distribution_criteria (Name_criteria) VALUES ('Distance');
+INSERT INTO Distribution_criteria (Name_criteria) VALUES ('Cohérence');
+INSERT INTO Distribution_criteria (Name_criteria) VALUES ('Est demandé');
+
+INSERT INTO Id_backup (Id_backup) VALUES (1);
+INSERT INTO Id_backup (Id_backup) VALUES (2);
+INSERT INTO Id_backup (Id_backup) VALUES (3);
 
 INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('B22662146', 'CASES', 'Murphy', 3);
 INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('R14328249', 'ALVARADOS', 'Christen', 2);
@@ -728,11 +780,6 @@ INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('C34567890', 'Vente 
 INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('D45678901', 'Économie');
 INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('E56789012', 'Droit');
 
-
-
-
-
-
 INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('B22662146', 'Teacher', 'IUT_INFO_AIX');
 INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('R14328249', 'Teacher', 'IUT_INFO_AIX');
 INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('G42185815', 'Teacher', 'IUT_INFO_AIX');
@@ -960,13 +1007,6 @@ INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('C45678901', 'Orléa
 INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('D56789012', 'Cambrai', 'Domicile_1');
 INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('E67890123', 'La Rochelle', 'Domicile_1');
 
-INSERT INTO Distribution_criteria (Name_criteria) VALUES ('A été responsable');
-INSERT INTO Distribution_criteria (Name_criteria) VALUES ('Distance');
-INSERT INTO Distribution_criteria (Name_criteria) VALUES ('Cohérence');
 
-INSERT INTO Id_backup (Id_backup) VALUES (1);
 
-INSERT INTO Backup (User_id, Name_criteria, Id_backup, Coef) VALUES ('B22662146', 'A été responsable', 1, 1);
-INSERT INTO Backup (User_id, Name_criteria, Id_backup, Coef) VALUES ('B22662146', 'Distance', 1, 1);
-INSERT INTO Backup (User_id, Name_criteria, Id_backup, Coef) VALUES ('B22662146', 'Cohérence', 1, 1);
 
