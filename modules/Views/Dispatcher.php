@@ -36,7 +36,7 @@ class Dispatcher {
                                             <option value='new'>Choisir une sauvegarde</option>
                                         <?php endif;?>
                                         <?php foreach ($saves as $save): ?>
-                                        <?php if ($save['id_backup'] == $_POST['save-selector']) {
+                                        <?php if (isset($_POST['save-selector']) && $save['id_backup'] == $_POST['save-selector']) {
                                             continue;
                                             }?>
                                             <option value="<?php echo $save['id_backup']; ?>">
@@ -101,13 +101,14 @@ class Dispatcher {
                     <form class="col card-panel white z-depth-3 s12 m5" style="padding: 20px;" action="./dispatcher" method="post" id="associate-form">
                         <div class="row">
                             <div class="input-field col s6">
-                                <input id="Id_teacher" name="Id_teacher" type="text" class="validate">
-                                <label for="Id_teacher">Id_teacher</label>
+                                <input id="searchTeacher" name="searchTeacher" type="text" class="validate">
+                                <label for="searchTeacher">Teacher ID</label>
                             </div>
                             <div class="input-field col s6">
-                                <input id="Internship_identifier" name="Internship_identifier" type="text" class="validate">
-                                <label for="Internship_identifier">Internship_identifier</label>
+                                <input id="searchInternship" name="searchInternship" type="text" class="validate">
+                                <label for="searchInternship">Internship Company</label>
                             </div>
+                            <div id="searchResults"></div>
                             <p class="red-text"><?php echo $this->errorMessage1; ?></p>
                             <div class="col s12">
                                 <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Associer
@@ -119,7 +120,10 @@ class Dispatcher {
                 </div>
 
                 <div id="loading-section" class="center-align" style="display: none;">
-                    <p>Chargement en cours, veuillez patienter...</p>
+                    <p style="font-size: 24px;">Chargement en cours, veuillez patienter...</p>
+                    <div class="progress">
+                        <div class="indeterminate"></div>
+                    </div>
                 </div>
                     <?php endif?>
 
@@ -160,7 +164,7 @@ class Dispatcher {
                                                 <td><strong><?= $resultDispatch['score']; ?></strong>/5</td>
                                                 <td>
                                                     <label class="center">
-                                                        <input type="checkbox" id="listTupleAssociate[]" name="listTupleAssociate[]" class="center-align filled-in" value="<?= $resultDispatch['id_teacher'] . "$". $resultDispatch['internship_identifier'] . "$". $resultDispatch['score']; ?>" />
+                                                        <input type="checkbox" class="dispatch-checkbox center-align filled-in" id="listTupleAssociate[]" name="listTupleAssociate[]" value="<?= $resultDispatch['id_teacher'] . "$". $resultDispatch['internship_identifier'] . "$". $resultDispatch['score']; ?>" />
                                                         <span></span>
                                                     </label>
                                                 </td>
@@ -208,19 +212,62 @@ class Dispatcher {
                                 currentPage = page;
                                 pageNumberSpan.textContent = `Page ${currentPage}`;
 
-                                rows.forEach((row, index) => {
-                                    const start = (currentPage - 1) * rowsPerPage;
-                                    const end = currentPage * rowsPerPage;
-                                    if (index >= start && index < end) {
-                                        row.style.display = '';
-                                    } else {
-                                        row.style.display = 'none';
-                                    }
-                                });
+                                rows.forEach(row => row.style.display = 'none');
+
+                                const start = (currentPage - 1) * rowsPerPage;
+                                const end = currentPage * rowsPerPage;
+                                const visibleRows = Array.from(rows).slice(start, end);
+                                visibleRows.forEach(row => row.style.display = '');
+
+                                addSelectAllRow();
 
                                 prevButton.disabled = currentPage === 1;
                                 nextButton.disabled = currentPage === totalPages;
                             }
+
+                            function addSelectAllRow() {
+                                const tbody = document.querySelector('#dispatch-table tbody');
+                                let selectAllRow = document.querySelector('#select-all-row');
+
+                                if (selectAllRow) {
+                                    selectAllRow.remove();
+                                }
+
+                                selectAllRow = document.createElement('tr');
+                                selectAllRow.id = 'select-all-row';
+
+                                const selectAllCheckbox = `<td></td><td></td><td><strong>Tout cocher</strong></td>
+                                           <td><label class="center">
+                                                <input type="checkbox" id="select-all-checkbox" class="center-align filled-in" />
+                                                <span></span>
+                                            </label></td>`;
+
+                                selectAllRow.innerHTML = selectAllCheckbox;
+                                tbody.appendChild(selectAllRow);
+
+                                const selectAllCheckboxElem = document.getElementById('select-all-checkbox');
+
+                                selectAllCheckboxElem.addEventListener('change', function () {
+                                    const checkboxes = document.querySelectorAll('.dispatch-row input[type="checkbox"]:not(#select-all-checkbox)');
+                                    const visibleRows = Array.from(rows).slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+                                    visibleRows.forEach(row => {
+                                        const checkbox = row.querySelector('input[type="checkbox"]');
+                                        checkbox.checked = selectAllCheckboxElem.checked;
+                                    });
+                                });
+                            }
+
+                            function toggleSelectAllCheckbox() {
+                                const checkboxes = document.querySelectorAll('.dispatch-row input[type="checkbox"]:not(#select-all-checkbox)');
+                                const selectAllCheckbox = document.getElementById('select-all-checkbox');
+                                const visibleRows = Array.from(rows).slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+                                const allChecked = visibleRows.every(row => row.querySelector('input[type="checkbox"]').checked);
+                                selectAllCheckbox.checked = allChecked;
+                            }
+
+                            document.querySelectorAll('.dispatch-row input[type="checkbox"]:not(#select-all-checkbox)').forEach(checkbox => {
+                                checkbox.addEventListener('change', toggleSelectAllCheckbox);
+                            });
 
                             prevButton.addEventListener('click', () => {
                                 showPage(currentPage - 1);
@@ -234,69 +281,8 @@ class Dispatcher {
                         });
                     </script>
                 <?php endif; ?>
+
             </div>
-            <script>
-                document.addEventListener('DOMContentLoaded', function () {
-                    const selects = document.querySelectorAll('select');
-                    M.FormSelect.init(selects);
-
-                    const saveSelector = document.getElementById('save-selector');
-                    if (saveSelector) {
-                        saveSelector.addEventListener('change', function () {
-                            const form = this.closest('form');
-                            form.submit();
-                        });
-                    }
-
-                    const checkboxes = document.querySelectorAll('.criteria-checkbox');
-
-                    checkboxes.forEach(checkbox => {
-                        const hiddenInput = document.querySelector(`input[name="is_checked[${checkbox.dataset.coefInputId}]"]`);
-
-                        if (checkbox.checked) {
-                            hiddenInput.value = '1';
-                        } else {
-                            hiddenInput.value = '0';
-                        }
-
-                        checkbox.addEventListener('change', function () {
-                            if (this.checked) {
-                                hiddenInput.value = '1';
-                            } else {
-                                hiddenInput.value = '0';
-                            }
-                        });
-                    });
-
-                    document.querySelectorAll('.coef-input').forEach(input => {
-                        input.addEventListener('input', function () {
-                            const value = parseInt(this.value);
-                            if (value > 100) {
-                                this.value = 100;
-                            } else if (value < 0) {
-                                this.value = 0;
-                            }
-                        });
-                    });
-                });
-
-                document.querySelectorAll('.criteria-checkbox').forEach(checkbox => {
-                    checkbox.addEventListener('change', function () {
-                        const hiddenInput = document.querySelector(`input[name="is_checked[${this.dataset.coefInputId}]"]`);
-                        hiddenInput.value = this.checked ? '1' : '0';
-                    });
-                });
-
-                function showLoading() {
-                    const loadingSection = document.getElementById('loading-section');
-                    const formsSection = document.getElementById('forms-section');
-
-                    if (loadingSection && formsSection) {
-                        loadingSection.style.display = 'block';
-                        formsSection.style.display = 'none';
-                    }
-                }
-            </script>
         </main>
 <?php
     }

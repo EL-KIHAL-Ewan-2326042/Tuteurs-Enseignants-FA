@@ -11,14 +11,14 @@ class Dispatcher {
      * @return void
      */
     public function association_direct($dispatcherModel): string {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['Internship_identifier']) && isset($_POST['Id_teacher']) && $_POST['Internship_identifier'] !== '' && $_POST['Id_teacher'] !== '') {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['searchInternship']) && isset($_POST['searchTeacher']) && $_POST['searchInternship'] !== '' && $_POST['searchTeacher'] !== '') {
 
             $listTeacher = $dispatcherModel->createListTeacher();
             $listStudent = $dispatcherModel->createListInternship();
             $listAssociate = $dispatcherModel->createListAssociate();
 
-            if (in_array($_POST['Id_teacher'], $listTeacher) && in_array($_POST['Internship_identifier'], $listStudent)){
-                if (!(in_array([$_POST['Id_teacher'], $_POST['Internship_identifier']], $listAssociate))) {
+            if (in_array($_POST['searchTeacher'], $listTeacher) && in_array($_POST['searchInternship'], $listStudent)){
+                if (!(in_array([$_POST['searchTeacher'], $_POST['searchInternship']], $listAssociate))) {
                     return $dispatcherModel->insertResponsible();
                 }
                 else {
@@ -48,6 +48,7 @@ class Dispatcher {
             $tmp = explode("$", $tupleAssociate);
             if (in_array($tmp[0], $listTeacher) && in_array($tmp[1], $listInternship)){
                 if (!(in_array([$tmp[0], $tmp[1]], $listAssociate))) {
+                    print_r($tmp[0]);
                     $returnMessage .= $dispatcherModel->insertIs_responsible($tmp[0], $tmp[1], floatval($tmp[2]));
                 }
                 else {
@@ -72,6 +73,14 @@ class Dispatcher {
             $errorMessage1 = '';
             $errorMessage2 = '';
 
+            if (isset($_POST['searchType']) && ($_POST['searchType'] === 'searchInternship' || $_POST['searchType'] === 'searchTeacher')) {
+                $results = $dispatcherModel->correspondTerms();
+
+                header('Content-Type: application/json');
+                echo json_encode($results);
+                exit();
+            }
+
             if (isset($_POST['action-save']) && $_POST['action-save'] !== 'default') {
                 $coefficients = [];
                 foreach ($_POST['coef'] as $criteria => $coef) {
@@ -85,9 +94,10 @@ class Dispatcher {
                 $dispatcherModel->saveCoefficients($coefficients, $_SESSION['identifier'], (int)$_POST['action-save']);
             }
 
-            if (isset($_POST['Internship_identifier']) && isset($_POST['Id_teacher'])) {
+            if (isset($_POST['searchInternship']) && isset($_POST['searchTeacher'])) {
                 $errorMessage1 = $this->association_direct($dispatcherModel);
             }
+
             if (isset($_POST['selectStudentSubmitted']) && isset($_POST['listTupleAssociate'])) {
                 $errorMessage2 = $this->association_after_sort($dispatcherModel);
             }
