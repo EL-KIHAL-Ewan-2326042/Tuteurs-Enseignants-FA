@@ -73,7 +73,7 @@ class Dashboard {
                                 }
 
                                 //importation des données dans la table
-                                if ($model->uploadCsv($csvFile, $tableName)) {
+                                if ($model->processCsv($csvFile, $tableName)) {
                                     echo "L'importation du fichier CSV pour la table $tableName a été réalisée avec succès!";
                                 } else {
                                     echo "Une erreur est survenue lors de l'importation pour la table $tableName.";

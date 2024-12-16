@@ -109,61 +109,6 @@ class Dashboard{
     }
 
     /**
-     * Importation des données depuis un fichiers CSV vers la base de données
-     * pour une table donnée
-     * @param string $csvFilePath Chemin du fichier CSV
-     * @param string $tableName Nom de la table
-     * @return bool True si l'importation réussit, sinon False
-     * @throws Exception
-     */
-    public function uploadCsv(string $csvFilePath, string $tableName): bool {
-        $db = $this->db;
-
-        if (($handle = fopen($csvFilePath, "r")) !== FALSE) {
-            //lecture de la première ligne du fichier CSV (les en-têtes)
-            $headers = fgetcsv($handle, 1000, ",");
-
-            if (!$this->validateHeaders($headers, $tableName)) {
-                //retourne false si il y une incohérence entre les colonnes de la table
-                fclose($handle);
-                return false;
-            }
-
-            try {
-                //recupération des colonnes de la tables dans la base de données
-                $tableColumns = $this->getTableColumn($tableName);
-
-                while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                    //vérification de la correspondance du nombre de données et le nombre de colonne
-                    if (count($data) !== count($tableColumns)) {
-                        continue;
-                    }
-
-                    //prépartation de la requête d'insertion
-                    $query = "INSERT INTO $tableName (" . implode(',', $tableColumns) . ") VALUES (" . implode(',', array_map(fn($i) => ":column$i", range(1, count($tableColumns)))) . ")";
-                    $stmt = $db->getConn()->prepare($query);
-
-                    //association des données aux paramètres de la requête
-                    foreach ($data as $index => $value) {
-                        if (empty($value)) {
-                            $value = null;
-                        } elseif (is_array($value)) {
-                            $value = implode(',', $value);
-                        }
-                        $stmt->bindValue(":column" . ($index + 1), $value);
-                    }
-                    $stmt->execute();
-                }
-                fclose($handle);
-                return true;
-            } catch (PDOException $e) {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Vérifie que les colonnes du fichier CSV correspondent aux colonnes attendues
      * dans la base de données
      * @param array $headers Liste des en-têtes
@@ -180,6 +125,181 @@ class Dashboard{
         }
         return empty(array_diff($csvHeaders, $tableColumns));
     }
+
+    /**
+     * @param string $csvFilePath
+     * @param string $tableName
+     * @return bool
+     * @throws Exception
+     */
+    public function processCsv(string $csvFilePath, string $tableName): bool {
+        if (($handle = fopen($csvFilePath, "r")) === false) {
+            throw new Exception("Impossible d'ouvrir le fichier CSV.");
+        }
+
+        $headers = fgetcsv($handle, 1000, ",");
+        if (!$this->validateHeaders($headers, $tableName)) {
+            fclose($handle);
+            return false;
+        }
+
+        try {
+            while (($data = fgetcsv($handle, 1000, ",")) !== false) {
+                $this->insertIntoDatabase($data, $tableName);
+            }
+            fclose($handle);
+            return true;
+        } catch (Exception $e) {
+            fclose($handle);
+            throw new Exception("Erreur lors du traitement du fichier CSV : " . $e->getMessage());
+        }
+    }
+
+
+    /**
+     * @param array $data
+     * @param string $tableName
+     * @return void
+     * @throws Exception
+     */
+    private function insertIntoDatabase(array $data, string $tableName): void {
+        switch ($tableName) {
+            case 'teacher':
+                $this->insertTeacherData($data);
+                break;
+            default:
+                $this->insertGenericData($data, $tableName);
+                break;
+        }
+    }
+
+    /**
+     * @param array $data
+     * @param string $tableName
+     * @return void
+     * @throws Exception
+     */
+    private function insertGenericData(array $data, string $tableName): void {
+        $tableColumns = $this->getTableColumn($tableName);
+        if (count($data) !== count($tableColumns)) {
+            return; // Ignore les lignes invalides
+        }
+
+        $query = "INSERT INTO $tableName (" . implode(',', $tableColumns) . ") 
+                  VALUES (" . implode(',', array_map(fn($i) => ":column$i", range(1, count($tableColumns)))) . ")";
+        $stmt = $this->db->getConn()->prepare($query);
+
+        foreach ($data as $index => $value) {
+            $stmt->bindValue(":column" . ($index + 1), $value ?: null);
+        }
+
+        $stmt->execute();
+    }
+
+    /**
+     * @param array $data
+     * @return void
+     * @throws Exception
+     */
+    private function insertTeacherData(array $data): void {
+        // Colonnes pour la table teacher
+        $teacherColumns = $this->getTableColumn('teacher');
+        $teacherData = array_combine($teacherColumns, $data);
+
+        // Insertion dans la table teacher
+        $this->insertGenericData($data, 'teacher');
+
+        // Insertion dans la table user_connect
+        $this->insertUserConnect($teacherData['id_teacher'], 'default_password');
+
+        // Insertion dans la table has_role
+        $department = $_SESSION['role_department'] ?? null;
+        if ($department) {
+            $this->insertHasRole($teacherData['id_teacher'], $department[0]);
+        }
+    }
+
+    /**
+     * @param string $userId
+     * @param string $user_pass
+     * @return void
+     */
+    private function insertUserConnect(string $userId, string $user_pass): void {
+        $query = "INSERT INTO user_connect (user_id, user_pass) VALUES (:user_id, :user_pass)";
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindValue(':user_id', $userId);
+        $stmt->bindValue(':user_pass', password_hash($user_pass, PASSWORD_DEFAULT));
+        $stmt->execute();
+    }
+
+    /**
+     * @param string $userId
+     * @param string $department
+     * @return void
+     */
+    private function insertHasRole(string $userId, string $department): void {
+        $query = "INSERT INTO has_role (user_id, role_name, department_name) VALUES (:user_id, 'Teacher' ,:department)";
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindValue(':user_id', $userId);
+        $stmt->bindValue(':department', $department);
+        $stmt->execute();
+    }
+
+
+//    /**
+//     * Importation des données depuis un fichiers CSV vers la base de données
+//     * pour une table donnée
+//     * @param string $csvFilePath Chemin du fichier CSV
+//     * @param string $tableName Nom de la table
+//     * @return bool True si l'importation réussit, sinon False
+//     * @throws Exception
+//     */
+//    public function uploadCsv(string $csvFilePath, string $tableName): bool {
+//        $db = $this->db;
+//
+//        if (($handle = fopen($csvFilePath, "r")) !== FALSE) {
+//            //lecture de la première ligne du fichier CSV (les en-têtes)
+//            $headers = fgetcsv($handle, 1000, ",");
+//
+//            if (!$this->validateHeaders($headers, $tableName)) {
+//                //retourne false si il y une incohérence entre les colonnes de la table
+//                fclose($handle);
+//                return false;
+//            }
+//
+//            try {
+//                //recupération des colonnes de la tables dans la base de données
+//                $tableColumns = $this->getTableColumn($tableName);
+//
+//                while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
+//                    //vérification de la correspondance du nombre de données et le nombre de colonne
+//                    if (count($data) !== count($tableColumns)) {
+//                        continue;
+//                    }
+//
+//                    //prépartation de la requête d'insertion
+//                    $query = "INSERT INTO $tableName (" . implode(',', $tableColumns) . ") VALUES (" . implode(',', array_map(fn($i) => ":column$i", range(1, count($tableColumns)))) . ")";
+//                    $stmt = $db->getConn()->prepare($query);
+//
+//                    //association des données aux paramètres de la requête
+//                    foreach ($data as $index => $value) {
+//                        if (empty($value)) {
+//                            $value = null;
+//                        } elseif (is_array($value)) {
+//                            $value = implode(',', $value);
+//                        }
+//                        $stmt->bindValue(":column" . ($index + 1), $value);
+//                    }
+//                    $stmt->execute();
+//                }
+//                fclose($handle);
+//                return true;
+//            } catch (PDOException $e) {
+//                return false;
+//            }
+//        }
+//        return false;
+//    }
 
 
     /**
