@@ -1,13 +1,16 @@
+main {
+    padding: 0 25px 25px 25px;
+}
+
 h3, h4{
     color: #00558B;
 }
-
 
 main a:visited ,main a:link{
     color: #00558B;
 }
 
-a:hover{
+main a:hover{
     color: #E8CE7E;
 }
 
