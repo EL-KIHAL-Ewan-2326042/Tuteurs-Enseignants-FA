@@ -31,6 +31,11 @@ main a:hover {
     color: var(--main-color);
 }
 
+.selection {
+    display: flex;
+    flex-direction: row;
+}
+
 .btn {
     background-color: #00558B;
     z-index: 0;
@@ -71,6 +76,29 @@ tbody {
     width: 100%;
     overflow-y: auto;
     display: block;
+}
+.pagination .prev,
+.pagination .next,
+.pagination .first,
+.pagination .last {
+    font-weight: bold;
+}
+
+.pagination a:visited  {
+    color: var(--text-color);
+}
+
+.pagination .active {
+    background-color: var(--tertiary-color);
+    border: solid 2px var(--tertiary-color);
+}
+
+.pagination .active:hover {
+    border: solid 2px var(--main-color);
+}
+
+.hidden {
+    margin: 0 10px;
 }
 
 main table {

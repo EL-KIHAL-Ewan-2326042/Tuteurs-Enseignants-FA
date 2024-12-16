@@ -18,4 +18,17 @@
     --font-small: 0.75em;
     --font-medium: 1em;
     --font-large: 1.2em;
+
+    /* Style des boutons de la page */
+    .btn,
+    [type="checkbox"].filled-in:checked+span:not(.lever):after {
+        border-color: var(--main-color);
+        background-color : var(--main-color);
+    }
+
+    /* Style au survol de la souris sur pour les boutons de la page */
+    .btn:hover{
+        background-color: var(--tertiary-color);
+    }
+
 }
