@@ -48,15 +48,14 @@ class Dispatcher {
             $tmp = explode("$", $tupleAssociate);
             if (in_array($tmp[0], $listTeacher) && in_array($tmp[1], $listInternship)){
                 if (!(in_array([$tmp[0], $tmp[1]], $listAssociate))) {
-                    print_r($tmp[0]);
                     $returnMessage .= $dispatcherModel->insertIs_responsible($tmp[0], $tmp[1], floatval($tmp[2]));
                 }
                 else {
-                    $returnMessage .= $tmp[0] . " et " . $tmp[1] . "Cette association existe déjà<br>";
+                    $returnMessage .= $tmp[0] . " et " . $tmp[1] . ", cette association existe déjà<br>";
                 }
             }
             else {
-                $returnMessage .=  $tmp[0] . "ou" . $tmp[1] . "inexistant dans ce departement<br>";
+                $returnMessage .=  $tmp[0] . "ou" . $tmp[1] . ", inexistant dans ce departement<br>";
             }
         }
         return $returnMessage;
