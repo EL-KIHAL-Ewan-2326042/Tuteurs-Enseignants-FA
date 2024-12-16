@@ -141,6 +141,19 @@ class GlobalModel {
         return $score;
     }
 
+    public function isRequested(string $internship_identifier, string $id_teacher): bool {
+
+        $query = "SELECT * FROM is_requested WHERE internship_identifier = :internship_identifier AND id_teacher = :id_teacher";
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindParam(':internship_identifier', $internship_identifier);
+        $stmt->bindParam(':id_teacher', $id_teacher);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$result) return 0;
+        return 1;
+    }
+
     /**
      * Calcul de distance entre un eleve et un professeur
      * @param string $internship_identifier l'identifiant du stage

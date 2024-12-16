@@ -3,6 +3,12 @@
 namespace Blog\Views;
 
 class Dashboard{
+
+    /**
+     * @param string $message
+     */
+    public function __construct(private readonly string $message){}
+
     /**
      * Vue de la Dashboard
      * @return void
@@ -73,6 +79,9 @@ class Dashboard{
                         </div>
                     </form>
                 </div>
+
+                <p class="message"><?php echo $this->message; ?></p>
+
             </div>
 
             <!--Exportation des tables : Etudiants/Professeurs/Stages-->

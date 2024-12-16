@@ -16,22 +16,58 @@ class Dispatcher{
     }
 
     /**
-     * Renvoie pour un professeur un couple avec tous les stages de son departement
-     * @param $identifier l'identifiant du professeur
-     * @param $dictCoef array cle->nom_critere et valeur->coef
-     * @return array|array[] array contenant id_prof, id_eleve et le Score associe
+     * Trouve dans le DB les termes correspondant(LIKE)
+     * On utilise le POST, avec search qui correspond à la recherche
+     * et searchType au type de recherche (studentId, name, ...)
+     * @return array tout les termes correspendants
      */
+    public function correspondTerms(): array
+    {
+        $searchTerm = $_POST['search'] ?? '';
+        $searchType = $_POST['searchType'] ?? '';
+        $teacher_id = $_POST['identifier'] ?? '';
+        $pdo = $this->db;
+
+        $searchTerm = trim($searchTerm);
+
+        if ($searchType === 'searchTeacher') {
+            $query = "
+            SELECT id_teacher, teacher_name, teacher_firstname
+            FROM teacher
+            WHERE id_teacher ILIKE :searchTerm
+            ORDER BY id_teacher ASC
+            LIMIT 5
+        ";
+            $searchTerm = "$searchTerm%";
+        } elseif ($searchType === 'searchInternship') {
+            $query = "
+            SELECT student.student_number, student_name, student_firstname, company_name, internship_identifier
+            FROM student
+            JOIN internship ON student.student_number = internship.student_number
+            WHERE internship_identifier ILIKE :searchTerm
+            ORDER BY company_name ASC
+            LIMIT 5
+        ";
+            $searchTerm = "$searchTerm%";
+        } else {
+            return [];
+        }
+
+        $stmt = $pdo->getConn()->prepare($query);
+        $stmt->bindValue(':searchTerm', $searchTerm);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function calculateRelevanceTeacherStudents($identifier, array $dictCoef): array
     {
         $internshipList = array();
-        // On recupere la liste des departement de l'eleve
         $departments = $this->globalModel->getDepTeacher($identifier);
         foreach($departments as $listDepTeacher) {
             foreach($listDepTeacher as $department) {
-                // Pour chaque departement, on recupere les eleve
                 $newList = $this->globalModel->getInternshipsPerDepartment($department);
                 if ($newList)  {
-                    // Les eleves sont rajoutes dans la liste finale
                     $internshipList = array_merge($internshipList, $newList);
                 }
             }
@@ -39,21 +75,34 @@ class Dispatcher{
 
         $result = array();
 
-        // Pour chaque relation tuteur-etudiant, on calcul leur Score qu'on met dans un array final
         foreach($internshipList as $internship) {
-            $distanceMin = $this->globalModel->getDistance($internship['internship_identifier'], $identifier);
-            $relevance= $this->globalModel->scoreDiscipSubject($internship['internship_identifier'], $identifier);
+            $dictValues = array();
 
-            $dictValues = array(
-                "A été responsable" => $this->globalModel->getInternships($internship['internship_identifier']),
-                "Distance" => $distanceMin,
-                "Cohérence" => round($relevance, 2));
+            // Calculer les valeurs uniquement si elles sont nécessaires
+            if (isset($dictCoef['Distance'])) {
+                $dictValues["Distance"] = $this->globalModel->getDistance($internship['internship_identifier'], $identifier);
+            }
+
+            if (isset($dictCoef['Cohérence'])) {
+                $dictValues["Cohérence"] = round($this->globalModel->scoreDiscipSubject($internship['internship_identifier'], $identifier), 2);
+            }
+
+            if (isset($dictCoef['A été responsable'])) {
+                $internshipListData = $this->globalModel->getInternships($internship['internship_identifier']);
+                $dictValues["A été responsable"] = $internshipListData;
+            }
+
+            if (isset($dictCoef['Est demandé'])) {
+                $dictValues["Est demandé"] = $this->globalModel->isRequested($internship['internship_identifier'], $identifier);
+            }
 
             $totalScore = 0;
             $totalCoef = 0;
-            foreach ($dictValues as $criteria => $value) {
-                if (isset($dictCoef[$criteria])) {
-                    $coef = $dictCoef[$criteria];
+
+            // Pour chaque critère dans le dictionnaire de coefficients, calculer le score associé
+            foreach ($dictCoef as $criteria => $coef) {
+                if (isset($dictValues[$criteria])) {
+                    $value = $dictValues[$criteria];
 
                     switch ($criteria) {
                         case 'Distance':
@@ -63,7 +112,6 @@ class Dispatcher{
 
                         case 'A été responsable':
                             $numberOfInternships = count($value);
-
                             $baselineScore = 0.7 * $coef;
 
                             if ($numberOfInternships > 0) {
@@ -75,6 +123,7 @@ class Dispatcher{
                             $totalScore += $ScoreInternship;
                             break;
 
+                        case 'Est demandé':
                         case 'Cohérence':
                             $ScoreRelevance = $value * $coef;
                             $totalScore += $ScoreRelevance;
@@ -87,10 +136,11 @@ class Dispatcher{
                     $totalCoef += $coef;
                 }
             }
+
             // Score normalise sur 5
             $ScoreFinal = ($totalScore * 5) / $totalCoef;
 
-            $newList = ["id_teacher" => $identifier, "internship_identifier" => $internship['internship_identifier'], "score" => (int)round($ScoreFinal, 2), "type" => $internship['type']];
+            $newList = ["id_teacher" => $identifier, "internship_identifier" => $internship['internship_identifier'], "score" => round($ScoreFinal, 2), "type" => $internship['type']];
 
             if (!empty($newList)) {
                 $result[] = $newList;
@@ -102,6 +152,7 @@ class Dispatcher{
         }
         return [[]];
     }
+
 
     /**
      * S'occupe de trouver la meilleure combinaison possible tuteur-stage et le renvoie sous forme de tableau
@@ -117,7 +168,11 @@ class Dispatcher{
 
         $query = "SELECT Teacher.Id_teacher, 
                   MAX(maxi_number_trainees) AS Max_trainees, 
-                  COUNT(internship.Student_number) AS Current_count
+                  SUM(CASE 
+                        WHEN internship.type = 'alternance' THEN 2 
+                        WHEN internship.type = 'Internship' THEN 1 
+                        ELSE 0
+                        END) AS Current_count
                   FROM Teacher
                   JOIN has_role ON Teacher.Id_teacher = Has_role.user_id
                   LEFT JOIN internship ON Teacher.Id_teacher = internship.Id_teacher
@@ -133,7 +188,7 @@ class Dispatcher{
         $listTeacherIntership = [];
         foreach ($teacherData as $teacher) {
             $listTeacherMax[$teacher['id_teacher']] = $teacher['max_trainees'];
-            $listTeacherIntership[$teacher['id_teacher']] = $teacher['current_count'] ?: 0;
+            $listTeacherIntership[$teacher['id_teacher']] = $teacher['current_count'];
         }
 
         $listFinal = [];
@@ -155,13 +210,21 @@ class Dispatcher{
         while (!empty($listStart)) {
             usort($listStart, fn($a, $b) => $b['score'] <=> $a['score']);
             $topCandidate = $listStart[0];
-
             if ($assignedCounts[$topCandidate['id_teacher']] < $listTeacherMax[$topCandidate['id_teacher']] &&
-                !in_array($topCandidate['internship_identifier'], $listEleveFinal)) {
-                $listFinal[] = $topCandidate;
-                $listEleveFinal[] = $topCandidate['internship_identifier'];
-                $assignedCounts[$topCandidate['id_teacher']] += ($topCandidate['type'] === 'Internship') ? 2 : 1;
+                !in_array($topCandidate['internship_identifier'], $listEleveFinal) && $topCandidate['type'] === 'Internship') {
+                if ($topCandidate['type'] = 'Internship' && $listTeacherMax[$topCandidate['id_teacher']] - $assignedCounts[$topCandidate['id_teacher']] > 1)  {
+                    $listFinal[] = $topCandidate;
+                    $listEleveFinal[] = $topCandidate['internship_identifier'];
+                    $assignedCounts[$topCandidate['id_teacher']] += 1;
+                }
+                elseif ($topCandidate['type'] = 'alternance' && $listTeacherMax[$topCandidate['id_teacher']] - $assignedCounts[$topCandidate['id_teacher']] > 2){
+                    $listFinal[] = $topCandidate;
+                    $listEleveFinal[] = $topCandidate['internship_identifier'];
+                    $assignedCounts[$topCandidate['id_teacher']] += 2;
+                }
+                else array_shift($listStart);
             }
+            else
             array_shift($listStart);
         }
 
@@ -226,10 +289,10 @@ class Dispatcher{
     public function insertResponsible() {
         $query = 'UPDATE internship SET Id_teacher = :Id_teacher WHERE Internship_identifier = :Internship_identifier';
         $stmt = $this->db->getConn()->prepare($query);
-        $stmt->bindParam(':Internship_identifier', $_POST['Internship_identifier']);
-        $stmt->bindParam(':Id_teacher', $_POST['Id_teacher']);
+        $stmt->bindParam(':Internship_identifier', $_POST['searchInternship']);
+        $stmt->bindParam(':Id_teacher', $_POST['searchTeacher']);
         $stmt->execute();
-        return "Association " . $_POST['Id_teacher'] . " et " . $_POST['Internship_identifier'] . " enregistrée.";
+        return "Association " . $_POST['searchTeacher'] . " et " . $_POST['searchInternship'] . " enregistrée.";
     }
 
     /**

@@ -36,6 +36,21 @@ main a:hover {
     flex-direction: row;
 }
 
+.btn {
+    background-color: #00558B;
+    z-index: 0;
+}
+
+.btn:hover {
+    background-color: #E8CE7E;
+}
+
+/* Style des options dans le menu déroulant du select */
+.dropdown-content li>a, .dropdown-content li>span{
+    padding: 15px;
+    color: #00558B;
+}
+
 .table {
     max-width: 85%;
 }
