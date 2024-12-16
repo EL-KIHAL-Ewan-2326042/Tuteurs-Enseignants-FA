@@ -178,8 +178,8 @@ class   Homepage {
 
             <div class="row"></div>
 
-            <? if (isset($_POST['selecDepSubmitted'])) {
-
+            <?
+            if (isset($_POST['selecDepSubmitted'])) {
                 if (isset($_POST['selecDep'])) {
                     $_SESSION['selecDep'] = $_POST['selecDep'];
 
@@ -201,9 +201,8 @@ class   Homepage {
                         <span><? echo str_replace('_', ' ', $dep['department_name']) ?></span>
                     </label>
                     <? endforeach; ?>
-                <div class="row"></div>
-                <input type="hidden" name="selecDepSubmitted" value="1">
-                <button class="waves-effect waves-light btn" type="submit">Afficher</button>
+                    <div class="row"></div>
+                    <button class="waves-effect waves-light btn" name="selecDepSubmitted" value="1" type="submit" formmethod="post">Afficher</button>
                 </form>
 
                 <div class="row"></div>
@@ -216,6 +215,19 @@ class   Homepage {
                         $_SESSION['decreasing'] = $_POST['decreasing'] ?? false;
                     }
                     $table = $this->model->sortRows($table, $_SESSION['sortBy'] ?? 0, $_SESSION['decreasing'] ?? 0);
+
+                    if (!isset($_SESSION['unconfirmed'])) {
+                        $_SESSION['unconfirmed'] = array();
+                        $_SESSION['unconfirmed']['all'] = array();
+                        for ($i = 0; $i < count($table); ++$i) {
+                            if (!isset($_SESSION['unconfirmed'][ceil(($i+1)/10)])) $_SESSION['unconfirmed'][ceil(($i+1)/10)] = array();
+                            if ($table[$i]['requested']) {
+                                $_SESSION['unconfirmed'][ceil(($i+1)/10)][count($_SESSION['unconfirmed'][ceil(($i+1)/10)])] = $table[$i]['internship_identifier'];
+                                $_SESSION['unconfirmed']['all'][count($_SESSION['unconfirmed']['all'])] = $table[$i]['internship_identifier'];
+                            }
+                        }
+                    }
+
                     if(empty($table)):
                         echo "<h6 class='left-align'>Aucun stage disponible</h6>";
                     else: ?>
@@ -268,10 +280,6 @@ class   Homepage {
 
                                 for ($i = ($page-1)*10 ; $i < $page*10 && $i < count($table) ; ++$i):
                                     $row = $table[$i];
-                                    if (!isset($_SESSION['unconfirmed']) && $row['requested'] && !in_array($row['internship_identifier'], $_SESSION['unconfirmed']['all'])) {
-                                        $_SESSION['unconfirmed'][$page][count($_SESSION['unconfirmed'][$page])] = $row['internship_identifier'];
-                                        $_SESSION['unconfirmed']['all'][count($_SESSION['unconfirmed']['all'])] = $row['internship_identifier'];
-                                    }
                                     ?>
                                     <tr>
                                         <td><?= $row['internship_identifier']?></td>
@@ -286,7 +294,7 @@ class   Homepage {
                                         <td><?= str_replace('_', ' ', $row["company_name"]) ?></td>
                                         <td>
                                             <label class="center">
-                                                <input type="checkbox" name="selecInternship[]" class="center-align filled-in" value="<?= $row['internship_identifier'] ?>" <?= isset($_SESSION['unconfirmed']) && in_array($row['internship_identifier'], $_SESSION['unconfirmed']['all']) ? 'checked="checked"' : '' ?> />
+                                                <input type="checkbox" name="selecInternship[]" class="center-align filled-in" value="<?= $row['internship_identifier'] ?>" <?= isset($_SESSION['unconfirmed']['all']) && in_array($row['internship_identifier'], $_SESSION['unconfirmed']['all']) ? 'checked="checked"' : '' ?> />
                                                 <span></span>
                                             </label>
                                         </td>
@@ -333,12 +341,10 @@ class   Homepage {
                                     <?php endif; ?>
                                 </div>
                         </form>
-                            <?
-                        endif;
+                        <? endif;
                     endif;
                 endif;
-            endif;
-            ?>
+            endif; ?>
             <script>
                 <? if(isset($_SESSION['address'])): ?>
                     const teacherAddress = "<?= $_SESSION['address'][0]['address']; ?>";
