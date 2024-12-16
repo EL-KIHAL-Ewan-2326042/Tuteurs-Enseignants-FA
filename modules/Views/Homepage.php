@@ -62,7 +62,7 @@ class   Homepage {
 
                 if(isset($_POST['selecInternshipSubmitted'])) {
 
-                    $_SESSION['unconfirmed'][$_SESSION['lastPage']] = $_POST['selecInternship'] ?? array();
+                    $_SESSION['unconfirmed'][$_SESSION['lastPage'] ?? 1] = $_POST['selecInternship'] ?? array();
                     $_SESSION['unconfirmed']['all'] = array();
                     foreach ($_SESSION['unconfirmed'] as $page => $internships) {
                         if ($page == 'all') continue;
