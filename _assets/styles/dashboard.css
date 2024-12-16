@@ -32,13 +32,3 @@ h3,h4 {
 .row {
     margin: 20px;
 }
-
-/* Style des boutons de la page */
-.btn{
-    background-color : #00558B;
-}
-
-/* Style au survol de la souris sur pour les boutons de la page */
-.btn:hover{
-    background-color: #E8CE7E;
-}

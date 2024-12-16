@@ -125,11 +125,14 @@ class Homepage {
                 if ($lastName === 0) {
                     $firstName = $a['student_firstname'] <=> $b['student_firstname'];
                     if ($firstName === 0) {
+                        return $b['requested'] <=> $a['requested'];
+                        /*
                         $requested = $b['requested'] <=> $a['requested'];
                         if($requested === 0) {
                             return $b['score'] <=> $a['score'];
                         }
                         return $requested;
+                        */
                     }
                     return $decreasing ? $firstName*-1 : $firstName;
                 }
@@ -141,15 +144,19 @@ class Homepage {
                 if($subject === 0) {
                     $requested = $b['requested'] <=> $a['requested'];
                     if ($requested === 0) {
+                        /*
                         $rank = $b['score'] <=> $a['score'];
                         if ($rank === 0) {
+                        */
                             $lastName = $a['student_name'] <=> $b['student_name'];
                             if ($lastName === 0) {
                                 return $a['student_firstname'] <=> $b['student_firstname'];
                             }
                             return $lastName;
+                        /*
                         }
                         return $rank;
+                        */
                     }
                     return $requested;
                 }
@@ -159,15 +166,19 @@ class Homepage {
             usort($table, function ($a, $b) use ($decreasing) {
                 $requested = $a['requested'] <=> $b['requested'];
                 if($requested === 0) {
+                    /*
                     $rank = $b['score'] <=> $a['score'];
                     if ($rank === 0) {
+                    */
                         $lastName = $a['student_name'] <=> $b['student_name'];
                         if ($lastName === 0) {
                             return $a['student_firstname'] <=> $b['student_firstname'];
                         }
                         return $lastName;
+                    /*
                     }
                     return $rank;
+                    */
                 }
                 return $decreasing ? $requested : $requested*-1;
             });
@@ -213,9 +224,9 @@ class Homepage {
             $row['duration'] = $this->globalModel->getDistance($row['internship_identifier'], $identifier);
 
             // le score final déterminant la pertinence du stage pour l'enseignant
-            $row['score'] = $this->calculateScore(array('Distance' => $row['duration'],
-                                                        'A été responsable' => $row['internshipTeacher'] > 0 ? $row['internshipTeacher']/count($internships) : 0,
-                                                        'Cohérence' => $this->globalModel->scoreDiscipSubject($row['internship_identifier'], $identifier)));
+            //$row['score'] = $this->calculateScore(array('Distance' => $row['duration'],
+            //                                            'A été responsable' => $row['internshipTeacher'] > 0 ? $row['internshipTeacher']/count($internships) : 0,
+            //                                            'Cohérence' => $this->globalModel->scoreDiscipSubject($row['internship_identifier'], $identifier)));
         }
 
         return $studentsList;
