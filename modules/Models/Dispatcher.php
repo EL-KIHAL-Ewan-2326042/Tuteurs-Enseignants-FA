@@ -3,6 +3,7 @@
 namespace Blog\Models;
 
 use Includes;
+use mysql_xdevapi\Exception;
 use PDO;
 
 class Dispatcher{
@@ -41,7 +42,7 @@ class Dispatcher{
         // Pour chaque relation tuteur-etudiant, on calcul leur Score qu'on met dans un array final
         foreach($internshipList as $internship) {
             $distanceMin = $this->globalModel->getDistance($internship['internship_identifier'], $identifier);
-            $relevance= $this->globalModel->ScoreDiscipSubject($internship['internship_identifier'], $identifier);
+            $relevance= $this->globalModel->scoreDiscipSubject($internship['internship_identifier'], $identifier);
 
             $dictValues = array(
                 "A été responsable" => $this->globalModel->getInternships($internship['internship_identifier']),
@@ -61,7 +62,16 @@ class Dispatcher{
                             break;
 
                         case 'A été responsable':
-                            $ScoreInternship = ($value > 0) ? $coef : 0;
+                            $numberOfInternships = count($value);
+
+                            $baselineScore = 0.7 * $coef;
+
+                            if ($numberOfInternships > 0) {
+                                $ScoreInternship = $coef * min(1, log(1 + $numberOfInternships, 2));
+                            } else {
+                                $ScoreInternship = $baselineScore;
+                            }
+
                             $totalScore += $ScoreInternship;
                             break;
 
@@ -80,7 +90,7 @@ class Dispatcher{
             // Score normalise sur 5
             $ScoreFinal = ($totalScore * 5) / $totalCoef;
 
-            $newList = ["id_teacher" => $identifier, "internship_identifier" => $internship['internship_identifier'], "score" => round($ScoreFinal, 2), "type" => $internship['type']];
+            $newList = ["id_teacher" => $identifier, "internship_identifier" => $internship['internship_identifier'], "score" => (int)round($ScoreFinal, 2), "type" => $internship['type']];
 
             if (!empty($newList)) {
                 $result[] = $newList;
@@ -250,7 +260,6 @@ class Dispatcher{
 
     /**
      * Montrer la liste des sauvegardes
-     * @param string $user_id
      * @return array|null Renvoie les coefficients ou les sauvegardes disponibles.
      */
     public function showCoefficients(): ?array {
@@ -266,7 +275,7 @@ class Dispatcher{
 
     public function loadCoefficients(string $user_id, int $id_backup): array|false {
         try {
-            $query = "SELECT name_criteria, coef FROM backup WHERE user_id = :user_id AND id_backup = :id_backup";
+            $query = "SELECT name_criteria, coef, is_checked FROM backup WHERE user_id = :user_id AND id_backup = :id_backup";
             $stmt = $this->db->getConn()->prepare($query);
             $stmt->bindParam(':user_id', $user_id);
             $stmt->bindParam(':id_backup', $id_backup);
@@ -280,59 +289,35 @@ class Dispatcher{
 
     /**
      * Sauvegarder les coefficients dans la base de donnée
-     * @param array $coefficients
+     * @param array $data
      * @param string $user_id
+     * @param int $id_backup
      * @return bool
      */
-    public function saveCoefficients(array $coefficients, string $user_id, int $id_backup = 0): bool {
+    public function saveCoefficients(array $data, string $user_id, int $id_backup = 0): bool {
         try {
-            if ($id_backup === 0) {
-                $query = "SELECT MAX(id_backup) FROM id_backup";
-                $stmt = $this->db->getConn()->prepare($query);
-                $stmt->execute();
-                $max_id_backup = $stmt->fetchColumn();
+            $query = "UPDATE backup 
+                  SET coef = :coef, is_checked = :is_checked 
+                  WHERE user_id = :user_id AND id_backup = :id_backup AND name_criteria = :name_criteria";
 
-                $query = "SELECT MAX(id_backup) FROM backup WHERE user_id = :user_id";
+            foreach ($data as $singleData) {
                 $stmt = $this->db->getConn()->prepare($query);
                 $stmt->bindParam(':user_id', $user_id);
+                $stmt->bindParam(':id_backup', $id_backup);
+                $stmt->bindParam(':name_criteria', $singleData['name_criteria']);
+                $stmt->bindParam(':coef', $singleData['coef']);
+                $stmt->bindParam(':is_checked', $singleData['is_checked']);
                 $stmt->execute();
-                $id_backup = $stmt->fetch(PDO::FETCH_COLUMN);
-
-                if ($id_backup + 1 !== $max_id_backup) {
-                    $id_backup += 1;
-                }
-
-                $query = "INSERT INTO backup (user_id, name_criteria, id_backup, coef) VALUES (:user_id, :name_criteria, :id_backup, :coef)";
-                foreach ($coefficients as $nameCriteria => $coef) {
-                    $stmt = $this->db->getConn()->prepare($query);
-                    $stmt->bindParam(':user_id', $user_id);
-                    $stmt->bindParam(':name_criteria', $nameCriteria);
-                    $stmt->bindParam(':id_backup', $id_backup);
-                    $stmt->bindParam(':coef', $coef);
-                    $stmt->execute();
-                }
-            }
-
-            else {
-                $query = "UPDATE backup SET coef = :coef WHERE user_id = :user_id AND id_backup = :id_backup AND name_criteria = :name_criteria";
-                foreach ($coefficients as $nameCriteria => $coef) {
-                    $stmt = $this->db->getConn()->prepare($query);
-                    $stmt->bindParam(':user_id', $user_id);
-                    $stmt->bindParam('id_backup', $id_backup);
-                    $stmt->bindParam(':name_criteria', $nameCriteria);
-                    $stmt->bindParam(':coef', $coef);
-                    $stmt->execute();
-                }
             }
 
             return true;
-            // TODO Si l'exception correspond au max d'id_backup
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
 
-    public function getDefaultCoef() {
+    public function getDefaultCoef(): array
+    {
         $query = "SELECT name_criteria FROM distribution_criteria";
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->execute();
@@ -340,6 +325,7 @@ class Dispatcher{
 
         foreach ($defaultCriteria as &$criteria) {
             $criteria['coef'] = 1;
+            $criteria['is_checked'] = true;
         }
 
         return $defaultCriteria;

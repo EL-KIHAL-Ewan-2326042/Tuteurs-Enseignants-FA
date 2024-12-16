@@ -44,22 +44,22 @@ main a:hover {
     padding-right: 3rem;
 }
 
-.scrollable-table-container {
-    max-height: 40rem;
-    overflow-y: auto;
-    margin-top: 20px;
-}
-
-.scrollable-table-container table {
-    width: 100%;
-    table-layout: fixed;
-}
-
 thead {
     background-color: #91B5CC;
     position: sticky;
     top: 0;
-    z-index: 1;
+}
+
+thead, tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+tbody {
+    width: 100%;
+    overflow-y: auto;
+    display: block;
 }
 
 main table {
