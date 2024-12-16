@@ -59,7 +59,7 @@ class Dispatcher {
                                     $listCriteria[$key] = $value;
                                 }
                             } else {
-                                $listCriteria = $this->dispatcherModel->loadCoefficients($_SESSION['identifier'], (int)$id_backup);
+                                $listCriteria = $this->dispatcherModel->loadCoefficients($_SESSION['identifier'], $id_backup);
                             }
                             ?>
 
@@ -128,7 +128,7 @@ class Dispatcher {
                         <div class="col s12">
                             <form class="col s12" action="./dispatcher" method="post">
                                 <div class="selection">
-                                    <table class="highlight centered">
+                                    <table class="highlight centered" id="dispatch-table">
                                         <thead>
                                         <tr>
                                             <th>Enseignant</th>
@@ -154,7 +154,7 @@ class Dispatcher {
                                         $resultDispatchList = $this->dispatcherModel->dispatcher($dictCoef)[0];
                                         foreach ($resultDispatchList as $resultDispatch):
                                             ?>
-                                            <tr>
+                                            <tr class="dispatch-row">
                                                 <td><?= $resultDispatch['id_teacher']; ?></td>
                                                 <td><?= $resultDispatch['internship_identifier']; ?></td>
                                                 <td><strong><?= $resultDispatch['score']; ?></strong>/5</td>
@@ -166,23 +166,22 @@ class Dispatcher {
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
-                                            <tr>
-                                                <td></td>
-                                                <td></td>
-                                                <td><span>Tout cocher: </span></td>
-                                                <td><p>
-                                                        <label>
-                                                            <input type="checkbox" class="filled-in" name="select-all" />
-                                                            <span></span>
-                                                        </label>
-                                                    </p>
-                                                </td>
-                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
+
+                                <br>
+
+                                <div id="pagination-controls" class="center-align">
+                                    <button type="button" class="waves-effect waves-light btn" id="prev-page"><i class="material-icons">arrow_back</i></button>
+                                    <span id="page-number">Page 1</span>
+                                    <button type="button" class="waves-effect waves-light btn" id="next-page"><i class="material-icons">arrow_forward</i></button>
+                                </div>
+
+                                <br>
+
                                 <div class="row s12 center">
-                                    <input type="hidden" id=selectStudentSubmitted" name="selectStudentSubmitted" value="1">
+                                    <input type="hidden" id="selectStudentSubmitted" name="selectStudentSubmitted" value="1">
                                     <button class="waves-effect waves-light btn" type="submit">Valider</button>
                                     <input type="hidden" name="restartDispatcherButton" value="1">
                                     <button class="waves-effect waves-light btn" type="submit">Recommencer</button>
@@ -190,83 +189,115 @@ class Dispatcher {
                             </form>
                         </div>
                     </div>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const rowsPerPage = 10;
+                            const rows = document.querySelectorAll('.dispatch-row');
+                            const totalRows = rows.length;
+                            const totalPages = Math.ceil(totalRows / rowsPerPage);
+                            let currentPage = 1;
+
+                            const prevButton = document.getElementById('prev-page');
+                            const nextButton = document.getElementById('next-page');
+                            const pageNumberSpan = document.getElementById('page-number');
+
+                            function showPage(page) {
+                                if (page < 1 || page > totalPages) return;
+
+                                currentPage = page;
+                                pageNumberSpan.textContent = `Page ${currentPage}`;
+
+                                rows.forEach((row, index) => {
+                                    const start = (currentPage - 1) * rowsPerPage;
+                                    const end = currentPage * rowsPerPage;
+                                    if (index >= start && index < end) {
+                                        row.style.display = '';
+                                    } else {
+                                        row.style.display = 'none';
+                                    }
+                                });
+
+                                prevButton.disabled = currentPage === 1;
+                                nextButton.disabled = currentPage === totalPages;
+                            }
+
+                            prevButton.addEventListener('click', () => {
+                                showPage(currentPage - 1);
+                            });
+
+                            nextButton.addEventListener('click', () => {
+                                showPage(currentPage + 1);
+                            });
+
+                            showPage(1);
+                        });
+                    </script>
                 <?php endif; ?>
             </div>
-        </main>
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const selects = document.querySelectorAll('select');
+                    M.FormSelect.init(selects);
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const selects = document.querySelectorAll('select');
-                M.FormSelect.init(selects);
-
-                const saveSelector = document.getElementById('save-selector');
-                if (saveSelector) {
-                    saveSelector.addEventListener('change', function () {
-                        const form = this.closest('form');
-                        form.submit();
-                    });
-                }
-
-                const checkboxes = document.querySelectorAll('.criteria-checkbox');
-                const selectAllCheckbox = document.querySelector('input[type="checkbox"][name="select-all"]');
-
-                if (selectAllCheckbox) {
-                    selectAllCheckbox.addEventListener('change', function () {
-                        const isChecked = this.checked;
-                        document.querySelectorAll('input[type="checkbox"][name="listTupleAssociate[]"').forEach(checkbox => {
-                            checkbox.checked = isChecked;
+                    const saveSelector = document.getElementById('save-selector');
+                    if (saveSelector) {
+                        saveSelector.addEventListener('change', function () {
+                            const form = this.closest('form');
+                            form.submit();
                         });
-                    });
-                }
-
-                checkboxes.forEach(checkbox => {
-                    const hiddenInput = document.querySelector(`input[name="is_checked[${checkbox.dataset.coefInputId}]"]`);
-
-                    if (checkbox.checked) {
-                        hiddenInput.value = '1';
-                    } else {
-                        hiddenInput.value = '0';
                     }
 
-                    checkbox.addEventListener('change', function () {
-                        if (this.checked) {
+                    const checkboxes = document.querySelectorAll('.criteria-checkbox');
+
+                    checkboxes.forEach(checkbox => {
+                        const hiddenInput = document.querySelector(`input[name="is_checked[${checkbox.dataset.coefInputId}]"]`);
+
+                        if (checkbox.checked) {
                             hiddenInput.value = '1';
                         } else {
                             hiddenInput.value = '0';
                         }
+
+                        checkbox.addEventListener('change', function () {
+                            if (this.checked) {
+                                hiddenInput.value = '1';
+                            } else {
+                                hiddenInput.value = '0';
+                            }
+                        });
+                    });
+
+                    document.querySelectorAll('.coef-input').forEach(input => {
+                        input.addEventListener('input', function () {
+                            const value = parseInt(this.value);
+                            if (value > 100) {
+                                this.value = 100;
+                            } else if (value < 0) {
+                                this.value = 0;
+                            }
+                        });
                     });
                 });
 
-                document.querySelectorAll('.coef-input').forEach(input => {
-                    input.addEventListener('input', function () {
-                        const value = parseInt(this.value);
-                        if (value > 100) {
-                            this.value = 100;
-                        } else if (value < 0) {
-                            this.value = 0;
-                        }
+                document.querySelectorAll('.criteria-checkbox').forEach(checkbox => {
+                    checkbox.addEventListener('change', function () {
+                        const hiddenInput = document.querySelector(`input[name="is_checked[${this.dataset.coefInputId}]"]`);
+                        hiddenInput.value = this.checked ? '1' : '0';
                     });
                 });
-            });
 
-            document.querySelectorAll('.criteria-checkbox').forEach(checkbox => {
-                checkbox.addEventListener('change', function () {
-                    const hiddenInput = document.querySelector(`input[name="is_checked[${this.dataset.coefInputId}]"]`);
-                    hiddenInput.value = this.checked ? '1' : '0';
-                });
-            });
+                function showLoading() {
+                    const loadingSection = document.getElementById('loading-section');
+                    const formsSection = document.getElementById('forms-section');
 
-            function showLoading() {
-                const loadingSection = document.getElementById('loading-section');
-                const formsSection = document.getElementById('forms-section');
-
-                if (loadingSection && formsSection) {
-                    loadingSection.style.display = 'block';
-                    formsSection.style.display = 'none';
+                    if (loadingSection && formsSection) {
+                        loadingSection.style.display = 'block';
+                        formsSection.style.display = 'none';
+                    }
                 }
-            }
-        </script>
-
+            </script>
+        </main>
 <?php
     }
 }
