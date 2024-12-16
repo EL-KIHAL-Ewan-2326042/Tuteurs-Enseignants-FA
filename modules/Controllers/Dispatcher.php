@@ -46,7 +46,6 @@ class Dispatcher {
         $returnMessage = '';
         foreach($_POST['listTupleAssociate'] as $tupleAssociate){
             $tmp = explode("$", $tupleAssociate);
-            print_r($tmp);
             if (in_array($tmp[0], $listTeacher) && in_array($tmp[1], $listInternship)){
                 if (!(in_array([$tmp[0], $tmp[1]], $listAssociate))) {
                     $returnMessage .= $dispatcherModel->insertIs_responsible($tmp[0], $tmp[1], floatval($tmp[2]));
