@@ -207,6 +207,32 @@ CREATE TRIGGER check_distance_assignment
     FOR EACH ROW
     EXECUTE FUNCTION check_distance_assignment();
 
+
+CREATE OR REPLACE FUNCTION insert_backup()
+RETURNS TRIGGER AS $$
+    DECLARE
+        name_criteria TEXT;
+        num integer;
+    BEGIN
+        for name_criteria IN
+            SELECT Distribution_criteria.name_criteria FROM Distribution_criteria
+            LOOP
+            FOR num IN
+                SELECT Id_backup.id_backup FROM Id_backup
+                LOOP
+                INSERT INTO backup (user_id, name_Criteria, id_backup, coef) VALUES (NEW.user_id, name_criteria, num, 1);
+            END LOOP;
+        END LOOP;
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE TRIGGER insert_backup
+    AFTER INSERT ON public.user_connect
+    FOR EACH ROW
+    EXECUTE FUNCTION insert_backup()
+
 INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('B22662146', 'CASES', 'Murphy', 3);
 INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('R14328249', 'ALVARADOS', 'Christen', 2);
 INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('G42185815', 'KOCHS', 'Barry', 4);
