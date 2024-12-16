@@ -229,14 +229,30 @@ $$ LANGUAGE plpgsql;
 
 
 CREATE TRIGGER insert_backup
-    AFTER INSERT ON public.user_connect
+    AFTER INSERT ON user_connect
     FOR EACH ROW
     EXECUTE FUNCTION insert_backup();
+
+CREATE OR REPLACE FUNCTION create_addr_for_insert_internship()
+RETURNS TRIGGER AS $$
+    BEGIN
+        IF (SELECT Address FROM Addr_name WHERE Address = NEW.Address) IS NULL THEN
+            INSERT INTO Addr_name (Address) VALUES (NEW.address);
+        END IF;
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER create_addr_for_insert_internship
+    BEFORE INSERT ON Internship
+    FOR EACH ROW
+    EXECUTE FUNCTION create_addr_for_insert_internship();
 
 
 INSERT INTO Distribution_criteria (Name_criteria) VALUES ('A été responsable');
 INSERT INTO Distribution_criteria (Name_criteria) VALUES ('Distance');
 INSERT INTO Distribution_criteria (Name_criteria) VALUES ('Cohérence');
+INSERT INTO Distribution_criteria (Name_criteria) VALUES ('Est demandé');
 
 INSERT INTO Id_backup (Id_backup) VALUES (1);
 INSERT INTO Id_backup (Id_backup) VALUES (2);
