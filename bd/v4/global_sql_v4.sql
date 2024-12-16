@@ -231,7 +231,16 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER insert_backup
     AFTER INSERT ON public.user_connect
     FOR EACH ROW
-    EXECUTE FUNCTION insert_backup()
+    EXECUTE FUNCTION insert_backup();
+
+
+INSERT INTO Distribution_criteria (Name_criteria) VALUES ('A été responsable');
+INSERT INTO Distribution_criteria (Name_criteria) VALUES ('Distance');
+INSERT INTO Distribution_criteria (Name_criteria) VALUES ('Cohérence');
+
+INSERT INTO Id_backup (Id_backup) VALUES (1);
+INSERT INTO Id_backup (Id_backup) VALUES (2);
+INSERT INTO Id_backup (Id_backup) VALUES (3);
 
 INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('B22662146', 'CASES', 'Murphy', 3);
 INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('R14328249', 'ALVARADOS', 'Christen', 2);
@@ -755,11 +764,6 @@ INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('C34567890', 'Vente 
 INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('D45678901', 'Économie');
 INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('E56789012', 'Droit');
 
-
-
-
-
-
 INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('B22662146', 'Teacher', 'IUT_INFO_AIX');
 INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('R14328249', 'Teacher', 'IUT_INFO_AIX');
 INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('G42185815', 'Teacher', 'IUT_INFO_AIX');
@@ -987,13 +991,6 @@ INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('C45678901', 'Orléa
 INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('D56789012', 'Cambrai', 'Domicile_1');
 INSERT INTO Has_address (Id_teacher, Address, Type) VALUES ('E67890123', 'La Rochelle', 'Domicile_1');
 
-INSERT INTO Distribution_criteria (Name_criteria) VALUES ('A été responsable');
-INSERT INTO Distribution_criteria (Name_criteria) VALUES ('Distance');
-INSERT INTO Distribution_criteria (Name_criteria) VALUES ('Cohérence');
 
-INSERT INTO Id_backup (Id_backup) VALUES (1);
 
-INSERT INTO Backup (User_id, Name_criteria, Id_backup, Coef) VALUES ('B22662146', 'A été responsable', 1, 1);
-INSERT INTO Backup (User_id, Name_criteria, Id_backup, Coef) VALUES ('B22662146', 'Distance', 1, 1);
-INSERT INTO Backup (User_id, Name_criteria, Id_backup, Coef) VALUES ('B22662146', 'Cohérence', 1, 1);
 
