@@ -31,7 +31,8 @@ main a:hover {
     color: var(--main-color);
 }
 
-.btn {
+.btn, span,
+div [class=select-wrapper] {
     z-index: 0;
 }
 
@@ -60,6 +61,43 @@ tbody {
     width: 100%;
     overflow-y: auto;
     display: block;
+}
+
+.pagination a {
+    background-color: #91B5CC;
+}
+
+.pagination a:hover,
+.pagination a:visited:hover {
+    background-color: #91B5CC;
+    color: var(--hover-color);
+}
+
+.pagination .prev,
+.pagination .next,
+.pagination .first,
+.pagination .last {
+    font-weight: bold;
+}
+
+.pagination a:visited  {
+    color: var(--text-color);
+}
+
+.pagination .active,
+.pagination .active:visited {
+    border: #91B5CC 1px solid;
+    background-color: white;
+    color: #91B5CC;
+}
+
+.pagination .active:hover,
+.pagination .active:visited:hover {
+    background-color: white;
+}
+
+.hidden {
+    margin: 0 10px;
 }
 
 main table {
