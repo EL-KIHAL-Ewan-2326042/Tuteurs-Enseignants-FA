@@ -76,39 +76,6 @@ class Dashboard{
     }
 
     /**
-     * Importation des données depuis un fichier CSV vers la base de données
-     * (pour la table Student)
-     * @param string $csvFilePath Chemin du fichier CSV
-     * @return bool True si l'importation réussit, sinon False
-     * @throws Exception
-     */
-    public function uploadCsvStudent(string $csvFilePath): bool {
-        return $this->uploadCsv($csvFilePath, 'student');
-    }
-
-    /**
-     * Importation des données depuis un fichier CSV vers la base de données
-     * (pour la table Teacher)
-     * @param string $csvFilePath Chemin du fichier CSV
-     * @return bool True si l'importation réussit, sinon False
-     * @throws Exception
-     */
-    public function uploadCsvTeacher(string $csvFilePath): bool {
-        return $this->uploadCsv($csvFilePath, 'teacher');
-    }
-
-    /**
-     * Importation des données depuis un fichier CSV vers la base de données
-     * (pour la table Internship)
-     * @param string $csvFilePath Chemin du fichier CSV
-     * @return bool True si l'importation réussit, sinon False
-     * @throws Exception
-     */
-    public function uploadCsvInternship(string $csvFilePath): bool {
-        return $this->uploadCsv($csvFilePath, 'internship');
-    }
-
-    /**
      * Vérifie que les colonnes du fichier CSV correspondent aux colonnes attendues
      * dans la base de données
      * @param array $headers Liste des en-têtes
@@ -167,6 +134,12 @@ class Dashboard{
             case 'teacher':
                 $this->insertTeacherData($data);
                 break;
+            case 'student':
+                $this->insertStudentData($data);
+                break;
+            case 'internship':
+                $this->insertInternshipData($data);
+                break;
             default:
                 $this->insertGenericData($data, $tableName);
                 break;
@@ -182,7 +155,7 @@ class Dashboard{
     private function insertGenericData(array $data, string $tableName): void {
         $tableColumns = $this->getTableColumn($tableName);
         if (count($data) !== count($tableColumns)) {
-            return; // Ignore les lignes invalides
+            return;
         }
 
         $query = "INSERT INTO $tableName (" . implode(',', $tableColumns) . ") 
@@ -195,6 +168,8 @@ class Dashboard{
 
         $stmt->execute();
     }
+
+    //----- IMPORTATION Teacher -----//
 
     /**
      * @param array $data
@@ -245,62 +220,91 @@ class Dashboard{
         $stmt->execute();
     }
 
+    //----- IMPORTATION Student -----//
 
-//    /**
-//     * Importation des données depuis un fichiers CSV vers la base de données
-//     * pour une table donnée
-//     * @param string $csvFilePath Chemin du fichier CSV
-//     * @param string $tableName Nom de la table
-//     * @return bool True si l'importation réussit, sinon False
-//     * @throws Exception
-//     */
-//    public function uploadCsv(string $csvFilePath, string $tableName): bool {
-//        $db = $this->db;
-//
-//        if (($handle = fopen($csvFilePath, "r")) !== FALSE) {
-//            //lecture de la première ligne du fichier CSV (les en-têtes)
-//            $headers = fgetcsv($handle, 1000, ",");
-//
-//            if (!$this->validateHeaders($headers, $tableName)) {
-//                //retourne false si il y une incohérence entre les colonnes de la table
-//                fclose($handle);
-//                return false;
-//            }
-//
-//            try {
-//                //recupération des colonnes de la tables dans la base de données
-//                $tableColumns = $this->getTableColumn($tableName);
-//
-//                while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-//                    //vérification de la correspondance du nombre de données et le nombre de colonne
-//                    if (count($data) !== count($tableColumns)) {
-//                        continue;
-//                    }
-//
-//                    //prépartation de la requête d'insertion
-//                    $query = "INSERT INTO $tableName (" . implode(',', $tableColumns) . ") VALUES (" . implode(',', array_map(fn($i) => ":column$i", range(1, count($tableColumns)))) . ")";
-//                    $stmt = $db->getConn()->prepare($query);
-//
-//                    //association des données aux paramètres de la requête
-//                    foreach ($data as $index => $value) {
-//                        if (empty($value)) {
-//                            $value = null;
-//                        } elseif (is_array($value)) {
-//                            $value = implode(',', $value);
-//                        }
-//                        $stmt->bindValue(":column" . ($index + 1), $value);
-//                    }
-//                    $stmt->execute();
-//                }
-//                fclose($handle);
-//                return true;
-//            } catch (PDOException $e) {
-//                return false;
-//            }
-//        }
-//        return false;
-//    }
+    /**
+     * @param array $data
+     * @return void
+     * @throws Exception
+     */
+    private function insertStudentData(array $data): void {
+        // Colonnes pour la table student
+        $studentColumns = $this->getTableColumn('student');
+        $studentData = array_combine($studentColumns, $data);
 
+        // Insertion dans la table teacher
+        $this->insertGenericData($data, 'student');
+
+        // Insertion dans la table study_at
+        $department = $_SESSION['role_department'] ?? null;
+        if ($department) {
+            $this->insertStudyAt($studentData['student_number'], $department[0]);
+        }
+    }
+
+    /**
+     * @param string $student_number
+     * @param string $department
+     * @return void
+     */
+    public function insertStudyAt(string $student_number, string $department): void {
+        $query = "INSERT INTO study_at (student_number, department_name) VALUES (:student_number, :department)";
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindValue(':student_number', $student_number);
+        $stmt->bindValue(':department', $department);
+        $stmt->execute();
+    }
+
+    //----- IMPORTATION Student -----//
+
+    /**
+     * @param array $data
+     * @return void
+     * @throws Exception
+     */
+    private function insertInternshipData(array $data): void {
+        // Colonnes pour la table internship
+        $internshipColumns = $this->getTableColumn('internship');
+        $internshipData = array_combine($internshipColumns, $data);
+
+        $idTeacher = $internshipData['id_teacher'] ?? null;
+        $studentNumber = $internshipData['student_number'] ?? null;
+
+        if (!$idTeacher || !$studentNumber) {
+            throw new Exception("Les données id_teacher ou student_number sont manquantes.");
+        }
+
+        // Vérification si la combinaison existe déjà
+        if ($this->internshipExists($idTeacher, $studentNumber)) {
+            throw new Exception("L'association id_teacher '$idTeacher' et student_number '$studentNumber' existe déjà.");
+        }
+
+        // Insertion dans la table internship
+        $this->insertGenericData($data, 'internship');
+    }
+
+    /**
+     * @param string $idTeacher
+     * @param string $studentNumber
+     * @return bool
+     */
+    public function internshipExists(string $idTeacher, string $studentNumber): bool {
+        $query = "
+        SELECT COUNT(*) 
+        FROM internship 
+        WHERE id_teacher = :id_teacher AND student_number = :student_number
+    ";
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindValue(':id_teacher', $idTeacher);
+        $stmt->bindValue(':student_number', $studentNumber);
+        $stmt->execute();
+
+        // Retourne True si un enregistrement existe, False sinon
+        return $stmt->fetchColumn() > 0;
+    }
+
+
+    //----- EXPORTATION -----//
 
     /**
      * Exportation des données de la base de données vers un fichier CSV
@@ -366,4 +370,6 @@ class Dashboard{
 
         exit();
     }
+
+
 }

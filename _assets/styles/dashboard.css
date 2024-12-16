@@ -19,6 +19,10 @@ h3,h4 {
     padding: 20px;
 }
 
+.message{
+    color: #00558B;
+}
+
 /* Style des options dans le menu déroulant du select */
 .dropdown-content li>a, .dropdown-content li>span{
     padding: 15px;
