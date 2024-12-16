@@ -94,7 +94,7 @@ class Dispatcher{
             // Score normalise sur 5
             $ScoreFinal = ($totalScore * 5) / $totalCoef;
 
-            $newList = ["id_teacher" => $identifier, "internship_identifier" => $internship['internship_identifier'], "score" => (int)round($ScoreFinal, 2), "type" => $internship['type']];
+            $newList = ["id_teacher" => $identifier, "internship_identifier" => $internship['internship_identifier'], "score" => round($ScoreFinal, 2), "type" => $internship['type']];
 
             if (!empty($newList)) {
                 $result[] = $newList;
