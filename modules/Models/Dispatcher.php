@@ -43,11 +43,14 @@ class Dispatcher{
         foreach($internshipList as $internship) {
             $distanceMin = $this->globalModel->getDistance($internship['internship_identifier'], $identifier);
             $relevance= $this->globalModel->scoreDiscipSubject($internship['internship_identifier'], $identifier);
+            $internshipList = $this->globalModel->getInternships($internship['internship_identifier']);
+            $isRequested = $this->globalModel->isRequested($internship['internship_identifier'], $identifier);
 
             $dictValues = array(
-                "A été responsable" => $this->globalModel->getInternships($internship['internship_identifier']),
+                "A été responsable" => $internshipList,
                 "Distance" => $distanceMin,
-                "Cohérence" => round($relevance, 2));
+                "Cohérence" => round($relevance, 2),
+                "Est demandé" => $isRequested);
 
             $totalScore = 0;
             $totalCoef = 0;
@@ -75,6 +78,7 @@ class Dispatcher{
                             $totalScore += $ScoreInternship;
                             break;
 
+                        case 'Est demande':
                         case 'Cohérence':
                             $ScoreRelevance = $value * $coef;
                             $totalScore += $ScoreRelevance;
