@@ -22,11 +22,11 @@ class Dashboard{
      * Récupère les colonnes d'une table donnée dans la base de données
      * @param string $tableName Nom de la table
      * @return array Liste des colonnes
-     * @throws Exception
+     * @throws Exception En cas d'erreur lors de l'exécution de la requête SQL
      */
     public function getTableColumn(string $tableName): array {
         try {
-            //requête pour obtenir les noms des colonnes d'une table spécifique
+            // Requête SQL pour obtenir les noms des colonnes
             $query = "
                 SELECT column_name
                 FROM information_schema.columns
@@ -36,11 +36,11 @@ class Dashboard{
             $stmt->bindParam(':table_name', $tableName);
             $stmt->execute();
 
-            //récupération des colonnes en tant que tableau
+            // Récupération des colonnes en tant que tableau
             $columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
             return $columns ?: [];
         } catch (PDOException $e) {
-            //gestion des erreurs liées à la base de données
+            // Gestion des erreurs liées à la base de données
             throw new Exception("Impossible de récupérer les colonnes pour la table $tableName.");
         }
     }
@@ -52,7 +52,7 @@ class Dashboard{
      */
     public function isValidTable(string $tableName): bool {
         try {
-            //vérification la présence d'au moins une colonne dans la table
+            // Vérifie la présence d'au moins une colonne dans la table
             return !empty($this->getTableColumn($tableName));
         } catch (Exception $e) {
             return false;
@@ -63,10 +63,10 @@ class Dashboard{
      * Récupère les en-têtes d'un fichier CSV
      * @param string $csvFilePath Chemin du fichier CSV
      * @return array Liste des en-têtes
-     * @throws Exception
+     * @throws Exception En cas d'erreur de lecture du fichier CSV
      */
     public function getCsvHeaders(string $csvFilePath): array {
-        //ouverture du fichier CSV et lecture de la première ligne (les en-têtes)
+        // Ouverture du fichier CSV et lecture de la première ligne (les en-têtes)
         if (($handle = fopen($csvFilePath, "r")) !== FALSE) {
             $headers = fgetcsv($handle,1000,",");
             fclose($handle);
@@ -76,103 +76,15 @@ class Dashboard{
     }
 
     /**
-     * Importation des données depuis un fichier CSV vers la base de données
-     * (pour la table Student)
-     * @param string $csvFilePath Chemin du fichier CSV
-     * @return bool True si l'importation réussit, sinon False
-     * @throws Exception
-     */
-    public function uploadCsvStudent(string $csvFilePath): bool {
-        return $this->uploadCsv($csvFilePath, 'student');
-    }
-
-    /**
-     * Importation des données depuis un fichier CSV vers la base de données
-     * (pour la table Teacher)
-     * @param string $csvFilePath Chemin du fichier CSV
-     * @return bool True si l'importation réussit, sinon False
-     * @throws Exception
-     */
-    public function uploadCsvTeacher(string $csvFilePath): bool {
-        return $this->uploadCsv($csvFilePath, 'teacher');
-    }
-
-    /**
-     * Importation des données depuis un fichier CSV vers la base de données
-     * (pour la table Internship)
-     * @param string $csvFilePath Chemin du fichier CSV
-     * @return bool True si l'importation réussit, sinon False
-     * @throws Exception
-     */
-    public function uploadCsvInternship(string $csvFilePath): bool {
-        return $this->uploadCsv($csvFilePath, 'internship');
-    }
-
-    /**
-     * Importation des données depuis un fichiers CSV vers la base de données
-     * pour une table donnée
-     * @param string $csvFilePath Chemin du fichier CSV
-     * @param string $tableName Nom de la table
-     * @return bool True si l'importation réussit, sinon False
-     * @throws Exception
-     */
-    public function uploadCsv(string $csvFilePath, string $tableName): bool {
-        $db = $this->db;
-
-        if (($handle = fopen($csvFilePath, "r")) !== FALSE) {
-            //lecture de la première ligne du fichier CSV (les en-têtes)
-            $headers = fgetcsv($handle, 1000, ",");
-
-            if (!$this->validateHeaders($headers, $tableName)) {
-                //retourne false si il y une incohérence entre les colonnes de la table
-                fclose($handle);
-                return false;
-            }
-
-            try {
-                //recupération des colonnes de la tables dans la base de données
-                $tableColumns = $this->getTableColumn($tableName);
-
-                while (($data = fgetcsv($handle, 1000, ",")) !== FALSE) {
-                    //vérification de la correspondance du nombre de données et le nombre de colonne
-                    if (count($data) !== count($tableColumns)) {
-                        continue;
-                    }
-
-                    //prépartation de la requête d'insertion
-                    $query = "INSERT INTO $tableName (" . implode(',', $tableColumns) . ") VALUES (" . implode(',', array_map(fn($i) => ":column$i", range(1, count($tableColumns)))) . ")";
-                    $stmt = $db->getConn()->prepare($query);
-
-                    //association des données aux paramètres de la requête
-                    foreach ($data as $index => $value) {
-                        if (empty($value)) {
-                            $value = null;
-                        } elseif (is_array($value)) {
-                            $value = implode(',', $value);
-                        }
-                        $stmt->bindValue(":column" . ($index + 1), $value);
-                    }
-                    $stmt->execute();
-                }
-                fclose($handle);
-                return true;
-            } catch (PDOException $e) {
-                return false;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Vérifie que les colonnes du fichier CSV correspondent aux colonnes attendues
      * dans la base de données
      * @param array $headers Liste des en-têtes
      * @param string $tableName Nom de la table
      * @return bool True si il y a un correspondance entre les colonnes, sinon False
-     * @throws Exception
+     * @throws Exception En cas de non-correspondance entre les colonnes
      */
     public function validateHeaders(array $headers, string $tableName): bool {
-        //comparaison des en-têtes du CSV avec les colonnes de la table dans la base de données
+        // Comparaison des en-têtes du CSV avec les colonnes de la table dans la base de données
         $tableColumns = array_map('strtolower', $this->getTableColumn($tableName));
         $csvHeaders = array_map('strtolower', $headers);
         if (array_diff($csvHeaders, $tableColumns)) {
@@ -181,6 +93,228 @@ class Dashboard{
         return empty(array_diff($csvHeaders, $tableColumns));
     }
 
+    /**
+     * Traite un fichier CSV et insère ses données dans la table correspondante
+     * @param string $csvFilePath
+     * @param string $tableName
+     * @return bool Ture si le traitement réussit, sinon False
+     * @throws Exception En cas d'erreur lors de l'importation des données
+     */
+    public function processCsv(string $csvFilePath, string $tableName): bool {
+        if (($handle = fopen($csvFilePath, "r")) === false) {
+            throw new Exception("Impossible d'ouvrir le fichier CSV.");
+        }
+
+        $headers = fgetcsv($handle, 1000, ",");
+        if (!$this->validateHeaders($headers, $tableName)) {
+            fclose($handle);
+            return false;
+        }
+
+        try {
+            while (($data = fgetcsv($handle, 1000, ",")) !== false) {
+                $this->insertIntoDatabase($data, $tableName);
+            }
+            fclose($handle);
+            return true;
+        } catch (Exception) {
+            fclose($handle);
+            throw new Exception("Erreur lors du traitement du fichier CSV.");
+        }
+    }
+
+
+    /**
+     * Insère des données dans la base de données en fonction du type de table
+     * @param array $data Données à insérer
+     * @param string $tableName Nom de la table
+     * @return void
+     * @throws Exception En cas d'erreur lors de l'insertion
+     */
+    private function insertIntoDatabase(array $data, string $tableName): void {
+        switch ($tableName) {
+            case 'teacher':
+                $this->insertTeacherData($data);
+                break;
+            case 'student':
+                $this->insertStudentData($data);
+                break;
+            case 'internship':
+                $this->insertInternshipData($data);
+                break;
+            default:
+                $this->insertGenericData($data, $tableName);
+                break;
+        }
+    }
+
+    /**
+     * Insère des données génériques dans la base de données
+     * @param array $data Données à insérer
+     * @param string $tableName Nom de la table
+     * @return void
+     * @throws Exception En cas d'erreur lors de l'insertion
+     */
+    private function insertGenericData(array $data, string $tableName): void {
+        $tableColumns = $this->getTableColumn($tableName);
+        if (count($data) !== count($tableColumns)) {
+            return;
+        }
+
+        $query = "INSERT INTO $tableName (" . implode(',', $tableColumns) . ") 
+                  VALUES (" . implode(',', array_map(fn($i) => ":column$i", range(1, count($tableColumns)))) . ")";
+        $stmt = $this->db->getConn()->prepare($query);
+
+        foreach ($data as $index => $value) {
+            $stmt->bindValue(":column" . ($index + 1), $value ?: null);
+        }
+
+        $stmt->execute();
+    }
+
+    //----- IMPORTATION Teacher -----//
+
+    /**
+     * Insère des données spécifiques pour la table teacher
+     * @param array $data Données à insérer
+     * @return void
+     * @throws Exception En cas d'erreur lors de l'insertion
+     */
+    private function insertTeacherData(array $data): void {
+        // Colonnes pour la table teacher
+        $teacherColumns = $this->getTableColumn('teacher');
+        $teacherData = array_combine($teacherColumns, $data);
+
+        // Insertion dans la table teacher
+        $this->insertGenericData($data, 'teacher');
+
+        // Insertion dans la table user_connect
+        $this->insertUserConnect($teacherData['id_teacher'], 'default_password');
+
+        // Insertion dans la table has_role
+        $department = $_SESSION['role_department'] ?? null;
+        if ($department) {
+            $this->insertHasRole($teacherData['id_teacher'], $department[0]);
+        }
+    }
+
+    /**
+     * Insère un utilisateur dans la table user_connect
+     * @param string $userId Identifiant de l'utilisateur
+     * @param string $user_pass Mot de passe de l'utilisateur
+     * @return void
+     */
+    private function insertUserConnect(string $userId, string $user_pass): void {
+        $query = "INSERT INTO user_connect (user_id, user_pass) VALUES (:user_id, :user_pass)";
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindValue(':user_id', $userId);
+        $stmt->bindValue(':user_pass', password_hash($user_pass, PASSWORD_DEFAULT));
+        $stmt->execute();
+    }
+
+    /**
+     * Insère une association utilisateur-départment dans la table has_role
+     * @param string $userId Identifiant de l'utilisateur
+     * @param string $department Nom du département
+     * @return void
+     */
+    private function insertHasRole(string $userId, string $department): void {
+        $query = "INSERT INTO has_role (user_id, role_name, department_name) VALUES (:user_id, 'Teacher' ,:department)";
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindValue(':user_id', $userId);
+        $stmt->bindValue(':department', $department);
+        $stmt->execute();
+    }
+
+    //----- IMPORTATION Student -----//
+
+    /**
+     * Insère des données spécifiques pour la table student
+     * @param array $data Données à insérer
+     * @return void
+     * @throws Exception En cas d'erreur lors de l'insertion
+     */
+    private function insertStudentData(array $data): void {
+        // Colonnes pour la table student
+        $studentColumns = $this->getTableColumn('student');
+        $studentData = array_combine($studentColumns, $data);
+
+        // Insertion dans la table teacher
+        $this->insertGenericData($data, 'student');
+
+        // Insertion dans la table study_at
+        $department = $_SESSION['role_department'] ?? null;
+        if ($department) {
+            $this->insertStudyAt($studentData['student_number'], $department[0]);
+        }
+    }
+
+    /**
+     * Associe un étudiant à un département dans la table study_at
+     * @param string $student_number Numéro étudiant
+     * @param string $department Nom de département
+     * @return void
+     */
+    public function insertStudyAt(string $student_number, string $department): void {
+        $query = "INSERT INTO study_at (student_number, department_name) VALUES (:student_number, :department)";
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindValue(':student_number', $student_number);
+        $stmt->bindValue(':department', $department);
+        $stmt->execute();
+    }
+
+    //----- IMPORTATION Student -----//
+
+    /**
+     * Insère les données relatives à un stage dans la table internship
+     * @param array $data Données du stage à insérer
+     * @return void
+     * @throws Exception En cas de données manquantes ou d'association déjà existante
+     */
+    private function insertInternshipData(array $data): void {
+        // Colonnes pour la table internship
+        $internshipColumns = $this->getTableColumn('internship');
+        $internshipData = array_combine($internshipColumns, $data);
+
+        $idTeacher = $internshipData['id_teacher'] ?? null;
+        $studentNumber = $internshipData['student_number'] ?? null;
+
+        if (!$idTeacher || !$studentNumber) {
+            throw new Exception("Les données id_teacher ou student_number sont manquantes.");
+        }
+
+        // Vérification si la combinaison existe déjà
+        if ($this->internshipExists($idTeacher, $studentNumber)) {
+            throw new Exception("L'association id_teacher '$idTeacher' et student_number '$studentNumber' existe déjà.");
+        }
+
+        // Insertion dans la table internship
+        $this->insertGenericData($data, 'internship');
+    }
+
+    /**
+     * Vérifie si une association id_teacher et student_number existe déjà avant insertion
+     * @param string $idTeacher L'identifiant de l'enseignant
+     * @param string $studentNumber Le numéro d'étudiant
+     * @return bool Retourne true si l'association existe déjà, sinon false
+     */
+    public function internshipExists(string $idTeacher, string $studentNumber): bool {
+        $query = "
+        SELECT COUNT(*) 
+        FROM internship 
+        WHERE id_teacher = :id_teacher AND student_number = :student_number
+    ";
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindValue(':id_teacher', $idTeacher);
+        $stmt->bindValue(':student_number', $studentNumber);
+        $stmt->execute();
+
+        // Retourne True si un enregistrement existe, False sinon
+        return $stmt->fetchColumn() > 0;
+    }
+
+
+    //----- EXPORTATION -----//
 
     /**
      * Exportation des données de la base de données vers un fichier CSV
@@ -188,7 +322,7 @@ class Dashboard{
      * @param string $tableName Nom de la table
      * @param array $headers Liste des en-têtes
      * @return bool True si l'exportation réussit, sinon False
-     * @throws Exception
+     * @throws Exception En cas d'erreur lors de l'exportation
      */
     public function exportToCsvByDepartment(string $tableName, array $headers): bool {
         $db = $this->db;
@@ -196,7 +330,7 @@ class Dashboard{
 
         ob_start();
 
-        //envoie des en-têtes HTTP pour le téléchargement du fichier CSV
+        // Configuration des en-têtes HTTP pour le téléchargement du fichier CSV
         header('Content-Type: text/csv');
         header('Content-Disposition: attachment; filename="' . $tableName . '_export.csv"');
         header('Pragma: no-cache');
@@ -208,13 +342,14 @@ class Dashboard{
             throw new Exception("Impossible d'ouvrir le fichier CSV");
         }
 
+        // Ecriture des en-têtes dans le fichier CSV
         fputcsv($output, $headers);
 
         if (empty($headers)) {
             throw new Exception("Les en-têtes sont manquants ou invalides pour la table $tableName.");
         }
 
-        //construction de la requête SQL filtré par le département de l'administrateur
+        // Construction de la requête SQL filtré par le département de l'administrateur
         $query = "SELECT " . implode(',', array_map(fn($header) => "$tableName." . (string)$header, $headers)) . " FROM $tableName";
 
         $query .= match ($tableName) {
@@ -229,16 +364,15 @@ class Dashboard{
             $department = $department[0] ?? '';
         }
 
-        //préparation et exécution de la requête SQL
+        // Préparation et exécution de la requête SQL
         $stmt = $db->getConn()->prepare($query);
         $stmt->bindValue(':department', $department);
         $stmt->execute();
 
-        //écriture des données récupérées dans le fichier CSV
+        // Ecriture des données récupérées dans le fichier CSV
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             fputcsv($output, $row);
         }
-
 
         fclose($output);
         $csvData = ob_get_clean();
@@ -246,4 +380,6 @@ class Dashboard{
 
         exit();
     }
+
+
 }
