@@ -19,7 +19,13 @@ class Dashboard {
         $this->layout = $layout;
     }
 
+    /**
+     * Gère les exceptions en simplifiant les messages pour les utilisateurs non techniques
+     * @param Exception $e L'exception levée
+     * @return string Un message compréhensible pour l'utilisateur final
+     */
     private function handleExceptionMessage(Exception $e):string {
+        // Correspondances entre mots-clés et message simplifiés
         $simplifyMessages = [
             'SQLSTATE' => "Une erreur de base de données est survenue. Une donnée que vous souhaitez insérer existe peut-être déjà.",
             'permission denied' => "Vous n'avez pas les droits nécessaires pour effectuer cette action.",
@@ -33,7 +39,7 @@ class Dashboard {
             }
         }
 
-        // Message générique
+        // Message générique si aucun mot-clé ne correspond
         return "Une erreur inattendue est survenue. Veuillez contacter l'administrateur.";
     }
 
@@ -42,25 +48,29 @@ class Dashboard {
      * @return void
      */
     public function show(): void {
-        //récupération de l'instance de la base de données et des classes associées
-        $message = '';
+        // Récupération de l'instance de la base de données et des classes associées
         $db = \Includes\Database::getInstance();
         $model = new \Blog\Models\Dashboard($db);
 
-        //vérification du rôle de l'utilisateur
+        // Initialisation du message à afficher
+        $message = '';
+
+        // Vérification du rôle de l'utilisateur
         if (isset($_SESSION['role_name']) && (
                 (is_array($_SESSION['role_name']) && in_array('Admin_dep', $_SESSION['role_name'])) ||
                 ($_SESSION['role_name'] === 'Admin_dep'))) {
 
-            //traitement des requêtes POST
+            // Traitement des requêtes POST
             if($_SERVER["REQUEST_METHOD"] == "POST") {
-                //gestion de l'importation de fichiers CSV spécifiques
+                // Gestion de l'importation de fichiers CSV spécifiques
                 if (isset($_FILES['student']) || isset($_FILES['teacher']) || isset($_FILES['internship'])) {
                     $tableName = $_POST['table_name'] ?? null;
 
                     if ($tableName && $model->isValidTable($tableName)) {
                         try {
                             $csvFile = null;
+
+                            // Détection du fichier importé
                             if (isset($_FILES['student'])) {
                                 $csvFile = $_FILES['student']['tmp_name'];
                             } elseif (isset($_FILES['teacher'])) {
@@ -72,7 +82,7 @@ class Dashboard {
                             }
 
                             if ($csvFile) {
-                                //validation du fichier et correspondances des en-têtes
+                                // Validation du fichier et correspondances des en-têtes
                                 $csvHeaders = $model->getCsvHeaders($csvFile);
 
                                 if (mime_content_type($csvFile) !== 'text/plain') {
@@ -85,7 +95,7 @@ class Dashboard {
                                     return;
                                 }
 
-                                //importation des données dans la table
+                                // Importation des données dans la table
                                 elseif ($model->processCsv($csvFile, $tableName)) {
                                     $message .= "L'importation du fichier CSV pour la table $tableName a été réalisée avec succès! <br>";
                                 } else {
@@ -99,7 +109,7 @@ class Dashboard {
                         $message = "Table non valide ou non reconnue.";
                     }
 
-                //gestion de l'exportation des fichiers CSV
+                // Gestion de l'exportation des fichiers CSV
                 } elseif (isset($_POST['export_list'])) {
                     $tableName = $_POST['export_list'];
 
@@ -117,19 +127,20 @@ class Dashboard {
                     echo "Aucun fichier CSV n'est reconnu.";
                 }
             }
-            //définition de variables
+
+            // Définition de variables
             $title = "Dashboard";
             $cssFilePath = '_assets/styles/dashboard.css';
             $jsFilePath = '_assets/scripts/dashboard.js';
             $view = new \Blog\Views\Dashboard($message);
 
-            //affichage de la vue Dashboard
+            // Affichage de la vue Dashboard
             $this->layout->renderTop($title, $cssFilePath);
             $view->showView();
             $this->layout->renderBottom($jsFilePath);
         }
 
-        //redirection de l'utilisateur si il n'a pas les autorisations
+        // Redirection de l'utilisateur si il n'a pas les autorisations
         else {
             header('Location: /homepage');
         }
