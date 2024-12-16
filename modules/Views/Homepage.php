@@ -151,8 +151,7 @@ class   Homepage {
                         if (!$internshipInfos['id_teacher'] && $inDep) {
                             ?>
                             <div class="row"></div>
-                            <input type="hidden" name="searchedStudentSubmitted" value="1">
-                            <button class="waves-effect waves-light btn" type="submit">Valider</button>
+                            <button class="waves-effect waves-light btn" name="searchedStudentSubmitted" value="1" type="submit" formmethod="post">Valider</button>
                             <?php
                             echo "</form>";
                         } else {
