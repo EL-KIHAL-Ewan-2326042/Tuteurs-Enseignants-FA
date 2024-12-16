@@ -30,10 +30,20 @@ class   Homepage {
                     <div id="searchResults"></div>
                 </form>
             </div>
-            <div class="center">
+            <form class="center">
                 <?php
                 if(isset($_POST['cancel'])) {
                     unset($_SESSION['selected_student']);
+                }
+
+                if (isset($_POST['page'])) {
+                    $_SESSION['unconfirmed'][$_SESSION['lastPage'] ?? 1] = $_POST['selecInternship'] ?? array();
+                    $_SESSION['unconfirmed']['all'] = array();
+                    foreach ($_SESSION['unconfirmed'] as $page => $internships) {
+                        if ($page == 'all') continue;
+                        $_SESSION['unconfirmed']['all'] = array_merge(gettype($internships) == "array" ? $internships : [$internships], $_SESSION['unconfirmed']['all']);
+                    }
+                    $_SESSION['lastPage'] = $_POST['page'];
                 }
 
                 if(isset($_POST['searchedStudentSubmitted'])) {
@@ -50,18 +60,20 @@ class   Homepage {
                     }
                 }
 
-                if(isset($_POST['selecStudentSubmitted'])) {
+                if(isset($_POST['selecInternshipSubmitted'])) {
 
-                    if(isset($_POST['selecStudent'])) {
-                        $update = $this->model->updateRequests($_POST['selecStudent'], $_SESSION['identifier']);
-
-                    } else {
-                        $update = $this->model->updateRequests(array(), $_SESSION['identifier']);
+                    $_SESSION['unconfirmed'][$_SESSION['lastPage']] = $_POST['selecInternship'] ?? array();
+                    $_SESSION['unconfirmed']['all'] = array();
+                    foreach ($_SESSION['unconfirmed'] as $page => $internships) {
+                        if ($page == 'all') continue;
+                        $_SESSION['unconfirmed']['all'] = array_merge(gettype($internships) == "array" ? $internships : [$internships], $_SESSION['unconfirmed']['all']);
                     }
+
+                    $update = $this->model->updateRequests($_SESSION['unconfirmed']['all'], $_SESSION['identifier']);
 
                     if(!$update || gettype($update) !== 'boolean') {
                         echo '<h6 class="red-text">Une erreur est survenue</h6>';
-                    }
+                    } else unset($_SESSION['unconfirmed']);
                 }
 
                 if (isset($_SESSION['selected_student']['firstName']) && isset($_SESSION['selected_student']['lastName'])) {
@@ -182,18 +194,16 @@ class   Homepage {
             <?
             else: ?>
                 <form method="post" class="center-align table">
-                    <div class="selection">
-                        <?
-                        foreach($departments as $dep): ?>
-                        <label class="formCell">
-                            <input type="checkbox" name="selecDep[]" class="filled-in" value="<?= $dep['department_name'] ?>" <? if(isset($_SESSION['selecDep']) && in_array($dep['department_name'], $_SESSION['selecDep'])): ?> checked="checked" <? endif; ?> />
-                            <span><? echo str_replace('_', ' ', $dep['department_name']) ?></span>
-                        </label>
-                        <? endforeach; ?>
-                    </div>
-                    <div class="row"></div>
-                    <input type="hidden" name="selecDepSubmitted" value="1">
-                    <button class="waves-effect waves-light btn" type="submit">Afficher</button>
+                    <?
+                    foreach($departments as $dep): ?>
+                    <label class="formCell">
+                        <input type="checkbox" name="selecDep[]" class="filled-in" value="<?= $dep['department_name'] ?>" <? if(isset($_SESSION['selecDep']) && in_array($dep['department_name'], $_SESSION['selecDep'])): ?> checked="checked" <? endif; ?> />
+                        <span><? echo str_replace('_', ' ', $dep['department_name']) ?></span>
+                    </label>
+                    <? endforeach; ?>
+                <div class="row"></div>
+                <input type="hidden" name="selecDepSubmitted" value="1">
+                <button class="waves-effect waves-light btn" type="submit">Afficher</button>
                 </form>
 
                 <div class="row"></div>
@@ -211,21 +221,25 @@ class   Homepage {
                     else: ?>
                         <form method="post" class="center-align table">
                             <div class="selection">
-                                <label for="sortBy">Trier par:</label>
-                                <div class="input-field">
-                                    <select id="sortBy" name="sortBy">
-                                        <option value=0 <? if(!isset($_SESSION['sortBy']) || $_SESSION['sortBy'] === "0") echo "selected"; ?> >Choix</option>
-                                        <!-- <option value=1 <? //if(isset($_SESSION['sortBy']) && $_SESSION['sortBy'] === "1") echo "selected"; ?> >Total</option> -->
-                                        <option value=2 <? if(isset($_SESSION['sortBy']) && $_SESSION['sortBy'] === "2") echo "selected"; ?> >Élève</option>
-                                        <option value=3 <? if(isset($_SESSION['sortBy']) && $_SESSION['sortBy'] === "3") echo "selected"; ?> >Sujet</option>
-                                    </select>
+                                <div class="formCell">
+                                    <label for="sortBy">Trier par:</label>
+                                    <div class="input-field">
+                                        <select id="sortBy" name="sortBy">
+                                            <option value=0 <? if(!isset($_SESSION['sortBy']) || $_SESSION['sortBy'] === "0") echo "selected"; ?> >Choix</option>
+                                            <!-- <option value=1 <? //if(isset($_SESSION['sortBy']) && $_SESSION['sortBy'] === "1") echo "selected"; ?> >Total</option> -->
+                                            <option value=2 <? if(isset($_SESSION['sortBy']) && $_SESSION['sortBy'] === "2") echo "selected"; ?> >Élève</option>
+                                            <option value=3 <? if(isset($_SESSION['sortBy']) && $_SESSION['sortBy'] === "3") echo "selected"; ?> >Sujet</option>
+                                        </select>
+                                    </div>
                                 </div>
-                                <label for="decreasing">Trier par ordre:</label>
-                                <div class="input-field">
-                                    <select id="decreasing" name="decreasing">
-                                        <option value="0" <? if(!isset($_SESSION['decreasing']) || $_SESSION['decreasing'] === "0") echo "selected"; ?> >Croissant</option>
-                                        <option value="1" <? if(isset($_SESSION['decreasing']) && $_SESSION['decreasing'] === "1") echo "selected"; ?> >Décroissant</option>
-                                    </select>
+                                <div class="formCell">
+                                    <label for="decreasing">Trier par ordre:</label>
+                                    <div class="input-field">
+                                        <select id="decreasing" name="decreasing">
+                                            <option value="0" <? if(!isset($_SESSION['decreasing']) || $_SESSION['decreasing'] === "0") echo "selected"; ?> >Croissant</option>
+                                            <option value="1" <? if(isset($_SESSION['decreasing']) && $_SESSION['decreasing'] === "1") echo "selected"; ?> >Décroissant</option>
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                             <input type="hidden" name="sortSubmitted" value="1">
@@ -249,11 +263,15 @@ class   Homepage {
                                 </thead>
                                 <tbody>
                                 <?
-                                $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
                                 $totalPages = ceil(count($table) / 10);
+                                $page = isset($_POST['page']) && $_POST['page'] > 0 && $_POST['page'] <= $totalPages ? (int)$_POST['page'] : 1;
 
                                 for ($i = ($page-1)*10 ; $i < $page*10 && $i < count($table) ; ++$i):
                                     $row = $table[$i];
+                                    if (!isset($_SESSION['unconfirmed']) && $row['requested'] && !in_array($row['internship_identifier'], $_SESSION['unconfirmed']['all'])) {
+                                        $_SESSION['unconfirmed'][$page][count($_SESSION['unconfirmed'][$page])] = $row['internship_identifier'];
+                                        $_SESSION['unconfirmed']['all'][count($_SESSION['unconfirmed']['all'])] = $row['internship_identifier'];
+                                    }
                                     ?>
                                     <tr>
                                         <td><?= $row['internship_identifier']?></td>
@@ -268,7 +286,7 @@ class   Homepage {
                                         <td><?= str_replace('_', ' ', $row["company_name"]) ?></td>
                                         <td>
                                             <label class="center">
-                                                <input type="checkbox" name="selecStudent[]" class="center-align filled-in" value="<?= $row['internship_identifier'] ?>" <?= $row['requested'] ? 'checked="checked"' : '' ?> />
+                                                <input type="checkbox" name="selecInternship[]" class="center-align filled-in" value="<?= $row['internship_identifier'] ?>" <?= isset($_SESSION['unconfirmed']) && in_array($row['internship_identifier'], $_SESSION['unconfirmed']['all']) ? 'checked="checked"' : '' ?> />
                                                 <span></span>
                                             </label>
                                         </td>
@@ -277,45 +295,44 @@ class   Homepage {
                                 </tbody>
                             </table>
                             <div class="row"></div>
-                            <input type="hidden" name="selecStudentSubmitted" value="1">
-                            <button class="waves-effect waves-light btn" type="submit">Valider</button>
+                            <button class="waves-effect waves-light btn" name="selecInternshipSubmitted" value="1" type="submit">Valider</button>
+                            <?
+                            if ($totalPages > 1):
+                                $start = ($totalPages>9 && $page > 1) ? $page-1 : 1;
+                                $end = ($totalPages>9 && $start+8 < $totalPages) ? $start+8 : $totalPages;
+                                while ($start > 1 && $end - $start < 8) --$start;
+                                ?>
+                                <div class="row"></div>
+                                <div class="pagination">
+                                    <?php if ($start > 1): ?>
+                                        <button class="waves-effect waves-light btn first" name="page" value="1" type="submit"><<</button>
+                                    <?php endif;
+
+                                    if ($page > 1): ?>
+                                        <button class="waves-effect waves-light btn prev" name="page" value="<?= $page - 1 ?>" type="submit">Précédent</button>
+                                    <?php endif;
+
+                                    if ($start > 1): ?>
+                                        <span class="hidden">...</span>
+                                    <?php endif;
+
+                                    for ($i = $start ; $i <= $end; ++$i): ?>
+                                        <button class="waves-effect waves-light btn <?= $i == $page ? 'active' : '' ?>" name="page" value="<?= $i ?>" type="submit"><?= $i ?></button>
+                                    <?php endfor;
+
+                                    if ($end < $totalPages): ?>
+                                        <span class="hidden">...</span>
+                                    <?php endif;
+
+                                    if ($page < $totalPages): ?>
+                                        <button class="waves-effect waves-light btn next" name="page" value="<?= $page + 1 ?>" type="submit">Suivant</button>
+                                    <?php endif;
+
+                                    if ($end < $totalPages): ?>
+                                        <button class="waves-effect waves-light btn last" name="page" value="<?= $totalPages ?>" type="submit">>></button>
+                                    <?php endif; ?>
+                                </div>
                         </form>
-                        <?
-                        if ($totalPages > 1):
-                            $start = ($totalPages>9 && $page > 1) ? $page-1 : 1;
-                            $end = ($totalPages>9 && $start+8 < $totalPages) ? $start+8 : $totalPages;
-                            if ($end - $start < 8) $start -= 8 - ($end - $start);
-                            ?>
-                            <div class="row"></div>
-                            <div class="pagination">
-                                <?php if ($start > 1): ?>
-                                    <a href="?page=1" class="waves-effect waves-light btn first"><<</a>
-                                <?php endif;
-
-                                if ($page > 1): ?>
-                                    <a href="?page=<?= $page - 1 ?>" class="waves-effect waves-light btn prev">Précédent</a>
-                                <?php endif;
-
-                                if ($start > 1): ?>
-                                    <span class="hidden">...</span>
-                                <?php endif;
-
-                                for ($i = $start ; $i <= $end; ++$i): ?>
-                                    <a href="?page=<?= $i ?>" class="waves-effect waves-light btn <?= $i == $page ? 'active' : '' ?>"><?= $i ?></a>
-                                <?php endfor;
-
-                                if ($end < $totalPages): ?>
-                                    <span class="hidden">...</span>
-                                <?php endif;
-
-                                if ($page < $totalPages): ?>
-                                    <a href="?page=<?= $page + 1 ?>" class="waves-effect waves-light btn next">Suivant</a>
-                                <?php endif;
-
-                                if ($end < $totalPages): ?>
-                                    <a href="?page=<?= $totalPages ?>" class="waves-effect waves-light btn last">>></a>
-                                <?php endif; ?>
-                            </div>
                             <?
                         endif;
                     endif;
