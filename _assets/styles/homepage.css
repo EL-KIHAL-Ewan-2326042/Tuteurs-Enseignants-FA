@@ -6,7 +6,7 @@ main {
 
 #map {
     height: 600px;
-    width: 70%;
+    width: 100%;
 }
 
 .center {
@@ -133,7 +133,7 @@ main table {
 @media screen and (max-width: 640px) {
     #map {
         height: 250px;
-        width: 80%;
+        width: 100%;
     }
 
     .center {
