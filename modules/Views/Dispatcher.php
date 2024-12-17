@@ -9,10 +9,10 @@ class Dispatcher {
 
     /**
      * @param \Blog\Models\Dispatcher $dispatcherModel
-     * @param string $errorMessage
+     * @param string $errorMessage1
      * @param string $errorMessage2
      */
-    public function __construct(private readonly \Blog\Models\Dispatcher $dispatcherModel, private readonly string $errorMessage1,private readonly string $errorMessage2) {
+    public function __construct(private readonly \Blog\Models\Dispatcher $dispatcherModel, private readonly string $errorMessage1, private readonly string $errorMessage2) {
     }
 
     public function showView(): void {
@@ -24,7 +24,7 @@ class Dispatcher {
                 <?php if (!isset($_POST['action']) || $_POST['action'] !== 'generate'): ?>
                 <div class="row" id="forms-section">
                     <div class="col card-panel white z-depth-3 s12 m6" style="padding: 20px; margin-right: 10px">
-                        <form class="col s12" action="./dispatcher" method="post" id="pushCoef" onsubmit="showLoading();">
+                        <form class="col s12" action="./dispatcher" method="post" onsubmit="showLoading();">
                             <?php
                             $saves = $this->dispatcherModel->showCoefficients();
                             if ($saves): ?>
@@ -88,7 +88,7 @@ class Dispatcher {
                             <?php endforeach; ?>
 
 
-                            <p class="red-text"><?php echo $this->errorMessage2; ?></p>
+                            <p class="red-text" id="checkboxError"><?php echo $this->errorMessage2; ?></p>
                             <button class="btn waves-effect waves-light button-margin" type="submit" name="action-save" value="<?= $id_backup ?>">Enregister
                                 <i class="material-icons right">arrow_downward</i>
                             </button>
@@ -127,7 +127,7 @@ class Dispatcher {
                 </div>
                     <?php endif?>
 
-                <?php if (isset($_POST['action']) && $_POST['action'] === 'generate'): ?>
+                <?php if (isset($_POST['coef']) && isset($_POST['action']) && $_POST['action'] === 'generate'): ?>
                     <div class="row card-panel white z-depth-3 s12 m6">
                         <div class="col s12">
                             <form class="col s12" action="./dispatcher" method="post">
@@ -143,10 +143,6 @@ class Dispatcher {
                                         </thead>
                                         <tbody>
                                         <?php
-                                        if (!isset($_POST['coef'])) {
-                                            header('location: ./dispatcher');
-                                        }
-
                                         $dictCoef = array_filter($_POST['coef'], function ($coef, $key) {
                                             return isset($_POST['criteria_enabled'][$key]);
                                         }, ARRAY_FILTER_USE_BOTH);
