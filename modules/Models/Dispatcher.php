@@ -16,11 +16,11 @@ class Dispatcher{
     }
 
     /**
-     * Trouve dans le DB les termes correspondant(LIKE)
-     * On utilise le POST, avec search qui correspond à la recherche
-     * et searchType au type de recherche (studentId, name, ...)
-     * @return array tout les termes correspendants
+     * Recherche des termes correspondants dans la base de données en fonction des paramètres fournis dans le POST.
+     *
+     * @return array -Tableau associatif contenant les résultats de la recherche.
      */
+
     public function correspondTerms(): array
     {
         $searchTerm = $_POST['search'] ?? '';
@@ -60,7 +60,20 @@ class Dispatcher{
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function calculateRelevanceTeacherStudents($identifier, array $dictCoef): array
+
+    /**
+     * Calcule la pertinence des stages pour un professeur et des stages en fonction de plusieurs critères de pondération.
+     *
+     * @param String $identifier Identifiant du professeur
+     * @param array $dictCoef Tableau associatif des critères de calcul et leurs coefficients
+     * @return array|array[] Tableau d'associations ('id_teacher', 'internship_identifier', 'score' et type')
+     */
+    /**
+     * @param String $identifier
+     * @param array $dictCoef
+     * @return array|array[]
+     */
+    public function calculateRelevanceTeacherStudents(String $identifier, array $dictCoef): array
     {
         $internshipList = array();
         $departments = $this->globalModel->getDepTeacher($identifier);
@@ -155,9 +168,9 @@ class Dispatcher{
 
 
     /**
-     * S'occupe de trouver la meilleure combinaison possible tuteur-stage et le renvoie sous forme de tableau
+     * Permet de trouver la meilleure combinaison possible tuteur-stage et le renvoie sous forme de tableau
      * @param array $dicoCoef dictionnaire cle->nom_critere et valeur->coef
-     * @return array|array[] resultat final sous forme de matrixe
+     * @return array|array[] resultat final sous forme de matrice
      */
     public function dispatcher(array $dicoCoef): array
     {
@@ -233,9 +246,9 @@ class Dispatcher{
 
 
     /**
-     * <#> à faire : verif dans la fonction algo2 que la valeur défaut ne casse pas tout
-     *  retourne un array composé de la liste des professeurs inscrit dans le departement de l'admin de la BD, à défaut false
-     * @return array|false
+     * Récupère une liste des identifiants des enseignants associés aux départements du rôle de l'admin.
+     *
+     * @return array|false Tableau contenant les identifiants des enseignants ou `false` en cas d'erreur si aucun enseignant n'est trouvé pour les départements spécifiés.
      */
     public function createListTeacher() {
         $roleDepartments = $_SESSION['role_department'];
@@ -250,9 +263,9 @@ class Dispatcher{
     }
 
     /**
-     *  <#> à faire : verif dans la fonction algo2 que la valeur défaut ne casse pas tout
-     * retourne un array composé de la liste des eleves inscrit dans le departement de l'admin de la BD, à défaut false
-     * @return array|false
+     * Récupère une liste des identifiants de stages des étudiants inscrits dans les départements associés au rôle de l'admin.
+     *
+     * @return array|false Un tableau contenant les identifiants des stages ou `false` en cas d'erreur ou si aucun stage n'est trouvé pour les départements spécifiés.
      */
 
     public function createListInternship() {
@@ -267,9 +280,9 @@ class Dispatcher{
     }
 
     /**
-     * <#> à faire : verif dans la fonction algo2 que la valeur défaut ne casse pas tout
-     * retourne un array composé de la liste des eleves et professeur inscrit etudiant, dans le departement dont l'admin est responsable, dans la relation Is_responsible de la BD, à défaut false
-     * @return array|false
+     * Récupère une liste des élèves et professeurs associés inscrits dans les départements dont l'admin est responsable.
+     *
+     * @return array|false Un tableau contenant les paires (id_teacher, internship_identifier) pour chaque étudiant dans les départements concernés, ou `false` en cas d'erreur ou si aucun résultat n'est trouvé.
      */
     public function createListAssociate() {
         $roleDepartments = $_SESSION['role_department'];
@@ -283,8 +296,9 @@ class Dispatcher{
     }
 
     /**
-     * Fonction recupérant les valeurs du post de la viewDispacher sans fonctionnement de l'algorithme de repartition
-     * @return string Valeur confirmant l'insertion
+     * Fonction permettant d'associer un enseignant à un stage.
+     *
+     * @return string Un message confirmant l'enregistrement de l'association entre l'enseignant et le stage.
      */
     public function insertResponsible() {
         $query = 'UPDATE internship SET Id_teacher = :Id_teacher WHERE Internship_identifier = :Internship_identifier';
@@ -296,8 +310,14 @@ class Dispatcher{
     }
 
     /**
-     * Fonction recupérant les valeurs du post de la viewDispacher servant à la suite de l'algorithme de repartition final
-     * @return string Valeur confirmant l'insertion
+     * Cette fonction effectue la mise à jour des informations dans la base de données en associant un enseignant et un score de pertinence à un stage.
+     *
+     * **Paramètres :**
+     * - `String $id_prof` : L'identifiant de l'enseignant à associer au stage.
+     * - `String $Internship_id` : L'identifiant du stage auquel l'enseignant est affecté.
+     * - `float $Score` : Le score de pertinence attribué à cette association (représente la qualité de la répartition).
+     *
+     * @return string Message confirmant l'enregistrement de l'association entre l'enseignant et le stage.."
      */
     public function insertIs_responsible(String $id_prof, String $Internship_id, float $Score) {
         $query = 'UPDATE internship SET Id_teacher = :id_prof, Relevance_score = :Score WHERE Internship_identifier = :Internship_id';
@@ -310,8 +330,9 @@ class Dispatcher{
     }
 
     /**
-     * Montrer la liste des sauvegardes
-     * @return array|null Renvoie les coefficients ou les sauvegardes disponibles.
+     * Cette fonction permet de récupérer la liste des sauvegardes disponibles dans la base de données.
+     *
+     * @return array|null Renvoie un tableau associatif contenant les identifiants des sauvegardes disponibles, ou `null` en cas d'échec.
      */
     public function showCoefficients(): ?array {
         try {
@@ -324,6 +345,13 @@ class Dispatcher{
         }
     }
 
+    /**
+     * Cette fonction permet de charger les coefficients d'un utilisateur pour une sauvegarde donnée.
+     *
+     * @param string $user_id L'identifiant de l'utilisateur pour lequel les coefficients sont chargés.
+     * @param int $id_backup L'identifiant de la sauvegarde pour laquelle les coefficients sont récupérés.
+     * @return array|false Retourne un tableau associatif des coefficients si la requête réussit, ou `false` en cas d'erreur ou de données non trouvées.
+     */
     public function loadCoefficients(string $user_id, int $id_backup): array|false {
         try {
             $query = "SELECT name_criteria, coef, is_checked FROM backup WHERE user_id = :user_id AND id_backup = :id_backup";
@@ -339,12 +367,14 @@ class Dispatcher{
     }
 
     /**
-     * Sauvegarder les coefficients dans la base de donnée
-     * @param array $data
-     * @param string $user_id
-     * @param int $id_backup
-     * @return bool
+     * Permet de sauvegarder les coefficients dans la base de données.
+     *
+     * @param array $data Tableau associatif contenant les informations sur les critères à mettre à jour ('name_criteria' (string), 'coef' et 'is_checked'` (int))
+     * @param string $user_id Identifiant de l'utilisateur pour lequel les coefficients doivent être mis à jour
+     * @param int $id_backup Identifiant de la sauvegarde pour laquelle les coefficients doivent être mis à jour
+     * @return bool Retourne True si la mise à jour a réussi, False sinon.
      */
+
     public function saveCoefficients(array $data, string $user_id, int $id_backup = 0): bool {
         try {
             $query = "UPDATE backup 
@@ -366,6 +396,12 @@ class Dispatcher{
             return false;
         }
     }
+
+    /**
+     * Récupère les critères de distribution et leur associe des valeurs par défaut 'coef' = 1 et 'is_checked' = true.
+     *
+     * @return array Tableau associatif contenant la liste des critères, associé au valeur par défaut
+     **/
 
     public function getDefaultCoef(): array
     {
