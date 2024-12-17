@@ -52,12 +52,7 @@ class   Homepage {
 
                 if(isset($_POST['searchedStudentSubmitted'])) {
 
-                    if(isset($_POST['searchedStudent'])) {
-                        $update = $this->model->updateRequests([$_POST['searchedStudent']], $_SESSION['identifier']);
-
-                    } else {
-                        $update = $this->model->updateRequests(array(), $_SESSION['identifier']);
-                    }
+                    $update = $this->model->updateSearchedStudent(isset($_POST['searchedStudent']), $_SESSION['identifier'], $_POST['searchedStudentSubmitted']);
 
                     if(!$update || gettype($update) !== 'boolean') {
                         echo '<h6 class="red-text">Une erreur est survenue</h6>';
@@ -139,7 +134,7 @@ class   Homepage {
                                                 } else {
                                                     ?>
                                                     <label class="center">
-                                                        <input type="checkbox" name="searchedStudent" class="center-align filled-in" value="<?= $internshipInfos["internship_identifier"] ?>" <?= in_array($internshipInfos["internship_identifier"], $this->model->getRequests($_SESSION['identifier'])) ? 'checked="checked"' : '' ?> />
+                                                        <input type="checkbox" name="searchedStudent" class="center-align filled-in" value="1" <?= in_array($internshipInfos["internship_identifier"], $this->model->getRequests($_SESSION['identifier'])) ? 'checked="checked"' : '' ?> />
                                                         <span></span>
                                                     </label>
                                                     <?
@@ -154,7 +149,7 @@ class   Homepage {
                         if (!$internshipInfos['id_teacher'] && $inDep) {
                             ?>
                             <div class="row"></div>
-                            <button class="waves-effect waves-light btn" name="searchedStudentSubmitted" value="1" type="submit" formmethod="post">Valider</button>
+                            <button class="waves-effect waves-light btn" name="searchedStudentSubmitted" value="<?= $internshipInfos["internship_identifier"] ?>" type="submit" formmethod="post">Valider</button>
                             <?php
                             echo "</form>";
                         } else {
@@ -167,8 +162,7 @@ class   Homepage {
                 }
                 ?>
                 <form method="post" class="center-align table">
-                    <input type="hidden" name="cancelSearch" value="1">
-                    <button class="waves-effect waves-light btn" type="submit">Annuler</button>
+                    <button class="waves-effect waves-light btn" name="cancelSearch" value="1" type="submit" formmethod="post">Annuler</button>
                 </form>
             <?
             } else {
@@ -248,6 +242,31 @@ class   Homepage {
                                 $_SESSION['unconfirmed'][ceil(($i+1)/10)][] = $table[$i]['internship_identifier'];
                                 $_SESSION['unconfirmed']['all'][] = $table[$i]['internship_identifier'];
                                 $_SESSION['requested'][] = $table[$i]['internship_identifier'];
+                            }
+                        }
+                    }
+
+                    if(isset($_POST['searchedStudentSubmitted'])) {
+                        foreach ($table as $key => $internship) {
+                            if ($internship['internship_identifier'] == $_POST['searchedStudentSubmitted']) {
+                                $pageSearchedInternship = ceil(($key + 1) / 10);
+                                if ($internship['requested']) {
+                                    if (!in_array($internship['internship_identifier'], $_SESSION['unconfirmed']['all'])) {
+                                        $_SESSION['unconfirmed']['all'][] = $internship['internship_identifier'];
+                                    } if (!in_array($internship['internship_identifier'], $_SESSION['unconfirmed'][$pageSearchedInternship])) {
+                                        $_SESSION['unconfirmed'][$pageSearchedInternship][] = $internship['internship_identifier'];
+                                    } if (!in_array($internship['internship_identifier'], $_SESSION['requested'])) {
+                                        $_SESSION['requested'][] = $internship['internship_identifier'];
+                                    }
+                                } else {
+                                    if (in_array($internship['internship_identifier'], $_SESSION['unconfirmed']['all'])) {
+                                        array_splice($_SESSION['unconfirmed']['all'], array_search($internship['internship_identifier'], $_SESSION['unconfirmed']['all']), 1);
+                                    } if (in_array($internship['internship_identifier'], $_SESSION['unconfirmed'][$pageSearchedInternship])) {
+                                        array_splice($_SESSION['unconfirmed'][$pageSearchedInternship], array_search($internship['internship_identifier'], $_SESSION['unconfirmed'][$pageSearchedInternship]), 1);
+                                    } if (in_array($internship['internship_identifier'], $_SESSION['requested'])) {
+                                        array_splice($_SESSION['requested'], array_search($internship['internship_identifier'], $_SESSION['requested']), 1);
+                                    }
+                                }
                             }
                         }
                     }
