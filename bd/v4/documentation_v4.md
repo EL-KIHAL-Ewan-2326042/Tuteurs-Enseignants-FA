@@ -175,4 +175,16 @@ La table company n'a pas été implémenter.
 - **Fonction** : Vérifie si l'adresse existe, et l'insère dans la table `Addr_name` si ce n'est pas le cas.
 - **Exécution** : Avant l'insertion dans la table `Internship`.
 
----
+
+#### **2.6 Trigger `update_backup_new_criteria`**
+
+- **Objectif** : Mettre à jour la table `Backup` avec de nouveaux critères de distribution après l'insertion dans la table `Distribution_criteria`.
+- **Fonction** : Lors de l'insertion d'un nouveau critère de distribution, des lignes sont ajoutées à la table Backup pour chaque utilisateur et chaque identifiant de sauvegarde.
+- **Exécution** : Ce trigger est exécuté après l'insertion dans la table `Distribution_criteria`.
+
+
+#### **2.7 Trigger `update_backup_new_id_backup`**
+
+- **Objectif** : Mettre à jour la table `Backup` en utilisant un nouvel identifiant de sauvegarde après l'insertion dans la table `Id_backup`.
+- **Fonction** : Lors de l'insertion d'un nouveau identifiant de backup, des lignes sont ajoutées à la table Backup pour chaque utilisateur et chaque critère de distribution.
+- **Exécution** : Ce trigger est exécuté après l'insertion dans la table `Distribution_criteria`.
