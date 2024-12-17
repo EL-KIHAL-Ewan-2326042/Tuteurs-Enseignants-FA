@@ -326,17 +326,21 @@ class   Homepage {
                                 </tbody>
                             </table>
                             <div class="row"></div>
-                            <? if ($_SESSION['unconfirmed']['all'] !== $_SESSION['requested']) {
+                            <?
+                            if (!isset($_SESSION['unconfirmed']['all'])) $_SESSION['unconfirmed']['all'] = array();
+                            if (!isset($_SESSION['requested'])) $_SESSION['requested'] = array();
+                            $change = $_SESSION['unconfirmed']['all'] !== $_SESSION['requested'];
+                            if ($change) {
                                 echo '<div class="selection"> <div class="formCell">';
                             }
                             ?>
                             <button class="waves-effect waves-light btn" name="selecInternshipSubmitted" value="1" type="submit">Valider</button>
-                            <? if ($_SESSION['unconfirmed']['all'] !== $_SESSION['requested']):
+                            <? if ($change):
                                 echo '</div>';
                                 ?>
                                 <div class="formCell"> <button class="waves-effect waves-light btn" name="cancelChanges" value="1" type="submit">Annuler</button> </div>
                             <? endif;
-                            if ($_SESSION['unconfirmed']['all'] !== $_SESSION['requested']) {
+                            if ($change) {
                                 echo '</div>';
                             }
                             ?>
