@@ -212,15 +212,13 @@ CREATE OR REPLACE FUNCTION insert_backup()
 RETURNS TRIGGER AS $$
     DECLARE
         name_criteria TEXT;
-        num integer;
+        id_backup integer;
     BEGIN
-        for name_criteria IN
-            SELECT Distribution_criteria.name_criteria FROM Distribution_criteria
+        for name_criteria IN SELECT Distribution_criteria.name_criteria FROM Distribution_criteria
             LOOP
-            FOR num IN
-                SELECT Id_backup.id_backup FROM Id_backup
+            FOR num IN SELECT Id_backup.id_backup FROM Id_backup
                 LOOP
-                INSERT INTO backup (user_id, name_Criteria, id_backup, coef) VALUES (NEW.user_id, name_criteria, num, 1);
+                INSERT INTO backup (user_id, name_Criteria, id_backup, coef) VALUES (NEW.user_id, name_criteria, id_backup, 1);
             END LOOP;
         END LOOP;
         RETURN NEW;
@@ -247,6 +245,52 @@ CREATE TRIGGER create_addr_for_insert_internship
     BEFORE INSERT ON Internship
     FOR EACH ROW
     EXECUTE FUNCTION create_addr_for_insert_internship();
+
+
+CREATE OR REPLACE FUNCTION update_backup_new_criteria()
+RETURNS TRIGGER AS $$
+    DECLARE
+        user_id TEXT;
+        id_backup integer;
+    BEGIN
+        FOR user_id IN SELECT user_connect.user_id FROM User_connect
+            LOOP
+            FOR id_backup IN SELECT Id_backup.id_backup FROM Id_backup
+                LOOP
+                INSERT INTO backup (user_id, name_Criteria, id_backup, coef, Is_checked) VALUES (user_id, NEW.name_criteria, id_backup, 1, False);
+                END LOOP;
+            END LOOP;
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_backup_new_criteria
+    AFTER INSERT ON Distribution_criteria
+    FOR EACH ROW
+    EXECUTE FUNCTION update_backup_new_criteria();
+
+
+CREATE OR REPLACE FUNCTION update_backup_new_id_backup()
+RETURNS TRIGGER AS $$
+    DECLARE
+        user_id TEXT;
+        name_criteria TEXT;
+    BEGIN
+        FOR user_id IN SELECT user_connect.user_id FROM User_connect
+            LOOP
+            FOR name_criteria IN SELECT Distribution_criteria.name_criteria FROM Distribution_criteria
+                LOOP
+                INSERT INTO backup (user_id, name_Criteria, id_backup, coef) VALUES (user_id, name_criteria, NEW.id_backup, 1);
+            END LOOP;
+        END LOOP;
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_backup_new_id_backup
+    AFTER INSERT ON Distribution_criteria
+    FOR EACH ROW
+    EXECUTE FUNCTION update_backup_new_id_backup();
 
 
 INSERT INTO Distribution_criteria (Name_criteria) VALUES ('A été responsable');
