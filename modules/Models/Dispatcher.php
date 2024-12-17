@@ -169,10 +169,10 @@ class Dispatcher{
         $query = "SELECT Teacher.Id_teacher, 
                   MAX(maxi_number_trainees) AS Max_trainees, 
                   SUM(CASE 
-                        WHEN internship.type = 'alternance' THEN 2 
-                        WHEN internship.type = 'Internship' THEN 1 
-                        ELSE 0
-                        END) AS Current_count
+                  WHEN internship.type = 'alternance' THEN 2 
+                  WHEN internship.type = 'Internship' THEN 1 
+                  ELSE 0
+                  END) AS Current_count
                   FROM Teacher
                   JOIN has_role ON Teacher.Id_teacher = Has_role.user_id
                   LEFT JOIN internship ON Teacher.Id_teacher = internship.Id_teacher
