@@ -145,6 +145,25 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    const criteriaCheckboxes = document.querySelectorAll('.criteria-checkbox');
+    const errorMessageElement = document.getElementById('checkboxError');
+
+    function validateCheckboxes() {
+        const anyChecked = Array.from(criteriaCheckboxes).some(checkbox => checkbox.checked);
+
+        if (!anyChecked) {
+            errorMessageElement.textContent = 'Veuillez sélectionner au moins un critère.';
+        } else {
+            errorMessageElement.textContent = '';
+        }
+    }
+
+    criteriaCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', validateCheckboxes);
+    });
+
+    validateCheckboxes();
 });
 
 document.querySelectorAll('.criteria-checkbox').forEach(checkbox => {

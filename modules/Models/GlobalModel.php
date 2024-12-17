@@ -239,7 +239,13 @@ class GlobalModel {
         ];
 
         $context = stream_context_create($options);
-        $response = file_get_contents($url, false, $context);
+        try {
+            $response = @file_get_contents($url, false, $context);
+        }
+        catch (\Exception $e) {
+            return 60;
+        }
+
         $data = json_decode($response, true);
 
         if (isset($data['routes'][0]['duration'])) {
