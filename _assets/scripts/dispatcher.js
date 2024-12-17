@@ -148,14 +148,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const criteriaCheckboxes = document.querySelectorAll('.criteria-checkbox');
     const errorMessageElement = document.getElementById('checkboxError');
+    const button = document.getElementById('generate-btn');
 
     function validateCheckboxes() {
         const anyChecked = Array.from(criteriaCheckboxes).some(checkbox => checkbox.checked);
 
         if (!anyChecked) {
             errorMessageElement.textContent = 'Veuillez sélectionner au moins un critère.';
+            button.disabled = true;
         } else {
             errorMessageElement.textContent = '';
+            if (button.disabled) {
+                button.disabled = false;
+            }
         }
     }
 
@@ -163,6 +168,20 @@ document.addEventListener('DOMContentLoaded', function () {
         checkbox.addEventListener('change', validateCheckboxes);
     });
 
+    const select = document.getElementById('save-selector');
+    const saveButton = document.getElementById('save-btn');
+
+    function updateButtonState() {
+        if (select.value === 'default') {
+            saveButton.disabled = true;
+        } else {
+            saveButton.disabled = false;
+        }
+    }
+
+    select.addEventListener('change', updateButtonState);
+
+    updateButtonState();
     validateCheckboxes();
 });
 
