@@ -87,10 +87,12 @@ class Dashboard{
         // Comparaison des en-têtes du CSV avec les colonnes de la table dans la base de données
         $tableColumns = array_map('strtolower', $this->getTableColumn($tableName));
         $csvHeaders = array_map('strtolower', $headers);
-        if (array_diff($csvHeaders, $tableColumns)) {
-            throw new Exception("Les colonnes CSV ne correspondent pas à la table $tableName.");
+        if (($tableName != 'teacher' AND array_diff($csvHeaders, $tableColumns)) OR ($tableName = 'teacher' AND array_diff($csvHeaders, array_merge($tableColumns, ['address$type'],['discipline_name'])))) {
+            throw new Exception("Les colonnes CSV ne correspondent pas à la table $tableName ou au valeur demandé pour la table teacher.");
         }
-        return empty(array_diff($csvHeaders, $tableColumns));
+        else {
+            return true;
+        }
     }
 
     /**
@@ -105,21 +107,22 @@ class Dashboard{
             throw new Exception("Impossible d'ouvrir le fichier CSV.");
         }
 
+        /**
         $headers = fgetcsv($handle, 1000, ",");
         if (!$this->validateHeaders($headers, $tableName)) {
             fclose($handle);
             return false;
-        }
+        } **/
 
         try {
-            while (($data = fgetcsv($handle, 1000, ",")) !== false) {
+            while (($data = fgetcsv($handle, 1000, ";")) !== false) {
                 $this->insertIntoDatabase($data, $tableName);
             }
             fclose($handle);
             return true;
         } catch (Exception) {
             fclose($handle);
-            throw new Exception("Erreur lors du traitement du fichier CSV.");
+            throw new Exception("Erreur lors du traitement du fichier CSV (merci de vérifier que vous repectez bien le guide utilisateur).");
         }
     }
 
@@ -181,12 +184,26 @@ class Dashboard{
      * @throws Exception En cas d'erreur lors de l'insertion
      */
     private function insertTeacherData(array $data): void {
+        $teacher = [$data[0], $data[1], $data[2], $data[3]];
+        $discipline = ['discipline_name' => $data[4]];
+        $address = ['address' => explode('$',$data[4])[0], 'type'=> explode('$',$data[4])[1]];
+
         // Colonnes pour la table teacher
         $teacherColumns = $this->getTableColumn('teacher');
-        $teacherData = array_combine($teacherColumns, $data);
+        $teacherData = array_combine($teacherColumns, $teacher);
+
+        Marche pas à revoir import de fichier ne fait rien, à débug !!!!
+
+        // Insertion dans la table has_address
+        $this->insertGenericData([['id_teacher' => $teacherData['id_teacher']], $address], 'has_address');
+
+        // Insertion dans la table is_taught
+        $this->insertGenericData([['id_teacher' => $teacherData['id_teacher']], $discipline], 'is_taught');
+
+
 
         // Insertion dans la table teacher
-        $this->insertGenericData($data, 'teacher');
+        $this->insertGenericData($teacher, 'teacher');
 
         // Insertion dans la table user_connect
         $this->insertUserConnect($teacherData['id_teacher'], 'default_password');

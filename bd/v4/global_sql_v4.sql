@@ -214,9 +214,9 @@ RETURNS TRIGGER AS $$
         name_criteria TEXT;
         id_backup integer;
     BEGIN
-        for name_criteria IN SELECT Distribution_criteria.name_criteria FROM Distribution_criteria
+        FOR name_criteria IN SELECT Distribution_criteria.name_criteria FROM Distribution_criteria
             LOOP
-            FOR num IN SELECT Id_backup.id_backup FROM Id_backup
+            FOR id_backup IN SELECT Id_backup.id_backup FROM Id_backup
                 LOOP
                 INSERT INTO backup (user_id, name_Criteria, id_backup, coef) VALUES (NEW.user_id, name_criteria, id_backup, 1);
             END LOOP;
@@ -231,7 +231,8 @@ CREATE TRIGGER insert_backup
     FOR EACH ROW
     EXECUTE FUNCTION insert_backup();
 
-CREATE OR REPLACE FUNCTION create_addr_for_insert_internship()
+
+CREATE OR REPLACE FUNCTION create_addr_for_insert()
 RETURNS TRIGGER AS $$
     BEGIN
         IF (SELECT Address FROM Addr_name WHERE Address = NEW.Address) IS NULL THEN
@@ -244,7 +245,7 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER create_addr_for_insert_internship
     BEFORE INSERT ON Internship
     FOR EACH ROW
-    EXECUTE FUNCTION create_addr_for_insert_internship();
+    EXECUTE FUNCTION create_addr_for_insert();
 
 
 CREATE OR REPLACE FUNCTION update_backup_new_criteria()
@@ -291,6 +292,28 @@ CREATE TRIGGER update_backup_new_id_backup
     AFTER INSERT ON Distribution_criteria
     FOR EACH ROW
     EXECUTE FUNCTION update_backup_new_id_backup();
+
+
+CREATE TRIGGER create_addr_for_insert_has_address
+    BEFORE INSERT ON Has_address
+    FOR EACH ROW
+    EXECUTE FUNCTION create_addr_for_insert();
+
+
+CREATE OR REPLACE FUNCTION create_discipline_for_insert()
+RETURNS TRIGGER AS $$
+    BEGIN
+        IF (SELECT discipline_name FROM Discipline WHERE discipline_name = NEW.discipline_name) IS NULL THEN
+            INSERT INTO Discipline (discipline_name) VALUES (NEW.discipline_name);
+        END IF;
+        RETURN NEW;
+    END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER create_discipline_for_insert_is_taught
+    BEFORE INSERT ON Is_taught
+    FOR EACH ROW
+    EXECUTE FUNCTION create_discipline_for_insert();
 
 
 INSERT INTO Distribution_criteria (Name_criteria) VALUES ('A été responsable');
