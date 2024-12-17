@@ -8,7 +8,11 @@ use PDO;
 
 class Dispatcher {
     /**
-     * @return void
+     * Cette méthode permet d'associer directement un enseignant à un stage, en fonction des données soumises via un formulaire `POST`, elle renvoie des messages d'erreurs appropriées si besoin sinon un message de validation.
+     *
+     * @param object $dispatcherModel Le modèle de gestion des données qui contient les méthodes pour récupérer les listes et insérer l'association.
+     *
+     * @return string Retourne un message de succès ou d'erreur concernant l'association ou la demande de remplissage des champs.
      */
     public function association_direct($dispatcherModel): string {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['searchInternship']) && isset($_POST['searchTeacher']) && $_POST['searchInternship'] !== '' && $_POST['searchTeacher'] !== '') {
@@ -36,7 +40,11 @@ class Dispatcher {
     }
 
     /**
-     * @return void
+     * Cette méthode permet d'associer un enseignant à un stage en fonction des données reçues depuis un formulaire (via `$_POST`), elle renvoie des messages d'erreurs appropriées si besoin sinon un message de validation.
+     *
+     * @param object $dispatcherModel Modèle de gestion des données qui contient les méthodes pour récupérer les listes et insérer les associations.
+     *
+     * @return string Retourne une chaîne de caractères contenant des messages d'information ou d'erreur concernant l'état des associations.
      */
     public function association_after_sort($dispatcherModel): string {
         $listTeacher = $dispatcherModel->createListTeacher();
@@ -61,6 +69,11 @@ class Dispatcher {
         return $returnMessage;
     }
 
+    /**
+     * Méthode `show` utilisée pour gérer l'affichage et la gestion des actions du tableau de bord lors de l'administration des départements, association après tri et avant tri, redirection sur la page de connexion en cas d'utilisateur non connecté, définition des chemins vers les fichiers utiles et gestion des $_POST.
+     *
+     * @return void
+     */
     public function show(): void {
 
         if (isset($_SESSION['role_name']) && (
