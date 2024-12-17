@@ -32,18 +32,22 @@ class   Homepage {
             </div>
             <form class="center">
                 <?php
-                if(isset($_POST['cancel'])) {
+                if(isset($_POST['cancelSearch'])) {
                     unset($_SESSION['selected_student']);
                 }
 
-                if (isset($_POST['page'])) {
+                if (isset($_POST['cancelChanges'])) {
+                    unset($_SESSION['unconfirmed']);
+                }
+
+                if (isset($_POST['page']) || isset($_POST['sortSubmitted'])) {
                     $_SESSION['unconfirmed'][$_SESSION['lastPage'] ?? 1] = $_POST['selecInternship'] ?? array();
                     $_SESSION['unconfirmed']['all'] = array();
-                    foreach ($_SESSION['unconfirmed'] as $page => $internships) {
-                        if ($page == 'all') continue;
+                    foreach ($_SESSION['unconfirmed'] as $currentPage => $internships) {
+                        if ($currentPage == 'all') continue;
                         $_SESSION['unconfirmed']['all'] = array_merge(gettype($internships) == "array" ? $internships : [$internships], $_SESSION['unconfirmed']['all']);
                     }
-                    $_SESSION['lastPage'] = $_POST['page'];
+                    $_SESSION['lastPage'] = $_POST['page'] ?? 1;
                 }
 
                 if(isset($_POST['searchedStudentSubmitted'])) {
@@ -61,11 +65,10 @@ class   Homepage {
                 }
 
                 if(isset($_POST['selecInternshipSubmitted'])) {
-
                     $_SESSION['unconfirmed'][$_SESSION['lastPage'] ?? 1] = $_POST['selecInternship'] ?? array();
                     $_SESSION['unconfirmed']['all'] = array();
-                    foreach ($_SESSION['unconfirmed'] as $page => $internships) {
-                        if ($page == 'all') continue;
+                    foreach ($_SESSION['unconfirmed'] as $currentPage => $internships) {
+                        if ($currentPage == 'all') continue;
                         $_SESSION['unconfirmed']['all'] = array_merge(gettype($internships) == "array" ? $internships : [$internships], $_SESSION['unconfirmed']['all']);
                     }
 
@@ -73,7 +76,7 @@ class   Homepage {
 
                     if(!$update || gettype($update) !== 'boolean') {
                         echo '<h6 class="red-text">Une erreur est survenue</h6>';
-                    } else unset($_SESSION['unconfirmed']);
+                    } else unset($_SESSION['unconfirmed'], $_SESSION['lastPage'], $_POST['page']);
                 }
 
                 if (isset($_SESSION['selected_student']['firstName']) && isset($_SESSION['selected_student']['lastName'])) {
@@ -164,7 +167,7 @@ class   Homepage {
                 }
                 ?>
                 <form method="post" class="center-align table">
-                    <input type="hidden" name="cancel" value="1">
+                    <input type="hidden" name="cancelSearch" value="1">
                     <button class="waves-effect waves-light btn" type="submit">Annuler</button>
                 </form>
             <?
@@ -213,16 +216,38 @@ class   Homepage {
                         $_SESSION['sortBy'] = $_POST['sortBy'] ?? 0;
                         $_SESSION['decreasing'] = $_POST['decreasing'] ?? false;
                     }
+
                     $table = $this->model->sortRows($table, $_SESSION['sortBy'] ?? 0, $_SESSION['decreasing'] ?? 0);
+
+                    if (isset($_POST['sortSubmitted'])) {
+                        if (isset($_SESSION['lastSortBy']) && isset($_SESSION['lastDecreasing'])
+                            && ($_SESSION['lastSortBy'] != $_SESSION['sortBy'] || $_SESSION['lastDecreasing'] != $_SESSION['decreasing'])
+                            && isset($_SESSION['unconfirmed']['all'])) {
+                            for ($i = 1; $i <= ceil(count($table)/10); ++$i) {
+                                $_SESSION['unconfirmed'][$i] = array();
+                            }
+                            foreach ($_SESSION['unconfirmed']['all'] as $value) {
+                                foreach ($table as $key => $internship) {
+                                    if ($internship['internship_identifier'] == $value) {
+                                        $_SESSION['unconfirmed'][ceil(($key + 1) / 10)][] = $value;
+                                    }
+                                }
+                            }
+                        }
+                        $_SESSION['lastSortBy'] = $_POST['sortBy'] ?? 0;
+                        $_SESSION['lastDecreasing'] = $_POST['decreasing'] ?? false;
+                    }
 
                     if (!isset($_SESSION['unconfirmed'])) {
                         $_SESSION['unconfirmed'] = array();
                         $_SESSION['unconfirmed']['all'] = array();
+                        $_SESSION['requested'] = array();
                         for ($i = 0; $i < count($table); ++$i) {
                             if (!isset($_SESSION['unconfirmed'][ceil(($i+1)/10)])) $_SESSION['unconfirmed'][ceil(($i+1)/10)] = array();
                             if ($table[$i]['requested']) {
-                                $_SESSION['unconfirmed'][ceil(($i+1)/10)][count($_SESSION['unconfirmed'][ceil(($i+1)/10)])] = $table[$i]['internship_identifier'];
-                                $_SESSION['unconfirmed']['all'][count($_SESSION['unconfirmed']['all'])] = $table[$i]['internship_identifier'];
+                                $_SESSION['unconfirmed'][ceil(($i+1)/10)][] = $table[$i]['internship_identifier'];
+                                $_SESSION['unconfirmed']['all'][] = $table[$i]['internship_identifier'];
+                                $_SESSION['requested'][] = $table[$i]['internship_identifier'];
                             }
                         }
                     }
@@ -253,13 +278,10 @@ class   Homepage {
                                     </div>
                                 </div>
                             </div>
-                            <input type="hidden" name="sortSubmitted" value="1">
-                            <button class="waves-effect waves-light btn" type="submit">Trier</button>
-                        </form>
+                            <button class="waves-effect waves-light btn" name="sortSubmitted" value="1" type="submit" formmethod="post">Trier</button>
 
-                        <div class="row"></div>
+                            <div class="row"></div>
 
-                        <form method="post" class="center-align table">
                             <table class="highlight centered">
                                 <thead>
                                 <tr>
@@ -275,7 +297,9 @@ class   Homepage {
                                 <tbody>
                                 <?
                                 $totalPages = ceil(count($table) / 10);
-                                $page = isset($_POST['page']) && $_POST['page'] > 0 && $_POST['page'] <= $totalPages ? (int)$_POST['page'] : 1;
+                                if (isset($_POST['page']) && $_POST['page'] > 0 && $_POST['page'] <= $totalPages) $page = $_POST['page'];
+                                else if (isset($_SESSION['lastPage']) && $_SESSION['lastPage'] > 0 && $_SESSION['lastPage'] <= $totalPages) $page = $_SESSION['lastPage'];
+                                else $page = 1;
 
                                 for ($i = ($page-1)*10 ; $i < $page*10 && $i < count($table) ; ++$i):
                                     $row = $table[$i];
@@ -302,7 +326,20 @@ class   Homepage {
                                 </tbody>
                             </table>
                             <div class="row"></div>
+                            <? if ($_SESSION['unconfirmed']['all'] !== $_SESSION['requested']) {
+                                echo '<div class="selection"> <div class="formCell">';
+                            }
+                            ?>
                             <button class="waves-effect waves-light btn" name="selecInternshipSubmitted" value="1" type="submit">Valider</button>
+                            <? if ($_SESSION['unconfirmed']['all'] !== $_SESSION['requested']):
+                                echo '</div>';
+                                ?>
+                                <div class="formCell"> <button class="waves-effect waves-light btn" name="cancelChanges" value="1" type="submit">Annuler</button> </div>
+                            <? endif;
+                            if ($_SESSION['unconfirmed']['all'] !== $_SESSION['requested']) {
+                                echo '</div>';
+                            }
+                            ?>
                             <?
                             if ($totalPages > 1):
                                 $start = ($totalPages>9 && $page > 1) ? $page-1 : 1;
