@@ -34,6 +34,7 @@ main a:hover {
 .selection {
     display: flex;
     flex-direction: row;
+    justify-content: center;
 }
 
 .btn {
@@ -56,8 +57,7 @@ main a:hover {
 }
 
 .formCell {
-    padding-left: 3rem;
-    padding-right: 3rem;
+    padding: 0 3rem;
 }
 
 thead {
