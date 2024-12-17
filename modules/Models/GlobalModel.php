@@ -204,7 +204,7 @@ class GlobalModel {
             }
         }
 
-        if (!$minDuration) {
+        if (!$minDuration || $minDuration > 999999) {
             return 60;
         }
 
@@ -249,7 +249,7 @@ class GlobalModel {
             return null;
         }
 
-        if ($duration >= 9223372036854775807) {
+        if ($duration >= 9999999) {
             return 60;
         }
         else {
@@ -274,7 +274,14 @@ class GlobalModel {
         ];
 
         $context = stream_context_create($options);
-        $response = file_get_contents($url, false, $context);
+
+        try {
+            $response = @file_get_contents($url, false, $context);
+        }
+        catch (\Exception $e) {
+            return null;
+        }
+
         $data = json_decode($response, true);
 
         if (!empty($data)) {
@@ -283,6 +290,7 @@ class GlobalModel {
                 'lng' => $data[0]['lon']
             ];
         }
+
         return null;
     }
 }
