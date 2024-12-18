@@ -2,10 +2,10 @@
 
 namespace Controllers;
 
-use Blog\Controllers\Dashboard;
+use Blog\Controllers\GestionDonnees;
 use Includes\Database;
 use Blog\Views\Layout;
-use Blog\Views\Dashboard as DashboardView;
+use Blog\Views\GestionDonnees as DashboardView;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 
@@ -60,7 +60,7 @@ class DashboardTest extends TestCase {
             ->method('showView');
 
         //instanciation des mocks
-        $controller = new Dashboard($mockLayout,$mockView);
+        $controller = new GestionDonnees($mockLayout,$mockView);
 
         //simulation d'une requête POST avec un fichier CSV (student par exemple)
         $_SERVER['REQUEST_METHOD'] = 'POST';
