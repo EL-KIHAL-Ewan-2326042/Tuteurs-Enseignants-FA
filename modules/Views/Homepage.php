@@ -82,7 +82,8 @@ class   Homepage {
                     $internshipInfos = $this->model->getInternshipStudent($_SESSION['selected_student']['id']);
                     if ($internshipInfos) {
                         $internships = $this->globalModel->getInternships($_SESSION['selected_student']['id']);
-                        $nbInternships = $this->model->getInternshipTeacher($internships, $_SESSION['identifier']);
+                        $year = "";
+                        $nbInternships = $this->model->getInternshipTeacher($internships, $_SESSION['identifier'], $year);
                         $distance = $this->globalModel->getDistance($internshipInfos['internship_identifier'], $_SESSION['identifier'], isset($internshipInfos['id_teacher']));
                         ?>
                         <div id="map"></div>
@@ -104,7 +105,7 @@ class   Homepage {
                             <table class="highlight centered">
                                 <thead>
                                 <tr>
-                                    <th>HISTORIQUE</th>
+                                    <th>A ETE RESPONSABLE</th>
                                     <th>DISTANCE</th>
                                     <th>SUJET</th>
                                     <th>ENTREPRISE</th>
@@ -113,7 +114,7 @@ class   Homepage {
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td><?= $nbInternships > 0 ? 'Oui' : 'Non' ?></td>
+                                        <td><?= $nbInternships > 0 ? $year : 'Non' ?></td>
                                         <td>~<?= $distance ?> minutes</td>
                                         <td><?= str_replace('_', ' ', $internshipInfos["internship_subject"]) ?></td>
                                         <td><?= str_replace('_', ' ', $internshipInfos["company_name"]) ?></td>
@@ -319,7 +320,7 @@ class   Homepage {
                                 <thead>
                                 <tr>
                                     <th>ETUDIANT</th>
-                                    <th>HISTORIQUE</th>
+                                    <th>A ETE RESPONSABLE</th>
                                     <th>DISTANCE</th>
                                     <th>SUJET</th>
                                     <th>ENTREPRISE</th>
@@ -340,7 +341,7 @@ class   Homepage {
                                         <td><?= $row["student_name"] . " " . $row["student_firstname"] ?></td>
                                         <td>
                                             <?php
-                                            echo $row['internshipTeacher'] > 0 ? 'Oui' : 'Non';
+                                            echo $row['internshipTeacher'] > 0 ? $row['year'] : 'Non';
                                             ?>
                                         </td>
                                         <td>~<?= $row['duration'] ?> minutes</td>
