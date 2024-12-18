@@ -325,11 +325,12 @@ function sortTable(n) {
     }
     for (i = 0; i < rows[0].cells.length; ++i) {
         column = rows[0].getElementsByTagName("TH")[i].innerHTML;
-        if (column.substring(column.length-1) === ("▲" || "▼")) column = column.substring(0, column.length-2);
+        if (column.substring(column.length-1) === "▲" || column.substring(column.length-1) === "▼") table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-2);
         if (i === n) {
-            if (dir === "asc") column += " ▲";
-            else column += " ▼";
-            console.log(column);
-        }
+            if (column.substring(column.length-1) === "▲") table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-1) + "▼";
+            else if (column.substring(column.length-1) === "▼") table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-1) + "▲";
+            else if (dir === "asc") table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▲";
+            else table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▼";
+        } else if (column.substring(column.length-1) === "▲" || column.substring(column.length-1) === "▼") table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-2);
     }
 }
