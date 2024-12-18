@@ -7,11 +7,11 @@ use Includes\Database;
 use PDO;
 use PDOException;
 
-class GestionDonnees{
+class dashboard{
     private Database $db;
 
     /**
-     * Constructeur de la classe GestionDonnees (modèle)
+     * Constructeur de la classe dashboard (modèle)
      * @param Database $db Instance de la base de données
      */
     public function __construct(Database $db){
@@ -191,19 +191,14 @@ class GestionDonnees{
         // Colonnes pour la table teacher
         $teacherColumns = $this->getTableColumn('teacher');
         $teacherData = array_combine($teacherColumns, $teacher);
-
-        // Marche pas à revoir import de fichier ne fait rien, à débug !!!!
+        // Insertion dans la table teacher
+        $this->insertGenericData($teacher, 'teacher');
 
         // Insertion dans la table has_address
         $this->insertGenericData([['id_teacher' => $teacherData['id_teacher']], $address], 'has_address');
 
         // Insertion dans la table is_taught
         $this->insertGenericData([['id_teacher' => $teacherData['id_teacher']], $discipline], 'is_taught');
-
-
-
-        // Insertion dans la table teacher
-        $this->insertGenericData($teacher, 'teacher');
 
         // Insertion dans la table user_connect
         $this->insertUserConnect($teacherData['id_teacher'], 'default_password');
