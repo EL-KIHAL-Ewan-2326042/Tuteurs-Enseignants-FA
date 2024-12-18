@@ -28,13 +28,13 @@ class Intramu {
                         </div>
                         <div class="row">
                             <div class="input-field col s12">
-                                <input type="text" id="identifier" name="identifier" minlength="4" maxlength="20" class="validate">
+                                <input type="text" id="identifier" name="identifier" maxlength="20" class="validate">
                                 <label for="identifier">Identifiant</label>
                             </div>
                         </div>
                         <div class="row">
                             <div class="input-field col s12">
-                                <input type="password" id="password" name="password" minlength="8" maxlength="32" class="validate">
+                                <input type="password" id="password" name="password" maxlength="32" class="validate">
                                 <label for="password">Mot de Passe</label>
                             </div>
                         </div>
