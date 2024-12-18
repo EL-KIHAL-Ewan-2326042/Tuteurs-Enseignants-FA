@@ -4,15 +4,15 @@ namespace Blog\Controllers;
 
 use Blog\Views\Layout;
 use Includes\Database;
-use Blog\Views\GestionDonnees as GestionDonneesView;
-use Blog\Models\GestionDonnees as GestioinDonneesModel;
+use Blog\Views\dashboard as GestionDonneesView;
+use Blog\Models\dashboard as GestioinDonneesModel;
 use Exception;
 
-class GestionDonnees {
+class dashboard {
     private Layout $layout;
 
     /**
-     * Constructeur de la classe GestionDonnees
+     * Constructeur de la classe dashboard
      * @param Layout $layout Instance de la classe Layout
      */
     public function __construct(Layout $layout) {
@@ -44,13 +44,13 @@ class GestionDonnees {
     }
 
     /**
-     * Contrôleur de GestionDonnees
+     * Contrôleur de dashboard
      * @return void
      */
     public function show(): void {
         // Récupération de l'instance de la base de données et des classes associées
         $db = \Includes\Database::getInstance();
-        $model = new \Blog\Models\GestionDonnees($db);
+        $model = new \Blog\Models\dashboard($db);
 
         // Initialisation du message à afficher
         $message = '';
@@ -132,9 +132,9 @@ class GestionDonnees {
             $title = "Gestion des données";
             $cssFilePath = '_assets/styles/gestionDonnees.css';
             $jsFilePath = '_assets/scripts/gestionDonnees.js';
-            $view = new \Blog\Views\GestionDonnees($message);
+            $view = new \Blog\Views\dashboard($message);
 
-            // Affichage de la vue GestionDonnees
+            // Affichage de la vue dashboard
             $this->layout->renderTop($title, $cssFilePath);
             $view->showView();
             $this->layout->renderBottom($jsFilePath);
