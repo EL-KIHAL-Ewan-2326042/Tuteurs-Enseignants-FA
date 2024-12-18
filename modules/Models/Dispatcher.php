@@ -240,7 +240,6 @@ class Dispatcher{
             else
             array_shift($listStart);
         }
-
         return [$listFinal, $assignedCounts];
     }
 
