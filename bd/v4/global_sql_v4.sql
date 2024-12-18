@@ -196,7 +196,7 @@ RETURNS TRIGGER AS $$
 BEGIN
     IF (SELECT Id_teacher FROM Internship WHERE Internship_identifier = NEW.Internship_identifier) IS NULL THEN
         RETURN NEW;
-ELSE
+    ELSE
         RAISE EXCEPTION 'Un professeur est déjà assigné à ce stage';
     END IF;
 END;
@@ -579,7 +579,7 @@ INSERT INTO User_connect (User_id, User_pass) VALUES ('H89012345', '$2y$10$vbTkN
 INSERT INTO User_connect (User_id, User_pass) VALUES ('I90123456', '$2y$10$ISrrFWkUhbb2b3y7/9NdHeEDJNOFqsV58CGuTqLp1Fg3clAho.U/q');
 INSERT INTO User_connect (User_id, User_pass) VALUES ('J01234567', '$2y$10$QmPv1aWspu0UIz3F5uzgZeH2AwZfTS1XgKjv.XFXFQz06a/QwmWQW');
 
-INSERT INTO Role (Role_name) VALUES ('Teacher');
+INSERT INTO Role (Role_name) VALUES ('Professeur');
 INSERT INTO Role (Role_name) VALUES ('Admin_dep');
 INSERT INTO Role (Role_name) VALUES ('Super_admin');
 
@@ -847,38 +847,38 @@ INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('C34567890', 'Vente 
 INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('D45678901', 'Économie');
 INSERT INTO Is_taught (Id_teacher, Discipline_name) VALUES ('E56789012', 'Droit');
 
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('B22662146', 'Teacher', 'IUT_INFO_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('R14328249', 'Teacher', 'IUT_INFO_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('G42185815', 'Teacher', 'IUT_INFO_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('R32281327', 'Teacher', 'IUT_INFO_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('O75041198', 'Teacher', 'IUT_INFO_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('V73654623', 'Teacher', 'IUT_INFO_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('Z17235374', 'Teacher', 'IUT_INFO_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('R84623671', 'Teacher', 'IUT_INFO_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('D78106598', 'Teacher', 'IUT_INFO_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('S85694088', 'Teacher', 'IUT_INFO_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('Y68664772', 'Teacher', 'IUT_INFO_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('Q66676064', 'Teacher', 'IUT_INFO_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('B10648624', 'Teacher', 'IUT_INFO_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('N26332417', 'Teacher', 'IUT_INFO_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('F42358144', 'Teacher', 'IUT_INFO_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('I57332640', 'Teacher', 'IUT_INFO_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('B51423637', 'Teacher', 'IUT_INFO_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('C45328794', 'Teacher', 'IUT_INFO_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('H48344613', 'Teacher', 'IUT_INFO_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('R41814241', 'Teacher', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('B22662146', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('R14328249', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('G42185815', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('R32281327', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('O75041198', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('V73654623', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('Z17235374', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('R84623671', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('D78106598', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('S85694088', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('Y68664772', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('Q66676064', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('B10648624', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('N26332417', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('F42358144', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('I57332640', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('B51423637', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('C45328794', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('H48344613', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('R41814241', 'Professeur', 'IUT_INFO_AIX');
 INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('B22662146', 'Admin_dep','IUT_INFO_AIX');
 -- insert pour prof de TC et GEA
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('A12345678', 'Teacher', 'IUT_TC_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('B23456789', 'Teacher', 'IUT_TC_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('C34567890', 'Teacher', 'IUT_TC_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('D45678901', 'Teacher', 'IUT_TC_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('E56789012', 'Teacher', 'IUT_TC_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('F67890123', 'Teacher', 'IUT_GEA_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('G78901234', 'Teacher', 'IUT_GEA_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('H89012345', 'Teacher', 'IUT_GEA_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('I90123456', 'Teacher', 'IUT_GEA_AIX');
-INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('J01234567', 'Teacher', 'IUT_GEA_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('A12345678', 'Professeur', 'IUT_TC_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('B23456789', 'Professeur', 'IUT_TC_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('C34567890', 'Professeur', 'IUT_TC_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('D45678901', 'Professeur', 'IUT_TC_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('E56789012', 'Professeur', 'IUT_TC_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('F67890123', 'Professeur', 'IUT_GEA_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('G78901234', 'Professeur', 'IUT_GEA_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('H89012345', 'Professeur', 'IUT_GEA_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('I90123456', 'Professeur', 'IUT_GEA_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('J01234567', 'Professeur', 'IUT_GEA_AIX');
 INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('J01234567', 'Admin_dep', 'IUT_TC_AIX');
 INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('A12345678', 'Admin_dep','IUT_GEA_AIX');
 
