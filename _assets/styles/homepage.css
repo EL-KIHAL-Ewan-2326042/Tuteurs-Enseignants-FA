@@ -52,8 +52,12 @@ main a:hover {
     color: #00558B;
 }
 
+.clickable {
+    cursor: pointer;
+}
+
 .table {
-    max-width: 85%;
+    width: 85%;
 }
 
 .formCell {

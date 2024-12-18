@@ -234,9 +234,6 @@ async function calculateDistance(origin, destination, map) {
         if (data.routes && data.routes.length > 0) {
             const route = data.routes[0];
 
-            console.log(`Distance : ${route.distance} mètres`);
-            console.log(`Durée : ${route.duration} secondes`);
-
             const routeCoords = route.geometry.coordinates.map((coord) =>
                 ol.proj.fromLonLat(coord)
             );
@@ -281,4 +278,58 @@ function createMarkerElement(label) {
     marker.style.borderRadius = "50%";
     marker.style.textAlign = "center";
     return marker;
+}
+
+/**
+ * Partie3: Tri du tableau
+ */
+
+/**
+ * Trie la table prenant pour id "tab"
+ * @param n numéro désignant la colonne par laquelle on trie le tableau
+ */
+function sortTable(n) {
+    let table, rows, switching, i, x, y, shouldSwitch, dir, column, switchcount = 0;
+    table = document.getElementById("tab");
+    switching = true;
+    dir = "asc";
+    while (switching) {
+        switching = false;
+        rows = table.rows;
+        for (i = 1; i < (rows.length - 1); ++i) {
+            shouldSwitch = false;
+            x = rows[i].getElementsByTagName("TD")[n];
+            y = rows[i + 1].getElementsByTagName("TD")[n];
+            if (dir === "asc") {
+                if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                    shouldSwitch = true;
+                    break;
+                }
+            } else if (dir === "desc") {
+                if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                    shouldSwitch = true;
+                    break;
+                }
+            }
+        }
+        if (shouldSwitch) {
+            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+            switching = true;
+            switchcount ++;
+        } else {
+            if (switchcount === 0 && dir === "asc") {
+                dir = "desc";
+                switching = true;
+            }
+        }
+    }
+    for (i = 0; i < rows[0].cells.length; ++i) {
+        column = rows[0].getElementsByTagName("TH")[i].innerHTML;
+        if (column.substring(column.length-1) === ("▲" || "▼")) column = column.substring(0, column.length-2);
+        if (i === n) {
+            if (dir === "asc") column += " ▲";
+            else column += " ▼";
+            console.log(column);
+        }
+    }
 }

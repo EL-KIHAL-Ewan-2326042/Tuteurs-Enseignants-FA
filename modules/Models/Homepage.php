@@ -96,67 +96,35 @@ class Homepage {
      * @param array $table tableau à trier
      * @param int $mode mode de tri
      * - 0 : choix de l'enseignant, par défaut
-     * - 1 : score
-     * - 2 : nom et prénom des élèves
-     * - 3 : sujet de stage
+     * - 1 : nom et prénom des élèves
+     * - 2 : sujet de stage
      * @param bool $decreasing true si c'est décroissant, false sinon
      * @return array tableau trié
      */
     public function sortRows(array $table, int $mode = 0, bool $decreasing = false): array {
         if($mode === 1) {
             usort($table, function ($a, $b) use ($decreasing) {
-                $rank = $b['score'] <=> $a['score'];
-                if ($rank === 0) {
-                    $requested = $b['requested'] <=> $a['requested'];
-                    if($requested === 0) {
-                        $lastName = $a['student_name'] <=> $b['student_name'];
-                        if ($lastName === 0) {
-                            return $a['student_firstname'] <=> $b['student_firstname'];
-                        }
-                        return $lastName;
-                    }
-                    return $requested;
-                }
-                return $decreasing ? $rank*-1 : $rank;
-            });
-        } elseif($mode === 2) {
-            usort($table, function ($a, $b) use ($decreasing) {
                 $lastName = $a['student_name'] <=> $b['student_name'];
                 if ($lastName === 0) {
                     $firstName = $a['student_firstname'] <=> $b['student_firstname'];
                     if ($firstName === 0) {
                         return $b['requested'] <=> $a['requested'];
-                        /*
-                        $requested = $b['requested'] <=> $a['requested'];
-                        if($requested === 0) {
-                            return $b['score'] <=> $a['score'];
-                        }
-                        return $requested;
-                        */
                     }
                     return $decreasing ? $firstName*-1 : $firstName;
                 }
                 return $decreasing ? $lastName*-1 : $lastName;
             });
-        } elseif($mode === 3) {
+        } elseif($mode === 2) {
             usort($table, function ($a, $b) use ($decreasing) {
                 $subject = $a['internship_subject'] <=> $b['internship_subject'];
                 if($subject === 0) {
                     $requested = $b['requested'] <=> $a['requested'];
                     if ($requested === 0) {
-                        /*
-                        $rank = $b['score'] <=> $a['score'];
-                        if ($rank === 0) {
-                        */
-                            $lastName = $a['student_name'] <=> $b['student_name'];
-                            if ($lastName === 0) {
-                                return $a['student_firstname'] <=> $b['student_firstname'];
-                            }
-                            return $lastName;
-                        /*
+                        $lastName = $a['student_name'] <=> $b['student_name'];
+                        if ($lastName === 0) {
+                            return $a['student_firstname'] <=> $b['student_firstname'];
                         }
-                        return $rank;
-                        */
+                        return $lastName;
                     }
                     return $requested;
                 }
@@ -166,19 +134,11 @@ class Homepage {
             usort($table, function ($a, $b) use ($decreasing) {
                 $requested = $a['requested'] <=> $b['requested'];
                 if($requested === 0) {
-                    /*
-                    $rank = $b['score'] <=> $a['score'];
-                    if ($rank === 0) {
-                    */
-                        $lastName = $a['student_name'] <=> $b['student_name'];
-                        if ($lastName === 0) {
-                            return $a['student_firstname'] <=> $b['student_firstname'];
-                        }
-                        return $lastName;
-                    /*
+                    $lastName = $a['student_name'] <=> $b['student_name'];
+                    if ($lastName === 0) {
+                        return $a['student_firstname'] <=> $b['student_firstname'];
                     }
-                    return $rank;
-                    */
+                    return $lastName;
                 }
                 return $decreasing ? $requested : $requested*-1;
             });
@@ -225,11 +185,6 @@ class Homepage {
 
             // durée en minute séparant l'enseignant de l'adresse de l'entreprise où l'étudiant effectue son stage
             $row['duration'] = $this->globalModel->getDistance($row['internship_identifier'], $identifier, isset($row['id_teacher']));
-
-            // le score final déterminant la pertinence du stage pour l'enseignant
-            //$row['score'] = $this->calculateScore(array('Distance' => $row['duration'],
-            //                                            'A été responsable' => $row['internshipTeacher'] > 0 ? $row['internshipTeacher']/count($internships) : 0,
-            //                                            'Cohérence' => $this->globalModel->scoreDiscipSubject($row['internship_identifier'], $identifier)));
         }
 
         return $studentsList;
@@ -244,7 +199,7 @@ class Homepage {
      */
     public function getInternshipTeacher(array $internshipStudent, string $teacher, string &$year): int {
         $internshipTeacher = 0;
-        foreach($internshipStudent as $key => $row) {
+        foreach($internshipStudent as $row) {
             if($row['id_teacher'] == $teacher) {
                 ++$internshipTeacher;
                 if ($internshipTeacher == 1) {
@@ -261,9 +216,11 @@ class Homepage {
      * @return false|array tableau contenant le numéro de stage, le nom de l'entreprise, le sujet du stage et le numéro de l'enseignant tuteur
      */
     public function getInternshipStudent(string $student): false|array {
-        $query = 'SELECT internship_identifier, company_name, internship_subject, id_teacher
+        $query = 'SELECT internship_identifier, company_name, internship_subject, address, internship.id_teacher, teacher_name, teacher_firstname, formation, class_group
                     FROM internship
-                    WHERE student_number = :student
+                    JOIN student ON internship.student_number = student.student_number
+                    LEFT JOIN teacher ON internship.id_teacher = teacher.id_teacher
+                    WHERE internship.student_number = :student
                     AND start_date_internship > CURRENT_DATE
                     ORDER BY start_date_internship ASC
                     LIMIT 1';
