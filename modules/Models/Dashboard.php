@@ -39,7 +39,7 @@ class Dashboard{
             // Récupération des colonnes en tant que tableau
             $columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
             return $columns ?: [];
-        } catch (PDOException $e) {
+        } catch (PDOException) {
             // Gestion des erreurs liées à la base de données
             throw new Exception("Impossible de récupérer les colonnes pour la table $tableName.");
         }
@@ -54,7 +54,7 @@ class Dashboard{
         try {
             // Vérifie la présence d'au moins une colonne dans la table
             return !empty($this->getTableColumn($tableName));
-        } catch (Exception $e) {
+        } catch (Exception) {
             return false;
         }
     }
@@ -279,8 +279,8 @@ class Dashboard{
         $idTeacher = $internshipData['id_teacher'] ?? null;
         $studentNumber = $internshipData['student_number'] ?? null;
 
-        if (!$idTeacher || !$studentNumber) {
-            throw new Exception("Les données id_teacher ou student_number sont manquantes.");
+        if (!$studentNumber) {
+            throw new Exception("Les données student_number sont manquantes.");
         }
 
         // Vérification si la combinaison existe déjà
