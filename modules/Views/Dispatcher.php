@@ -91,9 +91,9 @@ class Dispatcher {
                             <?php endforeach; ?>
 
 
-                            <p class="red-text"><?php echo $this->errorMessageAfterSort; ?></p>
+                            <p class="red-text" id="checkboxError"><?php echo $this->errorMessageAfterSort; ?></p>
                             <p class="green-text"><?php echo $this->checkMessageAfterSort; ?></p>
-                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action-save" value="<?= $id_backup ?>">Enregister
+                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action-save" value="<?= $id_backup ?>" id="save-btn">Enregister
                                 <i class="material-icons right">arrow_downward</i>
                             </button>
                             <button class="btn waves-effect waves-light button-margin" type="submit" name="action" value="generate" id="generate-btn">Générer
