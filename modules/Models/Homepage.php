@@ -221,7 +221,7 @@ class Homepage {
             $row['requested'] = in_array($row['internship_identifier'], $requests);
 
             // durée en minute séparant l'enseignant de l'adresse de l'entreprise où l'étudiant effectue son stage
-            $row['duration'] = $this->globalModel->getDistance($row['internship_identifier'], $identifier);
+            $row['duration'] = $this->globalModel->getDistance($row['internship_identifier'], $identifier, isset($row['id_teacher']));
 
             // le score final déterminant la pertinence du stage pour l'enseignant
             //$row['score'] = $this->calculateScore(array('Distance' => $row['duration'],

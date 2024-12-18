@@ -63,8 +63,7 @@ class   Homepage {
                     $_SESSION['unconfirmed'][$_SESSION['lastPage'] ?? 1] = $_POST['selecInternship'] ?? array();
                     $_SESSION['unconfirmed']['all'] = array();
                     foreach ($_SESSION['unconfirmed'] as $currentPage => $internships) {
-                        if ($currentPage == 'all') continue;
-                        $_SESSION['unconfirmed']['all'] = array_merge(gettype($internships) == "array" ? $internships : [$internships], $_SESSION['unconfirmed']['all']);
+                        if ($currentPage != 'all') $_SESSION['unconfirmed']['all'] = array_merge(gettype($internships) == "array" ? $internships : [$internships], $_SESSION['unconfirmed']['all']);
                     }
 
                     $update = $this->model->updateRequests($_SESSION['unconfirmed']['all'], $_SESSION['identifier']);
@@ -84,7 +83,7 @@ class   Homepage {
                     if ($internshipInfos) {
                         $internships = $this->globalModel->getInternships($_SESSION['selected_student']['id']);
                         $nbInternships = $this->model->getInternshipTeacher($internships, $_SESSION['identifier']);
-                        $distance = $this->globalModel->getDistance($internshipInfos['internship_identifier'], $_SESSION['identifier']);
+                        $distance = $this->globalModel->getDistance($internshipInfos['internship_identifier'], $_SESSION['identifier'], isset($internshipInfos['id_teacher']));
                         ?>
                         <div id="map"></div>
                         <div class="row"></div>
@@ -105,7 +104,6 @@ class   Homepage {
                             <table class="highlight centered">
                                 <thead>
                                 <tr>
-                                    <th>STAGE/ALTERNANCE</th>
                                     <th>HISTORIQUE</th>
                                     <th>DISTANCE</th>
                                     <th>SUJET</th>
@@ -115,7 +113,6 @@ class   Homepage {
                                 </thead>
                                 <tbody>
                                     <tr>
-                                        <td><?= $internshipInfos['internship_identifier']?></td>
                                         <td><?= $nbInternships > 0 ? 'Oui' : 'Non' ?></td>
                                         <td>~<?= $distance ?> minutes</td>
                                         <td><?= str_replace('_', ' ', $internshipInfos["internship_subject"]) ?></td>
@@ -209,27 +206,32 @@ class   Homepage {
                     if(isset($_POST['sortSubmitted'])) {
                         $_SESSION['sortBy'] = $_POST['sortBy'] ?? 0;
                         $_SESSION['decreasing'] = $_POST['decreasing'] ?? false;
+                        $_SESSION['lineCount'] = $_POST['lineCount'] ?? 10;
                     }
 
                     $table = $this->model->sortRows($table, $_SESSION['sortBy'] ?? 0, $_SESSION['decreasing'] ?? 0);
 
                     if (isset($_POST['sortSubmitted'])) {
-                        if (isset($_SESSION['lastSortBy']) && isset($_SESSION['lastDecreasing'])
-                            && ($_SESSION['lastSortBy'] != $_SESSION['sortBy'] || $_SESSION['lastDecreasing'] != $_SESSION['decreasing'])
-                            && isset($_SESSION['unconfirmed']['all'])) {
-                            for ($i = 1; $i <= ceil(count($table)/10); ++$i) {
+                        if ((isset($_SESSION['lastSortBy']) && $_SESSION['lastSortBy'] != $_SESSION['sortBy'])
+                            || (isset($_SESSION['lastDecreasing']) && $_SESSION['lastDecreasing'] != $_SESSION['decreasing'])
+                            || (isset($_SESSION['lastLineCount']) && $_SESSION['lastLineCount'] != $_SESSION['lineCount'])) {
+                            for ($i = 1; $i <= ceil(count($table) / ($_SESSION['lineCount'] ?? 10)); ++$i) {
                                 $_SESSION['unconfirmed'][$i] = array();
+                            }
+                            foreach ($_SESSION['unconfirmed'] as $key => $value) {
+                                if ($key != 'all') unset($_SESSION['unconfirmed'][$key]);
                             }
                             foreach ($_SESSION['unconfirmed']['all'] as $value) {
                                 foreach ($table as $key => $internship) {
                                     if ($internship['internship_identifier'] == $value) {
-                                        $_SESSION['unconfirmed'][ceil(($key + 1) / 10)][] = $value;
+                                        $_SESSION['unconfirmed'][ceil(($key + 1) / ($_SESSION['lineCount'] ?? 10))][] = $value;
                                     }
                                 }
                             }
                         }
                         $_SESSION['lastSortBy'] = $_POST['sortBy'] ?? 0;
                         $_SESSION['lastDecreasing'] = $_POST['decreasing'] ?? false;
+                        $_SESSION['lastLineCount'] = $_POST['lineCount'] ?? 10;
                     }
 
                     if (!isset($_SESSION['unconfirmed'])) {
@@ -237,9 +239,9 @@ class   Homepage {
                         $_SESSION['unconfirmed']['all'] = array();
                         $_SESSION['requested'] = array();
                         for ($i = 0; $i < count($table); ++$i) {
-                            if (!isset($_SESSION['unconfirmed'][ceil(($i+1)/10)])) $_SESSION['unconfirmed'][ceil(($i+1)/10)] = array();
+                            if (!isset($_SESSION['unconfirmed'][ceil(($i+1) / ($_SESSION['lineCount'] ?? 10))])) $_SESSION['unconfirmed'][ceil(($i+1) / ($_SESSION['lineCount'] ?? 10))] = array();
                             if ($table[$i]['requested']) {
-                                $_SESSION['unconfirmed'][ceil(($i+1)/10)][] = $table[$i]['internship_identifier'];
+                                $_SESSION['unconfirmed'][ceil(($i+1) / ($_SESSION['lineCount'] ?? 10))][] = $table[$i]['internship_identifier'];
                                 $_SESSION['unconfirmed']['all'][] = $table[$i]['internship_identifier'];
                                 $_SESSION['requested'][] = $table[$i]['internship_identifier'];
                             }
@@ -249,7 +251,7 @@ class   Homepage {
                     if(isset($_POST['searchedStudentSubmitted'])) {
                         foreach ($table as $key => $internship) {
                             if ($internship['internship_identifier'] == $_POST['searchedStudentSubmitted']) {
-                                $pageSearchedInternship = ceil(($key + 1) / 10);
+                                $pageSearchedInternship = ceil(($key + 1) / ($_SESSION['lineCount'] ?? 10));
                                 if ($internship['requested']) {
                                     if (!in_array($internship['internship_identifier'], $_SESSION['unconfirmed']['all'])) {
                                         $_SESSION['unconfirmed']['all'][] = $internship['internship_identifier'];
@@ -296,6 +298,18 @@ class   Homepage {
                                         </select>
                                     </div>
                                 </div>
+                                <div class="formCell">
+                                    <label for="lineCount">Nombre de lignes:</label>
+                                    <div class="input-field">
+                                        <select id="lineCount" name="lineCount">
+                                            <option value="10" <? if(!isset($_SESSION['lineCount']) || $_SESSION['lineCount'] === "10") echo "selected"; ?> >10</option>
+                                            <option value="20" <? if(isset($_SESSION['lineCount']) && $_SESSION['lineCount'] === "20") echo "selected"; ?> >20</option>
+                                            <option value="50" <? if(isset($_SESSION['lineCount']) && $_SESSION['lineCount'] === "50") echo "selected"; ?> >50</option>
+                                            <option value="100" <? if(isset($_SESSION['lineCount']) && $_SESSION['lineCount'] === "100") echo "selected"; ?> >100</option>
+                                            <option value="<?= count($table) ?>" <? if(isset($_SESSION['lineCount']) && $_SESSION['lineCount'] === (string)count($table)) echo "selected"; ?> >Tout</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
                             <button class="waves-effect waves-light btn" name="sortSubmitted" value="1" type="submit" formmethod="post">Trier</button>
 
@@ -304,8 +318,7 @@ class   Homepage {
                             <table class="highlight centered">
                                 <thead>
                                 <tr>
-                                    <th>STAGE/ALTERNANCE</th>
-                                    <th>ELEVE</th>
+                                    <th>ETUDIANT</th>
                                     <th>HISTORIQUE</th>
                                     <th>DISTANCE</th>
                                     <th>SUJET</th>
@@ -315,16 +328,15 @@ class   Homepage {
                                 </thead>
                                 <tbody>
                                 <?
-                                $totalPages = ceil(count($table) / 10);
+                                $totalPages = ceil(count($table) / ($_SESSION['lineCount'] ?? 10));
                                 if (isset($_POST['page']) && $_POST['page'] > 0 && $_POST['page'] <= $totalPages) $page = $_POST['page'];
                                 else if (isset($_SESSION['lastPage']) && $_SESSION['lastPage'] > 0 && $_SESSION['lastPage'] <= $totalPages) $page = $_SESSION['lastPage'];
                                 else $page = 1;
 
-                                for ($i = ($page-1)*10 ; $i < $page*10 && $i < count($table) ; ++$i):
+                                for ($i = ($page-1)*($_SESSION['lineCount'] ?? 10) ; $i < $page*($_SESSION['lineCount'] ?? 10) && $i < count($table) ; ++$i):
                                     $row = $table[$i];
                                     ?>
                                     <tr>
-                                        <td><?= $row['internship_identifier']?></td>
                                         <td><?= $row["student_name"] . " " . $row["student_firstname"] ?></td>
                                         <td>
                                             <?php
@@ -362,12 +374,11 @@ class   Homepage {
                             if ($change) {
                                 echo '</div>';
                             }
-                            ?>
-                            <?
+
                             if ($totalPages > 1):
-                                $start = ($totalPages>9 && $page > 1) ? $page-1 : 1;
-                                $end = ($totalPages>9 && $start+8 < $totalPages) ? $start+8 : $totalPages;
-                                while ($start > 1 && $end - $start < 8) --$start;
+                                $start = ($totalPages>(($_SESSION['lineCount'] ?? 10) -1) && $page > 1) ? $page-1 : 1;
+                                $end = ($totalPages>(($_SESSION['lineCount'] ?? 10) -1) && $start+(($_SESSION['lineCount'] ?? 10) -2) < $totalPages) ? $start+(($_SESSION['lineCount'] ?? 10) -2) : $totalPages;
+                                while ($start > 1 && $end - $start < (($_SESSION['lineCount'] ?? 10) -2)) --$start;
                                 ?>
                                 <div class="row"></div>
                                 <div class="pagination">
