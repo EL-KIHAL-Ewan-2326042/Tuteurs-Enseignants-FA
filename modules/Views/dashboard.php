@@ -2,7 +2,7 @@
 
 namespace Blog\Views;
 
-class GestionDonnees{
+class dashboard{
 
     /**
      * @param string $message
