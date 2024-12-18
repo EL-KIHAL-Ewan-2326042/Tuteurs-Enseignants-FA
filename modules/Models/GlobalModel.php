@@ -55,7 +55,8 @@ class GlobalModel {
                     FROM internship
                     WHERE student_number = :student
                     AND end_date_internship < CURRENT_DATE
-                    AND id_teacher IS NOT NULL';
+                    AND id_teacher IS NOT NULL
+                    ORDER BY start_date_internship ASC';
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':student', $student);
         $stmt->execute();
