@@ -34,7 +34,7 @@ class Dashboard {
 
         // Parcours des mots-clés pour personnaliser le message
         foreach ($simplifyMessages as $key => $simplifyMessage) {
-            if(str_contains($e->getMessage(), $key)) {
+            if(str_contains($this->handleExceptionMessage($e), $key)) {
                 return $simplifyMessage;
             }
         }
