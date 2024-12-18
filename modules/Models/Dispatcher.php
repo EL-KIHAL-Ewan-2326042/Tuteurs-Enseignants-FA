@@ -93,7 +93,7 @@ class Dispatcher{
 
             // Calculer les valeurs uniquement si elles sont nécessaires
             if (isset($dictCoef['Distance'])) {
-                $dictValues["Distance"] = $this->globalModel->getDistance($internship['internship_identifier'], $identifier);
+                $dictValues["Distance"] = $this->globalModel->getDistance($internship['internship_identifier'], $identifier, isset($internship['id_teacher']));
             }
 
             if (isset($dictCoef['Cohérence'])) {
