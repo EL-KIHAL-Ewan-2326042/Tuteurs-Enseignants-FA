@@ -336,7 +336,7 @@ class Dispatcher{
      */
     public function showCoefficients(): ?array {
         try {
-            $query = "SELECT DISTINCT id_backup FROM id_backup";
+            $query = "SELECT DISTINCT id_backup FROM id_backup ORDER BY id_backup ASC";
             $stmt = $this->db->getConn()->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -354,7 +354,7 @@ class Dispatcher{
      */
     public function loadCoefficients(string $user_id, int $id_backup): array|false {
         try {
-            $query = "SELECT name_criteria, coef, is_checked FROM backup WHERE user_id = :user_id AND id_backup = :id_backup";
+            $query = "SELECT name_criteria, coef, is_checked FROM backup WHERE user_id = :user_id AND id_backup = :id_backup ORDER BY name_criteria ASC";
             $stmt = $this->db->getConn()->prepare($query);
             $stmt->bindParam(':user_id', $user_id);
             $stmt->bindParam(':id_backup', $id_backup);
@@ -405,7 +405,7 @@ class Dispatcher{
 
     public function getDefaultCoef(): array
     {
-        $query = "SELECT name_criteria FROM distribution_criteria";
+        $query = "SELECT name_criteria FROM distribution_criteria ORDER BY name_criteria ASC";
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->execute();
         $defaultCriteria = $stmt->fetchAll(PDO::FETCH_ASSOC);

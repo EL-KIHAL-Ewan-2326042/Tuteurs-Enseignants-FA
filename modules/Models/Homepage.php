@@ -423,4 +423,32 @@ class Homepage {
         }
         return true;
     }
+
+    public function updateSearchedStudent(bool $add, string $teacher, string $internship): bool|string {
+        $current_requests = $this->getRequests($teacher);
+        if ($add) {
+            if (!in_array($internship, $current_requests)) {
+                $query = 'INSERT INTO is_requested(id_teacher, internship_identifier)
+                            VALUES(:teacher, :internship)';
+                $stmt = $this->db->getConn()->prepare($query);
+                $stmt->bindParam(':teacher', $teacher);
+                $stmt->bindParam(':internship', $internship);
+            } else return true;
+        } else {
+            if (in_array($internship, $current_requests)) {
+                $query = 'DELETE FROM is_requested
+                            WHERE  id_teacher = :teacher
+                            AND internship_identifier = :internship';
+                $stmt = $this->db->getConn()->prepare($query);
+                $stmt->bindParam(':teacher', $teacher);
+                $stmt->bindParam(':internship', $internship);
+            } else return true;
+        }
+        try {
+            $stmt->execute();
+        } catch(PDOException $e) {
+            return $e->getMessage();
+        }
+        return true;
+    }
 }
