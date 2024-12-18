@@ -22,6 +22,19 @@ a:hover {
     background-color: var(--main-color);
 }
 
+.navbar .brand-logo {
+    display: flex;
+    align-items: center;
+    margin-left: 20px;
+}
+
+.navbar .brand-logo img {
+    height: 55px;
+    width: 130px;
+    object-fit: contain;
+}
+
+
 .sidenav li:first-child {
     margin-top: var(--large-spacing);
 }
@@ -30,6 +43,32 @@ a.brand-logo {
     display: inline-block;
     height: 60px;
 }
+
+.nav-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.nav-wrapper .sidenav-trigger {
+    position: absolute;
+    left: 0;
+}
+
+.nav-wrapper .right {
+    position: absolute;
+    right: 0;
+}
+
+ul.center {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
 
 /* Ajustements Main */
 
