@@ -29,14 +29,14 @@ class Layout {
             </head>
         <body>
         <nav class="navbar">
+            <a href="/homepage" class="brand-logo hide-on-med-and-down">
+                <img src="https://i.postimg.cc/qMT89vt3/amu-logo.png" alt="Logo de AMU" height="55" width="130">
+            </a>
             <div class="nav-wrapper container">
                 <a href="#" data-target="mobile-demo" class="sidenav-trigger">
                     <i class="material-icons">menu</i>
                 </a>
-                <a href="/homepage" class="left brand-logo hide-on-med-and-down">
-                    <img src="https://i.postimg.cc/qMT89vt3/amu-logo.png" alt="Logo de AMU" height="60" width="130">
-                </a>
-                <ul class="right hide-on-med-and-down">
+                <ul class="center hide-on-med-and-down">
                     <?php
                     if (isset($_SESSION['identifier'])) {
                         echo '<li><a href="/homepage">ACCUEIL</a></li>';
@@ -48,12 +48,24 @@ class Layout {
                     <li><a href="/intramu"><?php
                             if (isset($_SESSION['identifier'])) {
                                 echo 'DECONNEXION';
-                                }
-                            else {
+                            } else {
                                 echo 'INTRAMU';
-                                }?>
-                    </a></li>
+                            } ?>
+                        </a></li>
                     <li><a href="/aboutus">A PROPOS</a></li>
+                </ul>
+                <ul class="right">
+                    <?php if (isset($_SESSION['identifier'])) { ?>
+                        <li><i class="material-icons" style="margin-right: 5px;">portrait</i></li>
+                        <li class="user-identifier"><?php echo $_SESSION['fullName']['teacher_firstname'] . ' ' . $_SESSION['fullName']['teacher_name'] . ' (';
+                        $roles = '';
+                        foreach($_SESSION['roles'] as $role) {
+                            $roles .= $role . ', ';
+                        }
+                        $roles = substr($roles, 0, -2);
+                        echo $roles . ')';
+                        ?></li>
+                    <?php } ?>
                 </ul>
             </div>
         </nav>
@@ -69,10 +81,9 @@ class Layout {
             <li><a href="/intramu"><?php
                     if (isset($_SESSION['identifier'])) {
                         echo 'DECONNEXION';
-                    }
-                    else {
+                    } else {
                         echo 'INTRAMU';
-                    }?></a></li>
+                    } ?></a></li>
             <li><a href="/aboutus">A PROPOS</a></li>
         </ul>
         <?php
