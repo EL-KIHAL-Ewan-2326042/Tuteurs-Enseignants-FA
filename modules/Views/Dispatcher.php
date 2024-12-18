@@ -9,10 +9,10 @@ class Dispatcher {
 
     /**
      * @param \Blog\Models\Dispatcher $dispatcherModel
-     * @param string $errorMessage
+     * @param string $errorMessage1
      * @param string $errorMessage2
      */
-    public function __construct(private readonly \Blog\Models\Dispatcher $dispatcherModel, private readonly string $errorMessage1,private readonly string $errorMessage2) {
+    public function __construct(private readonly \Blog\Models\Dispatcher $dispatcherModel, private readonly string $errorMessage1, private readonly string $errorMessage2) {
     }
 
     public function showView(): void {
@@ -24,16 +24,17 @@ class Dispatcher {
                 <?php if (!isset($_POST['action']) || $_POST['action'] !== 'generate'): ?>
                 <div class="row" id="forms-section">
                     <div class="col card-panel white z-depth-3 s12 m6" style="padding: 20px; margin-right: 10px">
-                        <form class="col s12" action="./dispatcher" method="post" id="pushCoef" onsubmit="showLoading();">
+                        <form class="col s12" action="./dispatcher" method="post" onsubmit="showLoading();">
                             <?php
                             $saves = $this->dispatcherModel->showCoefficients();
                             if ($saves): ?>
                                 <div class="input-field">
+                                    <label for="save-selector"></label>
                                     <select id="save-selector" name="save-selector">
                                         <?php if (isset($_POST['save-selector']) && $_POST['save-selector'] !== 'new'):?>
                                             <option value='new'>Sauvegarde #<?= $_POST['save-selector']?></option>
                                         <?php else:?>
-                                            <option value='new'>Choisir une sauvegarde</option>
+                                            <option value='default'>Choisir une sauvegarde</option>
                                         <?php endif;?>
                                         <?php foreach ($saves as $save): ?>
                                         <?php if (isset($_POST['save-selector']) && $save['id_backup'] == $_POST['save-selector']) {
@@ -88,8 +89,8 @@ class Dispatcher {
                             <?php endforeach; ?>
 
 
-                            <p class="red-text"><?php echo $this->errorMessage2; ?></p>
-                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action-save" value="<?= $id_backup ?>">Enregister
+                            <p class="red-text" id="checkboxError"><?php echo $this->errorMessage2; ?></p>
+                            <button class="btn waves-effect waves-light button-margin" type="submit" name="action-save" value="<?= $id_backup ?>" id="save-btn">Enregister
                                 <i class="material-icons right">arrow_downward</i>
                             </button>
                             <button class="btn waves-effect waves-light button-margin" type="submit" name="action" value="generate" id="generate-btn">Générer
@@ -127,7 +128,7 @@ class Dispatcher {
                 </div>
                     <?php endif?>
 
-                <?php if (isset($_POST['action']) && $_POST['action'] === 'generate'): ?>
+                <?php if (isset($_POST['coef']) && isset($_POST['action']) && $_POST['action'] === 'generate'): ?>
                     <div class="row card-panel white z-depth-3 s12 m6">
                         <div class="col s12">
                             <form class="col s12" action="./dispatcher" method="post">
@@ -143,10 +144,6 @@ class Dispatcher {
                                         </thead>
                                         <tbody>
                                         <?php
-                                        if (!isset($_POST['coef'])) {
-                                            header('location: ./dispatcher');
-                                        }
-
                                         $dictCoef = array_filter($_POST['coef'], function ($coef, $key) {
                                             return isset($_POST['criteria_enabled'][$key]);
                                         }, ARRAY_FILTER_USE_BOTH);
@@ -236,19 +233,16 @@ class Dispatcher {
                                 selectAllRow = document.createElement('tr');
                                 selectAllRow.id = 'select-all-row';
 
-                                const selectAllCheckbox = `<td></td><td></td><td><strong>Tout cocher</strong></td>
+                                selectAllRow.innerHTML = `<td></td><td></td><td><strong>Tout cocher</strong></td>
                                            <td><label class="center">
                                                 <input type="checkbox" id="select-all-checkbox" class="center-align filled-in" />
                                                 <span></span>
                                             </label></td>`;
-
-                                selectAllRow.innerHTML = selectAllCheckbox;
                                 tbody.appendChild(selectAllRow);
 
                                 const selectAllCheckboxElem = document.getElementById('select-all-checkbox');
 
                                 selectAllCheckboxElem.addEventListener('change', function () {
-                                    const checkboxes = document.querySelectorAll('.dispatch-row input[type="checkbox"]:not(#select-all-checkbox)');
                                     const visibleRows = Array.from(rows).slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
                                     visibleRows.forEach(row => {
                                         const checkbox = row.querySelector('input[type="checkbox"]');
@@ -258,11 +252,9 @@ class Dispatcher {
                             }
 
                             function toggleSelectAllCheckbox() {
-                                const checkboxes = document.querySelectorAll('.dispatch-row input[type="checkbox"]:not(#select-all-checkbox)');
                                 const selectAllCheckbox = document.getElementById('select-all-checkbox');
                                 const visibleRows = Array.from(rows).slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-                                const allChecked = visibleRows.every(row => row.querySelector('input[type="checkbox"]').checked);
-                                selectAllCheckbox.checked = allChecked;
+                                selectAllCheckbox.checked = visibleRows.every(row => row.querySelector('input[type="checkbox"]').checked);
                             }
 
                             document.querySelectorAll('.dispatch-row input[type="checkbox"]:not(#select-all-checkbox)').forEach(checkbox => {
