@@ -37,8 +37,10 @@ class Layout {
                     <img src="https://i.postimg.cc/qMT89vt3/amu-logo.png" alt="Logo de AMU" height="60" width="130">
                 </a>
                 <ul class="right hide-on-med-and-down">
-                    <li><a href="/homepage">ACCUEIL</a></li>
                     <?php
+                    if (isset($_SESSION['identifier'])) {
+                        echo '<li><a href="/homepage">ACCUEIL</a></li>';
+                    }
                     if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep') { ?>
                         <li><a href="/gestion-des-donnees"> <?php echo 'GESTION DES DONNEES'; ?> </a></li>
                         <li><a href="/dispatcher"> <?php echo 'DISPATCHER'; ?> </a></li>
@@ -56,8 +58,10 @@ class Layout {
             </div>
         </nav>
         <ul class="sidenav" id="mobile-demo">
-            <li><a href="/homepage">ACCUEIL</a></li>
             <?php
+            if (isset($_SESSION['identifier'])) {
+                echo '<li><a href="/homepage">ACCUEIL</a></li>';
+            }
             if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep') { ?>
                 <li><a href="/gestion-des-donnees"> <?php echo 'GESTION DES DONNEES'; ?> </a></li>
                 <li><a href="/dispatcher"> <?php echo 'DISPATCHER'; ?> </a></li>
