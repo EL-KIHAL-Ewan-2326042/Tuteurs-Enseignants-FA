@@ -7,11 +7,11 @@ use Includes\Database;
 use PDO;
 use PDOException;
 
-class Dashboard{
+class GestionDonnees{
     private Database $db;
 
     /**
-     * Constructeur de la classe Dashboard (modèle)
+     * Constructeur de la classe GestionDonnees (modèle)
      * @param Database $db Instance de la base de données
      */
     public function __construct(Database $db){
