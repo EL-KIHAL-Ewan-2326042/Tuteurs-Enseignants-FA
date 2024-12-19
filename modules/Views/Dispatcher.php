@@ -130,7 +130,31 @@ class Dispatcher {
                         <div class="indeterminate"></div>
                     </div>
                 </div>
-                    <?php endif?>
+                <?php endif?>
+
+                <?php
+                function renderStars($score) {
+                    $fullStars = floor($score);
+                    $halfStars = ($score - $fullStars >= 0.5) ? 1 : 0;
+                    $emptyStars = 5 - $fullStars - $halfStars;
+                    $stars = '';
+
+                    for ($i = 0; $i < $fullStars; $i++) {
+                        $stars .= '<span class="filled"></span>';
+                    }
+
+                    if ($halfStars) {
+                        $stars .= '<span class="half"></span>';
+                    }
+
+                    for ($i = 0; $i < $emptyStars; $i++) {
+                        $stars .= '<span class="empty"></span>';
+                    }
+
+                    return $stars;
+                }
+                ?>
+
 
                 <?php if (isset($_POST['coef']) && isset($_POST['action']) && $_POST['action'] === 'generate'): ?>
                     <div class="row card-panel white z-depth-3 s12 m6">
@@ -176,7 +200,11 @@ class Dispatcher {
                                                 <td><?=  'Raison Sociale '?></td>
                                                 <td><?=  $resultDispatch['internship_subject'] ?></td>
                                                 <td><?= $resultDispatch['address'] ?></td>
-                                                <td><strong><?= $resultDispatch['score']; ?></strong>/5</td>
+                                                <td>
+                                                    <div class="star-rating" data-tooltip="<?= $resultDispatch['score']; ?>" data-position="top">
+                                                        <?php echo renderStars($resultDispatch['score']); ?>
+                                                    </div>
+                                                </td>
                                                 <td>
                                                     <label class="center">
                                                         <input type="checkbox" class="dispatch-checkbox center-align filled-in" id="listTupleAssociate[]" name="listTupleAssociate[]" value="<?= $resultDispatch['id_teacher'] . "$". $resultDispatch['internship_identifier'] . "$". $resultDispatch['score']; ?>" />

@@ -144,3 +144,31 @@ input[type="checkbox"].filled-in:checked + span:after {
         flex-wrap: wrap;
     }
 }
+
+/* Etoiles */
+.star-rating {
+    display: inline-block;
+    font-size: 20px;
+}
+
+.star-rating span {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: #ddd;
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    margin: 0 2px;
+    transition: background-color 0.3s ease;
+}
+
+.star-rating span.filled {
+    background-color: gold;
+}
+
+.star-rating span.empty {
+    background-color: #ddd;
+}
+
+.star-rating span.half {
+    background: linear-gradient(to right, gold 50%, #ddd 50%);
+}
