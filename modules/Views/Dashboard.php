@@ -2,7 +2,7 @@
 
 namespace Blog\Views;
 
-class dashboard{
+class Dashboard{
 
     /**
      * @param string $message

@@ -8,7 +8,7 @@ use Blog\Views\dashboard as GestionDonneesView;
 use Blog\Models\dashboard as GestioinDonneesModel;
 use Exception;
 
-class dashboard {
+class Dashboard {
     private Layout $layout;
 
     /**
@@ -48,6 +48,7 @@ class dashboard {
      * @return void
      */
     public function show(): void {
+        print_r('coucou22');
         // Récupération de l'instance de la base de données et des classes associées
         $db = \Includes\Database::getInstance();
         $model = new \Blog\Models\dashboard($db);
@@ -108,14 +109,20 @@ class dashboard {
                     } else {
                         $message = "Table non valide ou non reconnue.";
                     }
-
+                print_r('tamère');
                 // Gestion de l'exportation des fichiers CSV
                 } elseif (isset($_POST['export_list'])) {
                     $tableName = $_POST['export_list'];
-
+                    print_r('coucou');
                     if ($model->isValidTable($tableName)) {
                         try {
                             $headers = $model->getTableColumn($tableName);
+                            print_r('coucou : qqq');
+                            if ($tableName = 'teacher') {
+                                $headers = array_merge($headers, ['address$type'], ['discipline']);
+                            }
+                            print_r('coucou : ',$headers);
+                            exit();
                             $model->exportToCsvByDepartment($tableName, $headers);
                         } catch (Exception $e) {
                             echo "Erreur lors de l'exportation : " . $this->handleExceptionMessage($e);
