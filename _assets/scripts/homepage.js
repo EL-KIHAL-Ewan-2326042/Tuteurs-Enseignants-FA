@@ -31,6 +31,45 @@ document.addEventListener('DOMContentLoaded', function() {
         sessionStorage.setItem('direction', "asc");
     }
     sortTable(Number(sessionStorage.getItem('columnNumber')), true);
+
+    const rowsPerPage = 10;
+    const rows = document.querySelectorAll('.homepage-row');
+    const totalRows = rows.length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    let currentPage = 1;
+
+    const prevButton = document.getElementById('prev-page');
+    const nextButton = document.getElementById('next-page');
+    const pageNumberSpan = document.getElementById('page-number');
+
+    function showPage(page) {
+        if (page < 1 || page > totalPages) return;
+
+        currentPage = page;
+        pageNumberSpan.textContent = `Page ${currentPage}`;
+
+        rows.forEach(row => row.style.display = 'none');
+
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = currentPage * rowsPerPage;
+        const visibleRows = Array.from(rows).slice(start, end);
+        visibleRows.forEach(row => row.style.display = '');
+
+        addSelectAllRow();
+
+        prevButton.disabled = currentPage === 1;
+        nextButton.disabled = currentPage === totalPages;
+    }
+
+    prevButton.addEventListener('click', () => {
+        showPage(currentPage - 1);
+    });
+
+    nextButton.addEventListener('click', () => {
+        showPage(currentPage + 1);
+    });
+
+    showPage(1);
 });
 
 /**
