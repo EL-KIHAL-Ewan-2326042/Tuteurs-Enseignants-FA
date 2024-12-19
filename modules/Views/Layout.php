@@ -42,7 +42,7 @@ class Layout {
                         echo '<li><a href="/homepage">ACCUEIL</a></li>';
                     }
                     if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep') { ?>
-                        <li><a href="/gestion-des-donnees"> <?php echo 'GESTION DES DONNEES'; ?> </a></li>
+                        <li><a href="/dashboard"> <?php echo 'GESTION DES DONNEES'; ?> </a></li>
                         <li><a href="/dispatcher"> <?php echo 'DISPATCHER'; ?> </a></li>
                     <?php } ?>
                     <li><a href="/intramu"><?php
@@ -75,7 +75,7 @@ class Layout {
                 echo '<li><a href="/homepage">ACCUEIL</a></li>';
             }
             if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep') { ?>
-                <li><a href="/gestion-des-donnees"> <?php echo 'GESTION DES DONNEES'; ?> </a></li>
+                <li><a href="/dashboard"> <?php echo 'GESTION DES DONNEES'; ?> </a></li>
                 <li><a href="/dispatcher"> <?php echo 'DISPATCHER'; ?> </a></li>
             <?php } ?>
             <li><a href="/intramu"><?php
