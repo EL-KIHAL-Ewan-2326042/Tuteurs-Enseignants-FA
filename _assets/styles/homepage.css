@@ -37,6 +37,10 @@ main a:hover {
     justify-content: center;
 }
 
+.formCell {
+    padding: 0 3rem;
+}
+
 .btn {
     background-color: #00558B;
     z-index: 0;
@@ -52,6 +56,8 @@ main a:hover {
     color: #00558B;
 }
 
+/* Tableau Homepage */
+
 .clickable {
     cursor: pointer;
 }
@@ -60,14 +66,7 @@ main a:hover {
     width: 85%;
 }
 
-.formCell {
-    padding: 0 3rem;
-}
-
 thead {
-    background-color: #91B5CC;
-    position: sticky;
-    top: 0;
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
@@ -81,31 +80,97 @@ thead, tbody tr {
 
 tbody {
     width: 100%;
-    overflow-y: auto;
     display: block;
 }
-.pagination .prev,
-.pagination .next,
-.pagination .first,
-.pagination .last {
+
+#homepage-table {
+    min-width: 800px;
+    font-size: 14px;
+    width: 100%;
+}
+
+#homepage-table th, #homepage-table td {
+    padding: 6px 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+#homepage-table thead th {
+    background-color: #f4f4f4;
     font-weight: bold;
+    font-size: 14px;
 }
 
-.pagination a:visited  {
-    color: var(--text-color);
+#homepage-table tbody tr:nth-child(even) {
+    background-color: #fafafa;
 }
 
-.pagination .active {
-    background-color: var(--tertiary-color);
-    border: solid 2px var(--tertiary-color);
+#homepage-table tbody tr:hover {
+    background-color: #f1f1f1;
 }
 
-.pagination .active:hover {
-    border: solid 2px var(--main-color);
+@media screen and (max-width: 768px) {
+    #homepage-table {
+        font-size: 12px;
+    }
+
+    #homepage-table th, #homepage-table td {
+        padding: 4px 8px;
+    }
 }
 
-.hidden {
+/** Pagination **/
+
+#pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    flex-wrap: wrap;
+    padding: 10px 0;
+    margin-top: 20px;
+}
+
+#pagination-controls button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#pagination-controls span {
     margin: 0 10px;
+    font-size: 16px;
+}
+
+#pagination-controls #page-numbers {
+    display: flex;
+    gap: 5px;
+}
+
+#pagination-controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media screen and (max-width: 768px) {
+    #pagination-controls {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    #pagination-controls button {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    #pagination-controls span {
+        font-size: 14px;
+    }
+
+    #pagination-controls #page-numbers {
+        flex-wrap: wrap;
+    }
 }
 
 main table {
