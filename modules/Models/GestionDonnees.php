@@ -192,7 +192,7 @@ class GestionDonnees{
         $teacherColumns = $this->getTableColumn('teacher');
         $teacherData = array_combine($teacherColumns, $teacher);
 
-        Marche pas à revoir import de fichier ne fait rien, à débug !!!!
+        // Marche pas à revoir import de fichier ne fait rien, à débug !!!!
 
         // Insertion dans la table has_address
         $this->insertGenericData([['id_teacher' => $teacherData['id_teacher']], $address], 'has_address');

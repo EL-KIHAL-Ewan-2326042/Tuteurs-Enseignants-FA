@@ -136,12 +136,19 @@ class Dispatcher {
                     <div class="row card-panel white z-depth-3 s12 m6">
                         <div class="col s12">
                             <form class="col s12" action="./dispatcher" method="post">
-                                <div class="selection">
+                                <div class="dispatch-table-wrapper selection">
                                     <table class="highlight centered" id="dispatch-table">
                                         <thead>
                                         <tr>
                                             <th>Enseignant</th>
-                                            <th>N° Stage</th>
+                                            <th>Etudiant</th>
+                                            <th>Stage</th>
+                                            <th>Formation</th>
+                                            <th>Groupe</th>
+                                            <th>Date Expérience</th>
+                                            <th>Raison sociale</th>
+                                            <th>Sujet</th>
+                                            <th>Adresse</th>
                                             <th>Score</th>
                                             <th>Associer</th>
                                         </tr>
@@ -160,8 +167,15 @@ class Dispatcher {
                                         foreach ($resultDispatchList as $resultDispatch):
                                             ?>
                                             <tr class="dispatch-row">
-                                                <td><?= $resultDispatch['id_teacher']; ?></td>
-                                                <td><?= $resultDispatch['internship_identifier']; ?></td>
+                                                <td><?= $resultDispatch['teacher_firstname'] . ' ' . $resultDispatch['teacher_name'] . ' (' . $resultDispatch['id_teacher'] . ')'; ?></td>
+                                                <td><?= $resultDispatch['student_firstname'] . ' ' . $resultDispatch['student_name'] . ' (' . $resultDispatch['student_number'] . ')' ?></td>
+                                                <td><?= $resultDispatch['company_name'] . ' (' .$resultDispatch['internship_identifier'] . ')'; ?></td>
+                                                <td><?= $resultDispatch['formation'] ?></td>
+                                                <td><?= $resultDispatch['class_group'] ?></td>
+                                                <td><?= 'Date expérience' ?></td>
+                                                <td><?=  'Raison Sociale '?></td>
+                                                <td><?=  $resultDispatch['internship_subject'] ?></td>
+                                                <td><?= $resultDispatch['address'] ?></td>
                                                 <td><strong><?= $resultDispatch['score']; ?></strong>/5</td>
                                                 <td>
                                                     <label class="center">
@@ -178,12 +192,12 @@ class Dispatcher {
                                 <br>
 
                                 <div id="pagination-controls" class="center-align">
+                                    <button type="button" class="waves-effect waves-light btn" id="first-page"><i class="material-icons">first_page</i></button>
                                     <button type="button" class="waves-effect waves-light btn" id="prev-page"><i class="material-icons">arrow_back</i></button>
-                                    <span id="page-number">Page 1</span>
+                                    <div id="page-numbers"></div>
                                     <button type="button" class="waves-effect waves-light btn" id="next-page"><i class="material-icons">arrow_forward</i></button>
+                                    <button type="button" class="waves-effect waves-light btn" id="last-page"><i class="material-icons">last_page</i></button>
                                 </div>
-
-                                <br>
 
                                 <div class="row s12 center">
                                     <input type="hidden" id="selectStudentSubmitted" name="selectStudentSubmitted" value="1">
@@ -205,13 +219,15 @@ class Dispatcher {
 
                             const prevButton = document.getElementById('prev-page');
                             const nextButton = document.getElementById('next-page');
-                            const pageNumberSpan = document.getElementById('page-number');
+                            const firstButton = document.getElementById('first-page');
+                            const lastButton = document.getElementById('last-page');
+                            const pageNumbersContainer = document.getElementById('page-numbers');
 
                             function showPage(page) {
                                 if (page < 1 || page > totalPages) return;
 
                                 currentPage = page;
-                                pageNumberSpan.textContent = `Page ${currentPage}`;
+                                updatePageNumbers();
 
                                 rows.forEach(row => row.style.display = 'none');
 
@@ -220,62 +236,36 @@ class Dispatcher {
                                 const visibleRows = Array.from(rows).slice(start, end);
                                 visibleRows.forEach(row => row.style.display = '');
 
-                                addSelectAllRow();
-
                                 prevButton.disabled = currentPage === 1;
                                 nextButton.disabled = currentPage === totalPages;
+                                firstButton.disabled = currentPage === 1;
+                                lastButton.disabled = currentPage === totalPages;
                             }
 
-                            function addSelectAllRow() {
-                                const tbody = document.querySelector('#dispatch-table tbody');
-                                let selectAllRow = document.querySelector('#select-all-row');
+                            function updatePageNumbers() {
+                                pageNumbersContainer.innerHTML = ''; // Clear the existing page numbers
 
-                                if (selectAllRow) {
-                                    selectAllRow.remove();
+                                for (let i = 1; i <= totalPages; i++) {
+                                    const pageNumberButton = document.createElement('button');
+                                    pageNumberButton.textContent = i;
+                                    pageNumberButton.classList.add('waves-effect', 'waves-light', 'btn');
+                                    pageNumberButton.classList.add('page-number');
+                                    pageNumberButton.disabled = (i === currentPage);
+                                    pageNumberButton.addEventListener('click', () => showPage(i));
+
+                                    pageNumbersContainer.appendChild(pageNumberButton);
                                 }
-
-                                selectAllRow = document.createElement('tr');
-                                selectAllRow.id = 'select-all-row';
-
-                                selectAllRow.innerHTML = `<td></td><td></td><td><strong>Tout cocher</strong></td>
-                                           <td><label class="center">
-                                                <input type="checkbox" id="select-all-checkbox" class="center-align filled-in" />
-                                                <span></span>
-                                            </label></td>`;
-                                tbody.appendChild(selectAllRow);
-
-                                const selectAllCheckboxElem = document.getElementById('select-all-checkbox');
-
-                                selectAllCheckboxElem.addEventListener('change', function () {
-                                    const visibleRows = Array.from(rows).slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-                                    visibleRows.forEach(row => {
-                                        const checkbox = row.querySelector('input[type="checkbox"]');
-                                        checkbox.checked = selectAllCheckboxElem.checked;
-                                    });
-                                });
                             }
 
-                            function toggleSelectAllCheckbox() {
-                                const selectAllCheckbox = document.getElementById('select-all-checkbox');
-                                const visibleRows = Array.from(rows).slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-                                selectAllCheckbox.checked = visibleRows.every(row => row.querySelector('input[type="checkbox"]').checked);
-                            }
+                            firstButton.addEventListener('click', () => showPage(1));
+                            lastButton.addEventListener('click', () => showPage(totalPages));
+                            prevButton.addEventListener('click', () => showPage(currentPage - 1));
+                            nextButton.addEventListener('click', () => showPage(currentPage + 1));
 
-                            document.querySelectorAll('.dispatch-row input[type="checkbox"]:not(#select-all-checkbox)').forEach(checkbox => {
-                                checkbox.addEventListener('change', toggleSelectAllCheckbox);
-                            });
-
-                            prevButton.addEventListener('click', () => {
-                                showPage(currentPage - 1);
-                            });
-
-                            nextButton.addEventListener('click', () => {
-                                showPage(currentPage + 1);
-                            });
-
-                            showPage(1);
+                            showPage(1); // Initialize the first page view
                         });
                     </script>
+
                 <?php endif; ?>
 
             </div>
