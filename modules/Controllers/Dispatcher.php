@@ -12,9 +12,9 @@ class Dispatcher {
      *
      * @param object $dispatcherModel Le modèle de gestion des données qui contient les méthodes pour récupérer les listes et insérer l'association.
      *
-     * @return string Retourne un message de succès ou d'erreur concernant l'association ou la demande de remplissage des champs.
+     * @return array Retourne un message de succès ou d'erreur concernant l'association ou la demande de remplissage des champs.
      */
-    public function association_direct($dispatcherModel): string {
+    public function association_direct($dispatcherModel): array {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['searchInternship']) && isset($_POST['searchTeacher']) && $_POST['searchInternship'] !== '' && $_POST['searchTeacher'] !== '') {
 
             $listTeacher = $dispatcherModel->createListTeacher();
@@ -23,20 +23,20 @@ class Dispatcher {
 
             if (in_array($_POST['searchTeacher'], $listTeacher) && in_array($_POST['searchInternship'], $listStudent)){
                 if (!(in_array([$_POST['searchTeacher'], $_POST['searchInternship']], $listAssociate))) {
-                    return $dispatcherModel->insertResponsible();
+                    return ["", $dispatcherModel->insertResponsible()];
                 }
                 else {
-                    return "Cette association existe déjà";
+                    return ["Cette association existe déjà", ""];
                 }
             }
             else {
-                return "Internship_identifier ou Id_Teacher inexistant dans ce departement";
+                return ["Internship_identifier ou Id_Teacher inexistant dans ce departement", ""];
             }
         }
         elseif ($_SERVER['REQUEST_METHOD'] === 'POST'){
-            return "Merci de remplir tout les champs";
+            return ["Merci de remplir tout les champs", ""];
         }
-        return '';
+        return ['',''];
     }
 
     /**
@@ -44,29 +44,30 @@ class Dispatcher {
      *
      * @param object $dispatcherModel Modèle de gestion des données qui contient les méthodes pour récupérer les listes et insérer les associations.
      *
-     * @return string Retourne une chaîne de caractères contenant des messages d'information ou d'erreur concernant l'état des associations.
+     * @return array Retourne une chaîne de caractères contenant des messages d'information ou d'erreur concernant l'état des associations.
      */
-    public function association_after_sort($dispatcherModel): string {
+    public function association_after_sort($dispatcherModel): array {
         $listTeacher = $dispatcherModel->createListTeacher();
         $listInternship = $dispatcherModel->createListInternship();
         $listAssociate = $dispatcherModel->createListAssociate();
+        $returnErrorMessage = '';
+        $returnCheckMessage = '';
 
-        $returnMessage = '';
         foreach($_POST['listTupleAssociate'] as $tupleAssociate){
             $tmp = explode("$", $tupleAssociate);
             if (in_array($tmp[0], $listTeacher) && in_array($tmp[1], $listInternship)){
                 if (!(in_array([$tmp[0], $tmp[1]], $listAssociate))) {
-                    $returnMessage .= $dispatcherModel->insertIs_responsible($tmp[0], $tmp[1], floatval($tmp[2]));
+                    $returnCheckMessage .= $dispatcherModel->insertIs_responsible($tmp[0], $tmp[1], floatval($tmp[2]));
                 }
                 else {
-                    $returnMessage .= $tmp[0] . " et " . $tmp[1] . ", cette association existe déjà<br>";
+                    $returnErrorMessage .= $tmp[0] . " et " . $tmp[1] . ", cette association existe déjà<br>";
                 }
             }
             else {
-                $returnMessage .=  $tmp[0] . "ou" . $tmp[1] . ", inexistant dans ce departement<br>";
+                $returnErrorMessage .=  $tmp[0] . "ou" . $tmp[1] . ", inexistant dans ce departement<br>";
             }
         }
-        return $returnMessage;
+        return [$returnErrorMessage, $returnCheckMessage];
     }
 
     /**
@@ -82,8 +83,10 @@ class Dispatcher {
             $db = Database::getInstance();
             $globalModel = new \Blog\Models\GlobalModel($db);
             $dispatcherModel = new \Blog\Models\Dispatcher($db, $globalModel);
-            $errorMessage1 = '';
-            $errorMessage2 = '';
+            $errorMessageDirectAssoc = '';
+            $checkMessageDirectAssoc = '';
+            $errorMessageAfterSort = '';
+            $checkMessageAfterSort = '';
 
             if (isset($_POST['searchType']) && ($_POST['searchType'] === 'searchInternship' || $_POST['searchType'] === 'searchTeacher')) {
                 $results = $dispatcherModel->correspondTerms();
@@ -107,17 +110,21 @@ class Dispatcher {
             }
 
             if (isset($_POST['searchInternship']) && isset($_POST['searchTeacher'])) {
-                $errorMessage1 = $this->association_direct($dispatcherModel);
+                $tmpmessage = $this->association_direct($dispatcherModel);
+                $errorMessageDirectAssoc = $tmpmessage[0];
+                $checkMessageDirectAssoc = $tmpmessage[1];
             }
 
             if (isset($_POST['selectStudentSubmitted']) && isset($_POST['listTupleAssociate'])) {
-                $errorMessage2 = $this->association_after_sort($dispatcherModel);
+                $tmpmessage = $this->association_after_sort($dispatcherModel);
+                $errorMessageAfterSort = $tmpmessage[0];
+                $checkMessageAfterSort = $tmpmessage[1];
             }
 
             $title = "Dispatcher";
             $cssFilePath = '_assets/styles/dispatcher.css';
             $jsFilePath = '_assets/scripts/dispatcher.js';
-            $view = new \Blog\Views\Dispatcher($dispatcherModel, $errorMessage1, $errorMessage2);
+            $view = new \Blog\Views\Dispatcher($dispatcherModel, $errorMessageAfterSort, $errorMessageDirectAssoc, $checkMessageDirectAssoc, $checkMessageAfterSort);
 
             $layout = new Layout();
             $layout->renderTop($title, $cssFilePath);

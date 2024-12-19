@@ -2,7 +2,7 @@
 
 namespace Models;
 
-use Blog\Models\Dashboard;
+use Blog\Models\dashboard;
 use Includes\Database;
 use PDO;
 use PDOException;
@@ -85,7 +85,7 @@ class DashboardTest extends TestCase  {
         $csvFilePath = $this->createTempCsv([$row]);
 
         //exécution
-        $dashboard = new Dashboard($mockDb);
+        $dashboard = new dashboard($mockDb);
         $result = $dashboard->$method($csvFilePath);
         $this->assertTrue($result, "L'importation aurait dû réussir pour $method");
     }
@@ -123,7 +123,7 @@ class DashboardTest extends TestCase  {
     public function testUploadCsvNotFound() {
         //création des mocks
         $mockDb = $this->createMock(Database::class);
-        $dashboard = new Dashboard($mockDb);
+        $dashboard = new dashboard($mockDb);
 
         //exécution
         $result = $dashboard->uploadCsvStudent('invalide/path/to/file.csv');
@@ -154,7 +154,7 @@ class DashboardTest extends TestCase  {
         $csvFilePath = $this->createTempCsv([$headers,$row]);
 
         //execution
-        $dashboard = new Dashboard($mockDb);
+        $dashboard = new dashboard($mockDb);
         $result = $dashboard->$method($csvFilePath);
         $this->assertFalse($result,"L'importation aurait dû échouer pour $method à cause d'une erreur de base de donnée");
     }
@@ -287,7 +287,7 @@ class DashboardTest extends TestCase  {
         $mockConn = $this->getMockBuilder(PDO::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $dashboard = new Dashboard($mockDb);
+        $dashboard = new dashboard($mockDb);
 
         //simulation de la connexion à la base données
         $mockDb->method('getConn')->willReturn($mockConn);
@@ -339,7 +339,7 @@ class DashboardTest extends TestCase  {
     public function testExportToCsvUnknownTable() {
         //Mock de la base de données
         $mockDb = $this->createMock(Database::class);
-        $dashboard = new Dashboard($mockDb);
+        $dashboard = new dashboard($mockDb);
 
         //exécution
         $result = $dashboard->exportToCsvByDepartment('unknown_table',[]);
@@ -365,7 +365,7 @@ class DashboardTest extends TestCase  {
         $mockConn->method('prepare')->willReturn($mockStmt);
         $mockStmt->method('execute')->will($this->throwException(new PDOException("Erreur d'insertion")));
 
-        $dashboard = new Dashboard($mockDb);
+        $dashboard = new dashboard($mockDb);
 
         //exécution
         $result = $dashboard->exportToCsvByDepartment('student', ['id', 'name']);

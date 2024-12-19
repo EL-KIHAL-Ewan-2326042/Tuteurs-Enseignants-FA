@@ -9,10 +9,12 @@ class Dispatcher {
 
     /**
      * @param \Blog\Models\Dispatcher $dispatcherModel
-     * @param string $errorMessage1
-     * @param string $errorMessage2
+     * @param string $errorMessageAfterSort
+     * @param string $errorMessageDirectAssoc
+     * @param string $checkMessageDirectAssoc
+     * @param string $checkMessageAfterSort
      */
-    public function __construct(private readonly \Blog\Models\Dispatcher $dispatcherModel, private readonly string $errorMessage1, private readonly string $errorMessage2) {
+    public function __construct(private readonly \Blog\Models\Dispatcher $dispatcherModel, private readonly string $errorMessageAfterSort,private readonly string $errorMessageDirectAssoc, private readonly string $checkMessageDirectAssoc,private readonly string $checkMessageAfterSort) {
     }
 
     public function showView(): void {
@@ -89,7 +91,8 @@ class Dispatcher {
                             <?php endforeach; ?>
 
 
-                            <p class="red-text" id="checkboxError"><?php echo $this->errorMessage2; ?></p>
+                            <p class="red-text" id="checkboxError"><?php echo $this->errorMessageAfterSort; ?></p>
+                            <p class="green-text"><?php echo $this->checkMessageAfterSort; ?></p>
                             <button class="btn waves-effect waves-light button-margin" type="submit" name="action-save" value="<?= $id_backup ?>" id="save-btn">Enregister
                                 <i class="material-icons right">arrow_downward</i>
                             </button>
@@ -103,14 +106,15 @@ class Dispatcher {
                         <div class="row">
                             <div class="input-field col s6">
                                 <input id="searchTeacher" name="searchTeacher" type="text" class="validate">
-                                <label for="searchTeacher">Teacher ID</label>
+                                <label for="searchTeacher">ID professeur</label>
                             </div>
                             <div class="input-field col s6">
                                 <input id="searchInternship" name="searchInternship" type="text" class="validate">
-                                <label for="searchInternship">Internship Company</label>
+                                <label for="searchInternship">ID Stage</label>
                             </div>
                             <div id="searchResults"></div>
-                            <p class="red-text"><?php echo $this->errorMessage1; ?></p>
+                            <p class="red-text"><?php echo $this->errorMessageDirectAssoc; ?></p>
+                            <p class="green-text"><?php echo $this->checkMessageDirectAssoc; ?></p>
                             <div class="col s12">
                                 <button class="btn waves-effect waves-light button-margin" type="submit" name="action">Associer
                                     <i class="material-icons right">arrow_downward</i>

@@ -10,13 +10,13 @@ class Dashboard{
     public function __construct(private readonly string $message){}
 
     /**
-     * Vue de la Dashboard
+     * Vue de la pas de Gestion des données
      * @return void
      */
     public function showView(): void {
         ?>
         <main>
-            <h3> Dashboard </h3>
+            <h3> Gestion des données </h3>
             <div class="card-panel white">
                 <h4>Importer :</h4>
 
