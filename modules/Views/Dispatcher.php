@@ -208,64 +208,6 @@ class Dispatcher {
                             </form>
                         </div>
                     </div>
-
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function () {
-                            const rowsPerPage = 10;
-                            const rows = document.querySelectorAll('.dispatch-row');
-                            const totalRows = rows.length;
-                            const totalPages = Math.ceil(totalRows / rowsPerPage);
-                            let currentPage = 1;
-
-                            const prevButton = document.getElementById('prev-page');
-                            const nextButton = document.getElementById('next-page');
-                            const firstButton = document.getElementById('first-page');
-                            const lastButton = document.getElementById('last-page');
-                            const pageNumbersContainer = document.getElementById('page-numbers');
-
-                            function showPage(page) {
-                                if (page < 1 || page > totalPages) return;
-
-                                currentPage = page;
-                                updatePageNumbers();
-
-                                rows.forEach(row => row.style.display = 'none');
-
-                                const start = (currentPage - 1) * rowsPerPage;
-                                const end = currentPage * rowsPerPage;
-                                const visibleRows = Array.from(rows).slice(start, end);
-                                visibleRows.forEach(row => row.style.display = '');
-
-                                prevButton.disabled = currentPage === 1;
-                                nextButton.disabled = currentPage === totalPages;
-                                firstButton.disabled = currentPage === 1;
-                                lastButton.disabled = currentPage === totalPages;
-                            }
-
-                            function updatePageNumbers() {
-                                pageNumbersContainer.innerHTML = ''; // Clear the existing page numbers
-
-                                for (let i = 1; i <= totalPages; i++) {
-                                    const pageNumberButton = document.createElement('button');
-                                    pageNumberButton.textContent = i;
-                                    pageNumberButton.classList.add('waves-effect', 'waves-light', 'btn');
-                                    pageNumberButton.classList.add('page-number');
-                                    pageNumberButton.disabled = (i === currentPage);
-                                    pageNumberButton.addEventListener('click', () => showPage(i));
-
-                                    pageNumbersContainer.appendChild(pageNumberButton);
-                                }
-                            }
-
-                            firstButton.addEventListener('click', () => showPage(1));
-                            lastButton.addEventListener('click', () => showPage(totalPages));
-                            prevButton.addEventListener('click', () => showPage(currentPage - 1));
-                            nextButton.addEventListener('click', () => showPage(currentPage + 1));
-
-                            showPage(1); // Initialize the first page view
-                        });
-                    </script>
-
                 <?php endif; ?>
 
             </div>
