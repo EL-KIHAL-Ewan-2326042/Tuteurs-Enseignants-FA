@@ -130,7 +130,7 @@ class Dispatcher {
                         <div class="indeterminate"></div>
                     </div>
                 </div>
-                <?php endif?>
+                    <?php endif?>
 
                 <?php
                 function renderStars($score) {
@@ -141,7 +141,7 @@ class Dispatcher {
                     $halfStars = (abs($decimalPart - 0.5) <= 0.1) ? 1 : 0;
 
                     $emptyStars = 5 - $fullStars - $halfStars;
-                    
+
                     $stars = '';
 
                     for ($i = 0; $i < $fullStars; $i++) {
@@ -235,7 +235,7 @@ class Dispatcher {
                                         <label>Nombre de lignes par page</label>
                                     </div>
                                 </div>
-                                
+
                                 <div id="pagination-controls" class="center-align">
                                     <button type="button" class="waves-effect waves-light btn" id="first-page"><i class="material-icons">first_page</i></button>
                                     <button type="button" class="waves-effect waves-light btn" id="prev-page"><i class="material-icons">arrow_back</i></button>
