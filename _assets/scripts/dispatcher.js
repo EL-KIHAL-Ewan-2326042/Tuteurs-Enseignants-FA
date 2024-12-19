@@ -205,6 +205,10 @@ function showLoading() {
 /** Pagination et bouton tout cocher **/
 
 document.addEventListener('DOMContentLoaded', function () {
+    M.Tooltip.init(document.querySelectorAll('.star-rating'), {
+        exitDelay: 100,
+    });
+
     const rowsPerPage = 10;
     const rows = document.querySelectorAll('.dispatch-row');
     const totalRows = rows.length;
