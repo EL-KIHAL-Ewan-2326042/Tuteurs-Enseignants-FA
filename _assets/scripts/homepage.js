@@ -285,10 +285,14 @@ function createMarkerElement(label) {
  */
 
 document.addEventListener('DOMContentLoaded', function () {
+    if (document.getElementById("homepage-table") === null) {
+        return;
+    }
+
     const rowsPerPage = 10;
     const totalRows = document.querySelectorAll('.homepage-row').length;
     const totalPages = Math.ceil(totalRows / rowsPerPage);
-    let currentPage = Number(sessionStorage.getItem('page')) ?? 1;
+    let currentPage = sessionStorage.getItem('page') ? Number(sessionStorage.getItem('page')) : 1;
 
     const prevButton = document.getElementById('prev-page');
     const nextButton = document.getElementById('next-page');
