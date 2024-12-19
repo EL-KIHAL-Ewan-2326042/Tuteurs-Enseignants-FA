@@ -2,7 +2,7 @@
 
 namespace Views;
 
-use Blog\Views\GestionDonnees;
+use Blog\Views\dashboard;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -29,7 +29,7 @@ class DashboardTest extends TestCase {
         $_SESSION['role'] = ['role_name' => 'Admin_dep'];
 
         //instance de la classe
-        $dashboard = new GestionDonnees();
+        $dashboard = new dashboard();
 
         //obtention du contenu généré
         ob_start();
@@ -54,7 +54,7 @@ class DashboardTest extends TestCase {
         $_SESSION['role'] = ['role_name' => 'User'];
 
         //instance de la classe
-        $dashboard = new GestionDonnees();
+        $dashboard = new dashboard();
 
         //obtention du contenu généré
         ob_start();
