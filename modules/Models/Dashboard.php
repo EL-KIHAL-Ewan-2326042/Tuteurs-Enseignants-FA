@@ -11,7 +11,7 @@ class Dashboard{
     private Database $db;
 
     /**
-     * Constructeur de la classe Dashboard (modèle)
+     * Constructeur de la classe dashboard (modèle)
      * @param Database $db Instance de la base de données
      */
     public function __construct(Database $db){
@@ -39,7 +39,7 @@ class Dashboard{
             // Récupération des colonnes en tant que tableau
             $columns = $stmt->fetchAll(PDO::FETCH_COLUMN);
             return $columns ?: [];
-        } catch (PDOException $e) {
+        } catch (PDOException) {
             // Gestion des erreurs liées à la base de données
             throw new Exception("Impossible de récupérer les colonnes pour la table $tableName.");
         }
@@ -54,7 +54,7 @@ class Dashboard{
         try {
             // Vérifie la présence d'au moins une colonne dans la table
             return !empty($this->getTableColumn($tableName));
-        } catch (Exception $e) {
+        } catch (Exception) {
             return false;
         }
     }
@@ -87,10 +87,12 @@ class Dashboard{
         // Comparaison des en-têtes du CSV avec les colonnes de la table dans la base de données
         $tableColumns = array_map('strtolower', $this->getTableColumn($tableName));
         $csvHeaders = array_map('strtolower', $headers);
-        if (array_diff($csvHeaders, $tableColumns)) {
-            throw new Exception("Les colonnes CSV ne correspondent pas à la table $tableName.");
+        if (($tableName != 'teacher' AND array_diff($csvHeaders, $tableColumns)) OR ($tableName = 'teacher' AND array_diff($csvHeaders, array_merge($tableColumns, ['address$type'],['discipline_name'])))) {
+            throw new Exception("Les colonnes CSV ne correspondent pas à la table $tableName ou au valeur demandé pour la table teacher.");
         }
-        return empty(array_diff($csvHeaders, $tableColumns));
+        else {
+            return true;
+        }
     }
 
     /**
@@ -105,21 +107,22 @@ class Dashboard{
             throw new Exception("Impossible d'ouvrir le fichier CSV.");
         }
 
+        /**
         $headers = fgetcsv($handle, 1000, ",");
         if (!$this->validateHeaders($headers, $tableName)) {
             fclose($handle);
             return false;
-        }
+        } **/
 
         try {
-            while (($data = fgetcsv($handle, 1000, ",")) !== false) {
+            while (($data = fgetcsv($handle, 1000, ";")) !== false) {
                 $this->insertIntoDatabase($data, $tableName);
             }
             fclose($handle);
             return true;
         } catch (Exception) {
             fclose($handle);
-            throw new Exception("Erreur lors du traitement du fichier CSV.");
+            throw new Exception("Erreur lors du traitement du fichier CSV (merci de vérifier que vous repectez bien le guide utilisateur).");
         }
     }
 
@@ -181,12 +184,21 @@ class Dashboard{
      * @throws Exception En cas d'erreur lors de l'insertion
      */
     private function insertTeacherData(array $data): void {
+        $teacher = [$data[0], $data[1], $data[2], $data[3]];
+        $discipline = ['discipline_name' => $data[4]];
+        $address = ['address' => explode('$',$data[4])[0], 'type'=> explode('$',$data[4])[1]];
+
         // Colonnes pour la table teacher
         $teacherColumns = $this->getTableColumn('teacher');
-        $teacherData = array_combine($teacherColumns, $data);
-
+        $teacherData = array_combine($teacherColumns, $teacher);
         // Insertion dans la table teacher
-        $this->insertGenericData($data, 'teacher');
+        $this->insertGenericData($teacher, 'teacher');
+
+        // Insertion dans la table has_address
+        $this->insertGenericData([['id_teacher' => $teacherData['id_teacher']], $address], 'has_address');
+
+        // Insertion dans la table is_taught
+        $this->insertGenericData([['id_teacher' => $teacherData['id_teacher']], $discipline], 'is_taught');
 
         // Insertion dans la table user_connect
         $this->insertUserConnect($teacherData['id_teacher'], 'default_password');
@@ -279,8 +291,8 @@ class Dashboard{
         $idTeacher = $internshipData['id_teacher'] ?? null;
         $studentNumber = $internshipData['student_number'] ?? null;
 
-        if (!$idTeacher || !$studentNumber) {
-            throw new Exception("Les données id_teacher ou student_number sont manquantes.");
+        if (!$studentNumber) {
+            throw new Exception("Les données student_number sont manquantes.");
         }
 
         // Vérification si la combinaison existe déjà
@@ -349,15 +361,18 @@ class Dashboard{
             throw new Exception("Les en-têtes sont manquants ou invalides pour la table $tableName.");
         }
 
-        // Construction de la requête SQL filtré par le département de l'administrateur
-        $query = "SELECT " . implode(',', array_map(fn($header) => "$tableName." . (string)$header, $headers)) . " FROM $tableName";
+        if ($tableName != 'teacher') {
+            // Construction de la requête SQL filtré par le département de l'administrateur
+            $query = "SELECT " . implode(',', array_map(fn($header) => "$tableName." . (string)$header, $headers)) . " FROM $tableName";
 
-        $query .= match ($tableName) {
-            'internship' => " JOIN student ON internship.student_number = student.student_number JOIN study_at ON study_at.student_number = student.student_number WHERE study_at.department_name = :department",
-            'student' => " JOIN study_at ON student.student_number = study_at.student_number WHERE study_at.department_name = :department",
-            'teacher' => " JOIN has_role ON teacher.id_teacher = has_role.user_id JOIN department ON department.department_name = has_role.department_name WHERE department.department_name = :department",
-            default => throw new Exception("Table non reconnue : " . $tableName),
-        };
+            $query .= match ($tableName) {
+                'internship' => " JOIN student ON internship.student_number = student.student_number JOIN study_at ON study_at.student_number = student.student_number WHERE study_at.department_name = :department",
+                'student' => " JOIN study_at ON student.student_number = study_at.student_number WHERE study_at.department_name = :department",
+                default => throw new Exception("Table non reconnue : " . $tableName),
+            };
+        }
+        else {$query = "SELECT teacher.maxi_number_trainees, teacher.id_teacher, teacher.teacher_name, teacher.teacher_firstname, CONCAT(has_address.address, '$', has_address.type) AS address_type, is_taught.discipline_name AS discipline FROM teacher  JOIN has_role ON teacher.id_teacher = has_role.user_id  JOIN department ON department.department_name = has_role.department_name  JOIN has_address ON teacher.id_teacher = has_address.id_teacher  JOIN is_taught ON teacher.id_teacher = is_taught.id_teacher  WHERE department.department_name = :department";
+        }
 
 
         if (is_array($department)) {
@@ -369,11 +384,13 @@ class Dashboard{
         $stmt->bindValue(':department', $department);
         $stmt->execute();
 
-        // Ecriture des données récupérées dans le fichier CSV
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            if ($tableName == 'teacher') {
+                $row['address$type'] = $row['address_type'];
+                unset($row['address_type']);
+            }
             fputcsv($output, $row);
         }
-
         fclose($output);
         $csvData = ob_get_clean();
         echo $csvData;

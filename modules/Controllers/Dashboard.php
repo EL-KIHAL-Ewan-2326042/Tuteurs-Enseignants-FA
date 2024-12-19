@@ -4,15 +4,15 @@ namespace Blog\Controllers;
 
 use Blog\Views\Layout;
 use Includes\Database;
-use Blog\Views\Dashboard as DashboardView;
-use Blog\Models\Dashboard as DashboardModel;
+use Blog\Views\dashboard as GestionDonneesView;
+use Blog\Models\dashboard as GestioinDonneesModel;
 use Exception;
 
 class Dashboard {
     private Layout $layout;
 
     /**
-     * Constructeur de la classe Dashboard
+     * Constructeur de la classe dashboard
      * @param Layout $layout Instance de la classe Layout
      */
     public function __construct(Layout $layout) {
@@ -29,12 +29,13 @@ class Dashboard {
         $simplifyMessages = [
             'SQLSTATE' => "Une erreur de base de données est survenue. Une donnée que vous souhaitez insérer existe peut-être déjà.",
             'permission denied' => "Vous n'avez pas les droits nécessaires pour effectuer cette action.",
-            'file not found' => "Le fichier demandé est introuvable. Veuillez vérifier votre saisie."
+            'file not found' => "Le fichier demandé est introuvable. Veuillez vérifier votre saisie.",
+            'Fatal' => "Erreur de taille mémoire, veuillez contacter l'administrateur du serveur.",
         ];
 
         // Parcours des mots-clés pour personnaliser le message
         foreach ($simplifyMessages as $key => $simplifyMessage) {
-            if(str_contains($e->getMessage(), $key)) {
+            if(str_contains($this->handleExceptionMessage($e), $key)) {
                 return $simplifyMessage;
             }
         }
@@ -44,7 +45,7 @@ class Dashboard {
     }
 
     /**
-     * Contrôleur de la Dashboard
+     * Contrôleur de dashboard
      * @return void
      */
     public function show(): void {
@@ -108,14 +109,15 @@ class Dashboard {
                     } else {
                         $message = "Table non valide ou non reconnue.";
                     }
-
                 // Gestion de l'exportation des fichiers CSV
                 } elseif (isset($_POST['export_list'])) {
                     $tableName = $_POST['export_list'];
-
                     if ($model->isValidTable($tableName)) {
                         try {
                             $headers = $model->getTableColumn($tableName);
+                            if ($tableName == 'teacher') {
+                                $headers = array_merge($headers, ['address$type'], ['discipline']);
+                            }
                             $model->exportToCsvByDepartment($tableName, $headers);
                         } catch (Exception $e) {
                             echo "Erreur lors de l'exportation : " . $this->handleExceptionMessage($e);
@@ -129,12 +131,12 @@ class Dashboard {
             }
 
             // Définition de variables
-            $title = "Dashboard";
-            $cssFilePath = '_assets/styles/dashboard.css';
-            $jsFilePath = '_assets/scripts/dashboard.js';
+            $title = "Gestion des données";
+            $cssFilePath = '_assets/styles/gestionDonnees.css';
+            $jsFilePath = '_assets/scripts/gestionDonnees.js';
             $view = new \Blog\Views\Dashboard($message);
 
-            // Affichage de la vue Dashboard
+            // Affichage de la vue dashboard
             $this->layout->renderTop($title, $cssFilePath);
             $view->showView();
             $this->layout->renderBottom($jsFilePath);

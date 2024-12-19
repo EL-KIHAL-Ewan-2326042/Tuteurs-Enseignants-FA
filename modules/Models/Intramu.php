@@ -40,12 +40,40 @@ class Intramu {
         return false;
     }
 
+    public function getFullName(string $identifier): ?array {
+        if (empty($identifier)) {
+            return null;
+        }
+        $db = $this->db;
+        $query = 'SELECT teacher_name, teacher_firstname FROM teacher WHERE id_teacher = :id_teacher';
+        $stmt = $db->getConn()->prepare($query);
+        $stmt->bindParam(':id_teacher', $identifier);
+        $stmt->execute();
+        return $stmt->fetch($db->getConn()::FETCH_ASSOC);
+    }
+
+    public function getRoles(string $identifier): ?array {
+        if ($_SESSION['identifier'] !== $identifier) {
+            return false;
+        }
+
+        $db = $this->db;
+        $query = 'SELECT role_name FROM has_role 
+              WHERE has_role.user_id = :user_id';
+
+        $stmt = $db->getConn()->prepare($query);
+        $stmt->bindParam(':user_id', $identifier);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+    }
+
     /**
      * renvoie le role de l'utilisateur selon son identifiant
      * @param string $identifier l'identifiant de l'utilisateur
      * @return mixed renvoie le rôle dans la DB
      */
-    public function getRole(string $identifier): mixed
+    public function getHighestRole(string $identifier): mixed
     {
         if ($_SESSION['identifier'] !== $identifier) {
             return false;

@@ -33,42 +33,57 @@ class Layout {
                 <a href="#" data-target="mobile-demo" class="sidenav-trigger">
                     <i class="material-icons">menu</i>
                 </a>
-                <a href="/homepage" class="left brand-logo hide-on-med-and-down">
-                    <img src="https://i.postimg.cc/qMT89vt3/amu-logo.png" alt="Logo de AMU" height="60" width="130">
+                <a href="/homepage" class="left brand-logo hide-on-med-and-down" style="margin-left: 10px;">
+                    <img src="https://i.postimg.cc/qMT89vt3/amu-logo.png" alt="Logo de AMU" height="55" width="130">
                 </a>
-                <ul class="right hide-on-med-and-down">
-                    <li><a href="/homepage">ACCUEIL</a></li>
+                <ul class="center hide-on-med-and-down">
                     <?php
+                    if (isset($_SESSION['identifier'])) {
+                        echo '<li><a href="/homepage">ACCUEIL</a></li>';
+                    }
                     if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep') { ?>
-                        <li><a href="/dashboard"> <?php echo 'DASHBOARD'; ?> </a></li>
+                        <li><a href="/dashboard"> <?php echo 'GESTION DES DONNEES'; ?> </a></li>
                         <li><a href="/dispatcher"> <?php echo 'DISPATCHER'; ?> </a></li>
                     <?php } ?>
                     <li><a href="/intramu"><?php
                             if (isset($_SESSION['identifier'])) {
                                 echo 'DECONNEXION';
-                                }
-                            else {
+                            } else {
                                 echo 'INTRAMU';
-                                }?>
-                    </a></li>
+                            } ?>
+                        </a></li>
                     <li><a href="/aboutus">A PROPOS</a></li>
+                </ul>
+                <ul class="right">
+                    <?php if (isset($_SESSION['identifier'])) { ?>
+                        <li><i class="material-icons" style="margin-right: 5px;">portrait</i></li>
+                        <li class="user-identifier"><?php echo $_SESSION['fullName']['teacher_firstname'] . ' ' . $_SESSION['fullName']['teacher_name'] . ' (';
+                            $roles = '';
+                            foreach($_SESSION['roles'] as $role) {
+                                $roles .= $role . ', ';
+                            }
+                            $roles = substr($roles, 0, -2);
+                            echo $roles . ')';
+                            ?></li>
+                    <?php } ?>
                 </ul>
             </div>
         </nav>
         <ul class="sidenav" id="mobile-demo">
-            <li><a href="/homepage">ACCUEIL</a></li>
             <?php
+            if (isset($_SESSION['identifier'])) {
+                echo '<li><a href="/homepage">ACCUEIL</a></li>';
+            }
             if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep') { ?>
-                <li><a href="/dashboard"> <?php echo 'DASHBOARD'; ?> </a></li>
+                <li><a href="/dashboard"> <?php echo 'GESTION DES DONNEES'; ?> </a></li>
                 <li><a href="/dispatcher"> <?php echo 'DISPATCHER'; ?> </a></li>
             <?php } ?>
             <li><a href="/intramu"><?php
                     if (isset($_SESSION['identifier'])) {
                         echo 'DECONNEXION';
-                    }
-                    else {
+                    } else {
                         echo 'INTRAMU';
-                    }?></a></li>
+                    } ?></a></li>
             <li><a href="/aboutus">A PROPOS</a></li>
         </ul>
         <?php
