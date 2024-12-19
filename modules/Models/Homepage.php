@@ -92,61 +92,6 @@ class Homepage {
     }
 
     /**
-     * Renvoie le tableau passé en paramètre trié
-     * @param array $table tableau à trier
-     * @param int $mode mode de tri
-     * - 0 : choix de l'enseignant, par défaut
-     * - 1 : nom et prénom des élèves
-     * - 2 : sujet de stage
-     * @param bool $decreasing true si c'est décroissant, false sinon
-     * @return array tableau trié
-     */
-    public function sortRows(array $table, int $mode = 0, bool $decreasing = false): array {
-        if($mode === 1) {
-            usort($table, function ($a, $b) use ($decreasing) {
-                $lastName = $a['student_name'] <=> $b['student_name'];
-                if ($lastName === 0) {
-                    $firstName = $a['student_firstname'] <=> $b['student_firstname'];
-                    if ($firstName === 0) {
-                        return $b['requested'] <=> $a['requested'];
-                    }
-                    return $decreasing ? $firstName*-1 : $firstName;
-                }
-                return $decreasing ? $lastName*-1 : $lastName;
-            });
-        } elseif($mode === 2) {
-            usort($table, function ($a, $b) use ($decreasing) {
-                $subject = $a['internship_subject'] <=> $b['internship_subject'];
-                if($subject === 0) {
-                    $requested = $b['requested'] <=> $a['requested'];
-                    if ($requested === 0) {
-                        $lastName = $a['student_name'] <=> $b['student_name'];
-                        if ($lastName === 0) {
-                            return $a['student_firstname'] <=> $b['student_firstname'];
-                        }
-                        return $lastName;
-                    }
-                    return $requested;
-                }
-                return $decreasing ? $subject*-1 : $subject;
-            });
-        } else {
-            usort($table, function ($a, $b) use ($decreasing) {
-                $requested = $a['requested'] <=> $b['requested'];
-                if($requested === 0) {
-                    $lastName = $a['student_name'] <=> $b['student_name'];
-                    if ($lastName === 0) {
-                        return $a['student_firstname'] <=> $b['student_firstname'];
-                    }
-                    return $lastName;
-                }
-                return $decreasing ? $requested : $requested*-1;
-            });
-        }
-        return $table;
-    }
-
-    /**
      * Renvoie un tableau contenant tous les stages à venir des étudiants faisant partie des départements passés en paramètre et n'ayant pas encore de tuteur, et leurs informations
      * Les stages sélectionnés sont uniquement ceux des élèves faisant partie d'au moins un des départements passés en paramètre
      * Les stages n'ont pas encore débuté et n'ont aucun tuteur attribué

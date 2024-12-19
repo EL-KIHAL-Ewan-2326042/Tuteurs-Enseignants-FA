@@ -68,6 +68,9 @@ thead {
     background-color: #91B5CC;
     position: sticky;
     top: 0;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 thead, tbody tr {
