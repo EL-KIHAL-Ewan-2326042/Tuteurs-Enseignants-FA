@@ -120,7 +120,7 @@ class   Homepage {
                                             <td><?= str_replace('_', ' ', $internshipInfos['formation']) ?></td>
                                             <td><?= str_replace('_', ' ', $internshipInfos['class_group']) ?></td>
                                             <td><?= $nbInternships > 0 ? $year : 'Non' ?></td>
-                                            <td><?= $internshipInfos["company_name"] ?></td>
+                                            <td><?= str_replace('_', ' ', $internshipInfos["company_name"]) ?></td>
                                             <td><?= str_replace('_', ' ', $internshipInfos["internship_subject"]) ?></td>
                                             <td><?= str_replace('_', "'", $internshipInfos['address']) ?></td>
                                             <td>~<?= $distance ?> minutes</td>
@@ -216,17 +216,8 @@ class   Homepage {
                 if(!empty($_SESSION['selecDep'])):
                     $table = $this->model->getStudentsList($_SESSION['selecDep'], $_SESSION['identifier']);
                     if(isset($_POST['sortSubmitted'])) {
-                        $_SESSION['sortBy'] = $_POST['sortBy'] ?? 0;
-                        $_SESSION['decreasing'] = $_POST['decreasing'] ?? false;
                         $_SESSION['lineCount'] = $_POST['lineCount'] ?? 10;
-                    }
-
-                    $table = $this->model->sortRows($table, $_SESSION['sortBy'] ?? 0, $_SESSION['decreasing'] ?? 0);
-
-                    if (isset($_POST['sortSubmitted'])) {
-                        if ((isset($_SESSION['lastSortBy']) && $_SESSION['lastSortBy'] != $_SESSION['sortBy'])
-                            || (isset($_SESSION['lastDecreasing']) && $_SESSION['lastDecreasing'] != $_SESSION['decreasing'])
-                            || (isset($_SESSION['lastLineCount']) && $_SESSION['lastLineCount'] != $_SESSION['lineCount'])) {
+                        if (isset($_SESSION['lastLineCount']) && $_SESSION['lastLineCount'] != $_SESSION['lineCount']) {
                             for ($i = 1; $i <= ceil(count($table) / ($_SESSION['lineCount'] ?? 10)); ++$i) {
                                 $_SESSION['unconfirmed'][$i] = array();
                             }
@@ -241,8 +232,6 @@ class   Homepage {
                                 }
                             }
                         }
-                        $_SESSION['lastSortBy'] = $_POST['sortBy'] ?? 0;
-                        $_SESSION['lastDecreasing'] = $_POST['decreasing'] ?? false;
                         $_SESSION['lastLineCount'] = $_POST['lineCount'] ?? 10;
                     }
 
@@ -291,25 +280,6 @@ class   Homepage {
                         <form method="post" class="center-align table">
                             <div class="selection">
                                 <div class="formCell">
-                                    <label for="sortBy">Trier par:</label>
-                                    <div class="input-field">
-                                        <select id="sortBy" name="sortBy">
-                                            <option value=0 <? if(!isset($_SESSION['sortBy']) || $_SESSION['sortBy'] === "0") echo "selected"; ?> >Choix</option>
-                                            <option value=1 <? if(isset($_SESSION['sortBy']) && $_SESSION['sortBy'] === "1") echo "selected"; ?> >Élève</option>
-                                            <option value=2 <? if(isset($_SESSION['sortBy']) && $_SESSION['sortBy'] === "2") echo "selected"; ?> >Sujet</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="formCell">
-                                    <label for="decreasing">Trier par ordre:</label>
-                                    <div class="input-field">
-                                        <select id="decreasing" name="decreasing">
-                                            <option value="0" <? if(!isset($_SESSION['decreasing']) || $_SESSION['decreasing'] === "0") echo "selected"; ?> >Croissant</option>
-                                            <option value="1" <? if(isset($_SESSION['decreasing']) && $_SESSION['decreasing'] === "1") echo "selected"; ?> >Décroissant</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="formCell">
                                     <label for="lineCount">Nombre de lignes:</label>
                                     <div class="input-field">
                                         <select id="lineCount" name="lineCount">
@@ -329,7 +299,7 @@ class   Homepage {
                             <table class="highlight centered" id="tab">
                                 <thead>
                                 <tr>
-                                    <th class="clickable" onclick="sortTable(0)">ETUDIANT ▲</th>
+                                    <th class="clickable" onclick="sortTable(0)">ETUDIANT</th>
                                     <th class="clickable" onclick="sortTable(1)">FORMATION</th>
                                     <th class="clickable" onclick="sortTable(2)">GROUPE</th>
                                     <th class="clickable" onclick="sortTable(3)">HISTORIQUE</th>
@@ -355,7 +325,7 @@ class   Homepage {
                                         <td><?= str_replace('_', ' ', $row["formation"]) ?></td>
                                         <td><?= str_replace('_', ' ', $row["class_group"]) ?></td>
                                         <td><?= $row['internshipTeacher'] > 0 ? $row['year'] : 'Non'; ?></td>
-                                        <td><?= $row["company_name"] ?></td>
+                                        <td><?= str_replace('_', ' ', $row["company_name"]) ?></td>
                                         <td><?= str_replace('_', ' ', $row["internship_subject"]) ?></td>
                                         <td><?= str_replace('_', "'", $row['address']) ?></td>
                                         <td>~<?= $row['duration'] ?> minutes</td>

@@ -25,6 +25,12 @@ document.addEventListener('DOMContentLoaded', function() {
             searchResults.innerHTML = '<p>Barre de recherche vide</p>'
         }
     })
+
+    if (!(sessionStorage.getItem('columnNumber') && sessionStorage.getItem('direction'))) {
+        sessionStorage.setItem('columnNumber', "0");
+        sessionStorage.setItem('direction', "asc");
+    }
+    sortTable(Number(sessionStorage.getItem('columnNumber')), true);
 });
 
 /**
@@ -287,12 +293,18 @@ function createMarkerElement(label) {
 /**
  * Trie la table prenant pour id "tab"
  * @param n numéro désignant la colonne par laquelle on trie le tableau
+ * @param firstLoad booléen indiquant si cet appel est le premier depuis le chargement de la page
  */
-function sortTable(n) {
-    let table, rows, switching, i, x, y, shouldSwitch, dir, column, switchcount = 0;
-    table = document.getElementById("tab");
+function sortTable(n, firstLoad = false) {
+    let dir, rows, switching, i, x, y, shouldSwitch, column;
+    const table = document.getElementById("tab");
     switching = true;
-    dir = "asc";
+
+    if (!firstLoad) {
+        if (table.rows[0].getElementsByTagName("TH")[n].innerHTML.substring(table.rows[0].getElementsByTagName("TH")[n].innerHTML.length - 1) === "▲") dir = "desc";
+        else dir = "asc";
+    } else dir = sessionStorage.getItem('direction');
+
     while (switching) {
         switching = false;
         rows = table.rows;
@@ -301,12 +313,16 @@ function sortTable(n) {
             x = rows[i].getElementsByTagName("TD")[n];
             y = rows[i + 1].getElementsByTagName("TD")[n];
             if (dir === "asc") {
-                if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                if ((n < 7 && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase())
+                    || (n === 7 && Number(x.innerHTML.substring(1, x.innerHTML.indexOf(' '))) > Number(y.innerHTML.substring(1, y.innerHTML.indexOf(' '))))
+                    || (n === 8 && x.getElementsByTagName("INPUT")[0].checked < y.getElementsByTagName("INPUT")[0].checked)) {
                     shouldSwitch = true;
                     break;
                 }
             } else if (dir === "desc") {
-                if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                if ((n < 7 && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())
+                    || (n === 7 && Number(x.innerHTML.substring(1, x.innerHTML.indexOf(' '))) < Number(y.innerHTML.substring(1, y.innerHTML.indexOf(' '))))
+                    || (n === 8 && x.getElementsByTagName("INPUT")[0].checked > y.getElementsByTagName("INPUT")[0].checked)) {
                     shouldSwitch = true;
                     break;
                 }
@@ -315,22 +331,17 @@ function sortTable(n) {
         if (shouldSwitch) {
             rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
             switching = true;
-            switchcount ++;
-        } else {
-            if (switchcount === 0 && dir === "asc") {
-                dir = "desc";
-                switching = true;
-            }
         }
     }
     for (i = 0; i < rows[0].cells.length; ++i) {
         column = rows[0].getElementsByTagName("TH")[i].innerHTML;
         if (column.substring(column.length-1) === "▲" || column.substring(column.length-1) === "▼") table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-2);
         if (i === n) {
-            if (column.substring(column.length-1) === "▲") table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-1) + "▼";
-            else if (column.substring(column.length-1) === "▼") table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-1) + "▲";
-            else if (dir === "asc") table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▲";
+            if (dir === "asc") table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▲";
             else table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▼";
-        } else if (column.substring(column.length-1) === "▲" || column.substring(column.length-1) === "▼") table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-2);
+        }
     }
+
+    sessionStorage.setItem('columnNumber', n);
+    sessionStorage.setItem('direction', dir);
 }
