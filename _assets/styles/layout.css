@@ -22,33 +22,35 @@ a:hover {
     background-color: var(--main-color);
 }
 
+.nav-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+}
+
+.nav-wrapper .center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .navbar .brand-logo {
     display: flex;
     align-items: center;
-    margin-left: 20px;
+    margin-left: 10px;
 }
 
 .navbar .brand-logo img {
     height: 55px;
     width: 130px;
     object-fit: contain;
-}
-
-
-.sidenav li:first-child {
-    margin-top: var(--large-spacing);
-}
-
-a.brand-logo {
-    display: inline-block;
-    height: 60px;
-}
-
-.nav-wrapper {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
 }
 
 .nav-wrapper .sidenav-trigger {
@@ -58,7 +60,7 @@ a.brand-logo {
 
 .nav-wrapper .right {
     position: absolute;
-    right: 0;
+    right: 10px;
 }
 
 ul.center {
@@ -69,6 +71,21 @@ ul.center {
     margin: 0;
 }
 
+.sidenav li:first-child {
+    margin-top: var(--large-spacing);
+}
+
+a.brand-logo {
+    display: flex;
+    align-items: center;
+    height: 60px;
+}
+
+@media (max-width: 1200px) {
+    .hide-on-med-and-down {
+        display: none !important;
+    }
+}
 
 /* Ajustements Main */
 
