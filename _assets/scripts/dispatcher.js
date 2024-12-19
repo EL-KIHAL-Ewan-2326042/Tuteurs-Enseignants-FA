@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function updatePageNumbers() {
-        pageNumbersContainer.innerHTML = ''; // Clear the existing page numbers
+        pageNumbersContainer.innerHTML = '';
 
         for (let i = 1; i <= totalPages; i++) {
             const pageNumberButton = document.createElement('button');
@@ -269,7 +269,6 @@ document.addEventListener('DOMContentLoaded', function () {
         selectAllRow.id = 'select-all-row';
 
         selectAllRow.innerHTML = `<td></td>
-                                                          <td></td>
                                                           <td></td>
                                                           <td></td>
                                                           <td></td>

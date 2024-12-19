@@ -135,8 +135,13 @@ class Dispatcher {
                 <?php
                 function renderStars($score) {
                     $fullStars = floor($score);
-                    $halfStars = ($score - $fullStars >= 0.5) ? 1 : 0;
+
+                    $decimalPart = $score - $fullStars;
+
+                    $halfStars = (abs($decimalPart - 0.5) <= 0.1) ? 1 : 0;
+
                     $emptyStars = 5 - $fullStars - $halfStars;
+                    
                     $stars = '';
 
                     for ($i = 0; $i < $fullStars; $i++) {
@@ -170,7 +175,6 @@ class Dispatcher {
                                             <th>Formation</th>
                                             <th>Groupe</th>
                                             <th>Date Expérience</th>
-                                            <th>Raison sociale</th>
                                             <th>Sujet</th>
                                             <th>Adresse</th>
                                             <th>Score</th>
@@ -196,8 +200,7 @@ class Dispatcher {
                                                 <td><?= $resultDispatch['company_name'] . ' (' .$resultDispatch['internship_identifier'] . ')'; ?></td>
                                                 <td><?= $resultDispatch['formation'] ?></td>
                                                 <td><?= $resultDispatch['class_group'] ?></td>
-                                                <td><?= 'Date expérience' ?></td>
-                                                <td><?=  'Raison Sociale '?></td>
+                                                <td><?= 'dd/mm/yyyy' ?></td>
                                                 <td><?=  $resultDispatch['internship_subject'] ?></td>
                                                 <td><?= $resultDispatch['address'] ?></td>
                                                 <td>

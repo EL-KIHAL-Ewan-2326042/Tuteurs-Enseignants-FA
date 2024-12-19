@@ -91,7 +91,7 @@ input[type="checkbox"].filled-in:checked + span:after {
     }
 }
 
-/** Pagination **/
+/** Pagination et Checkbox **/
 
 #pagination-controls {
     display: flex;
