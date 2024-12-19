@@ -29,7 +29,8 @@ class Dashboard {
         $simplifyMessages = [
             'SQLSTATE' => "Une erreur de base de données est survenue. Une donnée que vous souhaitez insérer existe peut-être déjà.",
             'permission denied' => "Vous n'avez pas les droits nécessaires pour effectuer cette action.",
-            'file not found' => "Le fichier demandé est introuvable. Veuillez vérifier votre saisie."
+            'file not found' => "Le fichier demandé est introuvable. Veuillez vérifier votre saisie.",
+            'Fatal' => "Erreur de taille mémoire, veuillez contacter l'administrateur du serveur.",
         ];
 
         // Parcours des mots-clés pour personnaliser le message
@@ -48,10 +49,9 @@ class Dashboard {
      * @return void
      */
     public function show(): void {
-        print_r('coucou22');
         // Récupération de l'instance de la base de données et des classes associées
         $db = \Includes\Database::getInstance();
-        $model = new \Blog\Models\dashboard($db);
+        $model = new \Blog\Models\Dashboard($db);
 
         // Initialisation du message à afficher
         $message = '';
@@ -109,20 +109,15 @@ class Dashboard {
                     } else {
                         $message = "Table non valide ou non reconnue.";
                     }
-                print_r('tamère');
                 // Gestion de l'exportation des fichiers CSV
                 } elseif (isset($_POST['export_list'])) {
                     $tableName = $_POST['export_list'];
-                    print_r('coucou');
                     if ($model->isValidTable($tableName)) {
                         try {
                             $headers = $model->getTableColumn($tableName);
-                            print_r('coucou : qqq');
-                            if ($tableName = 'teacher') {
+                            if ($tableName == 'teacher') {
                                 $headers = array_merge($headers, ['address$type'], ['discipline']);
                             }
-                            print_r('coucou : ',$headers);
-                            exit();
                             $model->exportToCsvByDepartment($tableName, $headers);
                         } catch (Exception $e) {
                             echo "Erreur lors de l'exportation : " . $this->handleExceptionMessage($e);
@@ -139,7 +134,7 @@ class Dashboard {
             $title = "Gestion des données";
             $cssFilePath = '_assets/styles/gestionDonnees.css';
             $jsFilePath = '_assets/scripts/gestionDonnees.js';
-            $view = new \Blog\Views\dashboard($message);
+            $view = new \Blog\Views\Dashboard($message);
 
             // Affichage de la vue dashboard
             $this->layout->renderTop($title, $cssFilePath);
