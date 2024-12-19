@@ -106,11 +106,11 @@ class Dispatcher {
                         <div class="row">
                             <div class="input-field col s6">
                                 <input id="searchTeacher" name="searchTeacher" type="text" class="validate">
-                                <label for="searchTeacher">Teacher ID</label>
+                                <label for="searchTeacher">ID professeur</label>
                             </div>
                             <div class="input-field col s6">
                                 <input id="searchInternship" name="searchInternship" type="text" class="validate">
-                                <label for="searchInternship">Internship Company</label>
+                                <label for="searchInternship">ID Stage</label>
                             </div>
                             <div id="searchResults"></div>
                             <p class="red-text"><?php echo $this->errorMessageDirectAssoc; ?></p>
