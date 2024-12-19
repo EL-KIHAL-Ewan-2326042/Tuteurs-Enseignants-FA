@@ -25,51 +25,6 @@ document.addEventListener('DOMContentLoaded', function() {
             searchResults.innerHTML = '<p>Barre de recherche vide</p>'
         }
     })
-
-    if (!(sessionStorage.getItem('columnNumber') && sessionStorage.getItem('direction'))) {
-        sessionStorage.setItem('columnNumber', "0");
-        sessionStorage.setItem('direction', "asc");
-    }
-    sortTable(Number(sessionStorage.getItem('columnNumber')), true);
-
-    const rowsPerPage = 10;
-    const rows = document.querySelectorAll('.homepage-row');
-    const totalRows = rows.length;
-    const totalPages = Math.ceil(totalRows / rowsPerPage);
-    let currentPage = 1;
-
-    const prevButton = document.getElementById('prev-page');
-    const nextButton = document.getElementById('next-page');
-    const pageNumberSpan = document.getElementById('page-number');
-
-    function showPage(page) {
-        if (page < 1 || page > totalPages) return;
-
-        currentPage = page;
-        pageNumberSpan.textContent = `Page ${currentPage}`;
-
-        rows.forEach(row => row.style.display = 'none');
-
-        const start = (currentPage - 1) * rowsPerPage;
-        const end = currentPage * rowsPerPage;
-        const visibleRows = Array.from(rows).slice(start, end);
-        visibleRows.forEach(row => row.style.display = '');
-
-        addSelectAllRow();
-
-        prevButton.disabled = currentPage === 1;
-        nextButton.disabled = currentPage === totalPages;
-    }
-
-    prevButton.addEventListener('click', () => {
-        showPage(currentPage - 1);
-    });
-
-    nextButton.addEventListener('click', () => {
-        showPage(currentPage + 1);
-    });
-
-    showPage(1);
 });
 
 /**
@@ -326,61 +281,132 @@ function createMarkerElement(label) {
 }
 
 /**
- * Partie3: Tri du tableau
+ * Partie3: Tri du tableau et pagination
  */
 
-/**
- * Trie la table prenant pour id "tab"
- * @param n numéro désignant la colonne par laquelle on trie le tableau
- * @param firstLoad booléen indiquant si cet appel est le premier depuis le chargement de la page
- */
-function sortTable(n, firstLoad = false) {
-    let dir, rows, switching, i, x, y, shouldSwitch, column;
-    const table = document.getElementById("tab");
-    switching = true;
+document.addEventListener('DOMContentLoaded', function () {
+    const rowsPerPage = 10;
+    const totalRows = document.querySelectorAll('.homepage-row').length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    let currentPage = Number(sessionStorage.getItem('page')) ?? 1;
 
-    if (!firstLoad) {
-        if (table.rows[0].getElementsByTagName("TH")[n].innerHTML.substring(table.rows[0].getElementsByTagName("TH")[n].innerHTML.length - 1) === "▲") dir = "desc";
-        else dir = "asc";
-    } else dir = sessionStorage.getItem('direction');
+    const prevButton = document.getElementById('prev-page');
+    const nextButton = document.getElementById('next-page');
+    const firstButton = document.getElementById('first-page');
+    const lastButton = document.getElementById('last-page');
+    const pageNumbersContainer = document.getElementById('page-numbers');
 
-    while (switching) {
-        switching = false;
-        rows = table.rows;
-        for (i = 1; i < (rows.length - 1); ++i) {
-            shouldSwitch = false;
-            x = rows[i].getElementsByTagName("TD")[n];
-            y = rows[i + 1].getElementsByTagName("TD")[n];
-            if (dir === "asc") {
-                if ((n < 7 && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase())
-                    || (n === 7 && Number(x.innerHTML.substring(1, x.innerHTML.indexOf(' '))) > Number(y.innerHTML.substring(1, y.innerHTML.indexOf(' '))))
-                    || (n === 8 && x.getElementsByTagName("INPUT")[0].checked < y.getElementsByTagName("INPUT")[0].checked)) {
-                    shouldSwitch = true;
-                    break;
-                }
-            } else if (dir === "desc") {
-                if ((n < 7 && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())
-                    || (n === 7 && Number(x.innerHTML.substring(1, x.innerHTML.indexOf(' '))) < Number(y.innerHTML.substring(1, y.innerHTML.indexOf(' '))))
-                    || (n === 8 && x.getElementsByTagName("INPUT")[0].checked > y.getElementsByTagName("INPUT")[0].checked)) {
-                    shouldSwitch = true;
-                    break;
+    if (!(sessionStorage.getItem('columnNumber') && sessionStorage.getItem('direction'))) {
+        sessionStorage.setItem('columnNumber', "0");
+        sessionStorage.setItem('direction', "asc");
+    }
+    sortTable(Number(sessionStorage.getItem('columnNumber')), true);
+
+    for (let i = 0; i < document.getElementById("homepage-table").rows[0].cells.length; ++i) {
+        document.getElementById("homepage-table").rows[0].getElementsByTagName("TH")[i].addEventListener('click', () => {
+            sortTable(i);
+        });
+    }
+
+    /**
+     * Trie la table prenant pour id "homepage-table"
+     * @param n numéro désignant la colonne par laquelle on trie le tableau
+     * @param firstLoad booléen indiquant si cet appel est le premier depuis le chargement de la page
+     */
+    function sortTable(n, firstLoad = false) {
+        let dir, rows, switching, i, x, y, shouldSwitch, column;
+        const table = document.getElementById("homepage-table");
+        switching = true;
+
+        if (!firstLoad) {
+            if (table.rows[0].getElementsByTagName("TH")[n].innerHTML.substring(table.rows[0].getElementsByTagName("TH")[n].innerHTML.length - 1) === "▲") dir = "desc";
+            else dir = "asc";
+        } else dir = sessionStorage.getItem('direction');
+
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+            for (i = 1; i < (rows.length - 1); ++i) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName("TD")[n];
+                y = rows[i + 1].getElementsByTagName("TD")[n];
+                if (dir === "asc") {
+                    if ((n < 7 && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase())
+                        || (n === 7 && Number(x.innerHTML.substring(1, x.innerHTML.indexOf(' '))) > Number(y.innerHTML.substring(1, y.innerHTML.indexOf(' '))))
+                        || (n === 8 && x.getElementsByTagName("INPUT")[0].checked < y.getElementsByTagName("INPUT")[0].checked)) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                } else if (dir === "desc") {
+                    if ((n < 7 && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())
+                        || (n === 7 && Number(x.innerHTML.substring(1, x.innerHTML.indexOf(' '))) < Number(y.innerHTML.substring(1, y.innerHTML.indexOf(' '))))
+                        || (n === 8 && x.getElementsByTagName("INPUT")[0].checked > y.getElementsByTagName("INPUT")[0].checked)) {
+                        shouldSwitch = true;
+                        break;
+                    }
                 }
             }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
         }
-        if (shouldSwitch) {
-            rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-            switching = true;
+        for (i = 0; i < rows[0].cells.length; ++i) {
+            column = rows[0].getElementsByTagName("TH")[i].innerHTML;
+            if (column.substring(column.length-1) === "▲" || column.substring(column.length-1) === "▼") table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-2);
+            if (i === n) {
+                if (dir === "asc") table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▲";
+                else table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▼";
+            }
         }
+
+        sessionStorage.setItem('columnNumber', n);
+        sessionStorage.setItem('direction', dir);
+        showPage(currentPage, sessionStorage.getItem('direction'));
     }
-    for (i = 0; i < rows[0].cells.length; ++i) {
-        column = rows[0].getElementsByTagName("TH")[i].innerHTML;
-        if (column.substring(column.length-1) === "▲" || column.substring(column.length-1) === "▼") table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-2);
-        if (i === n) {
-            if (dir === "asc") table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▲";
-            else table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▼";
+
+    function showPage(page) {
+        if (page < 1 || page > totalPages) return;
+
+        const rows = document.querySelectorAll('.homepage-row');
+
+        currentPage = page;
+        updatePageNumbers();
+
+        rows.forEach(row => row.style.display = 'none');
+
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = currentPage * rowsPerPage;
+        const visibleRows = Array.from(rows).slice(start, end);
+        visibleRows.forEach(row => row.style.display = '');
+
+        prevButton.disabled = currentPage === 1;
+        nextButton.disabled = currentPage === totalPages;
+        firstButton.disabled = currentPage === 1;
+        lastButton.disabled = currentPage === totalPages;
+
+        sessionStorage.setItem('page', currentPage);
+    }
+
+    function updatePageNumbers() {
+        pageNumbersContainer.innerHTML = '';
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageNumberButton = document.createElement('button');
+            pageNumberButton.textContent = String(i);
+            pageNumberButton.classList.add('waves-effect', 'waves-light', 'btn');
+            pageNumberButton.classList.add('page-number');
+            pageNumberButton.disabled = (i === currentPage);
+            pageNumberButton.addEventListener('click', () => showPage(i));
+
+            pageNumbersContainer.appendChild(pageNumberButton);
         }
     }
 
-    sessionStorage.setItem('columnNumber', n);
-    sessionStorage.setItem('direction', dir);
-}
+    firstButton.addEventListener('click', () => showPage(1));
+    lastButton.addEventListener('click', () => showPage(totalPages));
+    prevButton.addEventListener('click', () => showPage(currentPage - 1));
+    nextButton.addEventListener('click', () => showPage(currentPage + 1));
+
+    showPage(currentPage);
+});

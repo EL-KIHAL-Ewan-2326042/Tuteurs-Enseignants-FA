@@ -36,20 +36,6 @@ class   Homepage {
                     unset($_SESSION['selected_student']);
                 }
 
-                if (isset($_POST['cancelChanges'])) {
-                    unset($_SESSION['unconfirmed']);
-                }
-
-                if (isset($_POST['page']) || isset($_POST['sortSubmitted'])) {
-                    $_SESSION['unconfirmed'][$_SESSION['lastPage'] ?? 1] = $_POST['selecInternship'] ?? array();
-                    $_SESSION['unconfirmed']['all'] = array();
-                    foreach ($_SESSION['unconfirmed'] as $currentPage => $internships) {
-                        if ($currentPage == 'all') continue;
-                        $_SESSION['unconfirmed']['all'] = array_merge(gettype($internships) == "array" ? $internships : [$internships], $_SESSION['unconfirmed']['all']);
-                    }
-                    $_SESSION['lastPage'] = $_POST['page'] ?? 1;
-                }
-
                 if(isset($_POST['searchedStudentSubmitted'])) {
 
                     $update = $this->model->updateSearchedStudent(isset($_POST['searchedStudent']), $_SESSION['identifier'], $_POST['searchedStudentSubmitted']);
@@ -60,13 +46,7 @@ class   Homepage {
                 }
 
                 if(isset($_POST['selecInternshipSubmitted'])) {
-                    $_SESSION['unconfirmed'][$_SESSION['lastPage'] ?? 1] = $_POST['selecInternship'] ?? array();
-                    $_SESSION['unconfirmed']['all'] = array();
-                    foreach ($_SESSION['unconfirmed'] as $currentPage => $internships) {
-                        if ($currentPage != 'all') $_SESSION['unconfirmed']['all'] = array_merge(gettype($internships) == "array" ? $internships : [$internships], $_SESSION['unconfirmed']['all']);
-                    }
-
-                    $update = $this->model->updateRequests($_SESSION['unconfirmed']['all'], $_SESSION['identifier']);
+                    $update = $this->model->updateRequests($_POST['selecInternship'] ?? array(), $_SESSION['identifier']);
 
                     if(!$update || gettype($update) !== 'boolean') {
                         echo '<h6 class="red-text">Une erreur est survenue</h6>';
@@ -215,111 +195,26 @@ class   Homepage {
                 <?
                 if(!empty($_SESSION['selecDep'])):
                     $table = $this->model->getStudentsList($_SESSION['selecDep'], $_SESSION['identifier']);
-                    if(isset($_POST['sortSubmitted'])) {
-                        $_SESSION['lineCount'] = $_POST['lineCount'] ?? 10;
-                        if (isset($_SESSION['lastLineCount']) && $_SESSION['lastLineCount'] != $_SESSION['lineCount']) {
-                            for ($i = 1; $i <= ceil(count($table) / ($_SESSION['lineCount'] ?? 10)); ++$i) {
-                                $_SESSION['unconfirmed'][$i] = array();
-                            }
-                            foreach ($_SESSION['unconfirmed'] as $key => $value) {
-                                if ($key != 'all') unset($_SESSION['unconfirmed'][$key]);
-                            }
-                            foreach ($_SESSION['unconfirmed']['all'] as $value) {
-                                foreach ($table as $key => $internship) {
-                                    if ($internship['internship_identifier'] == $value) {
-                                        $_SESSION['unconfirmed'][ceil(($key + 1) / ($_SESSION['lineCount'] ?? 10))][] = $value;
-                                    }
-                                }
-                            }
-                        }
-                        $_SESSION['lastLineCount'] = $_POST['lineCount'] ?? 10;
-                    }
-
-                    if (!isset($_SESSION['unconfirmed'])) {
-                        $_SESSION['unconfirmed'] = array();
-                        $_SESSION['unconfirmed']['all'] = array();
-                        $_SESSION['requested'] = array();
-                        for ($i = 0; $i < count($table); ++$i) {
-                            if (!isset($_SESSION['unconfirmed'][ceil(($i+1) / ($_SESSION['lineCount'] ?? 10))])) $_SESSION['unconfirmed'][ceil(($i+1) / ($_SESSION['lineCount'] ?? 10))] = array();
-                            if ($table[$i]['requested']) {
-                                $_SESSION['unconfirmed'][ceil(($i+1) / ($_SESSION['lineCount'] ?? 10))][] = $table[$i]['internship_identifier'];
-                                $_SESSION['unconfirmed']['all'][] = $table[$i]['internship_identifier'];
-                                $_SESSION['requested'][] = $table[$i]['internship_identifier'];
-                            }
-                        }
-                    }
-
-                    if(isset($_POST['searchedStudentSubmitted'])) {
-                        foreach ($table as $key => $internship) {
-                            if ($internship['internship_identifier'] == $_POST['searchedStudentSubmitted']) {
-                                $pageSearchedInternship = ceil(($key + 1) / ($_SESSION['lineCount'] ?? 10));
-                                if ($internship['requested']) {
-                                    if (!in_array($internship['internship_identifier'], $_SESSION['unconfirmed']['all'])) {
-                                        $_SESSION['unconfirmed']['all'][] = $internship['internship_identifier'];
-                                    } if (!in_array($internship['internship_identifier'], $_SESSION['unconfirmed'][$pageSearchedInternship])) {
-                                        $_SESSION['unconfirmed'][$pageSearchedInternship][] = $internship['internship_identifier'];
-                                    } if (!in_array($internship['internship_identifier'], $_SESSION['requested'])) {
-                                        $_SESSION['requested'][] = $internship['internship_identifier'];
-                                    }
-                                } else {
-                                    if (in_array($internship['internship_identifier'], $_SESSION['unconfirmed']['all'])) {
-                                        array_splice($_SESSION['unconfirmed']['all'], array_search($internship['internship_identifier'], $_SESSION['unconfirmed']['all']), 1);
-                                    } if (in_array($internship['internship_identifier'], $_SESSION['unconfirmed'][$pageSearchedInternship])) {
-                                        array_splice($_SESSION['unconfirmed'][$pageSearchedInternship], array_search($internship['internship_identifier'], $_SESSION['unconfirmed'][$pageSearchedInternship]), 1);
-                                    } if (in_array($internship['internship_identifier'], $_SESSION['requested'])) {
-                                        array_splice($_SESSION['requested'], array_search($internship['internship_identifier'], $_SESSION['requested']), 1);
-                                    }
-                                }
-                            }
-                        }
-                    }
-
                     if(empty($table)):
                         echo "<h6 class='left-align'>Aucun stage disponible</h6>";
                     else: ?>
                         <form method="post" class="center-align table">
-                            <div class="selection">
-                                <div class="formCell">
-                                    <label for="lineCount">Nombre de lignes:</label>
-                                    <div class="input-field">
-                                        <select id="lineCount" name="lineCount">
-                                            <option value="10" <? if(!isset($_SESSION['lineCount']) || $_SESSION['lineCount'] === "10") echo "selected"; ?> >10</option>
-                                            <option value="20" <? if(isset($_SESSION['lineCount']) && $_SESSION['lineCount'] === "20") echo "selected"; ?> >20</option>
-                                            <option value="50" <? if(isset($_SESSION['lineCount']) && $_SESSION['lineCount'] === "50") echo "selected"; ?> >50</option>
-                                            <option value="100" <? if(isset($_SESSION['lineCount']) && $_SESSION['lineCount'] === "100") echo "selected"; ?> >100</option>
-                                            <option value="<?= count($table) ?>" <? if(isset($_SESSION['lineCount']) && $_SESSION['lineCount'] === (string)count($table)) echo "selected"; ?> >Tout</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                            <button class="waves-effect waves-light btn" name="sortSubmitted" value="1" type="submit" formmethod="post">Trier</button>
-
-                            <div class="row"></div>
-
-                            <table class="highlight centered" id="tab">
+                            <table class="highlight centered" id="homepage-table">
                                 <thead>
                                 <tr>
-                                    <th class="clickable" onclick="sortTable(0)">ETUDIANT</th>
-                                    <th class="clickable" onclick="sortTable(1)">FORMATION</th>
-                                    <th class="clickable" onclick="sortTable(2)">GROUPE</th>
-                                    <th class="clickable" onclick="sortTable(3)">HISTORIQUE</th>
-                                    <th class="clickable" onclick="sortTable(4)">ENTREPRISE</th>
-                                    <th class="clickable" onclick="sortTable(5)">SUJET</th>
-                                    <th class="clickable" onclick="sortTable(6)">ADRESSE</th>
-                                    <th class="clickable" onclick="sortTable(7)">DISTANCE</th>
-                                    <th class="clickable" onclick="sortTable(8)">CHOIX</th>
+                                    <th class="clickable">ETUDIANT</th>
+                                    <th class="clickable">FORMATION</th>
+                                    <th class="clickable">GROUPE</th>
+                                    <th class="clickable">HISTORIQUE</th>
+                                    <th class="clickable">ENTREPRISE</th>
+                                    <th class="clickable">SUJET</th>
+                                    <th class="clickable">ADRESSE</th>
+                                    <th class="clickable">DISTANCE</th>
+                                    <th class="clickable">CHOIX</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                <?
-                                $totalPages = ceil(count($table) / ($_SESSION['lineCount'] ?? 10));
-                                if (isset($_POST['page']) && $_POST['page'] > 0 && $_POST['page'] <= $totalPages) $page = $_POST['page'];
-                                else if (isset($_SESSION['lastPage']) && $_SESSION['lastPage'] > 0 && $_SESSION['lastPage'] <= $totalPages) $page = $_SESSION['lastPage'];
-                                else $page = 1;
-
-                                for ($i = 0 ; $i < count($table) ; ++$i):
-                                    $row = $table[$i];
-                                    ?>
+                                <? foreach ($table as $row): ?>
                                     <tr class="homepage-row">
                                         <td><?= $row["student_name"] . " " . $row["student_firstname"] ?></td>
                                         <td><?= str_replace('_', ' ', $row["formation"]) ?></td>
@@ -331,47 +226,28 @@ class   Homepage {
                                         <td>~<?= $row['duration'] ?> minutes</td>
                                         <td>
                                             <label class="center">
-                                                <input type="checkbox" name="selecInternship[]" class="center-align filled-in" value="<?= $row['internship_identifier'] ?>" <?= isset($_SESSION['unconfirmed']['all']) && in_array($row['internship_identifier'], $_SESSION['unconfirmed']['all']) ? 'checked="checked"' : '' ?> />
+                                                <input type="checkbox" name="selecInternship[]" class="center-align filled-in" value="<?= $row['internship_identifier'] ?>" <?= $row['requested'] ? 'checked="checked"' : '' ?> />
                                                 <span></span>
                                             </label>
                                         </td>
                                     </tr>
-                                <? endfor; ?>
+                                <? endforeach; ?>
                                 </tbody>
                             </table>
+                            <div id="pagination-controls" class="center-align">
+                                <button type="button" class="waves-effect waves-light btn" id="first-page"><i class="material-icons" type="button">first_page</i></button>
+                                <button type="button" class="waves-effect waves-light btn" id="prev-page"><i class="material-icons" type="button">arrow_back</i></button>
+                                <div id="page-numbers"></div>
+                                <button type="button" class="waves-effect waves-light btn" id="next-page"><i class="material-icons" type="button">arrow_forward</i></button>
+                                <button type="button" class="waves-effect waves-light btn" id="last-page"><i class="material-icons" type="button">last_page</i></button>
+                            </div>
                             <div class="row"></div>
-                            <?
-                            if (!isset($_SESSION['unconfirmed']['all'])) $_SESSION['unconfirmed']['all'] = array();
-                            if (!isset($_SESSION['requested'])) $_SESSION['requested'] = array();
-                            $change = $_SESSION['unconfirmed']['all'] !== $_SESSION['requested'];
-                            if ($change) {
-                                echo '<div class="selection"> <div class="formCell">';
-                            }
-                            ?>
-                            <button class="waves-effect waves-light btn" name="selecInternshipSubmitted" value="1" type="submit">Valider</button>
-                            <? if ($change):
-                                echo '</div>';
-                                ?>
-                                <div class="formCell"> <button class="waves-effect waves-light btn" name="cancelChanges" value="1" type="submit">Annuler</button> </div>
-                            <? endif;
-                            if ($change) {
-                                echo '</div>';
-                            }
-
-                            if ($totalPages > 1):
-                                $start = ($totalPages>(($_SESSION['lineCount'] ?? 10) -1) && $page > 1) ? $page-1 : 1;
-                                $end = ($totalPages>(($_SESSION['lineCount'] ?? 10) -1) && $start+(($_SESSION['lineCount'] ?? 10) -2) < $totalPages) ? $start+(($_SESSION['lineCount'] ?? 10) -2) : $totalPages;
-                                while ($start > 1 && $end - $start < (($_SESSION['lineCount'] ?? 10) -2)) --$start;
-                                ?>
-                                <div class="row"></div>
+                            <div class="selection"> <div class="formCell">
+                                <button class="waves-effect waves-light btn" name="selecInternshipSubmitted" value="1" type="submit">Valider</button>
+                                <button class="waves-effect waves-light btn" type="reset">Annuler</button>
+                            </div>
                         </form>
-                        <div class="selection">
-                            <button class="waves-effect waves-light btn" id="prev-page"><</button>
-                            <span id="page-number">1</span>
-                            <button class="waves-effect waves-light btn" id="next-page">></button>
-                        </div>
-                        <? endif;
-                    endif;
+                    <? endif;
                 endif;
             endif; ?>
             <script>
