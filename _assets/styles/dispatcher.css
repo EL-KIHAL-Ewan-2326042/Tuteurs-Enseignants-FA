@@ -28,37 +28,33 @@ input[type="checkbox"].filled-in:checked + span:after {
     border-color: #00558B !important;
 }
 
+/* Map OSM */
+
+#map {
+    height: 400px;
+    width: 70%;
+    margin: auto; /* TODO */
+}
+
+@media screen and (max-width: 640px) {
+    #map {
+        height: 150px;
+        width: 40%;
+    }
+}
+
 
 /* Tableau Dispatcher */
-
-#dispatch-table-wrapper {
-    white-space: nowrap;
-    margin: 0 auto;
-    border: 1px solid #ddd;
-    max-width: 100%;
-
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-}
-
-#dispatch-table {
-    min-width: 800px;
-    font-size: 14px;
-    width: 100%;
-}
 
 #dispatch-table th, #dispatch-table td {
     padding: 6px 10px;
     text-align: center;
     border: 1px solid #ddd;
-    white-space: nowrap;
 }
 
 #dispatch-table thead th {
     background-color: #f4f4f4;
     font-weight: bold;
-    font-size: 14px;
 }
 
 #dispatch-table tbody tr:nth-child(even) {
@@ -66,23 +62,6 @@ input[type="checkbox"].filled-in:checked + span:after {
 }
 
 #dispatch-table tbody tr:hover {
-    background-color: #f1f1f1;
-}
-
-#dispatch-table-wrapper::-webkit-scrollbar {
-    height: 6px;
-}
-
-#dispatch-table-wrapper::-webkit-scrollbar-thumb {
-    background-color: #888;
-    border-radius: 4px;
-}
-
-#dispatch-table-wrapper::-webkit-scrollbar-thumb:hover {
-    background-color: #555;
-}
-
-#dispatch-table-wrapper::-webkit-scrollbar-track {
     background-color: #f1f1f1;
 }
 
@@ -96,6 +75,7 @@ input[type="checkbox"].filled-in:checked + span:after {
     }
 }
 
+
 /** Pagination et Checkbox **/
 
 #pagination-controls {
@@ -103,7 +83,6 @@ input[type="checkbox"].filled-in:checked + span:after {
     justify-content: center;
     align-items: center;
     gap: 10px;
-    width: 100%;
     flex-wrap: wrap;
     padding: 10px 0;
     margin-top: 20px;
@@ -113,6 +92,8 @@ input[type="checkbox"].filled-in:checked + span:after {
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 16px;
+    padding: 0 10px;
 }
 
 #pagination-controls span {
@@ -130,23 +111,14 @@ input[type="checkbox"].filled-in:checked + span:after {
     cursor: not-allowed;
 }
 
-@media screen and (max-width: 768px) {
-    #pagination-controls {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
+@media screen and (max-width: 600px) {
     #pagination-controls button {
         font-size: 14px;
-        padding: 8px 12px;
+        padding: 0 5px;
     }
 
     #pagination-controls span {
         font-size: 14px;
-    }
-
-    #pagination-controls #page-numbers {
-        flex-wrap: wrap;
     }
 }
 
