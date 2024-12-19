@@ -209,10 +209,15 @@ document.addEventListener('DOMContentLoaded', function () {
         exitDelay: 100,
     });
 
-    const rowsPerPage = 10;
+    // Initialize the Materialize select dropdown
+    M.FormSelect.init(document.querySelectorAll('select'));
+
+    const rowsPerPageDropdown = document.getElementById('rows-per-page');
+    let rowsPerPage = parseInt(rowsPerPageDropdown.value); // Set default to 10
+
     const rows = document.querySelectorAll('.dispatch-row');
-    const totalRows = rows.length;
-    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    let totalRows = rows.length;
+    let totalPages = Math.ceil(totalRows / rowsPerPage);
     let currentPage = 1;
 
     const prevButton = document.getElementById('prev-page');
@@ -255,7 +260,6 @@ document.addEventListener('DOMContentLoaded', function () {
             pageNumbersContainer.appendChild(pageNumberButton);
         }
     }
-
 
     function addSelectAllRow() {
         const tbody = document.querySelector('#dispatch-table tbody');
@@ -302,6 +306,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.querySelectorAll('.dispatch-row input[type="checkbox"]:not(#select-all-checkbox)').forEach(checkbox => {
         checkbox.addEventListener('change', toggleSelectAllCheckbox);
+    });
+
+    rowsPerPageDropdown.addEventListener('change', function () {
+        rowsPerPage = parseInt(rowsPerPageDropdown.value);
+        totalPages = Math.ceil(rows.length / rowsPerPage);
+        currentPage = 1;
+        showPage(currentPage);
     });
 
     firstButton.addEventListener('click', () => showPage(1));

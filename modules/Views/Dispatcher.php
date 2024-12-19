@@ -222,6 +222,20 @@ class Dispatcher {
 
                                 <br>
 
+                                <div class="row">
+                                    <div class="input-field col s12">
+                                        <label for="rows-per-page"></label>
+                                        <select id="rows-per-page">
+                                            <option value="10" selected>10</option>
+                                            <option value="20">20</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                            <option value="<?= count($resultDispatchList)?>">Tout</option>
+                                        </select>
+                                        <label>Nombre de lignes par page</label>
+                                    </div>
+                                </div>
+                                
                                 <div id="pagination-controls" class="center-align">
                                     <button type="button" class="waves-effect waves-light btn" id="first-page"><i class="material-icons">first_page</i></button>
                                     <button type="button" class="waves-effect waves-light btn" id="prev-page"><i class="material-icons">arrow_back</i></button>
