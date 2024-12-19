@@ -317,10 +317,10 @@ class   Homepage {
                                 else if (isset($_SESSION['lastPage']) && $_SESSION['lastPage'] > 0 && $_SESSION['lastPage'] <= $totalPages) $page = $_SESSION['lastPage'];
                                 else $page = 1;
 
-                                for ($i = ($page-1)*($_SESSION['lineCount'] ?? 10) ; $i < $page*($_SESSION['lineCount'] ?? 10) && $i < count($table) ; ++$i):
+                                for ($i = 0 ; $i < count($table) ; ++$i):
                                     $row = $table[$i];
                                     ?>
-                                    <tr>
+                                    <tr class="homepage-row">
                                         <td><?= $row["student_name"] . " " . $row["student_firstname"] ?></td>
                                         <td><?= str_replace('_', ' ', $row["formation"]) ?></td>
                                         <td><?= str_replace('_', ' ', $row["class_group"]) ?></td>
@@ -364,36 +364,12 @@ class   Homepage {
                                 while ($start > 1 && $end - $start < (($_SESSION['lineCount'] ?? 10) -2)) --$start;
                                 ?>
                                 <div class="row"></div>
-                                <div class="pagination">
-                                    <?php if ($start > 1): ?>
-                                        <button class="waves-effect waves-light btn first" name="page" value="1" type="submit"><<</button>
-                                    <?php endif;
-
-                                    if ($page > 1): ?>
-                                        <button class="waves-effect waves-light btn prev" name="page" value="<?= $page - 1 ?>" type="submit">Précédent</button>
-                                    <?php endif;
-
-                                    if ($start > 1): ?>
-                                        <span class="hidden">...</span>
-                                    <?php endif;
-
-                                    for ($i = $start ; $i <= $end; ++$i): ?>
-                                        <button class="waves-effect waves-light btn <?= $i == $page ? 'active' : '' ?>" name="page" value="<?= $i ?>" type="submit"><?= $i ?></button>
-                                    <?php endfor;
-
-                                    if ($end < $totalPages): ?>
-                                        <span class="hidden">...</span>
-                                    <?php endif;
-
-                                    if ($page < $totalPages): ?>
-                                        <button class="waves-effect waves-light btn next" name="page" value="<?= $page + 1 ?>" type="submit">Suivant</button>
-                                    <?php endif;
-
-                                    if ($end < $totalPages): ?>
-                                        <button class="waves-effect waves-light btn last" name="page" value="<?= $totalPages ?>" type="submit">>></button>
-                                    <?php endif; ?>
-                                </div>
                         </form>
+                        <div class="selection">
+                            <button class="waves-effect waves-light btn" id="prev-page"><</button>
+                            <span id="page-number">1</span>
+                            <button class="waves-effect waves-light btn" id="next-page">></button>
+                        </div>
                         <? endif;
                     endif;
                 endif;
