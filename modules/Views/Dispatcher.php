@@ -224,7 +224,7 @@ class Dispatcher {
                                 <br>
 
                                 <div class="row">
-                                    <div class="input-field col s12">
+                                    <div class="input-field col s2">
                                         <label for="rows-per-page"></label>
                                         <select id="rows-per-page">
                                             <option value="10" selected>10</option>
