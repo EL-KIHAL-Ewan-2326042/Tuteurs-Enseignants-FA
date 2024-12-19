@@ -201,3 +201,110 @@ function showLoading() {
         formsSection.style.display = 'none';
     }
 }
+
+/** Pagination et bouton tout cocher **/
+
+document.addEventListener('DOMContentLoaded', function () {
+    const rowsPerPage = 10;
+    const rows = document.querySelectorAll('.dispatch-row');
+    const totalRows = rows.length;
+    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    let currentPage = 1;
+
+    const prevButton = document.getElementById('prev-page');
+    const nextButton = document.getElementById('next-page');
+    const firstButton = document.getElementById('first-page');
+    const lastButton = document.getElementById('last-page');
+    const pageNumbersContainer = document.getElementById('page-numbers');
+
+    function showPage(page) {
+        if (page < 1 || page > totalPages) return;
+
+        currentPage = page;
+        updatePageNumbers();
+
+        rows.forEach(row => row.style.display = 'none');
+        addSelectAllRow();
+
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = currentPage * rowsPerPage;
+        const visibleRows = Array.from(rows).slice(start, end);
+        visibleRows.forEach(row => row.style.display = '');
+
+        prevButton.disabled = currentPage === 1;
+        nextButton.disabled = currentPage === totalPages;
+        firstButton.disabled = currentPage === 1;
+        lastButton.disabled = currentPage === totalPages;
+    }
+
+    function updatePageNumbers() {
+        pageNumbersContainer.innerHTML = ''; // Clear the existing page numbers
+
+        for (let i = 1; i <= totalPages; i++) {
+            const pageNumberButton = document.createElement('button');
+            pageNumberButton.textContent = i;
+            pageNumberButton.classList.add('waves-effect', 'waves-light', 'btn');
+            pageNumberButton.classList.add('page-number');
+            pageNumberButton.disabled = (i === currentPage);
+            pageNumberButton.addEventListener('click', () => showPage(i));
+
+            pageNumbersContainer.appendChild(pageNumberButton);
+        }
+    }
+
+
+    function addSelectAllRow() {
+        const tbody = document.querySelector('#dispatch-table tbody');
+        let selectAllRow = document.querySelector('#select-all-row');
+
+        if (selectAllRow) {
+            selectAllRow.remove();
+        }
+
+        selectAllRow = document.createElement('tr');
+        selectAllRow.id = 'select-all-row';
+
+        selectAllRow.innerHTML = `<td></td>
+                                                          <td></td>
+                                                          <td></td>
+                                                          <td></td>
+                                                          <td></td>
+                                                          <td></td>
+                                                          <td></td>
+                                                          <td></td>
+                                                          <td></td>
+                                                          <td><strong>Tout cocher</strong></td>
+                                                          <td><label class="center">
+                                                               <input type="checkbox" id="select-all-checkbox" class="center-align filled-in" />
+                                                               <span></span>
+                                                           </label></td>`;
+        tbody.appendChild(selectAllRow);
+
+        const selectAllCheckboxElem = document.getElementById('select-all-checkbox');
+
+        selectAllCheckboxElem.addEventListener('change', function () {
+            const visibleRows = Array.from(rows).slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+            visibleRows.forEach(row => {
+                const checkbox = row.querySelector('input[type="checkbox"]');
+                checkbox.checked = selectAllCheckboxElem.checked;
+            });
+        });
+    }
+
+    function toggleSelectAllCheckbox() {
+        const selectAllCheckbox = document.getElementById('select-all-checkbox');
+        const visibleRows = Array.from(rows).slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+        selectAllCheckbox.checked = visibleRows.every(row => row.querySelector('input[type="checkbox"]').checked);
+    }
+
+    document.querySelectorAll('.dispatch-row input[type="checkbox"]:not(#select-all-checkbox)').forEach(checkbox => {
+        checkbox.addEventListener('change', toggleSelectAllCheckbox);
+    });
+
+    firstButton.addEventListener('click', () => showPage(1));
+    lastButton.addEventListener('click', () => showPage(totalPages));
+    prevButton.addEventListener('click', () => showPage(currentPage - 1));
+    nextButton.addEventListener('click', () => showPage(currentPage + 1));
+
+    showPage(1);
+});
