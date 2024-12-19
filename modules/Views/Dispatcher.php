@@ -104,6 +104,7 @@ class Dispatcher {
 
                     <form class="col card-panel white z-depth-3 s12 m5" style="padding: 20px;" action="./dispatcher" method="post" id="associate-form">
                         <div class="row">
+                            <p class="text">Associe un professeur à un stage (ne prend pas en compte le nombre maximum d'étudiant, ni le fait que le stage soit déjà attribué)</p>
                             <div class="input-field col s6">
                                 <input id="searchTeacher" name="searchTeacher" type="text" class="validate">
                                 <label for="searchTeacher">ID professeur</label>
