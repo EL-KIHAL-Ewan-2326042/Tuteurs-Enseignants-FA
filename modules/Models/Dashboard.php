@@ -7,7 +7,7 @@ use Includes\Database;
 use PDO;
 use PDOException;
 
-class dashboard{
+class Dashboard{
     private Database $db;
 
     /**
