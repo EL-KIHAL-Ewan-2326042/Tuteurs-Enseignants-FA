@@ -73,8 +73,10 @@ class Dispatcher{
      * @param array $dictCoef
      * @return array|array[]
      */
-    public function calculateRelevanceTeacherStudents(String $identifier, array $dictCoef): array
+    public function calculateRelevanceTeacherStudents(array $teacher, array $dictCoef): array
     {
+        $identifier = $teacher['id_teacher'];
+
         $internshipList = array();
         $departments = $this->globalModel->getDepTeacher($identifier);
         foreach($departments as $listDepTeacher) {
@@ -153,7 +155,7 @@ class Dispatcher{
             // Score normalise sur 5
             $ScoreFinal = ($totalScore * 5) / $totalCoef;
 
-            $newList = ["id_teacher" => $identifier, "internship_identifier" => $internship['internship_identifier'], "score" => round($ScoreFinal, 2), "type" => $internship['type']];
+            $newList = ["id_teacher" => $identifier, "teacher_name" => $teacher["teacher_name"], "teacher_firstname" => $teacher["teacher_firstname"], "student_number" => $internship["student_number"], "student_name" => $internship["student_name"], "student_firstname" => $internship["student_firstname"], "internship_identifier" => $internship['internship_identifier'], "internship_subject" => $internship["internship_subject"], "address" => $internship["address"], "company_name" => $internship["company_name"], "formation" => $internship["formation"], "class_group" => $internship["class_group"], "score" => round($ScoreFinal, 2), "type" => $internship['type']];
 
             if (!empty($newList)) {
                 $result[] = $newList;
@@ -170,7 +172,7 @@ class Dispatcher{
     /**
      * Permet de trouver la meilleure combinaison possible tuteur-stage et le renvoie sous forme de tableau
      * @param array $dicoCoef dictionnaire cle->nom_critere et valeur->coef
-     * @return array|array[] resultat final sous forme de matrice
+     * @return array|array[] resultat fina  l sous forme de matrice
      */
     public function dispatcher(array $dicoCoef): array
     {
@@ -179,18 +181,18 @@ class Dispatcher{
         $roleDepartments = $_SESSION['role_department'];
         $placeholders = implode(',', array_fill(0, count($roleDepartments), '?'));
 
-        $query = "SELECT Teacher.Id_teacher, 
-                  MAX(maxi_number_trainees) AS Max_trainees, 
-                  SUM(CASE 
-                  WHEN internship.type = 'alternance' THEN 2 
-                  WHEN internship.type = 'Internship' THEN 1 
-                  ELSE 0
-                  END) AS Current_count
-                  FROM Teacher
-                  JOIN has_role ON Teacher.Id_teacher = Has_role.user_id
-                  LEFT JOIN internship ON Teacher.Id_teacher = internship.Id_teacher
-                  WHERE department_name IN ($placeholders)
-                  GROUP BY Teacher.Id_teacher";
+        $query = "SELECT Teacher.Id_teacher, Teacher.teacher_name, Teacher.teacher_firstname,
+              MAX(maxi_number_trainees) AS Max_trainees, 
+              SUM(CASE 
+              WHEN internship.type = 'alternance' THEN 2 
+              WHEN internship.type = 'Internship' THEN 1 
+              ELSE 0
+              END) AS Current_count
+              FROM Teacher
+              JOIN has_role ON Teacher.Id_teacher = Has_role.user_id
+              LEFT JOIN internship ON Teacher.Id_teacher = internship.Id_teacher
+              WHERE department_name IN ($placeholders)
+              GROUP BY Teacher.Id_teacher";
 
         $stmt = $db->getConn()->prepare($query);
         $stmt->execute($roleDepartments);
@@ -208,9 +210,9 @@ class Dispatcher{
         $listStart = [];
         $listEleveFinal = [];
 
-        foreach ($listTeacherIntership as $teacherId => $currentCount) {
-            foreach ($this->calculateRelevanceTeacherStudents($teacherId, $dicoCoef) as $association) {
-               $listStart[] = $association;
+        foreach ($teacherData as $teacher) {
+            foreach ($this->calculateRelevanceTeacherStudents($teacher, $dicoCoef) as $association) {
+                $listStart[] = $association;
             }
         }
 
@@ -225,12 +227,12 @@ class Dispatcher{
             $topCandidate = $listStart[0];
             if ($assignedCounts[$topCandidate['id_teacher']] < $listTeacherMax[$topCandidate['id_teacher']] &&
                 !in_array($topCandidate['internship_identifier'], $listEleveFinal) && $topCandidate['type'] === 'Internship') {
-                if ($topCandidate['type'] = 'Internship' && $listTeacherMax[$topCandidate['id_teacher']] - $assignedCounts[$topCandidate['id_teacher']] > 1)  {
+                if ($topCandidate['type'] === 'Internship' && $listTeacherMax[$topCandidate['id_teacher']] - $assignedCounts[$topCandidate['id_teacher']] > 1)  {
                     $listFinal[] = $topCandidate;
                     $listEleveFinal[] = $topCandidate['internship_identifier'];
                     $assignedCounts[$topCandidate['id_teacher']] += 1;
                 }
-                elseif ($topCandidate['type'] = 'alternance' && $listTeacherMax[$topCandidate['id_teacher']] - $assignedCounts[$topCandidate['id_teacher']] > 2){
+                elseif ($topCandidate['type'] === 'alternance' && $listTeacherMax[$topCandidate['id_teacher']] - $assignedCounts[$topCandidate['id_teacher']] > 2){
                     $listFinal[] = $topCandidate;
                     $listEleveFinal[] = $topCandidate['internship_identifier'];
                     $assignedCounts[$topCandidate['id_teacher']] += 2;
@@ -238,7 +240,7 @@ class Dispatcher{
                 else array_shift($listStart);
             }
             else
-            array_shift($listStart);
+                array_shift($listStart);
         }
         return [$listFinal, $assignedCounts];
     }
