@@ -361,15 +361,18 @@ class Dashboard{
             throw new Exception("Les en-têtes sont manquants ou invalides pour la table $tableName.");
         }
 
-        // Construction de la requête SQL filtré par le département de l'administrateur
-        $query = "SELECT " . implode(',', array_map(fn($header) => "$tableName." . (string)$header, $headers)) . " FROM $tableName";
+        if ($tableName != 'teacher') {
+            // Construction de la requête SQL filtré par le département de l'administrateur
+            $query = "SELECT " . implode(',', array_map(fn($header) => "$tableName." . (string)$header, $headers)) . " FROM $tableName";
 
-        $query .= match ($tableName) {
-            'internship' => " JOIN student ON internship.student_number = student.student_number JOIN study_at ON study_at.student_number = student.student_number WHERE study_at.department_name = :department",
-            'student' => " JOIN study_at ON student.student_number = study_at.student_number WHERE study_at.department_name = :department",
-            'teacher' => " JOIN has_role ON teacher.id_teacher = has_role.user_id JOIN department ON department.department_name = has_role.department_name WHERE department.department_name = :department",
-            default => throw new Exception("Table non reconnue : " . $tableName),
-        };
+            $query .= match ($tableName) {
+                'internship' => " JOIN student ON internship.student_number = student.student_number JOIN study_at ON study_at.student_number = student.student_number WHERE study_at.department_name = :department",
+                'student' => " JOIN study_at ON student.student_number = study_at.student_number WHERE study_at.department_name = :department",
+                default => throw new Exception("Table non reconnue : " . $tableName),
+            };
+        }
+        else {$query = "SELECT teacher.maxi_number_trainees, teacher.id_teacher, teacher.teacher_name, teacher.teacher_firstname, CONCAT(has_address.address, '$', has_address.type) AS address_type, is_taught.discipline_name AS discipline FROM teacher  JOIN has_role ON teacher.id_teacher = has_role.user_id  JOIN department ON department.department_name = has_role.department_name  JOIN has_address ON teacher.id_teacher = has_address.id_teacher  JOIN is_taught ON teacher.id_teacher = is_taught.id_teacher  WHERE department.department_name = :department";
+        }
 
 
         if (is_array($department)) {
@@ -381,11 +384,13 @@ class Dashboard{
         $stmt->bindValue(':department', $department);
         $stmt->execute();
 
-        // Ecriture des données récupérées dans le fichier CSV
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            if ($tableName == 'teacher') {
+                $row['address$type'] = $row['address_type'];
+                unset($row['address_type']);
+            }
             fputcsv($output, $row);
         }
-
         fclose($output);
         $csvData = ob_get_clean();
         echo $csvData;

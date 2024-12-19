@@ -23,7 +23,7 @@ class Dashboard{
                 <!--Importation de nouveaux étudiants-->
                 <div class="row">
                     <h5> Rajouter des étudiants : </h5>
-                    <form action="/gestion-des-donnees" method="POST" enctype="multipart/form-data">
+                    <form action="/dashboard" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="table_name" value="student">
                         <div class="file-field input-field">
                             <div class="btn">
@@ -43,7 +43,7 @@ class Dashboard{
                 <!--Importation de nouveaux professeurs-->
                 <div class="row">
                     <h5> Rajouter des professeurs : </h5>
-                    <form action="/gestion-des-donnees" method="POST" enctype="multipart/form-data">
+                    <form action="/dashboard" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="table_name" value="teacher">
                         <div class="file-field input-field">
                             <div class="btn">
@@ -63,7 +63,7 @@ class Dashboard{
                 <!--Importation de nouveaux stages-->
                 <div class="row">
                     <h5> Rajouter des stages : </h5>
-                    <form action="/gestion-des-donnees" method="POST" enctype="multipart/form-data">
+                    <form action="/dashboard" method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="table_name" value="internship">
                         <div class="file-field input-field">
                             <div class="btn">
@@ -87,7 +87,7 @@ class Dashboard{
             <!--Exportation des tables : Etudiants/Professeurs/Stages-->
             <div class="card-panel white">
                 <h4>Exporter :</h4>
-                <form action="/gestion-des-donnees" method="POST">
+                <form action="/dashboard" method="POST">
                     <div>
                         <select name="export_list" required>
                             <option value="" disabled selected>Choisissez la liste à exporter</option>
