@@ -1,5 +1,5 @@
 /**
- * Partie 1
+ * Partie 1 Barre de recherche association directe
  */
 document.addEventListener('DOMContentLoaded', function () {
     const elems = document.querySelectorAll('select');
@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /**
- * Fetch results via AJAX from the server.
+ * Prendre les requetes avec une requête AJAX
  * @param query The search query.
  * @param searchType
  */
@@ -44,6 +44,7 @@ function fetchResults(query, searchType) {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
+            action: 'search',
             searchType: searchType,
             search: query,
         }),
@@ -65,7 +66,7 @@ function fetchResults(query, searchType) {
 
 
 /**
- * Display the results from the AJAX response.
+ * Afficher les résultats avec la requête AJAX
  * @param data The data received from the server.
  * @param action The action used to determine how to display the results.
  */
@@ -101,7 +102,7 @@ function displayResults(data, action) {
 }
 
 /**
- * Partie 2
+ * Partie 2: Coefficients
  */
 document.addEventListener('DOMContentLoaded', function () {
     const selects = document.querySelectorAll('select');
@@ -202,7 +203,9 @@ function showLoading() {
     }
 }
 
-/** Pagination et bouton tout cocher **/
+/**
+ *  Partie3: Pagination et bouton tout cocher
+ */
 
 document.addEventListener('DOMContentLoaded', function () {
     M.Tooltip.init(document.querySelectorAll('.star-rating'), {
@@ -322,3 +325,80 @@ document.addEventListener('DOMContentLoaded', function () {
 
     showPage(1);
 });
+
+/**
+ * Partie 4: Vue Etudiante
+ */
+document.addEventListener('DOMContentLoaded', function () {
+
+    function getTeachersForInternship(Id_teacher) {
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                action: 'TeachersForinternship',
+                Id_teacher: Id_teacher
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('ici');
+        })
+        .catch(error => {
+            console.error('Erreur fetch resultats:', error);
+        });
+    }
+
+    const tableBody = document.querySelector('#dispatch-table tbody');
+
+    if (tableBody) {
+        let lastTapTime = 0;
+        let tapTimeout;
+
+        ['click', 'touchstart'].forEach(eventType => {
+            tableBody.addEventListener(eventType, function (event) {
+                clearTimeout(tapTimeout);
+
+                const currentTime = new Date().getTime();
+                const timeSinceLastTap = currentTime - lastTapTime;
+
+                if (timeSinceLastTap > 100 && timeSinceLastTap < 300) {
+                    const clickedRow = getClickedRow(event.target);
+                    clickedRowIdentifier = clickedRow.getAttribute('data-internship-identifier');
+                }
+
+                if (timeSinceLastTap < 300 && timeSinceLastTap > 100) {
+                    const currentRow = getClickedRow(event.target);
+                    const currentRowIdentifier = currentRow.getAttribute('data-internship-identifier');
+
+                    if (currentRowIdentifier === clickedRowIdentifier) {
+                        const [Id_teacher, studentNumber] = currentRowIdentifier.split('$');
+
+                        getTeachersForInternship(Id_teacher);
+                    }
+                } else {
+                    lastTapTime = currentTime;
+                    tapTimeout = setTimeout(function() {
+                        lastTapTime = 0;
+                        clickedRowIdentifier = null;
+                    }, 500);
+                }
+
+                event.preventDefault();
+            });
+        });
+
+        function getClickedRow(element) {
+            while (element && element.tagName !== 'TR') {
+                element = element.parentElement;
+            }
+            return element;
+        }
+
+    } else {
+        console.error('Table with ID "dispatch-table" not found.');
+    }
+});
+

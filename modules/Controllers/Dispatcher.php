@@ -88,11 +88,19 @@ class Dispatcher {
             $errorMessageAfterSort = '';
             $checkMessageAfterSort = '';
 
-            if (isset($_POST['searchType']) && ($_POST['searchType'] === 'searchInternship' || $_POST['searchType'] === 'searchTeacher')) {
+            if (isset($_POST['action']) && ($_POST['action'] === 'search') && isset($_POST['searchType']) && ($_POST['searchType'] === 'searchInternship' || $_POST['searchType'] === 'searchTeacher')) {
                 $results = $dispatcherModel->correspondTerms();
 
                 header('Content-Type: application/json');
                 echo json_encode($results);
+                exit();
+            }
+
+            if (isset($_POST['action']) && ($_POST['action'] === 'TeachersForinternship')) {
+                $studentView = $dispatcherModel->correspondTerms();
+
+                header('Content-Type: application/json');
+                echo json_encode($studentView);
                 exit();
             }
 
