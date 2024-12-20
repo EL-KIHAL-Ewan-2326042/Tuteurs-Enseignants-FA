@@ -32,7 +32,7 @@ class GlobalModel {
      * @return false|array tableau contenant le numéro, le nom et le prénom de l'élève, ainsi que le nom de l'entreprise dans lequel il va faire son stage, le sujet et le numéro du stage, false sinon
      */
     public function getInternshipsPerDepartment(string $department): false|array {
-        $query = 'SELECT internship_identifier, company_name, internship_subject, address, internship.student_number, id_teacher, student_name, student_firstname, type, formation, class_group
+        $query = 'SELECT internship_identifier, internship.company_name, internship.internship_subject, internship.address, internship.student_number, internship.type, student.student_name, student.student_firstname, student.formation, student.class_group
                     FROM internship
                     JOIN student ON internship.student_number = student.student_number
                     JOIN study_at ON internship.student_number = study_at.student_number
