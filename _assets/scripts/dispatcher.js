@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 /**
- * Fetch results via AJAX from the server.
+ * Prendre les requetes avec une requête AJAX
  * @param query The search query.
  * @param searchType
  */
@@ -44,6 +44,7 @@ function fetchResults(query, searchType) {
             'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: new URLSearchParams({
+            action: 'search',
             searchType: searchType,
             search: query,
         }),
@@ -65,7 +66,7 @@ function fetchResults(query, searchType) {
 
 
 /**
- * Display the results from the AJAX response.
+ * Afficher les résultats avec la requête AJAX
  * @param data The data received from the server.
  * @param action The action used to determine how to display the results.
  */
@@ -101,7 +102,7 @@ function displayResults(data, action) {
 }
 
 /**
- * Partie 2
+ * Partie 2: Coefficients
  */
 document.addEventListener('DOMContentLoaded', function () {
     const selects = document.querySelectorAll('select');
@@ -202,17 +203,20 @@ function showLoading() {
     }
 }
 
-/** Pagination et bouton tout cocher **/
+/**
+ *  Partie3: Pagination et bouton tout cocher
+ */
 
 document.addEventListener('DOMContentLoaded', function () {
     M.Tooltip.init(document.querySelectorAll('.star-rating'), {
         exitDelay: 100,
     });
 
+    // Initialize the Materialize select dropdown
     M.FormSelect.init(document.querySelectorAll('select'));
 
     const rowsPerPageDropdown = document.getElementById('rows-per-page');
-    let rowsPerPage = parseInt(rowsPerPageDropdown.value);
+    let rowsPerPage = parseInt(rowsPerPageDropdown.value); // Set default to 10
 
     const rows = document.querySelectorAll('.dispatch-row');
     let totalRows = rows.length;
@@ -317,10 +321,14 @@ document.addEventListener('DOMContentLoaded', function () {
                                                           <td></td>
                                                           <td></td>
                                                           <td><strong>Tout cocher</strong></td>
-                                                          <td><label class="center">
-                                                               <input type="checkbox" id="select-all-checkbox" class="center-align filled-in" />
-                                                               <span></span>
-                                                           </label></td>`;
+                                                          <td>
+                                                              <p>
+                                                                  <label class="center">
+                                                                       <input type="checkbox" id="select-all-checkbox" class="center-align filled-in" />
+                                                                       <span data-type="checkbox"></span>
+                                                                   </label>
+                                                              </p>
+                                                           </td>`;
         tbody.appendChild(selectAllRow);
 
         const selectAllCheckboxElem = document.getElementById('select-all-checkbox');
@@ -364,5 +372,107 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     showPage(1);
+});
+
+/**
+ * Partie 4: Vue Etudiante
+ */
+document.addEventListener('DOMContentLoaded', function () {
+
+    function getDictCoef() {
+        var jsonString = document.getElementById('dictCoefJson').value;
+        try {
+            return JSON.parse(jsonString);
+        } catch (e) {
+            console.error("Invalid JSON string in dictCoefJson:", e);
+            return {};
+        }
+    }
+
+    function getTeachersForInternship(Internship_identifier) {
+        fetch(window.location.href, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams({
+                action: 'TeachersForinternship',
+                Internship_identifier: Internship_identifier,
+                dicoCoef: JSON.stringify(getDictCoef())
+            })
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(errorText => {
+                        console.error('Fetch error response:', errorText);
+                        throw new Error('Network response was not ok');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+            });
+    }
+
+    const tableBody = document.querySelector('#dispatch-table tbody');
+
+    if (tableBody) {
+        let lastTapTime = 0;
+        let tapTimeout;
+
+        ['click', 'touchstart'].forEach(eventType => {
+            tableBody.addEventListener(eventType, function (event) {
+
+                if ((event.target.tagName === 'SPAN'  && event.target.dataset.type === 'checkbox') || event.target.tagName === 'INPUT') {
+                    return;
+                }
+
+                console.log(event.target.tagName, event.target.dataset.type);
+                clearTimeout(tapTimeout);
+
+                const currentTime = new Date().getTime();
+                const timeSinceLastTap = currentTime - lastTapTime;
+
+                let clickedRowIdentifier;
+                if (timeSinceLastTap > 100 && timeSinceLastTap < 300) {
+                    const clickedRow = getClickedRow(event.target);
+                    clickedRowIdentifier = clickedRow.getAttribute('data-internship-identifier');
+                }
+
+                if (timeSinceLastTap < 300 && timeSinceLastTap > 100) {
+                    const currentRow = getClickedRow(event.target);
+                    const currentRowIdentifier = currentRow.getAttribute('data-internship-identifier');
+
+                    if (currentRowIdentifier === clickedRowIdentifier) {
+                        const [Internship_identifier, studentNumber] = currentRowIdentifier.split('$');
+
+                        getTeachersForInternship(Internship_identifier);
+                    }
+                } else {
+                    lastTapTime = currentTime;
+                    tapTimeout = setTimeout(function() {
+                        lastTapTime = 0;
+                        clickedRowIdentifier = null;
+                    }, 500);
+                }
+
+                event.preventDefault();
+            });
+        });
+
+        function getClickedRow(element) {
+            while (element && element.tagName !== 'TR') {
+                element = element.parentElement;
+            }
+            return element;
+        }
+
+    } else {
+        console.error('Table with ID "dispatch-table" not found.');
+    }
 });
 
