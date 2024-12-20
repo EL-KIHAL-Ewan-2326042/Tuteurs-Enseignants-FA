@@ -69,7 +69,7 @@ class Dispatcher{
      * @return array|array[] Tableau d'associations ('id_teacher', 'internship_identifier', 'score' et type')
      */
     /**
-     * @param String $identifier
+     * @param array $teacher
      * @param array $dictCoef
      * @return array|array[]
      */
