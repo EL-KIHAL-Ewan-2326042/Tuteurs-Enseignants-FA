@@ -73,7 +73,7 @@ class Dispatcher{
      * @param array $dictCoef
      * @return array|array[]
      */
-    public function calculateRelevanceTeacherStudents(array $teacher, array $dictCoef): array
+    public function RelevanceTeacher(array $teacher, array $dictCoef): array
     {
         $identifier = $teacher['id_teacher'];
 
@@ -91,75 +91,8 @@ class Dispatcher{
         $result = array();
 
         foreach($internshipList as $internship) {
-            $dictValues = array();
 
-            // Calculer les valeurs uniquement si elles sont nécessaires
-            if (isset($dictCoef['Distance'])) {
-                $dictValues["Distance"] = $this->globalModel->getDistance($internship['internship_identifier'], $identifier);
-            }
-
-            if (isset($dictCoef['Cohérence'])) {
-                $dictValues["Cohérence"] = round($this->globalModel->scoreDiscipSubject($internship['internship_identifier'], $identifier), 2);
-            }
-
-            if (isset($dictCoef['A été responsable'])) {
-                $internshipListData = $this->globalModel->getInternships($internship['internship_identifier']);
-                $dictValues["A été responsable"] = $internshipListData;
-            }
-
-            if (isset($dictCoef['Est demandé'])) {
-                $dictValues["Est demandé"] = $this->globalModel->isRequested($internship['internship_identifier'], $identifier);
-            }
-
-            $totalScore = 0;
-            $totalCoef = 0;
-
-            // Pour chaque critère dans le dictionnaire de coefficients, calculer le score associé
-            foreach ($dictCoef as $criteria => $coef) {
-                if (isset($dictValues[$criteria])) {
-                    $value = $dictValues[$criteria];
-
-                    switch ($criteria) {
-                        case 'Distance':
-                            $ScoreDuration = $coef / (1 + 0.02 * $value);
-                            $totalScore += $ScoreDuration;
-                            break;
-
-                        case 'A été responsable':
-                            $numberOfInternships = count($value);
-                            $baselineScore = 0.7 * $coef;
-
-                            if ($numberOfInternships > 0) {
-                                $ScoreInternship = $coef * min(1, log(1 + $numberOfInternships, 2));
-                            } else {
-                                $ScoreInternship = $baselineScore;
-                            }
-
-                            $totalScore += $ScoreInternship;
-                            break;
-
-                        case 'Est demandé':
-                        case 'Cohérence':
-                            $ScoreRelevance = $value * $coef;
-                            $totalScore += $ScoreRelevance;
-                            break;
-
-                        default:
-                            $totalScore += $value * $coef;
-                            break;
-                    }
-                    $totalCoef += $coef;
-                }
-            }
-
-            // Score normalise sur 5
-            $ScoreFinal = ($totalScore * 5) / $totalCoef;
-
-            $newList = ["id_teacher" => $identifier, "teacher_name" => $teacher["teacher_name"], "teacher_firstname" => $teacher["teacher_firstname"], "student_number" => $internship["student_number"], "student_name" => $internship["student_name"], "student_firstname" => $internship["student_firstname"], "internship_identifier" => $internship['internship_identifier'], "internship_subject" => $internship["internship_subject"], "address" => $internship["address"], "company_name" => $internship["company_name"], "formation" => $internship["formation"], "class_group" => $internship["class_group"], "score" => round($ScoreFinal, 2), "type" => $internship['type']];
-
-            if (!empty($newList)) {
-                $result[] = $newList;
-            }
+            $result[] = calculateRelevanceTeacherStudentsAssociate($teacher, $dictCoef, $internship);
         }
 
         if (!empty($result)) {
@@ -168,6 +101,122 @@ class Dispatcher{
         return [[]];
     }
 
+    public function RelevanceInternship(array $internship, array $dictCoef): array
+    {
+        $db = $this->db;
+        $internship = $internship['internship_identifier'];
+
+        $query = "SELECT Teacher.Id_teacher FROM Teacher 
+                  JOIN has_role ON Teacher.Id_teacher = has_role.user_id
+                  LEFT JOIN internship ON Teacher.Id_teacher = internship.Id_teacher
+                  AND department_name IN (
+                    SELECT department_name FROM Study_at 
+                    JOIN Student ON Study_at.student_number = Student.student_number
+                    JOIN Internship ON Internship.student_number = Internship.student_number
+                    WHERE Internship.internship_identifier = :internship)
+                  GROUP BY Teacher.Id_teacher
+                  HAVING Teacher.maxi_number_trainees > SUM(
+                    CASE 
+                        WHEN internship.type = 'alternance' THEN 2
+                        WHEN internship.type = 'Internship' THEN 1
+                        ELSE 0
+                    END) 
+                  ";
+
+        $stmt = $db->getConn()->prepare($query);
+        $stmt->bindValue(':internship', $internship);
+        $stmt->execute();
+        $teacherList = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $result = array();
+        foreach($teacherList as $teacher) {
+            $result[] = calculateRelevanceTeacherStudentsAssociate($teacher, $dictCoef, $internship);
+        }
+
+        if (!empty($result)) {
+            return $result;
+        }
+        return [[]];
+    }
+
+
+    public function calculateRelevanceTeacherStudentsAssociate(array $teacher, array $dictCoef, $internship): array{
+        $identifier = $teacher['id_teacher'];
+        $dictValues = array();
+
+        // Calculer les valeurs uniquement si elles sont nécessaires
+        if (isset($dictCoef['Distance'])) {
+            $dictValues["Distance"] = $this->globalModel->getDistance($internship['internship_identifier'], $identifier);
+        }
+
+        if (isset($dictCoef['Cohérence'])) {
+            $dictValues["Cohérence"] = round($this->globalModel->scoreDiscipSubject($internship['internship_identifier'], $identifier), 2);
+        }
+
+        if (isset($dictCoef['A été responsable'])) {
+            $internshipListData = $this->globalModel->getInternships($internship['internship_identifier']);
+            $dictValues["A été responsable"] = $internshipListData;
+        }
+
+        if (isset($dictCoef['Est demandé'])) {
+            $dictValues["Est demandé"] = $this->globalModel->isRequested($internship['internship_identifier'], $identifier);
+        }
+
+        $totalScore = 0;
+        $totalCoef = 0;
+
+        // Pour chaque critère dans le dictionnaire de coefficients, calculer le score associé
+        foreach ($dictCoef as $criteria => $coef) {
+            if (isset($dictValues[$criteria])) {
+                $value = $dictValues[$criteria];
+
+                switch ($criteria) {
+                    case 'Distance':
+                        $ScoreDuration = $coef / (1 + 0.02 * $value);
+                        $totalScore += $ScoreDuration;
+                        break;
+
+                    case 'A été responsable':
+                        $numberOfInternships = count($value);
+                        $baselineScore = 0.7 * $coef;
+
+                        if ($numberOfInternships > 0) {
+                            $ScoreInternship = $coef * min(1, log(1 + $numberOfInternships, 2));
+                        } else {
+                            $ScoreInternship = $baselineScore;
+                        }
+
+                        $totalScore += $ScoreInternship;
+                        break;
+
+                    case 'Est demandé':
+                    case 'Cohérence':
+                        $ScoreRelevance = $value * $coef;
+                        $totalScore += $ScoreRelevance;
+                        break;
+
+                    default:
+                        $totalScore += $value * $coef;
+                        break;
+                }
+                $totalCoef += $coef;
+            }
+        }
+
+        // Score normalise sur 5
+        $ScoreFinal = ($totalScore * 5) / $totalCoef;
+
+        $newList = ["id_teacher" => $identifier, "teacher_name" => $teacher["teacher_name"], "teacher_firstname" => $teacher["teacher_firstname"], "student_number" => $internship["student_number"], "student_name" => $internship["student_name"], "student_firstname" => $internship["student_firstname"], "internship_identifier" => $internship['internship_identifier'], "internship_subject" => $internship["internship_subject"], "address" => $internship["address"], "company_name" => $internship["company_name"], "formation" => $internship["formation"], "class_group" => $internship["class_group"], "score" => round($ScoreFinal, 2), "type" => $internship['type']];
+
+        if (!empty($newList)) {
+            $result[] = $newList;
+        }
+
+        if (!empty($result)) {
+            return $result;
+        }
+        return [];
+    }
 
     /**
      * Permet de trouver la meilleure combinaison possible tuteur-stage et le renvoie sous forme de tableau
@@ -211,7 +260,7 @@ class Dispatcher{
         $listEleveFinal = [];
 
         foreach ($teacherData as $teacher) {
-            foreach ($this->calculateRelevanceTeacherStudents($teacher, $dicoCoef) as $association) {
+            foreach ($this->RelevanceTeacher($teacher, $dicoCoef) as $association) {
                 $listStart[] = $association;
             }
         }
