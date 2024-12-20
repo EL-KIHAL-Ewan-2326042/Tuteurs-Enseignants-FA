@@ -7,7 +7,7 @@ class Dashboard{
     /**
      * @param string $message
      */
-    public function __construct(private readonly string $message){}
+    public function __construct(private readonly string $message,private readonly string $errorMessage){}
 
     /**
      * Vue de la pas de Gestion des données
@@ -18,6 +18,7 @@ class Dashboard{
         <main>
             <h3> Gestion des données </h3>
             <div class="card-panel white">
+                <div class="tooltip-container" data-tooltip="1. Exporter le modèle correspondant <br> 2. Inscrivez vos données <br> 3. Importez le fichier csv ci-dessous">(?)</div>
                 <h4>Importer :</h4>
 
                 <!--Importation de nouveaux étudiants-->
@@ -81,28 +82,55 @@ class Dashboard{
                 </div>
 
                 <p class="message"><?php echo $this->message; ?></p>
+                <p class="errorMessage"><?php echo $this->errorMessage?></p>
 
             </div>
 
-            <!--Exportation des tables : Etudiants/Professeurs/Stages-->
-            <div class="card-panel white">
-                <h4>Exporter :</h4>
-                <form action="/dashboard" method="POST">
-                    <div>
-                        <select name="export_list" required>
-                            <option value="" disabled selected>Choisissez la liste à exporter</option>
-                            <option value="student">Etudiants</option>
-                            <option value="teacher">Professeurs</option>
-                            <option value="internship">Stages</option>
-                        </select>
-                        <label>Choisissez la liste à exporter</label>
-                    </div>
-                    <div class="input-field">
-                        <button class="btn waves-effect waves-light" type="submit">Exporter
-                            <i class="material-icons right">send</i>
-                        </button>
-                    </div>
-                </form>
+            <!--Exportation-->
+            <div class="export">
+                <div class="card-panel white">
+                    <!--Exportation des listes : Etudiants/Professeurs/Stages-->
+                    <div class="tooltip-container" data-tooltip="Exportation des données d'une liste choisie dans un fichier .csv">(?)</div>
+                    <h4>Exporter une liste :</h4>
+                    <form action="/dashboard" method="POST">
+                        <div>
+                            <select name="export_list" required>
+                                <option value="" disabled selected>Choisissez la liste à exporter</option>
+                                <option value="student">Etudiants</option>
+                                <option value="teacher">Professeurs</option>
+                                <option value="internship">Stages</option>
+                            </select>
+                            <label>Choisissez la liste à exporter</label>
+                        </div>
+                        <div class="input-field">
+                            <button class="btn waves-effect waves-light" type="submit">Exporter
+                                <i class="material-icons right">send</i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!--Exportation des modèles des tables-->
+                <div class="card-panel white">
+                    <div class="tooltip-container" data-tooltip="Exportation d'un modèle d'une liste choisie dans un fichier .csv (Il n'y a que les noms de colonnes de la liste choisie)">(?)</div>
+                    <h4>Exporter un modèle:</h4>
+                    <form action="/dashboard" method="POST">
+                        <div>
+                            <select name="export_model" required>
+                                <option value="" disabled selected>Choisissez le modèle à exporter</option>
+                                <option value="student">Etudiants</option>
+                                <option value="teacher">Professeurs</option>
+                                <option value="internship">Stages</option>
+                            </select>
+                            <label>Choisissez la liste à exporter</label>
+                        </div>
+                        <div class="input-field">
+                            <button class="btn waves-effect waves-light" type="submit">Exporter
+                                <i class="material-icons right">send</i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </main>
 <?php

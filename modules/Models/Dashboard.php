@@ -68,7 +68,7 @@ class Dashboard{
     public function getCsvHeaders(string $csvFilePath): array {
         // Ouverture du fichier CSV et lecture de la première ligne (les en-têtes)
         if (($handle = fopen($csvFilePath, "r")) !== FALSE) {
-            $headers = fgetcsv($handle,1000,",");
+            $headers = fgetcsv($handle,1000,";");
             fclose($handle);
             return $headers ?: [];
         }
@@ -87,11 +87,22 @@ class Dashboard{
         // Comparaison des en-têtes du CSV avec les colonnes de la table dans la base de données
         $tableColumns = array_map('strtolower', $this->getTableColumn($tableName));
         $csvHeaders = array_map('strtolower', $headers);
-        if (($tableName != 'teacher' AND array_diff($csvHeaders, $tableColumns)) OR ($tableName = 'teacher' AND array_diff($csvHeaders, array_merge($tableColumns, ['address$type'],['discipline_name'])))) {
-            throw new Exception("Les colonnes CSV ne correspondent pas à la table $tableName ou au valeur demandé pour la table teacher.");
-        }
-        else {
-            return true;
+
+        error_log("Table columns: " . print_r($tableColumns[0], true));
+        error_log("CSV headers: " . print_r($csvHeaders[0], true));
+
+        try {
+            if (($tableName != 'teacher' AND array_diff($csvHeaders, $tableColumns)) OR
+                ($tableName == 'teacher' AND array_diff($csvHeaders, array_merge($tableColumns, ['address$type'], ['discipline_name'])))) {
+
+                // Crée une exception avec les colonnes CSV qui causent l'erreur
+                throw new Exception("Les colonnes CSV ne correspondent pas à la table $tableName ou aux valeurs demandées pour la table teacher. Colonnes CSV: " . implode(', ', $csvHeaders) . " Colonnes attendues: " . implode(', ', array_merge($tableColumns, ['address$type'], ['discipline_name'])));
+            } else {
+                return true;
+            }
+        } catch (Exception $e) {
+            // Affichage du message d'erreur détaillé
+            echo "Erreur : " . $e->getMessage();
         }
     }
 
@@ -107,12 +118,11 @@ class Dashboard{
             throw new Exception("Impossible d'ouvrir le fichier CSV.");
         }
 
-        /**
-        $headers = fgetcsv($handle, 1000, ",");
+        $headers = fgetcsv($handle, 1000, ";");
         if (!$this->validateHeaders($headers, $tableName)) {
             fclose($handle);
             return false;
-        } **/
+        }
 
         try {
             while (($data = fgetcsv($handle, 1000, ";")) !== false) {
@@ -120,9 +130,9 @@ class Dashboard{
             }
             fclose($handle);
             return true;
-        } catch (Exception) {
+        } catch (Exception $e) {
             fclose($handle);
-            throw new Exception("Erreur lors du traitement du fichier CSV (merci de vérifier que vous repectez bien le guide utilisateur).");
+            throw new Exception("Erreur lors du traitement du fichier CSV (merci de vérifier que vous repectez bien le guide utilisateur).". $e->getMessage());
         }
     }
 
@@ -186,7 +196,9 @@ class Dashboard{
     private function insertTeacherData(array $data): void {
         $teacher = [$data[0], $data[1], $data[2], $data[3]];
         $discipline = ['discipline_name' => $data[4]];
-        $address = ['address' => explode('$',$data[4])[0], 'type'=> explode('$',$data[4])[1]];
+        $address = [
+            'address' => explode('$',$data[5])[0],
+            'type'=> explode('$',$data[5])[1]];
 
         // Colonnes pour la table teacher
         $teacherColumns = $this->getTableColumn('teacher');
@@ -355,7 +367,7 @@ class Dashboard{
         }
 
         // Ecriture des en-têtes dans le fichier CSV
-        fputcsv($output, $headers);
+        fputcsv($output, $headers, ';');
 
         if (empty($headers)) {
             throw new Exception("Les en-têtes sont manquants ou invalides pour la table $tableName.");
@@ -386,10 +398,13 @@ class Dashboard{
 
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             if ($tableName == 'teacher') {
-                $row['address$type'] = $row['address_type'];
-                unset($row['address_type']);
+                if (isset($row['address_type']) && isset($row['discipline_name'])) {
+                    $row['address$type'] = $row['address_type'] . ' ' . $row['discipline_name'];
+                    unset($row['address_type']);
+                    unset($row['discipline_name']);
+                }
             }
-            fputcsv($output, $row);
+            fputcsv($output, $row, ';');
         }
         fclose($output);
         $csvData = ob_get_clean();
@@ -398,5 +413,51 @@ class Dashboard{
         exit();
     }
 
+    /**
+     * Exporte un modèle CSV avec les bonnes colonnes
+     * @param string $tableName Nom de la table
+     * @return bool Retourne true si l'export réussit, sinon lève une exception
+     * @throws Exception Si le fichier CSV ne peut être ouvert ou si aucune colonne n'est trouvée dans la table
+     */
+    public function exportModel(string $tableName): bool {
+        $db = $this->db;
+
+        ob_start();
+
+        // Configuration des en-têtes HTTP pour le téléchargement du fichier CSV
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="' . $tableName . '_export.csv"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        // Ouverture d'un flux de sortie pour écrire dans le fichier CSV
+        $output = fopen('php://output', 'w');
+        if ($output === false){
+            throw new Exception("Impossible d'ouvrir le fichier CSV");
+        }
+
+        // Récupération des colonnes de la base de données
+        $columns = $this->getTableColumn($tableName);
+
+        // Ajout de colonnes spécifiques pour la table 'teacher'
+        if ($tableName === 'teacher') {
+            $columns[] = 'address$type';
+            $columns[] = 'discipline_name';
+        }
+
+        // Vérification que des colonnes ont bien été trouvées
+        if (empty($columns)) {
+            throw new Exception("Aucune colonne trouvée pour la table $tableName.");
+        }
+
+        // Ecriture des en-têtes dans le fichier CSV
+        fputcsv($output, $columns,';');
+
+        fclose($output);
+        $csvData = ob_get_clean();
+        echo $csvData;
+
+        exit();
+    }
 
 }
