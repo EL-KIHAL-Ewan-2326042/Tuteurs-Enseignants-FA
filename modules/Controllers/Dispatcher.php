@@ -96,8 +96,8 @@ class Dispatcher {
                 exit();
             }
 
-            if (isset($_POST['action']) && ($_POST['action'] === 'TeachersForinternship')) {
-                $studentView = $dispatcherModel->correspondTerms();
+            if (isset($_POST['action']) && ($_POST['action'] === 'TeachersForinternship') && isset($_POST['Internship_identifier']) && isset($_POST['dicoCoef'])) {
+                $studentView = $dispatcherModel->RelevanceInternship($_POST['Internship_identifier'], $_POST['dicoCoef']);
 
                 header('Content-Type: application/json');
                 echo json_encode($studentView);

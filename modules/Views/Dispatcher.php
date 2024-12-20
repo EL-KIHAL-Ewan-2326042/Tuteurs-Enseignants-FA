@@ -23,6 +23,11 @@ class Dispatcher {
             <div class="col">
                 <h3 class="center-align">Répartiteur de tuteurs enseignants</h3>
 
+                <?php
+                $coucou = $this->dispatcherModel->RelevanceInternship('V08756321AB', ['A été responsable' => 1]);
+                print_r($coucou);
+                ?>
+
                 <?php if (!isset($_POST['action']) || $_POST['action'] !== 'generate'): ?>
                 <div class="row" id="forms-section">
                     <div class="col card-panel white z-depth-3 s12 m6" style="padding: 20px; margin-right: 10px">
@@ -188,7 +193,11 @@ class Dispatcher {
                                             return isset($_POST['criteria_enabled'][$key]);
                                         }, ARRAY_FILTER_USE_BOTH);
 
-                                        if (empty($dictCoef)) {
+                                        if (!empty($dictCoef)) {
+                                            $escapedJson = htmlspecialchars(json_encode($dictCoef), ENT_QUOTES);
+
+                                            echo "<input type='hidden' id='dictCoefJson' value='" . $escapedJson . "'>";
+                                        } else {
                                             header('location: ./dispatcher');
                                         }
 

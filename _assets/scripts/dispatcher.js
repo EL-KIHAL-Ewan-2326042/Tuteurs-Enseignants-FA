@@ -331,7 +331,13 @@ document.addEventListener('DOMContentLoaded', function () {
  */
 document.addEventListener('DOMContentLoaded', function () {
 
-    function getTeachersForInternship(Id_teacher) {
+    function getDictCoef() {
+        var jsonString = document.getElementById('dictCoefJson').value;
+        return JSON.parse(jsonString);
+    }
+
+    function getTeachersForInternship(Internship_identifier) {
+        console.log(Internship_identifier, getDictCoef());
         fetch(window.location.href, {
             method: 'POST',
             headers: {
@@ -339,12 +345,13 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             body: new URLSearchParams({
                 action: 'TeachersForinternship',
-                Id_teacher: Id_teacher
+                Internship_identifier: Internship_identifier,
+                dicoCoef: getDictCoef()
             })
         })
         .then(response => response.json())
         .then(data => {
-            console.log('ici');
+            console.log(data);
         })
         .catch(error => {
             console.error('Erreur fetch resultats:', error);
@@ -374,9 +381,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     const currentRowIdentifier = currentRow.getAttribute('data-internship-identifier');
 
                     if (currentRowIdentifier === clickedRowIdentifier) {
-                        const [Id_teacher, studentNumber] = currentRowIdentifier.split('$');
+                        const [Internship_identifier, studentNumber] = currentRowIdentifier.split('$');
 
-                        getTeachersForInternship(Id_teacher);
+                        getTeachersForInternship(Internship_identifier);
                     }
                 } else {
                     lastTapTime = currentTime;
