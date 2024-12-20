@@ -8,18 +8,20 @@ use PDOException;
 
 class Account {
     private Database $db;
+    private \Blog\Models\GlobalModel $globalModel;
 
-    public function __construct(Database $db) {
+    public function __construct(Database $db, \Blog\Models\GlobalModel $globalModel){
         $this->db = $db;
+        $this->globalModel = $globalModel;
     }
 
     /**
      * Récupère les informations relatives aux stages et alternances à venir ou en cours dont l'enseignant passé en paramètre est le tuteur
      * @param string $teacher numéro de l'enseignant
-     * @return false|array tableau contenant le nom de l'entreprise, son adresse, le sujet du stage, son type, le nom et prénom de l'étudiant, sa formation et son groupe, false sinon
+     * @return array tableau (pouvant être vide s'il n'y a aucun résultat ou qu'il y a eu une erreur) contenant le nom de l'entreprise, son adresse, le sujet du stage, son type, le nom et prénom de l'étudiant, sa formation et son groupe
      */
-    public function getInterns(string $teacher): false|array {
-        $query = 'SELECT company_name, internship_subject, address, student_name, student_firstname, type, formation, class_group
+    public function getInterns(string $teacher): array {
+        $query = 'SELECT company_name, internship_subject, address, student_name, student_firstname, type, formation, class_group, internship.student_number, internship_identifier, id_teacher
                     FROM internship
                     JOIN student ON internship.student_number = student.student_number
                     WHERE id_teacher = :teacher
@@ -27,7 +29,25 @@ class Account {
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':teacher', $teacher);
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $studentsList = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!$studentsList) return array();
+
+        foreach($studentsList as &$row) {
+            // le nombre de stages complétés par l'étudiant
+            $internships = $this->globalModel->getInternships($row['student_number']);
+
+            // l'année durant laquelle le dernier stage/alternance de l'étudiant a eu lieu avec l'enseignant comme tuteur
+            $row['year'] = "";
+
+            // le nombre de fois où l'enseignant a été le tuteur de l'étudiant
+            $row['internshipTeacher'] = $internships ? $this->globalModel->getInternshipTeacher($internships, $teacher, $row['year']) : 0;
+
+            // durée en minute séparant l'enseignant de l'adresse de l'entreprise où l'étudiant effectue son stage
+            $row['duration'] = $this->globalModel->getDistance($row['internship_identifier'], $teacher, isset($row['id_teacher']));
+        }
+
+        return $studentsList;
     }
 
     public function getCountInternsPerType(array $interns, &$internship, &$alternance): void {
@@ -36,8 +56,8 @@ class Account {
         if (empty($interns)) return;
 
         foreach ($interns as $intern) {
-            if ($intern['type'] == 'Internship') ++$internship;
-            if ($intern['type'] == 'alternance') ++$alternance;
+            if (strtolower($intern['type']) == 'internship') ++$internship;
+            if (strtolower($intern['type']) == 'alternance') ++$alternance;
         }
     }
 

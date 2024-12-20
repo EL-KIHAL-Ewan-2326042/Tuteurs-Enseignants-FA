@@ -123,7 +123,7 @@ class Homepage {
             $row['year'] = "";
 
             // le nombre de fois où l'enseignant a été le tuteur de l'étudiant
-            $row['internshipTeacher'] = $internships ? $this->getInternshipTeacher($internships, $identifier, $row['year']) : 0;
+            $row['internshipTeacher'] = $internships ? $this->globalModel->getInternshipTeacher($internships, $identifier, $row['year']) : 0;
 
             // true si l'enseignant a déjà demandé à tutorer le stage, false sinon
             $row['requested'] = in_array($row['internship_identifier'], $requests);
@@ -133,26 +133,6 @@ class Homepage {
         }
 
         return $studentsList;
-    }
-
-    /**
-     * Renvoie le nombre de fois où l'enseignant passé en paramètre a été tuteur dans le tableau passé en paramètre
-     * @param array $internshipStudent tableau renvoyé par la méthode 'getInternships()'
-     * @param string $teacher numéro de l'enseignant
-     * @param string $year dernière année durant laquelle l'enseignant a été tuteur
-     * @return int nombre de fois où l'enseignant connecté a été tuteur dans le tablau passé en paramètre
-     */
-    public function getInternshipTeacher(array $internshipStudent, string $teacher, string &$year): int {
-        $internshipTeacher = 0;
-        foreach($internshipStudent as $row) {
-            if($row['id_teacher'] == $teacher) {
-                ++$internshipTeacher;
-                if ($internshipTeacher == 1) {
-                    $year = substr($row['start_date_internship'], 0, 4);
-                }
-            }
-        }
-        return $internshipTeacher;
     }
 
     /**

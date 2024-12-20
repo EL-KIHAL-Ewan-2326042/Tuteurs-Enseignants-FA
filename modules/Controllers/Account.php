@@ -31,7 +31,7 @@ class Account {
         }
 
         $db = Database::getInstance();
-        $model = new \Blog\Models\Account($db);
+        $model = new \Blog\Models\Account($db, new \Blog\Models\GlobalModel($db));
         $view = new \Blog\Views\Account($model);
 
         $title = "Compte";
