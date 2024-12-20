@@ -201,7 +201,7 @@ class Dispatcher {
                                                 <td><?= $resultDispatch['company_name'] . ' (' .$resultDispatch['internship_identifier'] . ')'; ?></td>
                                                 <td><?= $resultDispatch['formation'] ?></td>
                                                 <td><?= $resultDispatch['class_group'] ?></td>
-                                                <td><?= $resultDispatch['year'] ?></td>
+                                                <td><?= 'dd/mm/yyyy' ?></td>
                                                 <td><?= $resultDispatch['internship_subject'] ?></td>
                                                 <td><?= $resultDispatch['address'] ?></td>
                                                 <td>
