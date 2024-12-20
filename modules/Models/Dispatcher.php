@@ -91,8 +91,9 @@ class Dispatcher{
         $result = array();
 
         foreach($internshipList as $internship) {
-
-            $result[] = calculateRelevanceTeacherStudentsAssociate($teacher, $dictCoef, $internship);
+            print_r($teacher);
+            print_r($internship);
+            $result[] = $this->calculateRelevanceTeacherStudentsAssociate($teacher, $dictCoef, $internship);
         }
 
         if (!empty($result)) {
@@ -101,21 +102,36 @@ class Dispatcher{
         return [[]];
     }
 
-    public function RelevanceInternship(array $internship, array $dictCoef): array
+    public function RelevanceInternship(string $internship, array $dictCoef): array
     {
         $db = $this->db;
-        $internship = $internship['internship_identifier'];
+        $internship = ['internship_identifier' => $internship];
 
-        $query = "SELECT Teacher.Id_teacher FROM Teacher 
+        $query = "SELECT Teacher.Id_teacher, Teacher.teacher_name, Teacher.teacher_firstname, Student.Student_number, Student.student_name, Internship.internship_identifier, Internship.internship_subject, Internship.address, Internship.company_name, Student.formation, Student.class_group, Internship.type FROM Teacher 
                   JOIN has_role ON Teacher.Id_teacher = has_role.user_id
-                  LEFT JOIN internship ON Teacher.Id_teacher = internship.Id_teacher
-                  AND department_name IN (
-                    SELECT department_name FROM Study_at 
-                    JOIN Student ON Study_at.student_number = Student.student_number
-                    JOIN Internship ON Internship.student_number = Internship.student_number
-                    WHERE Internship.internship_identifier = :internship)
-                  GROUP BY Teacher.Id_teacher
-                  HAVING Teacher.maxi_number_trainees > SUM(
+                  JOIN Study_at ON Study_at.department_name = has_role.department_name
+                  JOIN Student ON Student.student_number = Study_at.student_number
+                  JOIN INTERNSHIP ON Internship.student_number = Student.student_number
+                  WHERE has_role.department_name IN (SELECT department_name 
+                                            FROM Study_at 
+                                            JOIN Student ON Study_at.student_number = Student.student_number
+                                            JOIN Internship ON Internship.student_number = Internship.student_number
+                                            WHERE Internship.internship_identifier = :internship
+                                            GROUP BY department_name) AND Internship.internship_identifier = :internship
+                  GROUP BY 
+                        Teacher.Id_teacher, 
+                        Teacher.teacher_name, 
+                        Teacher.teacher_firstname, 
+                        Student.Student_number, 
+                        Student.student_name, 
+                        Internship.internship_identifier, 
+                        Internship.internship_subject, 
+                        Internship.address, 
+                        Internship.company_name, 
+                        Student.formation, 
+                        Student.class_group, 
+                        Internship.type
+                    HAVING Teacher.maxi_number_trainees > SUM(
                     CASE 
                         WHEN internship.type = 'alternance' THEN 2
                         WHEN internship.type = 'Internship' THEN 1
@@ -124,14 +140,12 @@ class Dispatcher{
                   ";
 
         $stmt = $db->getConn()->prepare($query);
-        $stmt->bindValue(':internship', $internship);
+        $stmt->bindValue(':internship', $internship['internship_identifier']);
         $stmt->execute();
         $teacherList = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $result = array();
-        foreach($teacherList as $teacher) {
-            $result[] = calculateRelevanceTeacherStudentsAssociate($teacher, $dictCoef, $internship);
-        }
+        $result[] = $this->calculateRelevanceTeacherStudentsAssociate($teacherList, $dictCoef, $internship);
+
 
         if (!empty($result)) {
             return $result;
@@ -139,8 +153,7 @@ class Dispatcher{
         return [[]];
     }
 
-
-    public function calculateRelevanceTeacherStudentsAssociate(array $teacher, array $dictCoef, $internship): array{
+    public function calculateRelevanceTeacherStudentsAssociate(array $teacher, array $dictCoef, array $internship): array{
         $identifier = $teacher['id_teacher'];
         $dictValues = array();
 
@@ -209,13 +222,10 @@ class Dispatcher{
         $newList = ["id_teacher" => $identifier, "teacher_name" => $teacher["teacher_name"], "teacher_firstname" => $teacher["teacher_firstname"], "student_number" => $internship["student_number"], "student_name" => $internship["student_name"], "student_firstname" => $internship["student_firstname"], "internship_identifier" => $internship['internship_identifier'], "internship_subject" => $internship["internship_subject"], "address" => $internship["address"], "company_name" => $internship["company_name"], "formation" => $internship["formation"], "class_group" => $internship["class_group"], "score" => round($ScoreFinal, 2), "type" => $internship['type']];
 
         if (!empty($newList)) {
-            $result[] = $newList;
+            return $newList;
         }
 
-        if (!empty($result)) {
-            return $result;
-        }
-        return [];
+        return [[]];
     }
 
     /**
