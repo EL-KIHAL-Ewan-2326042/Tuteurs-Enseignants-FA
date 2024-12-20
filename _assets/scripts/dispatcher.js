@@ -333,11 +333,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function getDictCoef() {
         var jsonString = document.getElementById('dictCoefJson').value;
-        return JSON.parse(jsonString);
+        try {
+            return JSON.parse(jsonString);
+        } catch (e) {
+            console.error("Invalid JSON string in dictCoefJson:", e);
+            return {};
+        }
     }
 
     function getTeachersForInternship(Internship_identifier) {
-        console.log(Internship_identifier, getDictCoef());
         fetch(window.location.href, {
             method: 'POST',
             headers: {
@@ -346,16 +350,24 @@ document.addEventListener('DOMContentLoaded', function () {
             body: new URLSearchParams({
                 action: 'TeachersForinternship',
                 Internship_identifier: Internship_identifier,
-                dicoCoef: getDictCoef()
+                dicoCoef: JSON.stringify(getDictCoef())
             })
         })
-        .then(response => response.json())
-        .then(data => {
-            console.log(data);
-        })
-        .catch(error => {
-            console.error('Erreur fetch resultats:', error);
-        });
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(errorText => {
+                        console.error('Fetch error response:', errorText);
+                        throw new Error('Network response was not ok');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+            });
     }
 
     const tableBody = document.querySelector('#dispatch-table tbody');
@@ -371,6 +383,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const currentTime = new Date().getTime();
                 const timeSinceLastTap = currentTime - lastTapTime;
 
+                let clickedRowIdentifier;
                 if (timeSinceLastTap > 100 && timeSinceLastTap < 300) {
                     const clickedRow = getClickedRow(event.target);
                     clickedRowIdentifier = clickedRow.getAttribute('data-internship-identifier');
