@@ -297,7 +297,7 @@ class Homepage {
      * @param string $teacher numéro de l'enseignant
      * @return true|string renvoie true si les insert et delete ont fonctionné, sinon l'erreur dans un string
      */
-    public function updateRequests(array $requests, string $teacher): bool|string {
+    public function updateRequests(array $requests, string $teacher): true|string {
         $current_requests = $this->getRequests($teacher);
         if(!$current_requests) $current_requests = array();
 
@@ -335,7 +335,14 @@ class Homepage {
         return true;
     }
 
-    public function updateSearchedStudent(bool $add, string $teacher, string $internship): bool|string {
+    /**
+     * Insère ou supprime de la table is_requested l'enseignant et le stage passés en paramètre
+     * @param bool $add est true s'il faut ajouter la ligne, false s'il faut la supprimer
+     * @param string $teacher numéro de l'enseignant
+     * @param string $internship numéro du stage
+     * @return true|string renvoie true si la requête a fonctionné, sinon l'erreur dans un string
+     */
+    public function updateSearchedStudent(bool $add, string $teacher, string $internship): true|string {
         $current_requests = $this->getRequests($teacher);
         if ($add) {
             if (!in_array($internship, $current_requests)) {

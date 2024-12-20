@@ -1,0 +1,72 @@
+@import "global.css";
+
+main {
+    flex-direction: column;
+}
+
+.center {
+    justify-content: center;
+    width: 70%;
+    align-items: flex-start;
+}
+
+h3, h4 {
+    color: var(--main-color);
+}
+
+main a {
+    color: black;
+}
+
+main a:visited {
+    color: black;
+}
+
+main a:hover {
+    color: var(--main-color);
+}
+
+.btn {
+    background-color: #00558B;
+    z-index: 0;
+}
+
+.btn:hover {
+    background-color: #E8CE7E;
+}
+
+/* Style des options dans le menu déroulant du select */
+.dropdown-content li>a, .dropdown-content li>span{
+    padding: 15px;
+    color: #00558B;
+}
+
+.countInternships {
+    width: 85%;
+    justify-content: flex-start;
+}
+
+.countInternships .cell {
+    padding: 1rem;
+}
+
+.countInternships .cell form {
+    display: flex;
+    flex-direction: row;
+    width: 50%;
+    justify-content: space-between;
+}
+
+.countInternships .cell form div {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.input-field {
+    width: 50%;
+}
+
+.form {
+    border: 
+}

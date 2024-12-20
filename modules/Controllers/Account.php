@@ -5,7 +5,7 @@ namespace Blog\Controllers;
 use Blog\Views\Layout;
 use Includes\Database;
 use Blog\Views\Account as AccountView;
-use Blog\Views\Account as AccountModel;
+use Blog\Models\Account as AccountModel;
 
 class Account {
     private Layout $layout;
@@ -35,8 +35,8 @@ class Account {
         $view = new \Blog\Views\Account($model);
 
         $title = "Compte";
-        $cssFilePath = '';
-        $jsFilePath = '';
+        $cssFilePath = '_assets/styles/account.css';
+        $jsFilePath = '_assets/scripts/account.js';
 
         $this->layout->renderTop($title, $cssFilePath);
         $view->showView();
