@@ -21,7 +21,7 @@ class Dispatcher {
         ?>
         <main>
             <div class="col">
-                <h3 class="center-align">Répartiteur de tuteurs enseignants</h3>
+                <h3 class="center-align flow-text">Répartiteur de tuteurs enseignants</h3>
 
                 <?php if (!isset($_POST['action']) || $_POST['action'] !== 'generate'): ?>
                 <div class="row" id="forms-section">
@@ -163,30 +163,28 @@ class Dispatcher {
 
 
                 <?php if (isset($_POST['coef']) && isset($_POST['action']) && $_POST['action'] === 'generate'): ?>
-                    <div class="row card-panel white z-depth-3 s12 m6">
-                        <div class="col s12">
-                            <form class="col s12" action="./dispatcher" method="post">
-                                <div class="dispatch-table-wrapper selection">
-                                    <table class="highlight centered" id="dispatch-table">
-                                        <thead>
-                                        <tr>
-                                            <th>Enseignant</th>
-                                            <th>Etudiant</th>
-                                            <th>Stage</th>
-                                            <th>Formation</th>
-                                            <th>Groupe</th>
-                                            <th>Date Expérience</th>
-                                            <th>Sujet</th>
-                                            <th>Adresse</th>
-                                            <th>Score</th>
-                                            <th>Associer</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <?php
-                                        $dictCoef = array_filter($_POST['coef'], function ($coef, $key) {
-                                            return isset($_POST['criteria_enabled'][$key]);
-                                        }, ARRAY_FILTER_USE_BOTH);
+                    <form action="./dispatcher" method="post">
+                        <div class="dispatch-table-wrapper selection table-container">
+                            <table class="highlight centered responsive-table" id="dispatch-table">
+                                <thead>
+                                <tr>
+                                    <th>Enseignant</th>
+                                    <th>Etudiant</th>
+                                    <th>Stage</th>
+                                    <th>Formation</th>
+                                    <th>Groupe</th>
+                                    <th>Date Expérience</th>
+                                    <th>Sujet</th>
+                                    <th>Adresse</th>
+                                    <th>Score</th>
+                                    <th>Associer</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <?php
+                                $dictCoef = array_filter($_POST['coef'], function ($coef, $key) {
+                                    return isset($_POST['criteria_enabled'][$key]);
+                                }, ARRAY_FILTER_USE_BOTH);
 
                                         if (!empty($dictCoef)) {
                                             $escapedJson = htmlspecialchars(json_encode($dictCoef), ENT_QUOTES);
@@ -225,39 +223,37 @@ class Dispatcher {
                                     </table>
                                 </div>
 
-                                <br>
+                        <br>
 
-                                <div class="row">
-                                    <div class="input-field col s12">
-                                        <label for="rows-per-page"></label>
-                                        <select id="rows-per-page">
-                                            <option value="10" selected>10</option>
-                                            <option value="20">20</option>
-                                            <option value="50">50</option>
-                                            <option value="100">100</option>
-                                            <option value="<?= count($resultDispatchList)?>">Tout</option>
-                                        </select>
-                                        <label>Nombre de lignes par page</label>
-                                    </div>
-                                </div>
-
-                                <div id="pagination-controls" class="center-align">
-                                    <button type="button" class="waves-effect waves-light btn" id="first-page"><i class="material-icons">first_page</i></button>
-                                    <button type="button" class="waves-effect waves-light btn" id="prev-page"><i class="material-icons">arrow_back</i></button>
-                                    <div id="page-numbers"></div>
-                                    <button type="button" class="waves-effect waves-light btn" id="next-page"><i class="material-icons">arrow_forward</i></button>
-                                    <button type="button" class="waves-effect waves-light btn" id="last-page"><i class="material-icons">last_page</i></button>
-                                </div>
-
-                                <div class="row s12 center">
-                                    <input type="hidden" id="selectStudentSubmitted" name="selectStudentSubmitted" value="1">
-                                    <button class="waves-effect waves-light btn" type="submit">Valider</button>
-                                    <input type="hidden" name="restartDispatcherButton" value="1">
-                                    <button class="waves-effect waves-light btn" type="submit">Recommencer</button>
-                                </div>
-                            </form>
+                        <div class="row">
+                            <div class="input-field col s2">
+                                <label for="rows-per-page"></label>
+                                <select id="rows-per-page">
+                                    <option value="10" selected>10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                    <option value="<?= count($resultDispatchList)?>">Tout</option>
+                                </select>
+                                <label>Nombre de lignes par page</label>
+                            </div>
                         </div>
-                    </div>
+
+                        <div id="pagination-controls" class="center-align">
+                            <button type="button" class="waves-effect waves-light btn" id="first-page"><i class="material-icons">first_page</i></button>
+                            <button type="button" class="waves-effect waves-light btn" id="prev-page"><i class="material-icons">arrow_back</i></button>
+                            <div id="page-numbers"></div>
+                            <button type="button" class="waves-effect waves-light btn" id="next-page"><i class="material-icons">arrow_forward</i></button>
+                            <button type="button" class="waves-effect waves-light btn" id="last-page"><i class="material-icons">last_page</i></button>
+                        </div>
+
+                        <div class="row s12 center">
+                            <input type="hidden" id="selectStudentSubmitted" name="selectStudentSubmitted" value="1">
+                            <button class="waves-effect waves-light btn" type="submit">Valider</button>
+                            <input type="hidden" name="restartDispatcherButton" value="1">
+                            <button class="waves-effect waves-light btn" type="submit">Recommencer</button>
+                        </div>
+                    </form>
                 <?php endif; ?>
 
             </div>
