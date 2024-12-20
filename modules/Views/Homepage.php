@@ -63,7 +63,7 @@ class   Homepage {
                         if ($internshipInfos) {
                             $internships = $this->globalModel->getInternships($_SESSION['selected_student']['id']);
                             $year = "";
-                            $nbInternships = $this->model->getInternshipTeacher($internships, $_SESSION['identifier'], $year);
+                            $nbInternships = $this->globalModel->getInternshipTeacher($internships, $_SESSION['identifier'], $year);
                             $distance = $this->globalModel->getDistance($internshipInfos['internship_identifier'], $_SESSION['identifier'], isset($internshipInfos['id_teacher']));
                             ?>
                             <div id="map"></div>
