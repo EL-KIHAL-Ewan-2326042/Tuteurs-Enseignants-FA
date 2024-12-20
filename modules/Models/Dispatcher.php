@@ -134,7 +134,7 @@ class Dispatcher{
         $stmt->execute();
         $teacherList = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $query = "  SELECT Internship.Internship_identifier, Internship.Company_name, Internship.Internship_subject, Internship.Address, Internship.Student_number, Internship.Type, Student.Student_name, Student.Student_firstname, Student.Formation, Student.Class_group
+        $query = "SELECT Internship.Internship_identifier, Internship.Company_name, Internship.Internship_subject, Internship.Address, Internship.Student_number, Internship.Type, Student.Student_name, Student.Student_firstname, Student.Formation, Student.Class_group
                     FROM Internship JOIN Student ON Internship.Student_number = Student.Student_number WHERE Internship.internship_identifier = :internship";
 
         $stmt = $db->getConn()->prepare($query);
