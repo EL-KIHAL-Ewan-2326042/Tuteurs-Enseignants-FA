@@ -321,10 +321,14 @@ document.addEventListener('DOMContentLoaded', function () {
                                                           <td></td>
                                                           <td></td>
                                                           <td><strong>Tout cocher</strong></td>
-                                                          <td><label class="center">
-                                                               <input type="checkbox" id="select-all-checkbox" class="center-align filled-in" />
-                                                               <span></span>
-                                                           </label></td>`;
+                                                          <td>
+                                                              <p>
+                                                                  <label class="center">
+                                                                       <input type="checkbox" id="select-all-checkbox" class="center-align filled-in" />
+                                                                       <span data-type="checkbox"></span>
+                                                                   </label>
+                                                              </p>
+                                                           </td>`;
         tbody.appendChild(selectAllRow);
 
         const selectAllCheckboxElem = document.getElementById('select-all-checkbox');
@@ -422,6 +426,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         ['click', 'touchstart'].forEach(eventType => {
             tableBody.addEventListener(eventType, function (event) {
+
+                if ((event.target.tagName === 'SPAN'  && event.target.dataset.type === 'checkbox') || event.target.tagName === 'INPUT') {
+                    return;
+                }
+
+                console.log(event.target.tagName, event.target.dataset.type);
                 clearTimeout(tapTimeout);
 
                 const currentTime = new Date().getTime();

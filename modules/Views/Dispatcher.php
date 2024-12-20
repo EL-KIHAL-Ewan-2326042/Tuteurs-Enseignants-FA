@@ -212,10 +212,12 @@ class Dispatcher {
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <label class="center">
-                                                        <input type="checkbox" class="dispatch-checkbox center-align filled-in" id="listTupleAssociate[]" name="listTupleAssociate[]" value="<?= $resultDispatch['id_teacher'] . "$". $resultDispatch['internship_identifier'] . "$". $resultDispatch['score']; ?>" />
-                                                        <span></span>
-                                                    </label>
+                                                    <p>
+                                                        <label class="center">
+                                                            <input type="checkbox" class="dispatch-checkbox center-align filled-in" id="listTupleAssociate[]" name="listTupleAssociate[]" value="<?= $resultDispatch['id_teacher'] . "$". $resultDispatch['internship_identifier'] . "$". $resultDispatch['score']; ?>" />
+                                                            <span data-type="checkbox"></span>
+                                                        </label>
+                                                    </p>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
