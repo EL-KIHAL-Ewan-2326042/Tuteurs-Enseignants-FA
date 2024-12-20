@@ -186,38 +186,44 @@ class Dispatcher {
                                     return isset($_POST['criteria_enabled'][$key]);
                                 }, ARRAY_FILTER_USE_BOTH);
 
-                                if (empty($dictCoef)) {
-                                    header('location: ./dispatcher');
-                                }
+                                        if (!empty($dictCoef)) {
+                                            $escapedJson = htmlspecialchars(json_encode($dictCoef), ENT_QUOTES);
 
-                                $resultDispatchList = $this->dispatcherModel->dispatcher($dictCoef)[0];
-                                foreach ($resultDispatchList as $resultDispatch):
-                                    ?>
-                                    <tr class="dispatch-row">
-                                        <td><?= $resultDispatch['teacher_firstname'] . ' ' . $resultDispatch['teacher_name'] . ' (' . $resultDispatch['id_teacher'] . ')'; ?></td>
-                                        <td><?= $resultDispatch['student_firstname'] . ' ' . $resultDispatch['student_name'] . ' (' . $resultDispatch['student_number'] . ')' ?></td>
-                                        <td><?= $resultDispatch['company_name'] . ' (' .$resultDispatch['internship_identifier'] . ')'; ?></td>
-                                        <td><?= $resultDispatch['formation'] ?></td>
-                                        <td><?= $resultDispatch['class_group'] ?></td>
-                                        <td><?= 'dd/mm/yyyy' ?></td>
-                                        <td><?=  $resultDispatch['internship_subject'] ?></td>
-                                        <td><?= $resultDispatch['address'] ?></td>
-                                        <td>
-                                            <div class="star-rating" data-tooltip="<?= $resultDispatch['score']; ?>" data-position="top">
-                                                <?php echo renderStars($resultDispatch['score']); ?>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <label class="center">
-                                                <input type="checkbox" class="dispatch-checkbox center-align filled-in" id="listTupleAssociate[]" name="listTupleAssociate[]" value="<?= $resultDispatch['id_teacher'] . "$". $resultDispatch['internship_identifier'] . "$". $resultDispatch['score']; ?>" />
-                                                <span></span>
-                                            </label>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
+                                            echo "<input type='hidden' id='dictCoefJson' value='" . $escapedJson . "'>";
+                                        } else {
+                                            header('location: ./dispatcher');
+                                        }
+
+                                        $resultDispatchList = $this->dispatcherModel->dispatcher($dictCoef)[0];
+                                        foreach ($resultDispatchList as $resultDispatch):
+                                            ?>
+                                            <tr class="dispatch-row" data-internship-identifier='<?= $resultDispatch['internship_identifier'] . '$' . $resultDispatch['id_teacher']; ?>'>
+                                                <td><?= $resultDispatch['teacher_firstname'] . ' ' . $resultDispatch['teacher_name'] . ' (' . $resultDispatch['id_teacher'] . ')'; ?></td>
+                                                <td><?= $resultDispatch['student_firstname'] . ' ' . $resultDispatch['student_name'] . ' (' . $resultDispatch['student_number'] . ')' ?></td>
+                                                <td><?= $resultDispatch['company_name'] . ' (' .$resultDispatch['internship_identifier'] . ')'; ?></td>
+                                                <td><?= $resultDispatch['formation'] ?></td>
+                                                <td><?= $resultDispatch['class_group'] ?></td>
+                                                <td><?= 'dd/mm/yyyy' ?></td>
+                                                <td><?=  $resultDispatch['internship_subject'] ?></td>
+                                                <td><?= $resultDispatch['address'] ?></td>
+                                                <td>
+                                                    <div class="star-rating" data-tooltip="<?= $resultDispatch['score']; ?>" data-position="top">
+                                                        <?php echo renderStars($resultDispatch['score']); ?>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <p>
+                                                        <label class="center">
+                                                            <input type="checkbox" class="dispatch-checkbox center-align filled-in" id="listTupleAssociate[]" name="listTupleAssociate[]" value="<?= $resultDispatch['id_teacher'] . "$". $resultDispatch['internship_identifier'] . "$". $resultDispatch['score']; ?>" />
+                                                            <span data-type="checkbox"></span>
+                                                        </label>
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                        </tbody>
+                                    </table>
+                                </div>
 
                         <br>
 
