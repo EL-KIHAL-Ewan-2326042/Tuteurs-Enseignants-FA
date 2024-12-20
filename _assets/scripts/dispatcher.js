@@ -1,5 +1,5 @@
 /**
- * Partie 1 Barre de recherche association directe
+ * Partie 1
  */
 document.addEventListener('DOMContentLoaded', function () {
     const elems = document.querySelectorAll('select');
@@ -235,13 +235,13 @@ document.addEventListener('DOMContentLoaded', function () {
         currentPage = page;
         updatePageNumbers();
 
-        rows.forEach(row => row.style.display = 'none');
+        rows.forEach(row => (row.style.display = 'none'));
         addSelectAllRow();
 
         const start = (currentPage - 1) * rowsPerPage;
         const end = currentPage * rowsPerPage;
         const visibleRows = Array.from(rows).slice(start, end);
-        visibleRows.forEach(row => row.style.display = '');
+        visibleRows.forEach(row => (row.style.display = ''));
 
         prevButton.disabled = currentPage === 1;
         nextButton.disabled = currentPage === totalPages;
@@ -252,16 +252,53 @@ document.addEventListener('DOMContentLoaded', function () {
     function updatePageNumbers() {
         pageNumbersContainer.innerHTML = '';
 
-        for (let i = 1; i <= totalPages; i++) {
-            const pageNumberButton = document.createElement('button');
-            pageNumberButton.textContent = i;
-            pageNumberButton.classList.add('waves-effect', 'waves-light', 'btn');
-            pageNumberButton.classList.add('page-number');
-            pageNumberButton.disabled = (i === currentPage);
-            pageNumberButton.addEventListener('click', () => showPage(i));
+        const maxVisiblePages = 5;
+        const halfWindow = Math.floor(maxVisiblePages / 2);
+        let startPage = Math.max(currentPage - halfWindow, 1);
+        let endPage = Math.min(currentPage + halfWindow, totalPages);
 
-            pageNumbersContainer.appendChild(pageNumberButton);
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            if (startPage === 1) {
+                endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+            } else if (endPage === totalPages) {
+                startPage = Math.max(endPage - maxVisiblePages + 1, 1);
+            }
         }
+
+        if (startPage > 1) {
+            createPageButton(1);
+            if (startPage > 2) {
+                addEllipsis();
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            createPageButton(i, i === currentPage);
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                addEllipsis();
+            }
+            createPageButton(totalPages);
+        }
+    }
+
+    function createPageButton(page, isActive = false) {
+        const pageNumberButton = document.createElement('button');
+        pageNumberButton.textContent = page;
+        pageNumberButton.classList.add('waves-effect', 'waves-light', 'btn');
+        pageNumberButton.classList.add('page-number');
+        pageNumberButton.disabled = isActive;
+        pageNumberButton.addEventListener('click', () => showPage(page));
+        pageNumbersContainer.appendChild(pageNumberButton);
+    }
+
+    function addEllipsis() {
+        const ellipsis = document.createElement('span');
+        ellipsis.textContent = '...';
+        ellipsis.classList.add('pagination-ellipsis');
+        pageNumbersContainer.appendChild(ellipsis);
     }
 
     function addSelectAllRow() {
@@ -322,6 +359,13 @@ document.addEventListener('DOMContentLoaded', function () {
     lastButton.addEventListener('click', () => showPage(totalPages));
     prevButton.addEventListener('click', () => showPage(currentPage - 1));
     nextButton.addEventListener('click', () => showPage(currentPage + 1));
+
+    window.addEventListener('resize', function () {
+        totalRows = rows.length;
+        totalPages = Math.ceil(totalRows / rowsPerPage);
+        if (currentPage > totalPages) currentPage = totalPages;
+        showPage(currentPage);
+    });
 
     showPage(1);
 });
