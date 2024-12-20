@@ -57,14 +57,14 @@ class Layout {
                 <ul class="right">
                     <?php if (isset($_SESSION['identifier'])) { ?>
                         <li><i class="material-icons" style="margin-right: 5px;">portrait</i></li>
-                        <li class="user-identifier"><?php echo $_SESSION['fullName']['teacher_firstname'] . ' ' . $_SESSION['fullName']['teacher_name'] . ' (';
+                        <li class="user-identifier"><a href="/account"> <?php echo $_SESSION['fullName']['teacher_firstname'] . ' ' . $_SESSION['fullName']['teacher_name'] . ' (';
                             $roles = '';
                             foreach($_SESSION['roles'] as $role) {
                                 $roles .= $role . ', ';
                             }
                             $roles = substr($roles, 0, -2);
                             echo $roles . ')';
-                            ?></li>
+                            ?> </a> </li>
                     <?php } ?>
                 </ul>
             </div>
