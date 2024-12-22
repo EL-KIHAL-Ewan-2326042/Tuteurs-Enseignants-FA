@@ -163,6 +163,9 @@ class Dispatcher {
 
 
                 <?php if (isset($_POST['coef']) && isset($_POST['action']) && $_POST['action'] === 'generate'): ?>
+                    <div id="map"></div>
+                    <div class="row"></div>
+
                     <form action="./dispatcher" method="post">
                         <div class="dispatch-table-wrapper selection table-container">
                             <table class="highlight centered responsive-table" id="dispatch-table">
