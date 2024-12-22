@@ -88,11 +88,26 @@ class Dispatcher {
             $errorMessageAfterSort = '';
             $checkMessageAfterSort = '';
 
-            if (isset($_POST['searchType']) && ($_POST['searchType'] === 'searchInternship' || $_POST['searchType'] === 'searchTeacher')) {
+            if (isset($_POST['action']) && ($_POST['action'] === 'search') && isset($_POST['searchType']) && ($_POST['searchType'] === 'searchInternship' || $_POST['searchType'] === 'searchTeacher')) {
                 $results = $dispatcherModel->correspondTerms();
 
                 header('Content-Type: application/json');
                 echo json_encode($results);
+                exit();
+            }
+
+            if (isset($_POST['action']) && ($_POST['action'] === 'TeachersForinternship') && isset($_POST['Internship_identifier']) && isset($_POST['dicoCoef'])) {
+                $dictCoef = json_decode($_POST['dicoCoef'], true);
+
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    echo json_encode(['error' => 'Invalid dicoCoef data.']);
+                    exit();
+                }
+
+                $studentView = $dispatcherModel->RelevanceInternship($_POST['Internship_identifier'], $dictCoef);
+
+                header('Content-Type: application/json');
+                echo json_encode($studentView);
                 exit();
             }
 
