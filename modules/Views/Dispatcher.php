@@ -163,6 +163,9 @@ class Dispatcher {
 
 
                 <?php if (isset($_POST['coef']) && isset($_POST['action']) && $_POST['action'] === 'generate'): ?>
+                    <div id="map"></div>
+                    <div class="row"></div>
+
                     <form action="./dispatcher" method="post">
                         <div class="dispatch-table-wrapper selection table-container">
                             <table class="highlight centered responsive-table" id="dispatch-table">
@@ -223,38 +226,42 @@ class Dispatcher {
                                         <?php endforeach; ?>
                                         </tbody>
                                     </table>
+
+                                    <br>
+
+                                    <div class="row">
+                                        <div class="input-field col s2">
+                                            <label for="rows-per-page"></label>
+                                            <select id="rows-per-page">
+                                                <option value="10" selected>10</option>
+                                                <option value="20">20</option>
+                                                <option value="50">50</option>
+                                                <option value="100">100</option>
+                                                <option value="<?= count($resultDispatchList)?>">Tout</option>
+                                            </select>
+                                            <label>Nombre de lignes par page</label>
+                                        </div>
+                                    </div>
+
+                                    <div id="pagination-controls" class="center-align">
+                                        <button type="button" class="waves-effect waves-light btn" id="first-page"><i class="material-icons">first_page</i></button>
+                                        <button type="button" class="waves-effect waves-light btn" id="prev-page"><i class="material-icons">arrow_back</i></button>
+                                        <div id="page-numbers"></div>
+                                        <button type="button" class="waves-effect waves-light btn" id="next-page"><i class="material-icons">arrow_forward</i></button>
+                                        <button type="button" class="waves-effect waves-light btn" id="last-page"><i class="material-icons">last_page</i></button>
+                                    </div>
+
+                                    <div class="row s12 center">
+                                        <input type="hidden" id="selectStudentSubmitted" name="selectStudentSubmitted" value="1">
+                                        <button class="waves-effect waves-light btn" type="submit">Valider</button>
+                                        <input type="hidden" name="restartDispatcherButton" value="1">
+                                        <button class="waves-effect waves-light btn" type="submit">Recommencer</button>
+                                    </div>
+
+                            <br>
+                            <br>
+
                                 </div>
-
-                        <br>
-
-                        <div class="row">
-                            <div class="input-field col s2">
-                                <label for="rows-per-page"></label>
-                                <select id="rows-per-page">
-                                    <option value="10" selected>10</option>
-                                    <option value="20">20</option>
-                                    <option value="50">50</option>
-                                    <option value="100">100</option>
-                                    <option value="<?= count($resultDispatchList)?>">Tout</option>
-                                </select>
-                                <label>Nombre de lignes par page</label>
-                            </div>
-                        </div>
-
-                        <div id="pagination-controls" class="center-align">
-                            <button type="button" class="waves-effect waves-light btn" id="first-page"><i class="material-icons">first_page</i></button>
-                            <button type="button" class="waves-effect waves-light btn" id="prev-page"><i class="material-icons">arrow_back</i></button>
-                            <div id="page-numbers"></div>
-                            <button type="button" class="waves-effect waves-light btn" id="next-page"><i class="material-icons">arrow_forward</i></button>
-                            <button type="button" class="waves-effect waves-light btn" id="last-page"><i class="material-icons">last_page</i></button>
-                        </div>
-
-                        <div class="row s12 center">
-                            <input type="hidden" id="selectStudentSubmitted" name="selectStudentSubmitted" value="1">
-                            <button class="waves-effect waves-light btn" type="submit">Valider</button>
-                            <input type="hidden" name="restartDispatcherButton" value="1">
-                            <button class="waves-effect waves-light btn" type="submit">Recommencer</button>
-                        </div>
                     </form>
                 <?php endif; ?>
 
