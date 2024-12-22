@@ -29,7 +29,7 @@ class Account {
                         $update = $this->model->updateMaxiNumberTrainees($_SESSION['identifier'], intval($_POST['newMaxNumber']));
                         if (!$update || gettype($update) !== 'boolean') {
                             echo '<h6 class="red-text">Une erreur est survenue</h6>';
-                        }
+                        } else $max = $_POST['newMaxNumber'];
                     } else $tooLow = true;
                 }
             }
