@@ -9,6 +9,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInputInternship = document.getElementById('searchInternship');
 
     const searchResults = document.getElementById('searchResults');
+
+    if (!searchResults) {
+        return;
+    }
     searchResults.innerHTML = '<p></p>';
 
     searchInputTeacher.addEventListener('input', function () {
@@ -178,6 +182,10 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             saveButton.disabled = false;
         }
+    }
+
+    if (!select) {
+        return;
     }
 
     select.addEventListener('change', updateButtonState);
@@ -479,9 +487,20 @@ document.addEventListener('DOMContentLoaded', function () {
         const container = document.querySelector('.dispatch-table-wrapper');
 
         const existingTable = document.getElementById('student-dispatch-table');
+        const existingHeader = document.getElementById('student-dispatch-header');
+
         if (existingTable) {
             existingTable.remove();
         }
+        if (existingHeader) {
+            existingHeader.remove();
+        }
+
+        const header = document.createElement('h3');
+        header.id = 'student-dispatch-header';
+        header.textContent = `Résultat pour ${data[0].student_firstname} ${data[0].student_name}`;
+        header.className = 'center-align flow-text';
+        container.appendChild(header);
 
         const newTable = document.createElement('table');
         newTable.className = 'highlight centered responsive-table';
@@ -569,3 +588,100 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
+/** Partie 5: Map OSM **/
+
+
+/**
+ * Initialise la carte en fonction des adresses du professeur et de l'entreprise
+ * @returns {Promise<void>}
+ */
+async function initMap() {
+    const mapElement = document.getElementById("map");
+
+    if (!mapElement) {
+        return;
+    }
+
+    try {
+        const franceCenter = ol.proj.fromLonLat([2.337, 46.227]);
+
+        const map = new ol.Map({
+            target: mapElement,
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM(),
+                }),
+            ],
+            view: new ol.View({
+                center: franceCenter,
+                zoom: 6,
+            }),
+        });
+
+    } catch (error) {
+        console.error("Erreur lors de l'initialisation de la carte :", error);
+    }
+}
+
+/**
+ * Mise à jour de la carte avec deux nouvelles adresses
+ * @param {string} address1 Première adresse
+ * @param {string} address2 Deuxième adresse
+ */
+async function updateMap(address1, address2) {
+    const mapElement = document.getElementById("map");
+
+    if (!mapElement) {
+        return;
+    }
+
+    try {
+        const location1 = await geocodeAddress(address1);
+        const location2 = await geocodeAddress(address2);
+
+        const map = new ol.Map({
+            target: mapElement,
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM(),
+                }),
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([
+                    (location1.lon + location2.lon) / 2,
+                    (location1.lat + location2.lat) / 2,
+                ]),
+                zoom: 10,
+            }),
+        });
+
+        const markerLayer = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                features: [
+                    new ol.Feature({
+                        geometry: new ol.geom.Point(ol.proj.transform([location1.lon, location1.lat], 'EPSG:4326', 'EPSG:3857')),
+                    }),
+                    new ol.Feature({
+                        geometry: new ol.geom.Point(ol.proj.transform([location2.lon, location2.lat], 'EPSG:4326', 'EPSG:3857')),
+                    }),
+                ],
+            }),
+            style: new ol.style.Style({
+                image: new ol.style.Icon({
+                    anchor: [0.5, 0.5],
+                    anchorXUnits: "fraction",
+                    anchorYUnits: "fraction",
+                    src: 'marker.png',
+                }),
+            }),
+        });
+
+        map.addLayer(markerLayer);
+
+        await calculateDistance(location1, location2, map);
+    } catch (error) {
+        console.error("Erreur lors de la mise à jour de la carte :", error);
+    }
+}
+
+initMap();
