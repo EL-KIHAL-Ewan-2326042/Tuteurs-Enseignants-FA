@@ -9,6 +9,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchInputInternship = document.getElementById('searchInternship');
 
     const searchResults = document.getElementById('searchResults');
+
+    if (!searchResults) {
+        return;
+    }
     searchResults.innerHTML = '<p></p>';
 
     searchInputTeacher.addEventListener('input', function () {
@@ -178,6 +182,10 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             saveButton.disabled = false;
         }
+    }
+
+    if (!select) {
+        return;
     }
 
     select.addEventListener('change', updateButtonState);
@@ -412,6 +420,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(data => {
                 console.log(data);
+                createNewTable(data);
             })
             .catch(error => {
                 console.error('Fetch error:', error);
@@ -431,7 +440,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
 
-                console.log(event.target.tagName, event.target.dataset.type);
                 clearTimeout(tapTimeout);
 
                 const currentTime = new Date().getTime();
@@ -474,5 +482,206 @@ document.addEventListener('DOMContentLoaded', function () {
     } else {
         console.error('Table with ID "dispatch-table" not found.');
     }
+
+    function createNewTable(data) {
+        const container = document.querySelector('.dispatch-table-wrapper');
+
+        const existingTable = document.getElementById('student-dispatch-table');
+        const existingHeader = document.getElementById('student-dispatch-header');
+
+        if (existingTable) {
+            existingTable.remove();
+        }
+        if (existingHeader) {
+            existingHeader.remove();
+        }
+
+        const header = document.createElement('h3');
+        header.id = 'student-dispatch-header';
+        header.textContent = `Résultat pour ${data[0].student_firstname} ${data[0].student_name}`;
+        header.className = 'center-align flow-text';
+        container.appendChild(header);
+
+        const newTable = document.createElement('table');
+        newTable.className = 'highlight centered responsive-table';
+        newTable.id = 'student-dispatch-table';
+
+        const thead = document.createElement('thead');
+        thead.innerHTML = `
+        <tr>
+            <th>Enseignant</th>
+            <th>Etudiant</th>
+            <th>Stage</th>
+            <th>Formation</th>
+            <th>Groupe</th>
+            <th>Date Expérience</th>
+            <th>Sujet</th>
+            <th>Adresse</th>
+            <th>Score</th>
+            <th>Associer</th>
+        </tr>`;
+        newTable.appendChild(thead);
+
+        const tbody = document.createElement('tbody');
+
+        data.forEach(row => {
+            const tr = document.createElement('tr');
+            tr.className = 'dispatch-row';
+            tr.dataset.internshipIdentifier = `${row.internship_identifier}$${row.id_teacher}`;
+
+            tr.innerHTML = `
+            <td>${row.teacher_firstname} ${row.teacher_name} (${row.id_teacher})</td>
+            <td>${row.student_firstname} ${row.student_name} (${row.student_number})</td>
+            <td>${row.company_name} (${row.internship_identifier})</td>
+            <td>${row.formation}</td>
+            <td>${row.class_group}</td>
+            <td>${row.date_experience || 'dd/mm/yyyy'}</td>
+            <td>${row.internship_subject}</td>
+            <td>${row.address}</td>
+            <td>
+                <div class="star-rating" data-tooltip="${row.score}" data-position="top">
+                    ${renderStarsJS(row.score)}
+                </div>
+            </td>
+            <td>
+                <p>
+                    <label class="center">
+                        <input type="checkbox" class="dispatch-checkbox center-align filled-in" name="listTupleAssociate[]" 
+                            value="${row.id_teacher}$${row.internship_identifier}$${row.score}" />
+                        <span data-type="checkbox"></span>
+                    </label>
+                </p>
+            </td>`;
+
+            tbody.appendChild(tr);
+        });
+
+        newTable.appendChild(tbody);
+
+        container.appendChild(newTable);
+
+        header.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function renderStarsJS(score) {
+        const fullStars = Math.floor(score);
+        const decimalPart = score - fullStars;
+        const halfStars = Math.abs(decimalPart - 0.5) <= 0.1 ? 1 : 0;
+        const emptyStars = 5 - fullStars - halfStars;
+
+        let stars = '';
+
+        for (let i = 0; i < fullStars; i++) {
+            stars += '<span class="filled"></span>';
+        }
+
+        if (halfStars) {
+            stars += '<span class="half"></span>';
+        }
+
+        for (let i = 0; i < emptyStars; i++) {
+            stars += '<span class="empty"></span>';
+        }
+
+        return stars;
+    }
+
 });
 
+/** Partie 5: Map OSM **/
+
+
+/**
+ * Initialise la carte en fonction des adresses du professeur et de l'entreprise
+ * @returns {Promise<void>}
+ */
+async function initMap() {
+    const mapElement = document.getElementById("map");
+
+    if (!mapElement) {
+        return;
+    }
+
+    try {
+        const franceCenter = ol.proj.fromLonLat([2.337, 46.227]);
+
+        const map = new ol.Map({
+            target: mapElement,
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM(),
+                }),
+            ],
+            view: new ol.View({
+                center: franceCenter,
+                zoom: 6,
+            }),
+        });
+
+    } catch (error) {
+        console.error("Erreur lors de l'initialisation de la carte :", error);
+    }
+}
+
+/**
+ * Mise à jour de la carte avec deux nouvelles adresses
+ * @param {string} address1 Première adresse
+ * @param {string} address2 Deuxième adresse
+ */
+async function updateMap(address1, address2) {
+    const mapElement = document.getElementById("map");
+
+    if (!mapElement) {
+        return;
+    }
+
+    try {
+        const location1 = await geocodeAddress(address1);
+        const location2 = await geocodeAddress(address2);
+
+        const map = new ol.Map({
+            target: mapElement,
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM(),
+                }),
+            ],
+            view: new ol.View({
+                center: ol.proj.fromLonLat([
+                    (location1.lon + location2.lon) / 2,
+                    (location1.lat + location2.lat) / 2,
+                ]),
+                zoom: 10,
+            }),
+        });
+
+        const markerLayer = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                features: [
+                    new ol.Feature({
+                        geometry: new ol.geom.Point(ol.proj.transform([location1.lon, location1.lat], 'EPSG:4326', 'EPSG:3857')),
+                    }),
+                    new ol.Feature({
+                        geometry: new ol.geom.Point(ol.proj.transform([location2.lon, location2.lat], 'EPSG:4326', 'EPSG:3857')),
+                    }),
+                ],
+            }),
+            style: new ol.style.Style({
+                image: new ol.style.Icon({
+                    anchor: [0.5, 0.5],
+                    anchorXUnits: "fraction",
+                    anchorYUnits: "fraction",
+                    src: 'marker.png',
+                }),
+            }),
+        });
+
+        map.addLayer(markerLayer);
+
+        await calculateDistance(location1, location2, map);
+    } catch (error) {
+        console.error("Erreur lors de la mise à jour de la carte :", error);
+    }
+}
+
+initMap();

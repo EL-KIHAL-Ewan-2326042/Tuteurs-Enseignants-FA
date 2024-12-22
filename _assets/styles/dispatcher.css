@@ -46,6 +46,25 @@ input[type="checkbox"].filled-in:checked + span:after {
 
 /* Tableau Dispatcher */
 
+#student-dispatch-table th, #student-dispatch-table td {
+    padding: 6px 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+#student-dispatch-table thead th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+#student-dispatch-table tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+#student-dispatch-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
 #dispatch-table th, #dispatch-table td {
     padding: 6px 10px;
     text-align: center;
@@ -66,6 +85,14 @@ input[type="checkbox"].filled-in:checked + span:after {
 }
 
 @media screen and (max-width: 768px) {
+    #student-dispatch-table {
+        font-size: 12px;
+    }
+
+    #student-dispatch-table th, #student-dispatch-table td {
+        padding: 4px 8px;
+    }
+
     #dispatch-table {
         font-size: 12px;
     }
@@ -74,7 +101,6 @@ input[type="checkbox"].filled-in:checked + span:after {
         padding: 4px 8px;
     }
 }
-
 
 /** Pagination et Checkbox **/
 
