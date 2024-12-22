@@ -560,7 +560,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         container.appendChild(newTable);
 
-        newTable.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        header.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     function renderStarsJS(score) {
