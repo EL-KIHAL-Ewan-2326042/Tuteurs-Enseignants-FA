@@ -21,7 +21,7 @@ class Dispatcher {
         ?>
         <main>
             <div class="col">
-                <h3 class="center-align">Répartiteur de tuteurs enseignants</h3>
+                <h3 class="center-align flow-text">Répartiteur de tuteurs enseignants</h3>
 
                 <?php if (!isset($_POST['action']) || $_POST['action'] !== 'generate'): ?>
                 <div class="row" id="forms-section">
@@ -104,6 +104,7 @@ class Dispatcher {
 
                     <form class="col card-panel white z-depth-3 s12 m5" style="padding: 20px;" action="./dispatcher" method="post" id="associate-form">
                         <div class="row">
+                            <p class="text">Associe un professeur à un stage (ne prend pas en compte le nombre maximum d'étudiant, ni le fait que le stage soit déjà attribué)</p>
                             <div class="input-field col s6">
                                 <input id="searchTeacher" name="searchTeacher" type="text" class="validate">
                                 <label for="searchTeacher">ID professeur</label>
@@ -132,150 +133,136 @@ class Dispatcher {
                 </div>
                     <?php endif?>
 
-                <?php if (isset($_POST['coef']) && isset($_POST['action']) && $_POST['action'] === 'generate'): ?>
-                    <div class="row card-panel white z-depth-3 s12 m6">
-                        <div class="col s12">
-                            <form class="col s12" action="./dispatcher" method="post">
-                                <div class="selection">
-                                    <table class="highlight centered" id="dispatch-table">
-                                        <thead>
-                                        <tr>
-                                            <th>Enseignant</th>
-                                            <th>N° Stage</th>
-                                            <th>Score</th>
-                                            <th>Associer</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <?php
-                                        $dictCoef = array_filter($_POST['coef'], function ($coef, $key) {
-                                            return isset($_POST['criteria_enabled'][$key]);
-                                        }, ARRAY_FILTER_USE_BOTH);
+                <?php
+                function renderStars($score) {
+                    $fullStars = floor($score);
 
-                                        if (empty($dictCoef)) {
+                    $decimalPart = $score - $fullStars;
+
+                    $halfStars = (abs($decimalPart - 0.5) <= 0.1) ? 1 : 0;
+
+                    $emptyStars = 5 - $fullStars - $halfStars;
+
+                    $stars = '';
+
+                    for ($i = 0; $i < $fullStars; $i++) {
+                        $stars .= '<span class="filled"></span>';
+                    }
+
+                    if ($halfStars) {
+                        $stars .= '<span class="half"></span>';
+                    }
+
+                    for ($i = 0; $i < $emptyStars; $i++) {
+                        $stars .= '<span class="empty"></span>';
+                    }
+
+                    return $stars;
+                }
+                ?>
+
+
+                <?php if (isset($_POST['coef']) && isset($_POST['action']) && $_POST['action'] === 'generate'): ?>
+                    <div id="map"></div>
+                    <div class="row"></div>
+
+                    <form action="./dispatcher" method="post">
+                        <div class="dispatch-table-wrapper selection table-container">
+                            <table class="highlight centered responsive-table" id="dispatch-table">
+                                <thead>
+                                <tr>
+                                    <th>Enseignant</th>
+                                    <th>Etudiant</th>
+                                    <th>Stage</th>
+                                    <th>Formation</th>
+                                    <th>Groupe</th>
+                                    <th>Date Expérience</th>
+                                    <th>Sujet</th>
+                                    <th>Adresse</th>
+                                    <th>Score</th>
+                                    <th>Associer</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <?php
+                                $dictCoef = array_filter($_POST['coef'], function ($coef, $key) {
+                                    return isset($_POST['criteria_enabled'][$key]);
+                                }, ARRAY_FILTER_USE_BOTH);
+
+                                        if (!empty($dictCoef)) {
+                                            $escapedJson = htmlspecialchars(json_encode($dictCoef), ENT_QUOTES);
+
+                                            echo "<input type='hidden' id='dictCoefJson' value='" . $escapedJson . "'>";
+                                        } else {
                                             header('location: ./dispatcher');
                                         }
 
                                         $resultDispatchList = $this->dispatcherModel->dispatcher($dictCoef)[0];
                                         foreach ($resultDispatchList as $resultDispatch):
                                             ?>
-                                            <tr class="dispatch-row">
-                                                <td><?= $resultDispatch['id_teacher']; ?></td>
-                                                <td><?= $resultDispatch['internship_identifier']; ?></td>
-                                                <td><strong><?= $resultDispatch['score']; ?></strong>/5</td>
+                                            <tr class="dispatch-row" data-internship-identifier='<?= $resultDispatch['internship_identifier'] . '$' . $resultDispatch['id_teacher']; ?>'>
+                                                <td><?= $resultDispatch['teacher_firstname'] . ' ' . $resultDispatch['teacher_name'] . ' (' . $resultDispatch['id_teacher'] . ')'; ?></td>
+                                                <td><?= $resultDispatch['student_firstname'] . ' ' . $resultDispatch['student_name'] . ' (' . $resultDispatch['student_number'] . ')' ?></td>
+                                                <td><?= $resultDispatch['company_name'] . ' (' .$resultDispatch['internship_identifier'] . ')'; ?></td>
+                                                <td><?= $resultDispatch['formation'] ?></td>
+                                                <td><?= $resultDispatch['class_group'] ?></td>
+                                                <td><?= 'dd/mm/yyyy' ?></td>
+                                                <td><?=  $resultDispatch['internship_subject'] ?></td>
+                                                <td><?= $resultDispatch['address'] ?></td>
                                                 <td>
-                                                    <label class="center">
-                                                        <input type="checkbox" class="dispatch-checkbox center-align filled-in" id="listTupleAssociate[]" name="listTupleAssociate[]" value="<?= $resultDispatch['id_teacher'] . "$". $resultDispatch['internship_identifier'] . "$". $resultDispatch['score']; ?>" />
-                                                        <span></span>
-                                                    </label>
+                                                    <div class="star-rating" data-tooltip="<?= $resultDispatch['score']; ?>" data-position="top">
+                                                        <?php echo renderStars($resultDispatch['score']); ?>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <p>
+                                                        <label class="center">
+                                                            <input type="checkbox" class="dispatch-checkbox center-align filled-in" id="listTupleAssociate[]" name="listTupleAssociate[]" value="<?= $resultDispatch['id_teacher'] . "$". $resultDispatch['internship_identifier'] . "$". $resultDispatch['score']; ?>" />
+                                                            <span data-type="checkbox"></span>
+                                                        </label>
+                                                    </p>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
                                         </tbody>
                                     </table>
+
+                                    <br>
+
+                                    <div class="row">
+                                        <div class="input-field col s2">
+                                            <label for="rows-per-page"></label>
+                                            <select id="rows-per-page">
+                                                <option value="10" selected>10</option>
+                                                <option value="20">20</option>
+                                                <option value="50">50</option>
+                                                <option value="100">100</option>
+                                                <option value="<?= count($resultDispatchList)?>">Tout</option>
+                                            </select>
+                                            <label>Nombre de lignes par page</label>
+                                        </div>
+                                    </div>
+
+                                    <div id="pagination-controls" class="center-align">
+                                        <button type="button" class="waves-effect waves-light btn" id="first-page"><i class="material-icons">first_page</i></button>
+                                        <button type="button" class="waves-effect waves-light btn" id="prev-page"><i class="material-icons">arrow_back</i></button>
+                                        <div id="page-numbers"></div>
+                                        <button type="button" class="waves-effect waves-light btn" id="next-page"><i class="material-icons">arrow_forward</i></button>
+                                        <button type="button" class="waves-effect waves-light btn" id="last-page"><i class="material-icons">last_page</i></button>
+                                    </div>
+
+                                    <div class="row s12 center">
+                                        <input type="hidden" id="selectStudentSubmitted" name="selectStudentSubmitted" value="1">
+                                        <button class="waves-effect waves-light btn" type="submit">Valider</button>
+                                        <input type="hidden" name="restartDispatcherButton" value="1">
+                                        <button class="waves-effect waves-light btn" type="submit">Recommencer</button>
+                                    </div>
+
+                            <br>
+                            <br>
+
                                 </div>
-
-                                <br>
-
-                                <div id="pagination-controls" class="center-align">
-                                    <button type="button" class="waves-effect waves-light btn" id="prev-page"><i class="material-icons">arrow_back</i></button>
-                                    <span id="page-number">Page 1</span>
-                                    <button type="button" class="waves-effect waves-light btn" id="next-page"><i class="material-icons">arrow_forward</i></button>
-                                </div>
-
-                                <br>
-
-                                <div class="row s12 center">
-                                    <input type="hidden" id="selectStudentSubmitted" name="selectStudentSubmitted" value="1">
-                                    <button class="waves-effect waves-light btn" type="submit">Valider</button>
-                                    <input type="hidden" name="restartDispatcherButton" value="1">
-                                    <button class="waves-effect waves-light btn" type="submit">Recommencer</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function () {
-                            const rowsPerPage = 10;
-                            const rows = document.querySelectorAll('.dispatch-row');
-                            const totalRows = rows.length;
-                            const totalPages = Math.ceil(totalRows / rowsPerPage);
-                            let currentPage = 1;
-
-                            const prevButton = document.getElementById('prev-page');
-                            const nextButton = document.getElementById('next-page');
-                            const pageNumberSpan = document.getElementById('page-number');
-
-                            function showPage(page) {
-                                if (page < 1 || page > totalPages) return;
-
-                                currentPage = page;
-                                pageNumberSpan.textContent = `Page ${currentPage}`;
-
-                                rows.forEach(row => row.style.display = 'none');
-
-                                const start = (currentPage - 1) * rowsPerPage;
-                                const end = currentPage * rowsPerPage;
-                                const visibleRows = Array.from(rows).slice(start, end);
-                                visibleRows.forEach(row => row.style.display = '');
-
-                                addSelectAllRow();
-
-                                prevButton.disabled = currentPage === 1;
-                                nextButton.disabled = currentPage === totalPages;
-                            }
-
-                            function addSelectAllRow() {
-                                const tbody = document.querySelector('#dispatch-table tbody');
-                                let selectAllRow = document.querySelector('#select-all-row');
-
-                                if (selectAllRow) {
-                                    selectAllRow.remove();
-                                }
-
-                                selectAllRow = document.createElement('tr');
-                                selectAllRow.id = 'select-all-row';
-
-                                selectAllRow.innerHTML = `<td></td><td></td><td><strong>Tout cocher</strong></td>
-                                           <td><label class="center">
-                                                <input type="checkbox" id="select-all-checkbox" class="center-align filled-in" />
-                                                <span></span>
-                                            </label></td>`;
-                                tbody.appendChild(selectAllRow);
-
-                                const selectAllCheckboxElem = document.getElementById('select-all-checkbox');
-
-                                selectAllCheckboxElem.addEventListener('change', function () {
-                                    const visibleRows = Array.from(rows).slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-                                    visibleRows.forEach(row => {
-                                        const checkbox = row.querySelector('input[type="checkbox"]');
-                                        checkbox.checked = selectAllCheckboxElem.checked;
-                                    });
-                                });
-                            }
-
-                            function toggleSelectAllCheckbox() {
-                                const selectAllCheckbox = document.getElementById('select-all-checkbox');
-                                const visibleRows = Array.from(rows).slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-                                selectAllCheckbox.checked = visibleRows.every(row => row.querySelector('input[type="checkbox"]').checked);
-                            }
-
-                            document.querySelectorAll('.dispatch-row input[type="checkbox"]:not(#select-all-checkbox)').forEach(checkbox => {
-                                checkbox.addEventListener('change', toggleSelectAllCheckbox);
-                            });
-
-                            prevButton.addEventListener('click', () => {
-                                showPage(currentPage - 1);
-                            });
-
-                            nextButton.addEventListener('click', () => {
-                                showPage(currentPage + 1);
-                            });
-
-                            showPage(1);
-                        });
-                    </script>
+                    </form>
                 <?php endif; ?>
 
             </div>
