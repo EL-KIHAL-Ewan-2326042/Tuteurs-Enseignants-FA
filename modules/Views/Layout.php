@@ -43,7 +43,7 @@ class Layout {
                     }
                     if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep') { ?>
                         <li><a href="/dashboard"> <?php echo 'GESTION DES DONNEES'; ?> </a></li>
-                        <li><a href="/dispatcher"> <?php echo 'DISPATCHER'; ?> </a></li>
+                        <li><a href="/dispatcher"> <?php echo 'REPARTITEUR'; ?> </a></li>
                     <?php } ?>
                     <li><a href="/intramu"><?php
                             if (isset($_SESSION['identifier'])) {
@@ -56,7 +56,6 @@ class Layout {
                 </ul>
                 <ul class="right">
                     <?php if (isset($_SESSION['identifier'])) { ?>
-                        <li><i class="material-icons" style="margin-right: 5px;">portrait</i></li>
                         <li class="user-identifier"><a href="/account"> <?php echo $_SESSION['fullName']['teacher_firstname'] . ' ' . $_SESSION['fullName']['teacher_name'] . ' (';
                             $roles = '';
                             foreach($_SESSION['roles'] as $role) {
@@ -76,7 +75,7 @@ class Layout {
             }
             if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep') { ?>
                 <li><a href="/dashboard"> <?php echo 'GESTION DES DONNEES'; ?> </a></li>
-                <li><a href="/dispatcher"> <?php echo 'DISPATCHER'; ?> </a></li>
+                <li><a href="/dispatcher"> <?php echo 'REPARTITEUR'; ?> </a></li>
             <?php } ?>
             <li><a href="/intramu"><?php
                     if (isset($_SESSION['identifier'])) {

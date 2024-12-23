@@ -688,7 +688,7 @@ async function updateMap(InternshipAddress, Id_teacher) {
 
 
         placeMarker(internshipLocation, "Entreprise", true);
-        placeMarker(closestTeacherAddress, "Vous", false);
+        placeMarker(closestTeacherAddress, "Professeur", false);
 
         console.log(closestTeacherAddress.lon, closestTeacherAddress.lat)
 
