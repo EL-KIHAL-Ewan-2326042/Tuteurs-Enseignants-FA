@@ -52,6 +52,7 @@ CREATE TABLE Role(
 
 CREATE TABLE Distribution_criteria(
     Name_criteria VARCHAR(50),
+    Description VARCHAR(500) NOT NULL,
     PRIMARY KEY(Name_criteria)
 );
 
@@ -152,6 +153,7 @@ CREATE TABLE Backup(
     Name_criteria VARCHAR(50),
     Id_backup INT,
     Coef INT,
+    Name_save VARCHAR(100),
     Is_checked BOOLEAN DEFAULT TRUE,
     PRIMARY KEY(User_id, Name_criteria, Id_backup),
     FOREIGN KEY(User_id) REFERENCES User_connect(User_id),
@@ -208,30 +210,6 @@ CREATE TRIGGER check_distance_assignment
     EXECUTE FUNCTION check_distance_assignment();
 
 
-CREATE OR REPLACE FUNCTION insert_backup()
-RETURNS TRIGGER AS $$
-    DECLARE
-        name_criteria TEXT;
-        id_backup integer;
-    BEGIN
-        FOR name_criteria IN SELECT Distribution_criteria.name_criteria FROM Distribution_criteria
-            LOOP
-            FOR id_backup IN SELECT Id_backup.id_backup FROM Id_backup
-                LOOP
-                INSERT INTO backup (user_id, name_Criteria, id_backup, coef) VALUES (NEW.user_id, name_criteria, id_backup, 1);
-            END LOOP;
-        END LOOP;
-        RETURN NEW;
-    END;
-$$ LANGUAGE plpgsql;
-
-
-CREATE TRIGGER insert_backup
-    AFTER INSERT ON user_connect
-    FOR EACH ROW
-    EXECUTE FUNCTION insert_backup();
-
-
 CREATE OR REPLACE FUNCTION create_addr_for_insert()
 RETURNS TRIGGER AS $$
     BEGIN
@@ -271,29 +249,6 @@ CREATE TRIGGER update_backup_new_criteria
     EXECUTE FUNCTION update_backup_new_criteria();
 
 
-CREATE OR REPLACE FUNCTION update_backup_new_id_backup()
-RETURNS TRIGGER AS $$
-    DECLARE
-        user_id TEXT;
-        name_criteria TEXT;
-    BEGIN
-        FOR user_id IN SELECT user_connect.user_id FROM User_connect
-            LOOP
-            FOR name_criteria IN SELECT Distribution_criteria.name_criteria FROM Distribution_criteria
-                LOOP
-                INSERT INTO backup (user_id, name_Criteria, id_backup, coef) VALUES (user_id, name_criteria, NEW.id_backup, 1);
-            END LOOP;
-        END LOOP;
-        RETURN NEW;
-    END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER update_backup_new_id_backup
-    AFTER INSERT ON Distribution_criteria
-    FOR EACH ROW
-    EXECUTE FUNCTION update_backup_new_id_backup();
-
-
 CREATE TRIGGER create_addr_for_insert_has_address
     BEFORE INSERT ON Has_address
     FOR EACH ROW
@@ -316,14 +271,29 @@ CREATE TRIGGER create_discipline_for_insert_is_taught
     EXECUTE FUNCTION create_discipline_for_insert();
 
 
-INSERT INTO Distribution_criteria (Name_criteria) VALUES ('A été responsable');
-INSERT INTO Distribution_criteria (Name_criteria) VALUES ('Distance');
-INSERT INTO Distribution_criteria (Name_criteria) VALUES ('Cohérence');
-INSERT INTO Distribution_criteria (Name_criteria) VALUES ('Est demandé');
 
-INSERT INTO Id_backup (Id_backup) VALUES (1);
-INSERT INTO Id_backup (Id_backup) VALUES (2);
-INSERT INTO Id_backup (Id_backup) VALUES (3);
+
+CREATE OR REPLACE FUNCTION create_id_backup_for_insert()
+RETURNS TRIGGER AS $$
+    BEGIN
+        IF (SELECT id_backup FROM id_backup WHERE id_backup.id_backup = NEW.id_backup) IS NULL THEN
+            INSERT INTO id_backup (id_backup) VALUES (NEW.id_backup);
+        END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER create_discipline_for_insert_is_taught
+    BEFORE INSERT ON backup
+    FOR EACH ROW
+    EXECUTE FUNCTION create_id_backup_for_insert();
+
+
+
+INSERT INTO Distribution_criteria (Name_criteria, Description) VALUES ('A été responsable', 'Prendre en compte le fait que le prof ait déjà travaillé avec l élève');
+INSERT INTO Distribution_criteria (Name_criteria, Description) VALUES ('Distance', 'Prendre en compte la distance entre le lieu du stage et l adresse renseigné la plus proche pour le responsable');
+INSERT INTO Distribution_criteria (Name_criteria, Description) VALUES ('Cohérence', 'Prendre en compte la corrélation entre la matière enseigner par le responsable et le sujet du stage');
+INSERT INTO Distribution_criteria (Name_criteria, Description) VALUES ('Est demandé', 'Prendre en compte le fait que le responsable demande le stage');
 
 INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('B22662146', 'CASES', 'Murphy', 3);
 INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('R14328249', 'ALVARADOS', 'Christen', 2);
@@ -730,30 +700,28 @@ INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, 
 INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('K91763894PQ', 'Schneider Electric', 'Auriol', 'Architecture_des_ordinateurs', '2025-08-20', 'Internship', '2026-05-12', 'IoT_et_technologies_connectees', 'H14863692');
 INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('F28647309PY', 'Orange', 'Cassis', 'BD POO', '2025-10-25', 'alternance', '2026-06-05', 'Developpement_de_jeux_video', 'T74730069');
 INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('J37692847LN', 'Safran', 'Saint-Estève-Janson', 'Gestion_de_projet', '2025-11-08', 'Internship', '2026-05-15', 'Developpement_d_API_restful', 'P15063542');
-INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('NV22132345YU','Capgemini','Marseille','BD POO','2025-03-01','alternance','2026-02-28','Développement d’application mobile','M33382558');
-INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('FO56423897HJ','Altran','Pertuis','Architecture des ordinateurs Gestion de projet','2025-04-12','Internship','2026-04-11','Sécurité informatique','U60431135');
-INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('VK22398012QR','Atos','Carnoux-en-Provence','BD POO','2025-05-05','alternance','2026-03-10','Cloud computing','M34783033');
-INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('YJ11254862BC','Dassault Systèmes','Aubagne','Gestion de projet Communication','2025-06-10','Internship','2026-04-15','Développement de solutions DevOps','O64863218');
-INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('AR74893621LV','Sopra Steria','Cassis','Architecture des ordinateurs Gestion de projet','2025-02-20','alternance','2026-01-15','Sécurité informatique et tests de pénétration','V51296562');
-INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('TM23458976YH','Orange','Marseille 13e','BD POO','2025-07-01','Internship','2026-07-10','Intelligence Artificielle','X62847517');
-INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('IY92248165DF','Accenture','La Ciotat','Gestion de projet Communication','2025-08-12','alternance','2026-10-10','Automatisation de processus avec RPA','J95442213');
-INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('UF23578495WD','Talan','Peynier','BD POO','2025-09-01','Internship','2026-06-20','Développement d’application web','J17865151');
-INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('LP73810298GH','Ubisoft','Simiane-Collongue','Architecture des ordinateurs Gestion de projet','2025-04-10','alternance','2026-12-15','Développement de jeux vidéo','E35962258');
-INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('SP55509832YN','Bouygues Telecom','Marseille 16e','Gestion de projet Communication','2025-11-03','Internship','2026-06-10','Big Data et Visualisation','D93211952');
-INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('CL12548976GD','Airbus','Aubagne','BD POO','2026-01-01','alternance','2026-10-05','E-commerce et marketing numérique','K11370670');
-INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('TY23054890ZS','Thales','Saint-Estève-Janson','Architecture des ordinateurs Gestion de projet','2025-10-15','Internship','2026-09-25','Développement de solutions DevOps','L61872638');
-INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('NF67389421JI','La Poste','Ceyreste','BD POO','2026-03-05','alternance','2026-12-20','Développement d’API Restful','L10783379');
-INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('GE90758214LK','SFR','Aubagne','Gestion de projet Communication','2025-06-20','Internship','2026-05-30','Automatisation des processus avec RPA','K14815933');
-INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('CL89573210FD','Nokia','Marseille 14e','BD POO','2025-05-25','alternance','2026-02-10','Cloud Computing et Services Web','L24677322');
-INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('JR67214839RT','L’Oréal','Le Tholonet','Architecture des ordinateurs Gestion de projet','2025-07-10','Internship','2026-05-20','Sécurité Informatique et Tests de Pénétration','C90023858');
-INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('KL25561894RW','SAP','Saint-Victoret','BD POO','2025-08-19','alternance','2026-03-21','Développement d’application mobile','I40581417');
-INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('ON74623598JY','Microsoft','Venelles','Gestion de projet Communication','2025-09-07','Internship','2026-06-25','IoT et Technologies Connectées','U44158779');
-INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('UC44619035ZL','Renault','Pertuis','BD POO','2025-11-20','alternance','2026-09-30','Cloud Computing et Services Web','U18373223');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('NV22132345YU','Capgemini','Marseille','BD POO','2025-03-01','alternance','2026-02-28','Développement_d’application_mobile','M33382558');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('FO56423897HJ','Altran','Pertuis','Architecture_des_ordinateurs_Gestion_de_projet','2025-04-12','Internship','2026-04-11','Sécurité_informatique','U60431135');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('VK22398012QR','Atos','Carnoux-en-Provence','BD_POO','2025-05-05','alternance','2026-03-10','Cloud_computing','M34783033');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('YJ11254862BC','Dassault_Systèmes','Aubagne','Gestion_de_projet_Communication','2025-06-10','Internship','2026-04-15','Développement_de_solutions_DevOps','O64863218');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('AR74893621LV','Sopra_Steria','Cassis','Architecture_des_ordinateurs_Gestion_de_projet','2025-02-20','alternance','2026-01-15','Sécurité_informatique_et_tests_de_pénétration','V51296562');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('TM23458976YH','Orange','Marseille_13e','BD_POO','2025-07-01','Internship','2026-07-10','Intelligence_Artificielle','X62847517');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('IY92248165DF','Accenture','La_Ciotat','Gestion_de_projet_Communication','2025-08-12','alternance','2026-10-10','Automatisation_de_processus_avec_RPA','J95442213');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('UF23578495WD','Talan','Peynier','BD_POO','2025-09-01','Internship','2026-06-20','Développement_d’application_web','J17865151');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('LP73810298GH','Ubisoft','Simiane-Collongue','Architecture_des_ordinateurs_Gestion_de_projet','2025-04-10','alternance','2026-12-15','Développement_de_jeux_vidéo','E35962258');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('SP55509832YN','Bouygues_Telecom','Marseille_16e','Gestion_de_projet_Communication','2025-11-03','Internship','2026-06-10','Big_Data_et_Visualisation','D93211952');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('CL12548976GD','Airbus','Aubagne','BD_POO','2026-01-01','alternance','2026-10-05','E-commerce_et_marketing_numérique','K11370670');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('TY23054890ZS','Thales','Saint-Estève-Janson','Architecture_des_ordinateurs_Gestion_de_projet','2025-10-15','Internship','2026-09-25','Développement_de_solutions_DevOps','L61872638');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('NF67389421JI','La_Poste','Ceyreste','BD_POO','2026-03-05','alternance','2026-12-20','Développement_d’API_Restful','L10783379');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('GE90758214LK','SFR','Aubagne','Gestion_de_projet_Communication','2025-06-20','Internship','2026-05-30','Automatisation_des_processus_avec_RPA','K14815933');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('CL89573210FD','Nokia','Marseille_14e','BD_POO','2025-05-25','alternance','2026-02-10','Cloud_Computing_et_Services_Web','L24677322');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('JR67214839RT','L’Oréal','Le_Tholonet','Architecture_des_ordinateurs_Gestion_de_projet','2025-07-10','Internship','2026-05-20','Sécurité_Informatique_et_Tests_de_Pénétration','C90023858');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('KL25561894RW','SAP','Saint-Victoret','BD_POO','2025-08-19','alternance','2026-03-21','Développement_d’application_mobile','I40581417');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('ON74623598JY','Microsoft','Venelles','Gestion_de_projet_Communication','2025-09-07','Internship','2026-06-25','IoT_et_Technologies_Connectées','U44158779');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('UC44619035ZL','Renault','Pertuis','BD_POO','2025-11-20','alternance','2026-09-30','Cloud_Computing_et_Services_Web','U18373223');
 INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('BD12345678XP','Capgemini','Gardanne','Gestion_de_projet Communication','2025-06-01','alternance','2026-06-01','Developpement_d_API_restful','Q61178516');
 INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('JK98765432LA','Atos','Lambesc','BD POO','2025-07-01','Internship','2026-06-30','Cloud_computing_et_services_web','X76731856');
 INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('GH12399876WI','Sopra Steria','La Roque-d_Anthéron','Gestion_de_projet Communication','2025-08-15','Internship','2026-08-14','Big_data_et_visualisation','T97220228');
-
-
 INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('MN34578612DZ','Orange','Marseille','Architecture_des_ordinateurs Gestion_de_projet','2025-04-20','alternance','2026-04-20','Developpement_de_plugins_PHP','G12824677');
 INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('JK12457896WR','Altran','Aubagne','BD POO','2025-11-01','alternance','2026-11-01','Securite_informatique_et_tests_de_penetration','V62147234');
 INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('TL56473891AX','Accenture','Venelles','Cloud_computing_et_services_web','2025-06-10','Internship','2026-06-10','Developpement_de_solution_devops','G23254613');

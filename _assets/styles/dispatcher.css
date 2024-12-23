@@ -13,6 +13,11 @@ h3, h4 {
     background-color : #00558B;
 }
 
+.text{
+    color: #00558B;
+    font-weight: bold;
+    font-size: 18px;
+}
 /* Style au survol de la souris sur pour les boutons de la page */
 .btn:hover{
     background-color: #E8CE7E;
@@ -21,4 +26,152 @@ h3, h4 {
 input[type="checkbox"].filled-in:checked + span:after {
     background-color: #00558B !important;
     border-color: #00558B !important;
+}
+
+/* Map OSM */
+
+#map {
+    height: 400px;
+    width: 70%;
+    margin: auto; /* TODO */
+}
+
+@media screen and (max-width: 640px) {
+    #map {
+        height: 150px;
+        width: 40%;
+    }
+}
+
+
+/* Tableau Dispatcher */
+
+#student-dispatch-table th, #student-dispatch-table td {
+    padding: 6px 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+#student-dispatch-table thead th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+#student-dispatch-table tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+#student-dispatch-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+#dispatch-table th, #dispatch-table td {
+    padding: 6px 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+#dispatch-table thead th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+#dispatch-table tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+#dispatch-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+@media screen and (max-width: 768px) {
+    #student-dispatch-table {
+        font-size: 12px;
+    }
+
+    #student-dispatch-table th, #student-dispatch-table td {
+        padding: 4px 8px;
+    }
+
+    #dispatch-table {
+        font-size: 12px;
+    }
+
+    #dispatch-table th, #dispatch-table td {
+        padding: 4px 8px;
+    }
+}
+
+/** Pagination et Checkbox **/
+
+#pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 10px 0;
+    margin-top: 20px;
+}
+
+#pagination-controls button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    padding: 0 10px;
+}
+
+#pagination-controls span {
+    margin: 0 10px;
+    font-size: 16px;
+}
+
+#pagination-controls #page-numbers {
+    display: flex;
+    gap: 5px;
+}
+
+#pagination-controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media screen and (max-width: 600px) {
+    #pagination-controls button {
+        font-size: 14px;
+        padding: 0 5px;
+    }
+
+    #pagination-controls span {
+        font-size: 14px;
+    }
+}
+
+/* Etoiles */
+.star-rating {
+    display: inline-block;
+    font-size: 20px;
+}
+
+.star-rating span {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    background-color: #ddd;
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+    margin: 0 2px;
+    transition: background-color 0.3s ease;
+}
+
+.star-rating span.filled {
+    background-color: gold;
+}
+
+.star-rating span.empty {
+    background-color: #ddd;
+}
+
+.star-rating span.half {
+    background: linear-gradient(to right, gold 50%, #ddd 50%);
 }
