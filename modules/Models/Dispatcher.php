@@ -249,7 +249,7 @@ class Dispatcher{
     /**
      * Permet de trouver la meilleure combinaison possible tuteur-stage et le renvoie sous forme de tableau
      * @param array $dicoCoef dictionnaire cle->nom_critere et valeur->coef
-     * @return array|array[] resultat fina  l sous forme de matrice
+     * @return array|array[] resultat final sous forme de matrice
      */
     public function dispatcher(array $dicoCoef): array
     {
