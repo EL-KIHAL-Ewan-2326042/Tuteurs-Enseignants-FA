@@ -60,6 +60,21 @@ class Dispatcher{
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Renvoie toutes les addresses d'un professeur
+     *
+     * @param string $Id_teacher Identifiant du professeur
+     * @return array array contenant les addresses du professeur
+     */
+    public function getTeacherAddresses(string $Id_teacher): array {
+        $query = "SELECT Address FROM Has_address WHERE Id_teacher = :Id_teacher";
+        $db = $this->db;
+        $stmt = $db->getConn()->prepare($query);
+        $stmt->bindParam(':Id_teacher', $Id_teacher);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 
     /**
      * Calcule la pertinence des stages pour un professeur et des stages en fonction de plusieurs critères de pondération.
@@ -150,6 +165,7 @@ class Dispatcher{
         }
 
         if (!empty($result)) {
+            usort($result, fn($a, $b) => $b['score'] <=> $a['score']);
             return $result;
         }
         return [[]];
