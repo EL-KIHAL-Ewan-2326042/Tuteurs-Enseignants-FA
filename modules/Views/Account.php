@@ -129,7 +129,7 @@ class Account {
 
                     <div class="row">
                         <div class="input-field col s2">
-                            <label for="rows-per-page">Nombre de lignes par page</label>
+                            <label for="rows-per-page"></label>
                             <select id="rows-per-page">
                                 <option value="10" selected>10</option>
                                 <option value="20">20</option>
@@ -137,6 +137,7 @@ class Account {
                                 <option value="100">100</option>
                                 <option value="<?= count($interns)?>">Tout</option>
                             </select>
+                            <label>Nombre de lignes par page</label>
                         </div>
                     </div>
 
