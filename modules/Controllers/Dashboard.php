@@ -27,7 +27,7 @@ class Dashboard {
     private function handleExceptionMessage(Exception $e):string {
         // Correspondances entre mots-clés et message simplifiés
         $simplifyMessages = [
-            //'SQLSTATE' => "Une erreur de base de données est survenue. Une donnée que vous souhaitez insérer existe peut-être déjà.",
+            'SQLSTATE' => "Une erreur de base de données est survenue. Une donnée que vous souhaitez insérer existe peut-être déjà.",
             'permission denied' => "Vous n'avez pas les droits nécessaires pour effectuer cette action.",
             'file not found' => "Le fichier demandé est introuvable. Veuillez vérifier votre saisie.",
             'Fatal' => "Erreur de taille mémoire, veuillez contacter l'administrateur du serveur.",
@@ -41,7 +41,7 @@ class Dashboard {
         }
 
         // Message générique si aucun mot-clé ne correspond
-        return "Une erreur inattendue est survenue. Veuillez contacter l'administrateur.".$e->getMessage();
+        return "Une erreur inattendue est survenue. Veuillez contacter l'administrateur.".$this->handleExceptionMessage($e);
     }
 
     /**
@@ -99,13 +99,13 @@ class Dashboard {
 
                                 // Importation des données dans la table
                                 elseif ($model->processCsv($csvFile, $tableName)) {
-                                    $errorMessage .= "L'importation du fichier CSV pour la table $tableName a été réalisée avec succès! <br>";
+                                    $message .= "L'importation du fichier CSV pour la table $tableName a été réalisée avec succès! <br>";
                                 } else {
                                     $errorMessage .= "Une erreur est survenue lors de l'importation pour la table $tableName. <br>";
                                 }
                             }
                         } catch (Exception $e) {
-                            $errorMessage .= "Erreur lors de l'importation : <br>" . $this->handleExceptionMessage($e);
+                            $errorMessage .= "Erreur lors de l'importation : " . $this->handleExceptionMessage($e);
                         }
                     } else {
                         $errorMessage = "Table non valide ou non reconnue.";
