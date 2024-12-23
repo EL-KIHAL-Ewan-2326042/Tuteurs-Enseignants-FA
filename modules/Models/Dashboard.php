@@ -68,7 +68,7 @@ class Dashboard{
     public function getCsvHeaders(string $csvFilePath): array {
         // Ouverture du fichier CSV et lecture de la première ligne (les en-têtes)
         if (($handle = fopen($csvFilePath, "r")) !== FALSE) {
-            $headers = fgetcsv($handle,1000,",");
+            $headers = fgetcsv($handle,1000,";");
             fclose($handle);
             return $headers ?: [];
         }
@@ -87,34 +87,41 @@ class Dashboard{
         // Comparaison des en-têtes du CSV avec les colonnes de la table dans la base de données
         $tableColumns = array_map('strtolower', $this->getTableColumn($tableName));
         $csvHeaders = array_map('strtolower', $headers);
-        if (($tableName != 'teacher' AND array_diff($csvHeaders, $tableColumns)) OR ($tableName = 'teacher' AND array_diff($csvHeaders, array_merge($tableColumns, ['address$type'],['discipline_name'])))) {
-            throw new Exception("Les colonnes CSV ne correspondent pas à la table $tableName ou au valeur demandé pour la table teacher.");
-        }
-        else {
+
+        if (($tableName != 'teacher' AND array_diff($csvHeaders, $tableColumns)) OR
+            ($tableName == 'teacher' AND array_diff($csvHeaders, array_merge($tableColumns, ['address$type'], ['discipline_name'])))) {
+
+            // Crée une exception avec les colonnes CSV qui causent l'erreur
+            throw new Exception("Les colonnes CSV ne correspondent pas à la table $tableName ou aux valeurs demandées pour la table teacher. ");
+        } else {
             return true;
         }
     }
 
     /**
      * Traite un fichier CSV et insère ses données dans la table correspondante
-     * @param string $csvFilePath
-     * @param string $tableName
+     * @param string $csvFilePath Le chemin du fichier CSV à traiter
+     * @param string $tableName Le nom de la table
      * @return bool Ture si le traitement réussit, sinon False
      * @throws Exception En cas d'erreur lors de l'importation des données
      */
     public function processCsv(string $csvFilePath, string $tableName): bool {
+        // Ouvre le fichier en lecture
         if (($handle = fopen($csvFilePath, "r")) === false) {
             throw new Exception("Impossible d'ouvrir le fichier CSV.");
         }
 
-        /**
-        $headers = fgetcsv($handle, 1000, ",");
+        // Lecture le première ligne du fichier
+        $headers = fgetcsv($handle, 1000, ";");
+
+        // Vérifie que les en-têtes du fichier correspondent à celles de la base de données
         if (!$this->validateHeaders($headers, $tableName)) {
             fclose($handle);
             return false;
-        } **/
+        }
 
         try {
+            // Insertion des données
             while (($data = fgetcsv($handle, 1000, ";")) !== false) {
                 $this->insertIntoDatabase($data, $tableName);
             }
@@ -122,7 +129,7 @@ class Dashboard{
             return true;
         } catch (Exception) {
             fclose($handle);
-            throw new Exception("Erreur lors du traitement du fichier CSV (merci de vérifier que vous repectez bien le guide utilisateur).");
+            throw new Exception("Erreur lors du traitement du fichier CSV (merci de vérifier que vous repectez bien le guide utilisateur). ");
         }
     }
 
@@ -135,6 +142,7 @@ class Dashboard{
      * @throws Exception En cas d'erreur lors de l'insertion
      */
     private function insertIntoDatabase(array $data, string $tableName): void {
+        // Appelle de la méthode d'insertion correspondante selon le nom de la table
         switch ($tableName) {
             case 'teacher':
                 $this->insertTeacherData($data);
@@ -159,15 +167,20 @@ class Dashboard{
      * @throws Exception En cas d'erreur lors de l'insertion
      */
     private function insertGenericData(array $data, string $tableName): void {
+        // Récupère les colonne de la base de données
         $tableColumns = $this->getTableColumn($tableName);
+
+        // Vérifie que le nombre de données correspond au nombre de colonne dans la table
         if (count($data) !== count($tableColumns)) {
             return;
         }
 
+        // Réquee SQL d'insertion
         $query = "INSERT INTO $tableName (" . implode(',', $tableColumns) . ") 
                   VALUES (" . implode(',', array_map(fn($i) => ":column$i", range(1, count($tableColumns)))) . ")";
         $stmt = $this->db->getConn()->prepare($query);
 
+        // Lier les valeurs des données aux paramètres nommés dans le requête
         foreach ($data as $index => $value) {
             $stmt->bindValue(":column" . ($index + 1), $value ?: null);
         }
@@ -186,21 +199,21 @@ class Dashboard{
     private function insertTeacherData(array $data): void {
         $teacher = [$data[0], $data[1], $data[2], $data[3]];
         $discipline = ['discipline_name' => $data[4]];
-        $address = ['address' => explode('$',$data[4])[0], 'type'=> explode('$',$data[4])[1]];
-
+        $explodedData = explode('$', $data[5]);
+        $address = [
+            'address' => $explodedData[0],
+            'type' => isset($explodedData[1]) ? $explodedData[1] : null
+        ];
         // Colonnes pour la table teacher
         $teacherColumns = $this->getTableColumn('teacher');
         $teacherData = array_combine($teacherColumns, $teacher);
+
         // Insertion dans la table teacher
         $this->insertGenericData($teacher, 'teacher');
 
-        // Insertion dans la table has_address
-        $this->insertGenericData([['id_teacher' => $teacherData['id_teacher']], $address], 'has_address');
-
-        // Insertion dans la table is_taught
-        $this->insertGenericData([['id_teacher' => $teacherData['id_teacher']], $discipline], 'is_taught');
-
-        // Insertion dans la table user_connect
+        // Insertion dans la table has_address, is_taught et user_connect
+        $this->insertGenericData([['id_teacher' => $teacherData['id_teacher']] + $address], 'has_address');
+        $this->insertGenericData([['id_teacher' => $teacherData['id_teacher']] + $discipline], 'is_taught');
         $this->insertUserConnect($teacherData['id_teacher'], 'default_password');
 
         // Insertion dans la table has_role
@@ -231,7 +244,7 @@ class Dashboard{
      * @return void
      */
     private function insertHasRole(string $userId, string $department): void {
-        $query = "INSERT INTO has_role (user_id, role_name, department_name) VALUES (:user_id, 'Teacher' ,:department)";
+        $query = "INSERT INTO has_role (user_id, role_name, department_name) VALUES (:user_id, 'Professeur' ,:department)";
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindValue(':user_id', $userId);
         $stmt->bindValue(':department', $department);
@@ -348,6 +361,7 @@ class Dashboard{
         header('Pragma: no-cache');
         header('Expires: 0');
 
+        // Ouverture du flux de sortie pour écrire le fichier CSV
         $output = fopen('php://output', 'w');
 
         if ($output === false){
@@ -355,12 +369,14 @@ class Dashboard{
         }
 
         // Ecriture des en-têtes dans le fichier CSV
-        fputcsv($output, $headers);
+        fputcsv($output, $headers, ';');
 
+        // Vérification des en-têtes
         if (empty($headers)) {
             throw new Exception("Les en-têtes sont manquants ou invalides pour la table $tableName.");
         }
 
+        // Construction de la requête SQL selon la table à exporter
         if ($tableName != 'teacher') {
             // Construction de la requête SQL filtré par le département de l'administrateur
             $query = "SELECT " . implode(',', array_map(fn($header) => "$tableName." . (string)$header, $headers)) . " FROM $tableName";
@@ -371,9 +387,13 @@ class Dashboard{
                 default => throw new Exception("Table non reconnue : " . $tableName),
             };
         }
-        else {$query = "SELECT teacher.maxi_number_trainees, teacher.id_teacher, teacher.teacher_name, teacher.teacher_firstname, CONCAT(has_address.address, '$', has_address.type) AS address_type, is_taught.discipline_name AS discipline FROM teacher  JOIN has_role ON teacher.id_teacher = has_role.user_id  JOIN department ON department.department_name = has_role.department_name  JOIN has_address ON teacher.id_teacher = has_address.id_teacher  JOIN is_taught ON teacher.id_teacher = is_taught.id_teacher  WHERE department.department_name = :department";
+        else {$query = "SELECT teacher.maxi_number_trainees, teacher.id_teacher, teacher.teacher_name, teacher.teacher_firstname, CONCAT(has_address.address, '$', has_address.type) AS address_type, is_taught.discipline_name AS discipline FROM teacher  
+                        JOIN has_role ON teacher.id_teacher = has_role.user_id  
+                        JOIN department ON department.department_name = has_role.department_name  
+                        JOIN has_address ON teacher.id_teacher = has_address.id_teacher  
+                        JOIN is_taught ON teacher.id_teacher = is_taught.id_teacher  
+                        WHERE department.department_name = :department";
         }
-
 
         if (is_array($department)) {
             $department = $department[0] ?? '';
@@ -384,12 +404,16 @@ class Dashboard{
         $stmt->bindValue(':department', $department);
         $stmt->execute();
 
+        // Boucle pour récupérer les résultats de la requête et les ajouter au fichier CSV
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             if ($tableName == 'teacher') {
-                $row['address$type'] = $row['address_type'];
-                unset($row['address_type']);
+                if (isset($row['address_type']) && isset($row['discipline_name'])) {
+                    $row['address$type'] = $row['address_type'] . ' ' . $row['discipline_name'];
+                    unset($row['address_type']);
+                    unset($row['discipline_name']);
+                }
             }
-            fputcsv($output, $row);
+            fputcsv($output, $row, ';');
         }
         fclose($output);
         $csvData = ob_get_clean();
@@ -398,5 +422,51 @@ class Dashboard{
         exit();
     }
 
+    /**
+     * Exporte un modèle CSV avec les bonnes colonnes
+     * @param string $tableName Nom de la table
+     * @return bool Retourne true si l'export réussit, sinon lève une exception
+     * @throws Exception Si le fichier CSV ne peut être ouvert ou si aucune colonne n'est trouvée dans la table
+     */
+    public function exportModel(string $tableName): bool {
+        $db = $this->db;
+
+        ob_start();
+
+        // Configuration des en-têtes HTTP pour le téléchargement du fichier CSV
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="' . $tableName . '_export.csv"');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+
+        // Ouverture d'un flux de sortie pour écrire dans le fichier CSV
+        $output = fopen('php://output', 'w');
+        if ($output === false){
+            throw new Exception("Impossible d'ouvrir le fichier CSV");
+        }
+
+        // Récupération des colonnes de la base de données
+        $columns = $this->getTableColumn($tableName);
+
+        // Ajout de colonnes spécifiques pour la table 'teacher'
+        if ($tableName === 'teacher') {
+            $columns[] = 'address$type';
+            $columns[] = 'discipline_name';
+        }
+
+        // Vérification que des colonnes ont bien été trouvées
+        if (empty($columns)) {
+            throw new Exception("Aucune colonne trouvée pour la table $tableName.");
+        }
+
+        // Ecriture des en-têtes dans le fichier CSV
+        fputcsv($output, $columns,';');
+
+        fclose($output);
+        $csvData = ob_get_clean();
+        echo $csvData;
+
+        exit();
+    }
 
 }
