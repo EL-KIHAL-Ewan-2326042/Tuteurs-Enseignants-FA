@@ -303,16 +303,18 @@ document.addEventListener('DOMContentLoaded', function () {
     const lastButton = document.getElementById('last-page');
     const pageNumbersContainer = document.getElementById('page-numbers');
 
-    if (!(sessionStorage.getItem('columnNumber') && sessionStorage.getItem('direction'))) {
-        sessionStorage.setItem('columnNumber', "0");
-        sessionStorage.setItem('direction', "asc");
-    }
-    sortTable(Number(sessionStorage.getItem('columnNumber')), true);
+    if (document.getElementById("homepage-table").rows.length > 2) {
+        if (!(sessionStorage.getItem('columnNumber') && sessionStorage.getItem('direction'))) {
+            sessionStorage.setItem('columnNumber', "0");
+            sessionStorage.setItem('direction', "asc");
+        }
+        sortTable(Number(sessionStorage.getItem('columnNumber')), true);
 
-    for (let i = 0; i < document.getElementById("homepage-table").rows[0].cells.length; ++i) {
-        document.getElementById("homepage-table").rows[0].getElementsByTagName("TH")[i].addEventListener('click', () => {
-            sortTable(i);
-        });
+        for (let i = 0; i < document.getElementById("homepage-table").rows[0].cells.length; ++i) {
+            document.getElementById("homepage-table").rows[0].getElementsByTagName("TH")[i].addEventListener('click', () => {
+                sortTable(i);
+            });
+        }
     }
 
     /**

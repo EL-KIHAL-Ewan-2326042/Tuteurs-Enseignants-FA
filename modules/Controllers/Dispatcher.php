@@ -111,6 +111,15 @@ class Dispatcher {
                 exit();
             }
 
+            if (isset($_POST['action']) && ($_POST['action'] === 'getTeacherAddresses') && isset($_POST['Id_teacher'])) {
+
+                $teacherAdresses = $dispatcherModel->getTeacherAddresses($_POST['Id_teacher']);
+
+                header('Content-Type: application/json');
+                echo json_encode($teacherAdresses);
+                exit();
+            }
+
             if (isset($_POST['action-save']) && $_POST['action-save'] !== 'default') {
                 $coefficients = [];
                 foreach ($_POST['coef'] as $criteria => $coef) {

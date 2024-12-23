@@ -200,14 +200,14 @@ class Dispatcher {
                                         $resultDispatchList = $this->dispatcherModel->dispatcher($dictCoef)[0];
                                         foreach ($resultDispatchList as $resultDispatch):
                                             ?>
-                                            <tr class="dispatch-row" data-internship-identifier='<?= $resultDispatch['internship_identifier'] . '$' . $resultDispatch['id_teacher']; ?>'>
+                                            <tr class="dispatch-row" data-internship-identifier='<?= $resultDispatch['internship_identifier'] . '$' . $resultDispatch['id_teacher'] . '$' . $resultDispatch['address']; ?>'>
                                                 <td><?= $resultDispatch['teacher_firstname'] . ' ' . $resultDispatch['teacher_name'] . ' (' . $resultDispatch['id_teacher'] . ')'; ?></td>
                                                 <td><?= $resultDispatch['student_firstname'] . ' ' . $resultDispatch['student_name'] . ' (' . $resultDispatch['student_number'] . ')' ?></td>
                                                 <td><?= $resultDispatch['company_name'] . ' (' .$resultDispatch['internship_identifier'] . ')'; ?></td>
                                                 <td><?= $resultDispatch['formation'] ?></td>
                                                 <td><?= $resultDispatch['class_group'] ?></td>
                                                 <td><?= 'dd/mm/yyyy' ?></td>
-                                                <td><?=  $resultDispatch['internship_subject'] ?></td>
+                                                <td><?= $resultDispatch['internship_subject'] ?></td>
                                                 <td><?= $resultDispatch['address'] ?></td>
                                                 <td>
                                                     <div class="star-rating" data-tooltip="<?= $resultDispatch['score']; ?>" data-position="top">
