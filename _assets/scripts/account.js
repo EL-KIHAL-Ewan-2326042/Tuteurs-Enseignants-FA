@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const maxNumberInput = document.getElementById("newMaxNumber");
     maxNumberInput.addEventListener("keyup", inputBoundaries);
     maxNumberInput.addEventListener("keypress", inputBoundaries);
-    function inputBoundaries(e) {
+    function inputBoundaries() {
         if (Number(maxNumberInput.value) < Number(maxNumberInput.min)) maxNumberInput.value = maxNumberInput.min;
         if (Number(maxNumberInput.value) > Number(maxNumberInput.max)) maxNumberInput.value = maxNumberInput.max;
     }
@@ -20,9 +20,12 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
-    const rowsPerPage = 10;
-    const totalRows = document.querySelectorAll('.account-row').length;
-    const totalPages = Math.ceil(totalRows / rowsPerPage);
+    const rowsPerPageDropdown = document.getElementById('rows-per-page');
+    let rowsPerPage = parseInt(rowsPerPageDropdown.value); // Set default to 10
+
+    let rows = document.querySelectorAll('.account-row');
+    let totalRows = rows.length;
+    let totalPages = Math.ceil(totalRows / rowsPerPage);
     let currentPage = sessionStorage.getItem('page') ? Number(sessionStorage.getItem('page')) : 1;
 
     const prevButton = document.getElementById('prev-page');
@@ -103,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function showPage(page) {
         if (page < 1 || page > totalPages) return;
 
-        const rows = document.querySelectorAll('.account-row');
+        rows = document.querySelectorAll('.account-row');
 
         currentPage = page;
         updatePageNumbers();
@@ -126,22 +129,73 @@ document.addEventListener('DOMContentLoaded', function () {
     function updatePageNumbers() {
         pageNumbersContainer.innerHTML = '';
 
-        for (let i = 1; i <= totalPages; i++) {
-            const pageNumberButton = document.createElement('button');
-            pageNumberButton.textContent = String(i);
-            pageNumberButton.classList.add('waves-effect', 'waves-light', 'btn');
-            pageNumberButton.classList.add('page-number');
-            pageNumberButton.disabled = (i === currentPage);
-            pageNumberButton.addEventListener('click', () => showPage(i));
+        const maxVisiblePages = 5;
+        const halfWindow = Math.floor(maxVisiblePages / 2);
+        let startPage = Math.max(currentPage - halfWindow, 1);
+        let endPage = Math.min(currentPage + halfWindow, totalPages);
 
-            pageNumbersContainer.appendChild(pageNumberButton);
+        if (endPage - startPage + 1 < maxVisiblePages) {
+            if (startPage === 1) {
+                endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+            } else if (endPage === totalPages) {
+                startPage = Math.max(endPage - maxVisiblePages + 1, 1);
+            }
+        }
+
+        if (startPage > 1) {
+            createPageButton(1);
+            if (startPage > 2) {
+                addEllipsis();
+            }
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
+            createPageButton(i, i === currentPage);
+        }
+
+        if (endPage < totalPages) {
+            if (endPage < totalPages - 1) {
+                addEllipsis();
+            }
+            createPageButton(totalPages);
         }
     }
+
+    function createPageButton(page, isActive = false) {
+        const pageNumberButton = document.createElement('button');
+        pageNumberButton.textContent = page;
+        pageNumberButton.classList.add('waves-effect', 'waves-light', 'btn');
+        pageNumberButton.classList.add('page-number');
+        pageNumberButton.disabled = isActive;
+        pageNumberButton.addEventListener('click', () => showPage(page));
+        pageNumbersContainer.appendChild(pageNumberButton);
+    }
+
+    function addEllipsis() {
+        const ellipsis = document.createElement('span');
+        ellipsis.textContent = '...';
+        ellipsis.classList.add('pagination-ellipsis');
+        pageNumbersContainer.appendChild(ellipsis);
+    }
+
+    rowsPerPageDropdown.addEventListener('change', function () {
+        rowsPerPage = parseInt(rowsPerPageDropdown.value);
+        totalPages = Math.ceil(rows.length / rowsPerPage);
+        currentPage = 1;
+        showPage(currentPage);
+    });
 
     firstButton.addEventListener('click', () => showPage(1));
     lastButton.addEventListener('click', () => showPage(totalPages));
     prevButton.addEventListener('click', () => showPage(currentPage - 1));
     nextButton.addEventListener('click', () => showPage(currentPage + 1));
+
+    window.addEventListener('resize', function () {
+        totalRows = rows.length;
+        totalPages = Math.ceil(totalRows / rowsPerPage);
+        if (currentPage > totalPages) currentPage = totalPages;
+        showPage(currentPage);
+    });
 
     showPage(currentPage);
 });
