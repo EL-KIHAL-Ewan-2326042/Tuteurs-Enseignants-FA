@@ -18,7 +18,10 @@ class Dashboard{
         <main>
             <h3> Gestion des données </h3>
             <div class="card-panel white">
-                <div class="tooltip-container" data-tooltip="1. Exporter le modèle correspondant <br> 2. Inscrivez vos données <br> 3. Importez le fichier csv ci-dessous">(?)</div>
+                <div class="tooltip-container" data-tooltip="1. Exporter le modèle correspondant <br>
+                                                             2. Inscrivez vos données <br>
+                                                             3. Vérifiez que le séparateur est bien un point-virgule <br>
+                                                             4. Importez le fichier csv ci-dessous">(?)</div>
                 <h4>Importer :</h4>
 
                 <!--Importation de nouveaux étudiants-->
@@ -112,7 +115,7 @@ class Dashboard{
 
                 <!--Exportation des modèles des tables-->
                 <div class="card-panel white">
-                    <div class="tooltip-container" data-tooltip="Exportation d'un modèle d'une liste choisie dans un fichier .csv (Il n'y a que les noms de colonnes de la liste choisie)">(?)</div>
+                    <div class="tooltip-container" data-tooltip="Exportation d'un modèle d'une liste choisie dans un fichier .csv (Pour avoir seulement le nom des colonnes)">(?)</div>
                     <h4>Exporter un modèle:</h4>
                     <form action="/dashboard" method="POST">
                         <div>
