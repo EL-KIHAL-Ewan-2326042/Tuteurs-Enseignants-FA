@@ -207,7 +207,7 @@ class Dispatcher {
                                                 <td><?= $resultDispatch['formation'] ?></td>
                                                 <td><?= $resultDispatch['class_group'] ?></td>
                                                 <td><?= 'dd/mm/yyyy' ?></td>
-                                                <td><?=  $resultDispatch['internship_subject'] ?></td>
+                                                <td><?= $resultDispatch['internship_subject'] ?></td>
                                                 <td><?= $resultDispatch['address'] ?></td>
                                                 <td>
                                                     <div class="star-rating" data-tooltip="<?= $resultDispatch['score']; ?>" data-position="top">

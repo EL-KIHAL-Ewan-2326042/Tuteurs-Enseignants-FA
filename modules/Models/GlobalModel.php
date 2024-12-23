@@ -55,11 +55,32 @@ class GlobalModel {
                     FROM internship
                     WHERE student_number = :student
                     AND end_date_internship < CURRENT_DATE
-                    AND id_teacher IS NOT NULL';
+                    AND id_teacher IS NOT NULL
+                    ORDER BY start_date_internship ASC';
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':student', $student);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Renvoie le nombre de fois où l'enseignant passé en paramètre a été tuteur dans le tableau passé en paramètre
+     * @param array $internshipStudent tableau renvoyé par la méthode 'getInternships()'
+     * @param string $teacher numéro de l'enseignant
+     * @param string $year dernière année durant laquelle l'enseignant a été tuteur
+     * @return int nombre de fois où l'enseignant connecté a été tuteur dans le tablau passé en paramètre
+     */
+    public function getInternshipTeacher(array $internshipStudent, string $teacher, string &$year): int {
+        $internshipTeacher = 0;
+        foreach($internshipStudent as $row) {
+            if($row['id_teacher'] == $teacher) {
+                ++$internshipTeacher;
+                if ($internshipTeacher == 1) {
+                    $year = substr($row['start_date_internship'], 0, 4);
+                }
+            }
+        }
+        return $internshipTeacher;
     }
 
     /**
@@ -158,9 +179,10 @@ class GlobalModel {
      * Calcul de distance entre un eleve et un professeur
      * @param string $internship_identifier l'identifiant du stage
      * @param string $id_teacher l'identifiant du professeur
+     * @param bool $bound true si un enseignant est déjà associé au stage, false sinon
      * @return int distance en minute entre les deux
      */
-    public function getDistance(string $internship_identifier, string $id_teacher): int {
+    public function getDistance(string $internship_identifier, string $id_teacher, bool $bound): int {
 
         $query = 'SELECT * from Distance WHERE internship_identifier = :idInternship AND id_teacher = :idTeacher';
         $stmt0 = $this->db->getConn()->prepare($query);
@@ -208,16 +230,18 @@ class GlobalModel {
             return 60;
         }
 
-        $query = 'INSERT INTO Distance (id_teacher, internship_identifier, distance)
+        if (!$bound) {
+            $query = 'INSERT INTO Distance (id_teacher, internship_identifier, distance)
                   VALUES (:id_teacher, :id_internship, :distance)
                   ON CONFLICT (id_teacher, internship_identifier)
                   DO UPDATE SET distance = EXCLUDED.distance;';
 
-        $stmt3 = $this->db->getConn()->prepare($query);
-        $stmt3->bindParam(':id_teacher', $id_teacher);
-        $stmt3->bindParam(':id_internship', $internship_identifier);
-        $stmt3->bindParam(':distance', $minDuration);
-        $stmt3->execute();
+            $stmt3 = $this->db->getConn()->prepare($query);
+            $stmt3->bindParam(':id_teacher', $id_teacher);
+            $stmt3->bindParam(':id_internship', $internship_identifier);
+            $stmt3->bindParam(':distance', $minDuration);
+            $stmt3->execute();
+        }
 
         return $minDuration;
     }

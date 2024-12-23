@@ -175,10 +175,10 @@ class Dispatcher{
         $identifier = $teacher['id_teacher'];
         $dictValues = array();
 
-        // Calculer les valeurs uniquement si elles sont nécessaires
-        if (isset($dictCoef['Distance'])) {
-            $dictValues["Distance"] = $this->globalModel->getDistance($internship['internship_identifier'], $identifier);
-        }
+            // Calculer les valeurs uniquement si elles sont nécessaires
+            if (isset($dictCoef['Distance'])) {
+                $dictValues["Distance"] = $this->globalModel->getDistance($internship['internship_identifier'], $identifier, isset($internship['id_teacher']));
+            }
 
         if (isset($dictCoef['Cohérence'])) {
             $dictValues["Cohérence"] = round($this->globalModel->scoreDiscipSubject($internship['internship_identifier'], $identifier), 2);
