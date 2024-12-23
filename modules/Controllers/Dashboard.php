@@ -35,13 +35,13 @@ class Dashboard {
 
         // Parcours des mots-clés pour personnaliser le message
         foreach ($simplifyMessages as $key => $simplifyMessage) {
-            if(str_contains($this->handleExceptionMessage($e), $key)) {
+            if(str_contains($e->getMessage(), $key)) {
                 return $simplifyMessage;
             }
         }
 
         // Message générique si aucun mot-clé ne correspond
-        return "Une erreur inattendue est survenue. Veuillez contacter l'administrateur.";
+        return "Une erreur inattendue est survenue. Veuillez contacter l'administrateur.".$this->handleExceptionMessage($e);
     }
 
     /**
@@ -55,6 +55,7 @@ class Dashboard {
 
         // Initialisation du message à afficher
         $message = '';
+        $errorMessage = '';
 
         // Vérification du rôle de l'utilisateur
         if (isset($_SESSION['role_name']) && (
@@ -79,7 +80,7 @@ class Dashboard {
                             } elseif (isset($_FILES['internship'])) {
                                 $csvFile = $_FILES['internship']['tmp_name'];
                             } else {
-                                $message = "Aucun fichier CSV valide détecté";
+                                $errorMessage = "Aucun fichier CSV valide détecté";
                             }
 
                             if ($csvFile) {
@@ -87,12 +88,12 @@ class Dashboard {
                                 $csvHeaders = $model->getCsvHeaders($csvFile);
 
                                 if (mime_content_type($csvFile) !== 'text/plain') {
-                                    $message = "Le fichier uploadé n'est pas un CSV valide.";
+                                    $errorMessage = "Le fichier uploadé n'est pas un CSV valide.";
                                     return;
                                 }
 
                                 elseif (!$model->validateHeaders($csvHeaders, $tableName)) {
-                                    $message = "Les en-têtes du fichier CSV ne correspondent pas à la structure de la table $tableName.";
+                                    $errorMessage = "Les en-têtes du fichier CSV ne correspondent pas à la structure de la table $tableName.";
                                     return;
                                 }
 
@@ -100,14 +101,14 @@ class Dashboard {
                                 elseif ($model->processCsv($csvFile, $tableName)) {
                                     $message .= "L'importation du fichier CSV pour la table $tableName a été réalisée avec succès! <br>";
                                 } else {
-                                    $message .= "Une erreur est survenue lors de l'importation pour la table $tableName. <br>";
+                                    $errorMessage .= "Une erreur est survenue lors de l'importation pour la table $tableName. <br>";
                                 }
                             }
                         } catch (Exception $e) {
-                            $message .= "Erreur lors de l'importation : <br>" . $this->handleExceptionMessage($e);
+                            $errorMessage .= "Erreur lors de l'importation : " . $this->handleExceptionMessage($e);
                         }
                     } else {
-                        $message = "Table non valide ou non reconnue.";
+                        $errorMessage = "Table non valide ou non reconnue.";
                     }
                 // Gestion de l'exportation des fichiers CSV
                 } elseif (isset($_POST['export_list'])) {
@@ -116,7 +117,7 @@ class Dashboard {
                         try {
                             $headers = $model->getTableColumn($tableName);
                             if ($tableName == 'teacher') {
-                                $headers = array_merge($headers, ['address$type'], ['discipline']);
+                                $headers = array_merge($headers, ['address$type'], ['discipline_name']);
                             }
                             $model->exportToCsvByDepartment($tableName, $headers);
                         } catch (Exception $e) {
@@ -124,6 +125,17 @@ class Dashboard {
                         }
                     } else {
                         echo "Table inconnue pour l'export";
+                    }
+
+                // Gestion de l'exportation des modèles en CSV
+                } elseif (isset($_POST['export_model'])) {
+                    $tableName = $_POST['export_model'];
+                    if($model->isValidTable($tableName)) {
+                        try{
+                            $model->exportModel($tableName);
+                        } catch (Exception $e) {
+                            echo "Erreur lors de l'exportation : " . $this->handleExceptionMessage($e);
+                        }
                     }
                 } else {
                     echo "Aucun fichier CSV n'est reconnu.";
@@ -134,7 +146,7 @@ class Dashboard {
             $title = "Gestion des données";
             $cssFilePath = '_assets/styles/gestionDonnees.css';
             $jsFilePath = '_assets/scripts/gestionDonnees.js';
-            $view = new \Blog\Views\Dashboard($message);
+            $view = new \Blog\Views\Dashboard($message,$errorMessage);
 
             // Affichage de la vue dashboard
             $this->layout->renderTop($title, $cssFilePath);

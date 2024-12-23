@@ -436,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ['click', 'touchstart'].forEach(eventType => {
             tableBody.addEventListener(eventType, function (event) {
 
-                if ((event.target.tagName === 'SPAN'  && event.target.dataset.type === 'checkbox') || event.target.tagName === 'INPUT') {
+                if ((event.target.tagName === 'SPAN' && event.target.dataset.type === 'checkbox') || event.target.tagName === 'INPUT') {
                     return;
                 }
 
@@ -445,42 +445,41 @@ document.addEventListener('DOMContentLoaded', function () {
                 const currentTime = new Date().getTime();
                 const timeSinceLastTap = currentTime - lastTapTime;
 
-                let clickedRowIdentifier;
-                if (timeSinceLastTap > 100 && timeSinceLastTap < 300) {
-                    const clickedRow = getClickedRow(event.target);
-                    clickedRowIdentifier = clickedRow.getAttribute('data-internship-identifier');
+                const clickedRow = getClickedRow(event.target);
+                if (!clickedRow) {
+                    return;
                 }
+                const clickedRowIdentifier = clickedRow.getAttribute('data-internship-identifier');
 
                 if (timeSinceLastTap < 300 && timeSinceLastTap > 100) {
-                    const currentRow = getClickedRow(event.target);
-                    const currentRowIdentifier = currentRow.getAttribute('data-internship-identifier');
+                    const [Internship_identifier, Id_teacher, Internship_address] = clickedRowIdentifier.split('$');
+                    getTeachersForInternship(Internship_identifier);
 
-                    if (currentRowIdentifier === clickedRowIdentifier) {
-                        const [Internship_identifier, studentNumber] = currentRowIdentifier.split('$');
-
-                        getTeachersForInternship(Internship_identifier);
-                    }
-                } else {
-                    lastTapTime = currentTime;
-                    tapTimeout = setTimeout(function() {
-                        lastTapTime = 0;
-                        clickedRowIdentifier = null;
-                    }, 500);
+                    lastTapTime = 0;
+                    event.preventDefault();
+                    return;
                 }
 
+                tapTimeout = setTimeout(function () {
+                    const [Internship_identifier, Id_teacher, Internship_address] = clickedRowIdentifier.split('$');
+
+                    updateMap(Internship_address, Id_teacher);
+                    lastTapTime = 0;
+                }, 300);
+
+                lastTapTime = currentTime;
                 event.preventDefault();
             });
         });
-
-        function getClickedRow(element) {
-            while (element && element.tagName !== 'TR') {
-                element = element.parentElement;
-            }
-            return element;
-        }
-
     } else {
         console.error('Table with ID "dispatch-table" not found.');
+    }
+
+    function getClickedRow(element) {
+        while (element && element.tagName !== 'TR') {
+            element = element.parentElement;
+        }
+        return element;
     }
 
     function createNewTable(data) {
@@ -588,11 +587,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
-/** Partie 5: Map OSM **/
 
+/** Partie 5: map OSM **/
+
+let map, routeLayer, companyMarker, teacherMarker;
 
 /**
- * Initialise la carte en fonction des adresses du professeur et de l'entreprise
+ * Initialise la carte, centree sur la France
  * @returns {Promise<void>}
  */
 async function initMap() {
@@ -605,7 +606,7 @@ async function initMap() {
     try {
         const franceCenter = ol.proj.fromLonLat([2.337, 46.227]);
 
-        const map = new ol.Map({
+        map = new ol.Map({
             target: mapElement,
             layers: [
                 new ol.layer.Tile({
@@ -617,71 +618,215 @@ async function initMap() {
                 zoom: 6,
             }),
         });
-
     } catch (error) {
-        console.error("Erreur lors de l'initialisation de la carte :", error);
+        return;
+    }
+}
+
+/**
+ * Obtenir les différentes adresses d'un professeur
+ * @param Id_teacher Identifiant du professeur
+ * @returns {Promise<Array<string>>}
+ */
+async function getTeacherAddresses(Id_teacher) {
+    try {
+        const response = await fetch(window.location.href, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                action: "getTeacherAddresses",
+                Id_teacher: Id_teacher,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Fetch error response:", errorText);
+            throw new Error("Network response was not ok");
+        }
+
+        return response.json();
+    } catch (error) {
+        console.error("Fetch error:", error);
+        return [];
     }
 }
 
 /**
  * Mise à jour de la carte avec deux nouvelles adresses
- * @param {string} address1 Première adresse
- * @param {string} address2 Deuxième adresse
+ * @param {string} InternshipAddress Première adresse
+ * @param {string} Id_teacher Deuxième adresse
  */
-async function updateMap(address1, address2) {
-    const mapElement = document.getElementById("map");
-
-    if (!mapElement) {
+async function updateMap(InternshipAddress, Id_teacher) {
+    if (!map) {
+        console.error("La carte n'est pas initialisée. Appelez initMap d'abord.");
         return;
     }
 
     try {
-        const location1 = await geocodeAddress(address1);
-        const location2 = await geocodeAddress(address2);
+        const teacherAddresses = await getTeacherAddresses(Id_teacher);
+        const internshipLocation = await geocodeAddress(InternshipAddress);
 
-        const map = new ol.Map({
-            target: mapElement,
-            layers: [
-                new ol.layer.Tile({
-                    source: new ol.source.OSM(),
-                }),
-            ],
-            view: new ol.View({
-                center: ol.proj.fromLonLat([
-                    (location1.lon + location2.lon) / 2,
-                    (location1.lat + location2.lat) / 2,
-                ]),
-                zoom: 10,
-            }),
-        });
+        let closestTeacherAddress = null;
+        let minDistance = Infinity;
 
-        const markerLayer = new ol.layer.Vector({
-            source: new ol.source.Vector({
-                features: [
-                    new ol.Feature({
-                        geometry: new ol.geom.Point(ol.proj.transform([location1.lon, location1.lat], 'EPSG:4326', 'EPSG:3857')),
-                    }),
-                    new ol.Feature({
-                        geometry: new ol.geom.Point(ol.proj.transform([location2.lon, location2.lat], 'EPSG:4326', 'EPSG:3857')),
-                    }),
-                ],
-            }),
-            style: new ol.style.Style({
-                image: new ol.style.Icon({
-                    anchor: [0.5, 0.5],
-                    anchorXUnits: "fraction",
-                    anchorYUnits: "fraction",
-                    src: 'marker.png',
-                }),
-            }),
-        });
+        if (Array.isArray(teacherAddresses)) {
+            for (const teacher of teacherAddresses) {
+                const location = await geocodeAddress(teacher.address);
+                const distance = await calculateDistanceOnly(internshipLocation, location);
 
-        map.addLayer(markerLayer);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestTeacherAddress = location;
+                }
+            }
+        } else {
+            closestTeacherAddress = await geocodeAddress(teacherAddresses.address);
+        }
 
-        await calculateDistance(location1, location2, map);
+
+        placeMarker(internshipLocation, "Entreprise", true);
+        placeMarker(closestTeacherAddress, "Vous", false);
+
+        console.log(closestTeacherAddress.lon, closestTeacherAddress.lat)
+
+        centerMap(internshipLocation, closestTeacherAddress);
+        displayRoute(internshipLocation, closestTeacherAddress);
     } catch (error) {
         console.error("Erreur lors de la mise à jour de la carte :", error);
     }
 }
+
+function centerMap(location1, location2) {
+    const view = map.getView();
+    view.setCenter(
+        ol.proj.fromLonLat([
+            (location1.lon + location2.lon) / 2,
+            (location1.lat + location2.lat) / 2,
+        ])
+    );
+}
+
+/**
+ * Géocode une adresse
+ * @param {string} address Adresse à géocoder
+ * @returns {Promise<Object>} Localisation géocodée { lat, lon }
+ */
+async function geocodeAddress(address) {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+        address
+    )}&format=json&limit=1`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.length > 0 && data[0].lat && data[0].lon) {
+            return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
+        } else {
+            throw new Error("Le géocodage n'a retourné aucun résultat.");
+        }
+    } catch (error) {
+        console.error("Erreur de géocodage :", error);
+        throw error;
+    }
+}
+
+async function calculateDistanceOnly(origin, destination) {
+    const url = `https://router.project-osrm.org/route/v1/driving/${origin.lon},${origin.lat};${destination.lon},${destination.lat}?overview=false`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.routes && data.routes.length > 0) {
+        return data.routes[0].distance;
+    } else {
+        console.error("Aucun itinéraire trouvé.");
+        return Infinity;
+    }
+}
+
+async function displayRoute(origin, destination) {
+    const url = `https://router.project-osrm.org/route/v1/driving/${origin.lon},${origin.lat};${destination.lon},${destination.lat}?overview=full&geometries=geojson`;
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.routes && data.routes.length > 0) {
+            const route = data.routes[0];
+            const routeCoords = route.geometry.coordinates.map((coord) =>
+                ol.proj.fromLonLat(coord)
+            );
+
+            if (!routeLayer) {
+                routeLayer = new ol.layer.Vector({
+                    source: new ol.source.Vector(),
+                    style: new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                            color: "red",
+                            width: 3,
+                        }),
+                    }),
+                });
+                map.addLayer(routeLayer);
+            }
+
+            const routeFeature = new ol.Feature({
+                geometry: new ol.geom.LineString(routeCoords),
+            });
+
+            routeLayer.setSource(new ol.source.Vector({
+                features: [routeFeature],
+            }));
+
+            map.render();
+        }
+    } catch (error) {
+        console.error("Erreur lors de la récupération de l'itinéraire :", error);
+    }
+}
+
+function placeMarker(location, label, isCompany) {
+    if (isCompany && companyMarker) {
+        map.removeOverlay(companyMarker);
+    } else if (!isCompany && teacherMarker) {
+        map.removeOverlay(teacherMarker);
+    }
+
+    const marker = new ol.Overlay({
+        position: ol.proj.fromLonLat([location.lon, location.lat]),
+        element: createMarkerElement(label),
+    });
+
+    if (isCompany) {
+        companyMarker = marker;
+    } else {
+        teacherMarker = marker;
+    }
+
+    map.addOverlay(marker);
+}
+
+
+/**
+ * Crée un élément de marqueur
+ * @param {string} label Étiquette du marqueur
+ * @returns {HTMLElement} Élément du marqueur
+ */
+function createMarkerElement(label) {
+    const marker = document.createElement("div");
+    marker.className = "marker";
+    marker.textContent = label;
+    marker.style.backgroundColor = "blue";
+    marker.style.color = "white";
+    marker.style.padding = "5px";
+    marker.style.borderRadius = "50%";
+    marker.style.textAlign = "center";
+    return marker;
+}
+
 
 initMap();

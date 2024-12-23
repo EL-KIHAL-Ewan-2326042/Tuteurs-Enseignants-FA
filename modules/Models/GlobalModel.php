@@ -64,6 +64,26 @@ class GlobalModel {
     }
 
     /**
+     * Renvoie le nombre de fois où l'enseignant passé en paramètre a été tuteur dans le tableau passé en paramètre
+     * @param array $internshipStudent tableau renvoyé par la méthode 'getInternships()'
+     * @param string $teacher numéro de l'enseignant
+     * @param string $year dernière année durant laquelle l'enseignant a été tuteur
+     * @return int nombre de fois où l'enseignant connecté a été tuteur dans le tablau passé en paramètre
+     */
+    public function getInternshipTeacher(array $internshipStudent, string $teacher, string &$year): int {
+        $internshipTeacher = 0;
+        foreach($internshipStudent as $row) {
+            if($row['id_teacher'] == $teacher) {
+                ++$internshipTeacher;
+                if ($internshipTeacher == 1) {
+                    $year = substr($row['start_date_internship'], 0, 4);
+                }
+            }
+        }
+        return $internshipTeacher;
+    }
+
+    /**
      * Renvoie un score associé à la pertinence entre le sujet du stage et les disciplines enseignées par le professeur, tous deux passés en paramètre
      * @param string $internshipId numéro du stage
      * @param string $identifier identifiant de l'enseignant
