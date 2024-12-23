@@ -150,6 +150,7 @@ class Dispatcher{
         }
 
         if (!empty($result)) {
+            usort($result, fn($a, $b) => $b['score'] <=> $a['score']);
             return $result;
         }
         return [[]];
