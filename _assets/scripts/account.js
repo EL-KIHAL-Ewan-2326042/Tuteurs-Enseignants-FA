@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let rows = document.querySelectorAll('.account-row');
     let totalRows = rows.length;
     let totalPages = Math.ceil(totalRows / rowsPerPage);
-    let currentPage = sessionStorage.getItem('page') ? Number(sessionStorage.getItem('page')) : 1;
+    let currentPage = sessionStorage.getItem('page') && Number(sessionStorage.getItem('page')) <= totalPages ? Number(sessionStorage.getItem('page')) : 1;
 
     const prevButton = document.getElementById('prev-page');
     const nextButton = document.getElementById('next-page');
