@@ -7,6 +7,10 @@
  * @type {HTMLElement}
  */
 document.addEventListener('DOMContentLoaded', function() {
+    M.Tooltip.init(document.querySelectorAll('.tooltip'), {
+        exitDelay: 100,
+    });
+
     var elems = document.querySelectorAll('select');
     var instances = M.FormSelect.init(elems);
 
