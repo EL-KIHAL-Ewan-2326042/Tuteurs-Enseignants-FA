@@ -242,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const lastButton = document.getElementById('last-page');
     const pageNumbersContainer = document.getElementById('page-numbers');
 
-    sortTable(8);
+    sortTable(7);
 
     for (let i = 0; i < document.getElementById("dispatch-table").rows[0].cells.length; ++i) {
         document.getElementById("dispatch-table").rows[0].getElementsByTagName("TH")[i].addEventListener('click', () => {
@@ -276,16 +276,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 y = rows[i + 1].getElementsByTagName("TD")[n];
 
                 if (dir === "asc") {
-                    if ((n < 8 && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase())
-                        || (n === 8 && Number(x.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')) < Number(y.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')))
-                        || (n === 9 && x.getElementsByTagName("INPUT")[0].checked < y.getElementsByTagName("INPUT")[0].checked)) {
+                    if ((n < 7 && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase())
+                        || (n === 7 && Number(x.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')) < Number(y.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')))
+                        || (n === 8 && x.getElementsByTagName("INPUT")[0].checked < y.getElementsByTagName("INPUT")[0].checked)) {
                         shouldSwitch = true;
                         break;
                     }
                 } else if (dir === "desc") {
-                    if ((n < 8 && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())
-                        || (n === 8 && Number(x.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')) > Number(y.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')))
-                        || (n === 9 && x.getElementsByTagName("INPUT")[0].checked > y.getElementsByTagName("INPUT")[0].checked)) {
+                    if ((n < 7 && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())
+                        || (n === 7 && Number(x.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')) > Number(y.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')))
+                        || (n === 8 && x.getElementsByTagName("INPUT")[0].checked > y.getElementsByTagName("INPUT")[0].checked)) {
                         shouldSwitch = true;
                         break;
                     }
