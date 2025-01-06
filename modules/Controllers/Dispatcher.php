@@ -77,11 +77,13 @@ class Dispatcher {
      */
     public function show(): void {
 
+
         if (isset($_SESSION['role_name']) && (
                 (is_array($_SESSION['role_name']) && in_array('Admin_dep', $_SESSION['role_name'])) ||
                 ($_SESSION['role_name'] === 'Admin_dep'))) {
             $db = Database::getInstance();
             $globalModel = new \Blog\Models\GlobalModel($db);
+
             $dispatcherModel = new \Blog\Models\Dispatcher($db, $globalModel);
             $errorMessageDirectAssoc = '';
             $checkMessageDirectAssoc = '';
@@ -108,6 +110,32 @@ class Dispatcher {
 
                 header('Content-Type: application/json');
                 echo json_encode($studentView);
+                exit();
+            }
+
+            if (isset($_POST['action']) && ($_POST['action'] === 'getDistance') && isset($_POST['Internship_identifier']) && isset($_POST['Id_teacher'])) {
+
+                $distance = $globalModel->getDistance($_POST['Internship_identifier'], $_POST['Id_teacher'], false);
+
+                header('Content-Type: application/json');
+                echo json_encode($distance);
+                exit();
+            }
+
+            if (isset($_POST['action']) && ($_POST['action'] === 'getHistory') && isset($_POST['Student_number'])) {
+
+                $history = $globalModel->getStudentHistory($_POST['Student_number']);
+
+                header('Content-Type: application/json');
+                echo json_encode($history);
+                exit();
+            }
+
+            if (isset($_POST['action']) && ($_POST['action'] === 'getDisciplines') && isset($_POST['Id_teacher'])) {
+
+                $discipline = $globalModel->getDisciplines($_POST['Id_teacher']);
+                header('Content-Type: application/json');
+                echo json_encode($discipline);
                 exit();
             }
 
@@ -145,7 +173,7 @@ class Dispatcher {
                 $checkMessageAfterSort = $tmpmessage[1];
             }
 
-            $title = "Dispatcher";
+            $title = "Repartiteur";
             $cssFilePath = '_assets/styles/dispatcher.css';
             $jsFilePath = '_assets/scripts/dispatcher.js';
             $view = new \Blog\Views\Dispatcher($dispatcherModel, $errorMessageAfterSort, $errorMessageDirectAssoc, $checkMessageDirectAssoc, $checkMessageAfterSort);
