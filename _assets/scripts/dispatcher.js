@@ -223,10 +223,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize the Materialize select dropdown
     M.FormSelect.init(document.querySelectorAll('select'));
 
+    if (document.getElementById("dispatch-table") === null) {
+        return;
+    }
+
     const rowsPerPageDropdown = document.getElementById('rows-per-page');
     let rowsPerPage = parseInt(rowsPerPageDropdown.value); // Set default to 10
 
-    const rows = document.querySelectorAll('.dispatch-row');
+    let rows = document.querySelectorAll('.dispatch-row');
     let totalRows = rows.length;
     let totalPages = Math.ceil(totalRows / rowsPerPage);
     let currentPage = 1;
@@ -237,8 +241,76 @@ document.addEventListener('DOMContentLoaded', function () {
     const lastButton = document.getElementById('last-page');
     const pageNumbersContainer = document.getElementById('page-numbers');
 
+    sortTable(8);
+
+    for (let i = 0; i < document.getElementById("dispatch-table").rows[0].cells.length; ++i) {
+        document.getElementById("dispatch-table").rows[0].getElementsByTagName("TH")[i].addEventListener('click', () => {
+            sortTable(i);
+        });
+    }
+
+    /**
+     * Trie la table prenant pour id "dispatch-table"
+     * @param n numéro désignant la colonne par laquelle on trie le tableau
+     */
+    function sortTable(n) {
+        let dir, rows, switching, i, x, y, shouldSwitch, column;
+        const table = document.getElementById("dispatch-table");
+        switching = true;
+
+        if (table.rows[0].getElementsByTagName("TH")[n].innerHTML.substring(table.rows[0].getElementsByTagName("TH")[n].innerHTML.length - 1) === "▲") dir = "desc";
+        else dir = "asc";
+
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+            for (i = 1; i < (rows.length - 1); ++i) {
+                shouldSwitch = false;
+                if (rows[i].id === 'select-all-row'
+                    || rows[i + 1].id === 'select-all-row') {
+                    continue;
+                }
+
+                x = rows[i].getElementsByTagName("TD")[n];
+                y = rows[i + 1].getElementsByTagName("TD")[n];
+
+                if (dir === "asc") {
+                    if ((n < 8 && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase())
+                        || (n === 8 && Number(x.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')) < Number(y.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')))
+                        || (n === 9 && x.getElementsByTagName("INPUT")[0].checked < y.getElementsByTagName("INPUT")[0].checked)) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                } else if (dir === "desc") {
+                    if ((n < 8 && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())
+                        || (n === 8 && Number(x.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')) > Number(y.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')))
+                        || (n === 9 && x.getElementsByTagName("INPUT")[0].checked > y.getElementsByTagName("INPUT")[0].checked)) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+            }
+        }
+        for (i = 0; i < rows[0].cells.length; ++i) {
+            column = rows[0].getElementsByTagName("TH")[i].innerHTML;
+            if (column.substring(column.length-1) === "▲" || column.substring(column.length-1) === "▼") table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-2);
+            if (i === n) {
+                if (dir === "asc") table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▲";
+                else table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▼";
+            }
+        }
+
+        showPage(currentPage);
+    }
+
     function showPage(page) {
         if (page < 1 || page > totalPages) return;
+
+        rows = document.querySelectorAll('.dispatch-row');
 
         currentPage = page;
         updatePageNumbers();
@@ -379,7 +451,7 @@ document.addEventListener('DOMContentLoaded', function () {
         showPage(currentPage);
     });
 
-    showPage(1);
+    showPage(currentPage);
 });
 
 /**

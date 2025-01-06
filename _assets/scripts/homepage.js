@@ -371,7 +371,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         sessionStorage.setItem('columnNumber', n);
         sessionStorage.setItem('direction', dir);
-        showPage(currentPage, sessionStorage.getItem('direction'));
+        showPage(currentPage);
     }
 
     function showPage(page) {

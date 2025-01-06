@@ -46,6 +46,10 @@ input[type="checkbox"].filled-in:checked + span:after {
 
 /* Tableau Dispatcher */
 
+.clickable {
+    cursor: pointer;
+}
+
 #student-dispatch-table th, #student-dispatch-table td {
     padding: 6px 10px;
     text-align: center;
