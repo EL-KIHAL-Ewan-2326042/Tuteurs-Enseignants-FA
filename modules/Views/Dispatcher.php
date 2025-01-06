@@ -171,16 +171,16 @@ class Dispatcher {
                             <table class="highlight centered responsive-table" id="dispatch-table">
                                 <thead>
                                 <tr>
-                                    <th>Enseignant</th>
-                                    <th>Etudiant</th>
-                                    <th>Stage</th>
-                                    <th>Formation</th>
-                                    <th>Groupe</th>
-                                    <th>Date Expérience</th>
-                                    <th>Sujet</th>
-                                    <th>Adresse</th>
-                                    <th>Score</th>
-                                    <th>Associer</th>
+                                    <th class="clickable">Enseignant</th>
+                                    <th class="clickable">Etudiant</th>
+                                    <th class="clickable">Stage</th>
+                                    <th class="clickable">Formation</th>
+                                    <th class="clickable">Groupe</th>
+                                    <th class="clickable">Date Expérience</th>
+                                    <th class="clickable">Sujet</th>
+                                    <th class="clickable">Adresse</th>
+                                    <th class="clickable">Score</th>
+                                    <th class="clickable">Associer</th>
                                 </tr>
                                 </thead>
                                 <tbody>
