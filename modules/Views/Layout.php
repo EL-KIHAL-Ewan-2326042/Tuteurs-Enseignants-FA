@@ -52,7 +52,6 @@ class Layout {
                                 echo 'INTRAMU';
                             } ?>
                         </a></li>
-                    <li><a href="/aboutus">A PROPOS</a></li>
                 </ul>
                 <ul class="right">
                     <?php if (isset($_SESSION['identifier'])) { ?>
@@ -83,7 +82,6 @@ class Layout {
                     } else {
                         echo 'INTRAMU';
                     } ?></a></li>
-            <li><a href="/aboutus">A PROPOS</a></li>
         </ul>
         <?php
     }
@@ -102,7 +100,8 @@ class Layout {
                         &copy; 2024 TutorMap
                     </div>
                     <div class="col s6 right-align">
-                        <a href="/mentions-legales">Mentions Légales</a>
+                        <a href="/mentions-legales">Mentions Légales -</a>
+                        <a href="/aboutus"> A Propos</a>
                     </div>
                 </div>
             </div>
