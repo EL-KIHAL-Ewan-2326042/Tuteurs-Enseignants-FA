@@ -141,12 +141,13 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.querySelectorAll('.coef-input').forEach(input => {
-        input.addEventListener('input', function () {
-            const value = parseInt(this.value);
-            if (value > 100) {
+        input.addEventListener('change', function () {
+            let value = parseInt(this.value);
+
+            if (isNaN(value) || value < 1) {
+                this.value = 1;
+            } else if (value > 100) {
                 this.value = 100;
-            } else if (value < 0) {
-                this.value = 0;
             }
         });
     });
@@ -241,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const lastButton = document.getElementById('last-page');
     const pageNumbersContainer = document.getElementById('page-numbers');
 
-    sortTable(8);
+    sortTable(7);
 
     for (let i = 0; i < document.getElementById("dispatch-table").rows[0].cells.length; ++i) {
         document.getElementById("dispatch-table").rows[0].getElementsByTagName("TH")[i].addEventListener('click', () => {
@@ -275,16 +276,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 y = rows[i + 1].getElementsByTagName("TD")[n];
 
                 if (dir === "asc") {
-                    if ((n < 8 && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase())
-                        || (n === 8 && Number(x.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')) < Number(y.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')))
-                        || (n === 9 && x.getElementsByTagName("INPUT")[0].checked < y.getElementsByTagName("INPUT")[0].checked)) {
+                    if ((n < 7 && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase())
+                        || (n === 7 && Number(x.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')) < Number(y.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')))
+                        || (n === 8 && x.getElementsByTagName("INPUT")[0].checked < y.getElementsByTagName("INPUT")[0].checked)) {
                         shouldSwitch = true;
                         break;
                     }
                 } else if (dir === "desc") {
-                    if ((n < 8 && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())
-                        || (n === 8 && Number(x.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')) > Number(y.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')))
-                        || (n === 9 && x.getElementsByTagName("INPUT")[0].checked > y.getElementsByTagName("INPUT")[0].checked)) {
+                    if ((n < 7 && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())
+                        || (n === 7 && Number(x.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')) > Number(y.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')))
+                        || (n === 8 && x.getElementsByTagName("INPUT")[0].checked > y.getElementsByTagName("INPUT")[0].checked)) {
                         shouldSwitch = true;
                         break;
                     }
@@ -399,7 +400,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                                           <td></td>
                                                           <td></td>
                                                           <td></td>
-                                                          <td></td>
                                                           <td><strong>Tout cocher</strong></td>
                                                           <td>
                                                               <p>
@@ -491,13 +491,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 return response.json();
             })
             .then(data => {
-                console.log(data);
                 createNewTable(data);
             })
             .catch(error => {
                 console.error('Fetch error:', error);
             });
     }
+
+
 
     const tableBody = document.querySelector('#dispatch-table tbody');
 
@@ -554,7 +555,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return element;
     }
 
-    function createNewTable(data) {
+    async function createNewTable(data) {
         const container = document.querySelector('.dispatch-table-wrapper');
 
         const existingTable = document.getElementById('student-dispatch-table');
@@ -573,6 +574,18 @@ document.addEventListener('DOMContentLoaded', function () {
         header.className = 'center-align flow-text';
         container.appendChild(header);
 
+
+        const loadingContainer = document.createElement('div');
+        loadingContainer.className = 'center-align loading-indicator';
+        loadingContainer.innerHTML = `
+        <p style="font-size: 24px;">Chargement en cours, veuillez patienter...</p>
+        <div class="progress">
+            <div class="indeterminate"></div>
+        </div>`;
+        container.appendChild(loadingContainer);
+
+        loadingContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
         const newTable = document.createElement('table');
         newTable.className = 'highlight centered responsive-table';
         newTable.id = 'student-dispatch-table';
@@ -581,13 +594,10 @@ document.addEventListener('DOMContentLoaded', function () {
         thead.innerHTML = `
         <tr>
             <th>Enseignant</th>
-            <th>Etudiant</th>
-            <th>Stage</th>
-            <th>Formation</th>
-            <th>Groupe</th>
-            <th>Date Expérience</th>
-            <th>Sujet</th>
-            <th>Adresse</th>
+            <th>Historique</th>
+            <th>Position</th>
+            <th>Discipline</th>
+            <th>Entreprise</th>
             <th>Score</th>
             <th>Associer</th>
         </tr>`;
@@ -595,20 +605,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const tbody = document.createElement('tbody');
 
-        data.forEach(row => {
+        for (const row of data) {
             const tr = document.createElement('tr');
+            row.distance = await getDistance(row.internship_identifier, row.id_teacher);
+            row.discipline = await getDisciplines(row.id_teacher);
+            let studentHistory = await getStudentHistory(row.student_number);
+
+            if (studentHistory) {
+                row.date_experience = studentHistory;
+            }
+            else {
+                row.date_experience = '❌';
+            }
+
             tr.className = 'dispatch-row';
             tr.dataset.internshipIdentifier = `${row.internship_identifier}$${row.id_teacher}`;
 
             tr.innerHTML = `
             <td>${row.teacher_firstname} ${row.teacher_name} (${row.id_teacher})</td>
-            <td>${row.student_firstname} ${row.student_name} (${row.student_number})</td>
-            <td>${row.company_name} (${row.internship_identifier})</td>
-            <td>${row.formation}</td>
-            <td>${row.class_group}</td>
             <td>${row.date_experience || 'dd/mm/yyyy'}</td>
-            <td>${row.internship_subject}</td>
-            <td>${row.address}</td>
+            <td>${row.distance} min</td>
+            <td>${row.discipline}</td>
+            <td>${row.company_name}</td>
             <td>
                 <div class="star-rating" data-tooltip="${row.score}" data-position="top">
                     ${renderStarsJS(row.score)}
@@ -625,13 +643,12 @@ document.addEventListener('DOMContentLoaded', function () {
             </td>`;
 
             tbody.appendChild(tr);
-        });
+        }
 
         newTable.appendChild(tbody);
-
         container.appendChild(newTable);
 
-        header.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        loadingContainer.remove();
     }
 
     function renderStarsJS(score) {
@@ -727,6 +744,98 @@ async function getTeacherAddresses(Id_teacher) {
 }
 
 /**
+ * Requête au serveur pour avoir la distance minimale entre un prof et un stage
+ * @param Internship_identifier
+ * @param Id_teacher
+ * @returns {Promise<number|*[]>}
+ */
+async function getDistance(Internship_identifier, Id_teacher) {
+    try {
+        const response = await fetch(window.location.href, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                action: "getDistance",
+                Internship_identifier: Internship_identifier,
+                Id_teacher: Id_teacher
+            }),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Fetch error response:", errorText);
+            throw new Error("Network response was not ok");
+        }
+
+        const data = await response.json();
+        return parseInt(data, 10);
+    } catch (error) {
+        console.error("Fetch error:", error);
+        return [];
+    }
+}
+
+/**
+ * Requête au serveur pour avoir les disciplines d'un professeur
+ * @param Internship_identifier
+ * @param Id_teacher
+ * @returns {Promise<number|*[]>}
+ */
+async function getDisciplines(Id_teacher) {
+    try {
+        const response = await fetch(window.location.href, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                action: "getDisciplines",
+                Id_teacher: Id_teacher
+            }),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Fetch error response:", errorText);
+            throw new Error("Network response was not ok");
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Fetch error:", error);
+        return [];
+    }
+}
+
+async function getStudentHistory(Student_number) {
+    try {
+        const response = await fetch(window.location.href, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
+            body: new URLSearchParams({
+                action: "getHistory",
+                Student_number: Student_number
+            }),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Fetch error response:", errorText);
+            throw new Error("Network response was not ok");
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Fetch error:", error);
+        return [];
+    }
+}
+
+/**
  * Mise à jour de la carte avec deux nouvelles adresses
  * @param {string} InternshipAddress Première adresse
  * @param {string} Id_teacher Deuxième adresse
@@ -761,8 +870,6 @@ async function updateMap(InternshipAddress, Id_teacher) {
 
         placeMarker(internshipLocation, "Entreprise", true);
         placeMarker(closestTeacherAddress, "Professeur", false);
-
-        console.log(closestTeacherAddress.lon, closestTeacherAddress.lat)
 
         centerMap(internshipLocation, closestTeacherAddress);
         displayRoute(internshipLocation, closestTeacherAddress);
