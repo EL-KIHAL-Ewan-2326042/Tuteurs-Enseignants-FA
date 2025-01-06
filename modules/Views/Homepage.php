@@ -24,7 +24,7 @@ class   Homepage {
                             <option value="company">Entreprise</option>
                         </select>
                     </div>
-                    <label for="search">Rechercher un étudiant:</label>
+                    <label for="search">Rechercher:</label>
                     <input type="text" id="search" name="search" autocomplete="off" maxlength="50" required>
                     <p>Etudiant(s):</p>
                     <div id="searchResults"></div>
@@ -137,7 +137,7 @@ class   Homepage {
                             if (!$internshipInfos['id_teacher'] && $inDep) {
                                 ?>
                                 <div class="row"></div>
-                                <button class="waves-effect waves-light btn" name="searchedStudentSubmitted" value="<?= $internshipInfos["internship_identifier"] ?>" type="submit" formmethod="post">Valider</button>
+                                <button class="waves-effect waves-light btn tooltip" name="searchedStudentSubmitted" value="<?= $internshipInfos["internship_identifier"] ?>" type="submit" formmethod="post" data-tooltip="Valider votre choix" data-position="top">Valider</button>
                                 <?php
                                 echo "</form>";
                             } else {
@@ -150,7 +150,7 @@ class   Homepage {
                     }
                     ?>
                     <form method="post" class="center-align">
-                        <button class="waves-effect waves-light btn" name="cancelSearch" value="1" type="submit" formmethod="post">Annuler</button>
+                        <button class="waves-effect waves-light btn tooltip" name="cancelSearch" value="1" type="submit" formmethod="post" data-tooltip="Annuler la recherche" data-position="top">Annuler</button>
                     </form>
                 <?
                 } else {
@@ -187,7 +187,7 @@ class   Homepage {
                     </label>
                     <? endforeach; ?>
                     <div class="row"></div>
-                    <button class="waves-effect waves-light btn" name="selecDepSubmitted" value="1" type="submit" formmethod="post">Afficher</button>
+                    <button class="waves-effect waves-light btn tooltip" name="selecDepSubmitted" value="1" type="submit" formmethod="post" data-tooltip="Afficher les tutorats disponibles" data-position="top">Afficher</button>
                 </form>
 
                 <div class="row"></div>
@@ -260,8 +260,8 @@ class   Homepage {
                             <div class="row"></div>
 
                             <div class="selection"> <div class="formCell">
-                                <button class="waves-effect waves-light btn" name="selecInternshipSubmitted" value="1" type="submit">Valider</button>
-                                <button class="waves-effect waves-light btn" type="reset">Annuler</button>
+                                <button class="waves-effect waves-light btn tooltip" name="selecInternshipSubmitted" value="1" type="submit" data-tooltip="Envoyer vos choix" data-position="top">Valider</button>
+                                <button class="waves-effect waves-light btn tooltip" type="reset" data-tooltip="Annuler les modifications" data-position="top">Annuler</button>
                             </div>
                         </form>
                     <? endif;
