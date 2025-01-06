@@ -12,6 +12,19 @@ class GlobalModel {
     }
 
     /**
+     * Renvoie l'historique (de stage) le plus recent d'un etudiant s'il en a un
+     * @param string $student_number
+     * @return mixed
+     */
+    public function getStudentHistory(string $student_number): mixed {
+        $query = "SELECT End_date_internship FROM Internship WHERE Student_number = :student_number AND Start_date_internship < CURRENT_DATE";
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindParam(':student_number', $student_number);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_COLUMN);
+    }
+
+    /**
      * Renvoie tous les départements de l'enseignant passé en paramètre
      * @param string $teacher_id identifiant de l'enseignant
      * @return false|array tableau contenant tous les départements dont l'enseignant connecté fait partie, false sinon
@@ -64,6 +77,27 @@ class GlobalModel {
     }
 
     /**
+     * Récupère les informations relatives au prochain stage de l'étudiant passé en paramètre
+     * @param string $student numéro de l'étudiant
+     * @return false|array tableau contenant le numéro de stage, le nom de l'entreprise, le sujet du stage et le numéro de l'enseignant tuteur
+     */
+    public function getInternshipStudent(string $student): false|array {
+        $query = 'SELECT internship_identifier, company_name, internship_subject, address, internship.id_teacher, teacher_name, teacher_firstname, formation, class_group
+                    FROM internship
+                    JOIN student ON internship.student_number = student.student_number
+                    LEFT JOIN teacher ON internship.id_teacher = teacher.id_teacher
+                    WHERE internship.student_number = :student
+                    AND start_date_internship > CURRENT_DATE
+                    ORDER BY start_date_internship ASC
+                    LIMIT 1';
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindParam(':student', $student);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+
+    /**
      * Renvoie le nombre de fois où l'enseignant passé en paramètre a été tuteur dans le tableau passé en paramètre
      * @param array $internshipStudent tableau renvoyé par la méthode 'getInternships()'
      * @param string $teacher numéro de l'enseignant
@@ -82,6 +116,22 @@ class GlobalModel {
         }
         return $internshipTeacher;
     }
+
+    /**
+     * Renvoie le ou les disiplines d'un professeur
+     * @param string $id_teahcer identifiant du prof
+     * @return array|false result de la requete
+     */
+    public function getDisciplines(string $id_teahcer) {
+        $pdo = $this->db;
+
+        $query = "SELECT discipline_name FROM is_taught WHERE id_teacher = :id";
+        $stmt = $pdo->getConn()->prepare($query);
+        $stmt->bindParam(':id', $id_teahcer);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
 
     /**
      * Renvoie un score associé à la pertinence entre le sujet du stage et les disciplines enseignées par le professeur, tous deux passés en paramètre

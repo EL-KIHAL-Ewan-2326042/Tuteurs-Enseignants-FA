@@ -66,7 +66,7 @@ input[type="checkbox"].filled-in:checked + span:after {
 }
 
 #student-dispatch-table tbody tr:hover {
-    background-color: #f1f1f1;
+    background-color: #ffffcc;
 }
 
 #dispatch-table th, #dispatch-table td {
@@ -85,7 +85,8 @@ input[type="checkbox"].filled-in:checked + span:after {
 }
 
 #dispatch-table tbody tr:hover {
-    background-color: #f1f1f1;
+    background-color: #ffffcc;
+    cursor: pointer;
 }
 
 @media screen and (max-width: 768px) {
