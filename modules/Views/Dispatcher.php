@@ -176,7 +176,6 @@ class Dispatcher {
                                     <th class="clickable">Stage</th>
                                     <th class="clickable">Formation</th>
                                     <th class="clickable">Groupe</th>
-                                    <th class="clickable">Date Expérience</th>
                                     <th class="clickable">Sujet</th>
                                     <th class="clickable">Adresse</th>
                                     <th class="clickable">Score</th>
@@ -206,7 +205,6 @@ class Dispatcher {
                                                 <td><?= $resultDispatch['company_name'] . ' (' .$resultDispatch['internship_identifier'] . ')'; ?></td>
                                                 <td><?= $resultDispatch['formation'] ?></td>
                                                 <td><?= $resultDispatch['class_group'] ?></td>
-                                                <td><?= 'dd/mm/yyyy' ?></td>
                                                 <td><?= $resultDispatch['internship_subject'] ?></td>
                                                 <td><?= $resultDispatch['address'] ?></td>
                                                 <td>
