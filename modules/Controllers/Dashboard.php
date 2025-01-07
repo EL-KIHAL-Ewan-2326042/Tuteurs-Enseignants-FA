@@ -2,10 +2,7 @@
 
 namespace Blog\Controllers;
 
-use Blog\Views\Layout;
-use Includes\Database;
-use Blog\Views\dashboard as GestionDonneesView;
-use Blog\Models\dashboard as GestioinDonneesModel;
+use Blog\Views\layout\Layout;
 use Exception;
 
 class Dashboard {

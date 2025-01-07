@@ -2,10 +2,8 @@
 
 namespace Blog\Controllers;
 
-use Blog\Views\Layout;
+use Blog\Views\layout\Layout;
 use Includes\Database;
-use Blog\Views\Account as AccountView;
-use Blog\Models\Account as AccountModel;
 
 class Account {
     private Layout $layout;

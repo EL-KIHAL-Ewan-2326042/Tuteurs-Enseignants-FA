@@ -3,9 +3,9 @@
 namespace Controllers;
 
 use Blog\Controllers\Intramu;
-use Blog\Views\Layout;
-use Blog\Views\Intramu as IntramuView;
 use Blog\Models\Intramu as IntramuModel;
+use Blog\Views\intramu\Intramu as IntramuView;
+use Blog\Views\layout\Layout;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 

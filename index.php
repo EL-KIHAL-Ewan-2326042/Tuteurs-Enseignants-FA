@@ -117,7 +117,7 @@ function createAction($uri, $layout): Closure
     };
 }
 
-$layout = new \Blog\Views\Layout();
+$layout = new \Blog\Views\layout\Layout();
 $action = createAction($uri, $layout);
 $router->get($uri, $action);
 $router->post($uri, $action);
