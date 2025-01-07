@@ -1,8 +1,7 @@
 <?php
 namespace Blog\Controllers;
 
-use Blog\Views\Layout;
-use Blog\Views\Aboutus as AboutUsView;
+use Blog\Views\layout\Layout;
 
 class Aboutus {
 

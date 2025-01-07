@@ -3,8 +3,8 @@
 namespace Controllers;
 
 use Blog\Controllers\Homepage;
-use Blog\Views\Layout;
-use Blog\Views\Homepage as HomepageView;
+use Blog\Views\homepage\Homepage as HomepageView;
+use Blog\Views\layout\Layout;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 

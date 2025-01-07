@@ -3,7 +3,7 @@
 
 namespace Blog\Controllers;
 
-use Blog\Views\Layout;
+use Blog\Views\layout\Layout;
 
 class Error404 {
 

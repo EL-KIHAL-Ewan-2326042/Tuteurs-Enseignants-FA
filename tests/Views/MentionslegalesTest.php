@@ -2,7 +2,7 @@
 
 namespace Views;
 
-use Blog\Views\Mentionslegales;
+use Blog\Views\mentionslegales\Mentionslegales;
 use PHPUnit\Framework\TestCase;
 
 /**

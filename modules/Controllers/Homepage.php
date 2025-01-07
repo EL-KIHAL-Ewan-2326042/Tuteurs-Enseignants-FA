@@ -1,10 +1,8 @@
 <?php
 namespace Blog\Controllers;
 
-use Blog\Views\Layout;
+use Blog\Views\layout\Layout;
 use Includes\Database;
-use Blog\Views\Homepage as HomepageView;
-use Blog\Models\Homepage as HomepageModel;
 
 class Homepage {
     private Layout $layout;
@@ -33,7 +31,7 @@ class Homepage {
         $db = Database::getInstance();
         $globalModel = new \Blog\Models\GlobalModel($db);
         $homepageModel = new \Blog\Models\Homepage($db, $globalModel);
-        $view = new \Blog\Views\Homepage($homepageModel, $globalModel);
+        $view = new \Blog\Views\homepage\Homepage($homepageModel, $globalModel);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_POST['action'])) {
