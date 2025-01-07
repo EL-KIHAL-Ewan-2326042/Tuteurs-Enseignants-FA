@@ -2,27 +2,34 @@
 
 namespace Blog\Controllers;
 
-use Blog\Views\layout\Layout;
+use Blog\Models\Department;
+use Blog\Models\GlobalModel;
+use Blog\Models\Internship;
+use Blog\Models\Student;
+use Blog\Models\Teacher;
+use Blog\Models\User;
+use Blog\Views\Layout;
 use Includes\Database;
+use PDO;
 
 class Dispatcher {
     /**
      * Cette méthode permet d'associer directement un enseignant à un stage, en fonction des données soumises via un formulaire `POST`, elle renvoie des messages d'erreurs appropriées si besoin sinon un message de validation.
      *
-     * @param object $dispatcherModel Le modèle de gestion des données qui contient les méthodes pour récupérer les listes et insérer l'association.
-     *
+     * @param $teacherModel
+     * @param $internshipModel
      * @return array Retourne un message de succès ou d'erreur concernant l'association ou la demande de remplissage des champs.
      */
-    public function association_direct($dispatcherModel): array {
+    public function association_direct($teacherModel, $internshipModel): array {
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['searchInternship']) && isset($_POST['searchTeacher']) && $_POST['searchInternship'] !== '' && $_POST['searchTeacher'] !== '') {
 
-            $listTeacher = $dispatcherModel->createListTeacher();
-            $listStudent = $dispatcherModel->createListInternship();
-            $listAssociate = $dispatcherModel->createListAssociate();
+            $listTeacher = $teacherModel->createListTeacher();
+            $listStudent = $internshipModel->createListInternship();
+            $listAssociate = $internshipModel->createListAssociate();
 
             if (in_array($_POST['searchTeacher'], $listTeacher) && in_array($_POST['searchInternship'], $listStudent)){
                 if (!(in_array([$_POST['searchTeacher'], $_POST['searchInternship']], $listAssociate))) {
-                    return ["", $dispatcherModel->insertResponsible()];
+                    return ["", $internshipModel->insertResponsible()];
                 }
                 else {
                     return ["Cette association existe déjà", ""];
@@ -45,10 +52,10 @@ class Dispatcher {
      *
      * @return array Retourne une chaîne de caractères contenant des messages d'information ou d'erreur concernant l'état des associations.
      */
-    public function association_after_sort($dispatcherModel): array {
-        $listTeacher = $dispatcherModel->createListTeacher();
-        $listInternship = $dispatcherModel->createListInternship();
-        $listAssociate = $dispatcherModel->createListAssociate();
+    public function association_after_sort($teacherModel, $internshipModel): array {
+        $listTeacher = $teacherModel->createListTeacher();
+        $listInternship = $internshipModel->createListInternship();
+        $listAssociate = $internshipModel->createListAssociate();
         $returnErrorMessage = '';
         $returnCheckMessage = '';
 
@@ -56,7 +63,7 @@ class Dispatcher {
             $tmp = explode("$", $tupleAssociate);
             if (in_array($tmp[0], $listTeacher) && in_array($tmp[1], $listInternship)){
                 if (!(in_array([$tmp[0], $tmp[1]], $listAssociate))) {
-                    $returnCheckMessage .= $dispatcherModel->insertIs_responsible($tmp[0], $tmp[1], floatval($tmp[2]));
+                    $returnCheckMessage .= $internshipModel->insertIs_responsible($tmp[0], $tmp[1], floatval($tmp[2]));
                 }
                 else {
                     $returnErrorMessage .= $tmp[0] . " et " . $tmp[1] . ", cette association existe déjà<br>";
@@ -81,16 +88,27 @@ class Dispatcher {
                 (is_array($_SESSION['role_name']) && in_array('Admin_dep', $_SESSION['role_name'])) ||
                 ($_SESSION['role_name'] === 'Admin_dep'))) {
             $db = Database::getInstance();
-            $globalModel = new \Blog\Models\GlobalModel($db);
+            $globalModel = new GlobalModel($db);
 
-            $dispatcherModel = new \Blog\Models\Dispatcher($db, $globalModel);
+            $teacherModel = new Teacher($db);
+            $studentModel = new Student($db);
+            $internshipModel = new Internship($db);
+            $userModel = new User($db);
+            $departmentModel = new Department($db);
+
             $errorMessageDirectAssoc = '';
             $checkMessageDirectAssoc = '';
             $errorMessageAfterSort = '';
             $checkMessageAfterSort = '';
 
             if (isset($_POST['action']) && ($_POST['action'] === 'search') && isset($_POST['searchType']) && ($_POST['searchType'] === 'searchInternship' || $_POST['searchType'] === 'searchTeacher')) {
-                $results = $dispatcherModel->correspondTerms();
+
+                if ($_POST['searchType'] === 'searchTeacher') {
+                    $results = $teacherModel->correspondTermsTeacher();
+                }
+                else {
+                    $results = $studentModel->correspondTermsStudent();
+                }
 
                 header('Content-Type: application/json');
                 echo json_encode($results);
@@ -105,7 +123,7 @@ class Dispatcher {
                     exit();
                 }
 
-                $studentView = $dispatcherModel->RelevanceInternship($_POST['Internship_identifier'], $dictCoef);
+                $studentView = $internshipModel->RelevanceInternship($_POST['Internship_identifier'], $dictCoef);
 
                 header('Content-Type: application/json');
                 echo json_encode($studentView);
@@ -114,7 +132,7 @@ class Dispatcher {
 
             if (isset($_POST['action']) && ($_POST['action'] === 'getDistance') && isset($_POST['Internship_identifier']) && isset($_POST['Id_teacher'])) {
 
-                $distance = $globalModel->getDistance($_POST['Internship_identifier'], $_POST['Id_teacher'], false);
+                $distance = $internshipModel->getDistance($_POST['Internship_identifier'], $_POST['Id_teacher'], false);
 
                 header('Content-Type: application/json');
                 echo json_encode($distance);
@@ -140,7 +158,7 @@ class Dispatcher {
 
             if (isset($_POST['action']) && ($_POST['action'] === 'getTeacherAddresses') && isset($_POST['Id_teacher'])) {
 
-                $teacherAdresses = $dispatcherModel->getTeacherAddresses($_POST['Id_teacher']);
+                $teacherAdresses = $teacherModel->getAddress($_POST['Id_teacher']);
 
                 header('Content-Type: application/json');
                 echo json_encode($teacherAdresses);
@@ -157,17 +175,17 @@ class Dispatcher {
                     ];
                 }
 
-                $dispatcherModel->saveCoefficients($coefficients, $_SESSION['identifier'], (int)$_POST['action-save']);
+                $userModel->saveCoefficients($coefficients, $_SESSION['identifier'], (int)$_POST['action-save']);
             }
 
             if (isset($_POST['searchInternship']) && isset($_POST['searchTeacher'])) {
-                $tmpmessage = $this->association_direct($dispatcherModel);
+                $tmpmessage = $this->association_direct($teacherModel, $internshipModel);
                 $errorMessageDirectAssoc = $tmpmessage[0];
                 $checkMessageDirectAssoc = $tmpmessage[1];
             }
 
             if (isset($_POST['selectStudentSubmitted']) && isset($_POST['listTupleAssociate'])) {
-                $tmpmessage = $this->association_after_sort($dispatcherModel);
+                $tmpmessage = $this->association_after_sort($teacherModel, $internshipModel);
                 $errorMessageAfterSort = $tmpmessage[0];
                 $checkMessageAfterSort = $tmpmessage[1];
             }
@@ -175,7 +193,7 @@ class Dispatcher {
             $title = "Repartiteur";
             $cssFilePath = '_assets/styles/dispatcher.css';
             $jsFilePath = '_assets/scripts/dispatcher.js';
-            $view = new \Blog\Views\Dispatcher($dispatcherModel, $errorMessageAfterSort, $errorMessageDirectAssoc, $checkMessageDirectAssoc, $checkMessageAfterSort);
+            $view = new \Blog\Views\Dispatcher($internshipModel, $userModel, $departmentModel, $errorMessageAfterSort, $errorMessageDirectAssoc, $checkMessageDirectAssoc, $checkMessageAfterSort);
 
             $layout = new Layout();
             $layout->renderTop($title, $cssFilePath);

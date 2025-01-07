@@ -2,9 +2,13 @@
 
 namespace Blog\Views;
 
+use Blog\Models\Internship;
+use Blog\Models\Student;
+use Blog\Models\Teacher;
+
 class Account {
 
-    public function __construct(private readonly \Blog\Models\Account $model) { }
+    public function __construct(private readonly Teacher $teacherModel, private readonly Internship $internshipModel) { }
 
     /**
      * Vue de Account
@@ -16,17 +20,17 @@ class Account {
             <h3 class="center-align">Stages et alternances assignés</h3>
 
             <?
-            $interns = $this->model->getInterns($_SESSION['identifier']);
-            $max = $this->model->getMaxNumberInterns($_SESSION['identifier']);
+            $interns = $this->internshipModel->getInterns($_SESSION['identifier']);
+            $max = $this->teacherModel->getMaxNumberInterns($_SESSION['identifier']);
             $internship = 0;
             $alternance = 0;
-            $this->model->getCountInternsPerType($interns, $internship, $alternance);
+            $this->internshipModel->getCountInternsPerType($interns, $internship, $alternance);
 
             if (isset($_POST['newMaxNumberSubmitted'])) {
                 if (isset($_POST['newMaxNumber']) && (!$max || $max !== $_POST['newMaxNumber'])
                     && intval($_POST['newMaxNumber']) > 0 && intval($_POST['newMaxNumber']) <= 100) {
                     if (intval($_POST['newMaxNumber']) >= $internship + $alternance) {
-                        $update = $this->model->updateMaxiNumberTrainees($_SESSION['identifier'], intval($_POST['newMaxNumber']));
+                        $update = $this->teacherModel->updateMaxiNumberTrainees($_SESSION['identifier'], intval($_POST['newMaxNumber']));
                         if (!$update || gettype($update) !== 'boolean') {
                             echo '<h6 class="red-text">Une erreur est survenue</h6>';
                         } else $max = $_POST['newMaxNumber'];
