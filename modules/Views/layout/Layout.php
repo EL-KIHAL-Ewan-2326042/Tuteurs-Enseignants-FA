@@ -1,6 +1,6 @@
 <?php
 /**
- * Fichier contenant la vue de la mise en page
+ * Fichier contenant la vue de la mise en page présente sur chaque page du site
  *
  * PHP version 8.3
  *
@@ -15,11 +15,11 @@
  * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
  * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
  */
-namespace Blog\Views;
-use Includes\Database;
+
+namespace Blog\Views\layout;
 
 /**
- * Fichier contenant la vue de la mise en page
+ * Classe gérant l'affichage de la mise en page
  *
  * PHP version 8.3
  *
