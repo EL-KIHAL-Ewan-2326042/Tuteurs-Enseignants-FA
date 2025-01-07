@@ -1,6 +1,10 @@
 <?php
 namespace Blog\Views;
 
+use Blog\Models\Department;
+use Blog\Models\Internship;
+use Blog\Models\User;
+
 /**
  * Vue du Dispatcher
  * @return void
@@ -8,13 +12,15 @@ namespace Blog\Views;
 class Dispatcher {
 
     /**
-     * @param \Blog\Models\Dispatcher $dispatcherModel
+     * @param Internship $internshipModel
+     * @param User $userModel
+     * @param Department $departmentModel
      * @param string $errorMessageAfterSort
      * @param string $errorMessageDirectAssoc
      * @param string $checkMessageDirectAssoc
      * @param string $checkMessageAfterSort
      */
-    public function __construct(private readonly \Blog\Models\Dispatcher $dispatcherModel, private readonly string $errorMessageAfterSort,private readonly string $errorMessageDirectAssoc, private readonly string $checkMessageDirectAssoc,private readonly string $checkMessageAfterSort) {
+    public function __construct(private readonly Internship $internshipModel, private readonly User $userModel, private readonly Department $departmentModel, private readonly string $errorMessageAfterSort,private readonly string $errorMessageDirectAssoc, private readonly string $checkMessageDirectAssoc,private readonly string $checkMessageAfterSort) {
     }
 
     public function showView(): void {
@@ -28,7 +34,7 @@ class Dispatcher {
                     <div class="col card-panel white z-depth-3 s12 m6" style="padding: 20px; margin-right: 10px">
                         <form class="col s12" action="./dispatcher" method="post" onsubmit="showLoading();">
                             <?php
-                            $saves = $this->dispatcherModel->showCoefficients();
+                            $saves = $this->userModel->showCoefficients();
                             if ($saves): ?>
                                 <div class="input-field">
                                     <label for="save-selector"></label>
@@ -55,14 +61,14 @@ class Dispatcher {
                             $id_backup = $_POST['save-selector'] ?? 'default';
 
                             if ($id_backup === 'default' || $id_backup === 'new') {
-                                $defaultCriteria = $this->dispatcherModel->getDefaultCoef();
+                                $defaultCriteria = $this->userModel->getDefaultCoef();
                                 $listCriteria = [];
 
                                 foreach ($defaultCriteria as $key => $value) {
                                     $listCriteria[$key] = $value;
                                 }
                             } else {
-                                $listCriteria = $this->dispatcherModel->loadCoefficients($_SESSION['identifier'], $id_backup);
+                                $listCriteria = $this->userModel->loadCoefficients($_SESSION['identifier'], $id_backup);
                             }
                             ?>
 
@@ -196,7 +202,7 @@ class Dispatcher {
                                             header('location: ./dispatcher');
                                         }
 
-                                        $resultDispatchList = $this->dispatcherModel->dispatcher($dictCoef)[0];
+                                        $resultDispatchList = $this->internshipModel->dispatcher($this->departmentModel, $dictCoef)[0];
                                         foreach ($resultDispatchList as $resultDispatch):
                                             ?>
                                             <tr class="dispatch-row" data-internship-identifier='<?= $resultDispatch['internship_identifier'] . '$' . $resultDispatch['id_teacher'] . '$' . $resultDispatch['address']; ?>'>

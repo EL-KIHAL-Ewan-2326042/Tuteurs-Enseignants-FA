@@ -784,7 +784,6 @@ async function getDistance(Internship_identifier, Id_teacher) {
 
 /**
  * Requête au serveur pour avoir les disciplines d'un professeur
- * @param Internship_identifier
  * @param Id_teacher
  * @returns {Promise<number|*[]>}
  */

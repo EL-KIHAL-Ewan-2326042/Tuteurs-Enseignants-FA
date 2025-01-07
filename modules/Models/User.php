@@ -2,6 +2,7 @@
 
 namespace Blog\Models;
 use Includes\Database;
+use mysql_xdevapi\Exception;
 use PDO;
 
 class User extends Model {
@@ -107,5 +108,94 @@ class User extends Model {
         $roles = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
 
         return $roles ?: [];
+    }
+
+    /**
+     * Cette fonction permet de récupérer la liste des sauvegardes disponibles dans la base de données.
+     *
+     * @return array|null Renvoie un tableau associatif contenant les identifiants des sauvegardes disponibles, ou `null` en cas d'échec.
+     */
+    public function showCoefficients(): ?array {
+        try {
+            $query = "SELECT DISTINCT id_backup FROM id_backup ORDER BY id_backup ASC";
+            $stmt = $this->db->getConn()->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Cette fonction permet de charger les coefficients d'un utilisateur pour une sauvegarde donnée.
+     *
+     * @param string $user_id L'identifiant de l'utilisateur pour lequel les coefficients sont chargés.
+     * @param int $id_backup L'identifiant de la sauvegarde pour laquelle les coefficients sont récupérés.
+     * @return array|false Retourne un tableau associatif des coefficients si la requête réussit, ou `false` en cas d'erreur ou de données non trouvées.
+     */
+    public function loadCoefficients(string $user_id, int $id_backup): array|false {
+        try {
+            $query = "SELECT name_criteria, coef, is_checked FROM backup WHERE user_id = :user_id AND id_backup = :id_backup ORDER BY name_criteria ASC";
+            $stmt = $this->db->getConn()->prepare($query);
+            $stmt->bindParam(':user_id', $user_id);
+            $stmt->bindParam(':id_backup', $id_backup);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }
+        catch (\Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Permet de sauvegarder les coefficients dans la base de données.
+     *
+     * @param array $data Tableau associatif contenant les informations sur les critères à mettre à jour ('name_criteria' (string), 'coef' et 'is_checked'` (int))
+     * @param string $user_id Identifiant de l'utilisateur pour lequel les coefficients doivent être mis à jour
+     * @param int $id_backup Identifiant de la sauvegarde pour laquelle les coefficients doivent être mis à jour
+     * @return bool Retourne True si la mise à jour a réussi, False sinon.
+     */
+
+    public function saveCoefficients(array $data, string $user_id, int $id_backup = 0): bool {
+        try {
+            $query = "UPDATE backup 
+                  SET coef = :coef, is_checked = :is_checked 
+                  WHERE user_id = :user_id AND id_backup = :id_backup AND name_criteria = :name_criteria";
+
+            foreach ($data as $singleData) {
+                $stmt = $this->db->getConn()->prepare($query);
+                $stmt->bindParam(':user_id', $user_id);
+                $stmt->bindParam(':id_backup', $id_backup);
+                $stmt->bindParam(':name_criteria', $singleData['name_criteria']);
+                $stmt->bindParam(':coef', $singleData['coef']);
+                $stmt->bindParam(':is_checked', $singleData['is_checked']);
+                $stmt->execute();
+            }
+
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Récupère les critères de distribution et leur associe des valeurs par défaut 'coef' = 1 et 'is_checked' = true.
+     *
+     * @return array Tableau associatif contenant la liste des critères, associé au valeur par défaut
+     **/
+
+    public function getDefaultCoef(): array
+    {
+        $query = "SELECT name_criteria FROM distribution_criteria ORDER BY name_criteria ASC";
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->execute();
+        $defaultCriteria = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($defaultCriteria as &$criteria) {
+            $criteria['coef'] = 1;
+            $criteria['is_checked'] = true;
+        }
+
+        return $defaultCriteria;
     }
 }
