@@ -209,8 +209,8 @@ class   Homepage {
                                     <th class="clickable">ENTREPRISE</th>
                                     <th class="clickable">SUJET</th>
                                     <th class="clickable">ADRESSE</th>
-                                    <th class="clickable">DISTANCE</th>
-                                    <th class="clickable">CHOIX</th>
+                                    <th class="clickable tooltip" data-tooltip="Distance moyenne vous séparant du lieu du stage" data-position="top">DISTANCE</th>
+                                    <th class="clickable tooltip" data-tooltip="Voeux formulés" data-position="top">CHOIX</th>
                                 </tr>
                                 </thead>
                                 <tbody>
