@@ -1,6 +1,8 @@
 <?php
 namespace Blog\Controllers;
 
+use Blog\Models\Teacher;
+use Blog\Models\User;
 use Blog\Views\Layout;
 use Includes\Database;
 
@@ -40,15 +42,16 @@ class Intramu {
             $passwordLogs = $_POST['password'];
             $db = Database::getInstance();
 
-            $loginModel = new \Blog\Models\Intramu($db);
+            $userModel = new User($db);
+            $teacherModel = new Teacher($db);
 
-            if ($loginModel->doLogsExist($identifierLogs, $passwordLogs)) {
+            if ($userModel->doLogsExist($identifierLogs, $passwordLogs)) {
                 $_SESSION['identifier'] = $identifierLogs;
-                $_SESSION['fullName'] = $loginModel->getFullName($identifierLogs);
-                $_SESSION['roles'] = $loginModel->getRoles($identifierLogs);
-                $_SESSION['role_name'] = $loginModel->getHighestRole($identifierLogs);
-                $_SESSION['role_department'] = $loginModel->getRole_department($identifierLogs);
-                $_SESSION['address'] = $loginModel->getAddress($identifierLogs);
+                $_SESSION['fullName'] = $teacherModel->getFullName($identifierLogs);
+                $_SESSION['roles'] = $userModel->getRoles($identifierLogs);
+                $_SESSION['role_name'] = $userModel->getHighestRole($identifierLogs);
+                $_SESSION['role_department'] = $userModel->getRole_department($identifierLogs);
+                $_SESSION['address'] = $teacherModel->getAddress($identifierLogs);
                 header('Location: /homepage');
                 exit();
             } else {
