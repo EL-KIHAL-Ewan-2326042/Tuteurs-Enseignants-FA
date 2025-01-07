@@ -105,6 +105,7 @@ class Account {
                             <th class="clickable">FORMATION</th>
                             <th class="clickable">GROUPE</th>
                             <th class="clickable">HISTORIQUE</th>
+                            <th class="clickable">TYPE</th>
                             <th class="clickable">ENTREPRISE</th>
                             <th class="clickable">SUJET</th>
                             <th class="clickable">ADRESSE</th>
@@ -118,6 +119,7 @@ class Account {
                                 <td><?= str_replace('_', ' ', $row["formation"]) ?></td>
                                 <td><?= str_replace('_', ' ', $row["class_group"]) ?></td>
                                 <td><?= $row['internshipTeacher'] > 0 ? $row['year'] : 'Non'; ?></td>
+                                <td><?= strtolower($row['type']) === "internship" ? "Stage" : "Alternance"; ?></td>
                                 <td><?= str_replace('_', ' ', $row["company_name"]) ?></td>
                                 <td><?= str_replace('_', ' ', $row["internship_subject"]) ?></td>
                                 <td><?= str_replace('_', "'", $row['address']) ?></td>
