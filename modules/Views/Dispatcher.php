@@ -88,7 +88,7 @@ class Dispatcher {
                                     </div>
                                     <div class="col s6">
                                         <div class="input-field">
-                                            <input type="number" name="coef[<?= $criteria['name_criteria']; ?>]" id="<?= $criteria['name_criteria']; ?>"
+                                            <input type="number" class="coef-input" name="coef[<?= $criteria['name_criteria']; ?>]" id="<?= $criteria['name_criteria']; ?>"
                                                    min="1" max="100" value="<?= $criteria['coef']; ?>" />
                                             <label for="<?= $criteria['name_criteria']; ?>">Coefficient</label>
                                         </div>
