@@ -20,8 +20,15 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
+    // Initialize the Materialize select dropdown
+    M.FormSelect.init(document.querySelectorAll('select'));
+
     const rowsPerPageDropdown = document.getElementById('rows-per-page');
-    let rowsPerPage = parseInt(rowsPerPageDropdown.value); // Set default to 10
+    let rowsPerPage = sessionStorage.getItem("rowsCount") ? Number(sessionStorage.getItem("rowsCount")) : parseInt(rowsPerPageDropdown.value); // Set default to 10
+    if (rowsPerPage !== 10) {
+        rowsPerPageDropdown.options[rowsPerPage === 20 ? 1 : rowsPerPage === 50 ? 2 : rowsPerPage === 100 ? 3 : 4].selected = true;
+    }
+    sessionStorage.setItem("rowsCount", String(rowsPerPage));
 
     let rows = document.querySelectorAll('.account-row');
     let totalRows = rows.length;
@@ -71,14 +78,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 x = rows[i].getElementsByTagName("TD")[n];
                 y = rows[i + 1].getElementsByTagName("TD")[n];
                 if (dir === "asc") {
-                    if ((n < 7 && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase())
-                        || (n === 7 && Number(x.innerHTML.substring(1, x.innerHTML.indexOf(' '))) > Number(y.innerHTML.substring(1, y.innerHTML.indexOf(' '))))) {
+                    if ((n < 8 && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase())
+                        || (n === 8 && Number(x.innerHTML.substring(1, x.innerHTML.indexOf(' '))) > Number(y.innerHTML.substring(1, y.innerHTML.indexOf(' '))))) {
                         shouldSwitch = true;
                         break;
                     }
                 } else if (dir === "desc") {
-                    if ((n < 7 && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())
-                        || (n === 7 && Number(x.innerHTML.substring(1, x.innerHTML.indexOf(' '))) < Number(y.innerHTML.substring(1, y.innerHTML.indexOf(' '))))) {
+                    if ((n < 8 && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())
+                        || (n === 8 && Number(x.innerHTML.substring(1, x.innerHTML.indexOf(' '))) < Number(y.innerHTML.substring(1, y.innerHTML.indexOf(' '))))) {
                         shouldSwitch = true;
                         break;
                     }
@@ -180,6 +187,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     rowsPerPageDropdown.addEventListener('change', function () {
         rowsPerPage = parseInt(rowsPerPageDropdown.value);
+        sessionStorage.setItem("rowsCount", String(rowsPerPage));
         totalPages = Math.ceil(rows.length / rowsPerPage);
         currentPage = 1;
         showPage(currentPage);

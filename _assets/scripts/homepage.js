@@ -294,12 +294,17 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const rowsPerPageDropdown = document.getElementById('rows-per-page');
-    let rowsPerPage = parseInt(rowsPerPageDropdown.value); // Set default to 10
+    let rowsPerPage = sessionStorage.getItem("rowsCount") ? Number(sessionStorage.getItem("rowsCount")) : parseInt(rowsPerPageDropdown.value); // Set default to 10
+    if (rowsPerPage !== 10) {
+        rowsPerPageDropdown.options[rowsPerPage === 20 ? 1 : rowsPerPage === 50 ? 2 : rowsPerPage === 100 ? 3 : 4].selected = true;
+    }
+    sessionStorage.setItem("rowsCount", String(rowsPerPage));
 
     let rows = document.querySelectorAll('.homepage-row');
     let totalRows = rows.length;
     let totalPages = Math.ceil(totalRows / rowsPerPage);
-    let currentPage = sessionStorage.getItem('page') && Number(sessionStorage.getItem('page')) <= totalPages ? Number(sessionStorage.getItem('page')) : 1;
+    let currentPage = sessionStorage.getItem("page") && Number(sessionStorage.getItem("page")) <= totalPages
+    && rowsPerPage === 10 ? Number(sessionStorage.getItem("page")) : 1;
 
     const prevButton = document.getElementById('prev-page');
     const nextButton = document.getElementById('next-page');
@@ -455,6 +460,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     rowsPerPageDropdown.addEventListener('change', function () {
         rowsPerPage = parseInt(rowsPerPageDropdown.value);
+        sessionStorage.setItem("rowsCount", String(rowsPerPage));
         totalPages = Math.ceil(rows.length / rowsPerPage);
         currentPage = 1;
         showPage(currentPage);
