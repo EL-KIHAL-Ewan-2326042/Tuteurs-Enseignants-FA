@@ -2,7 +2,7 @@
 
 namespace Views;
 
-use Blog\Views\Layout;
+use Blog\Views\layout\Layout;
 use PHPUnit\Framework\TestCase;
 
 /**

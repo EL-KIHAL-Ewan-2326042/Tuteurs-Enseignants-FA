@@ -3,9 +3,9 @@
 namespace Controllers;
 
 use Blog\Controllers\dashboard;
+use Blog\Views\dashboard\dashboard as DashboardView;
+use Blog\Views\layout\Layout;
 use Includes\Database;
-use Blog\Views\Layout;
-use Blog\Views\dashboard as DashboardView;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 

@@ -3,10 +3,9 @@
 namespace Views;
 
 use Blog\Models\Homepage;
-use Blog\Views\Homepage as HomepageView;
+use Blog\Views\homepage\Homepage as HomepageView;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
-use TypeError;
 
 /**
  * Classe de HomepageTest

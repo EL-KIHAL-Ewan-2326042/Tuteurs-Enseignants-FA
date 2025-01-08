@@ -1,6 +1,6 @@
 <?php
 
-namespace Blog\Views;
+namespace Blog\Views\errors;
 
 class Error404 {
     /**

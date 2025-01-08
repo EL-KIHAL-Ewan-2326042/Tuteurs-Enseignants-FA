@@ -2,13 +2,12 @@
 namespace Blog\Controllers;
 
 use Blog\Models\Department;
+use Blog\Models\Homepage as HomepageModel;
 use Blog\Models\Internship;
 use Blog\Models\Student;
 use Blog\Models\Teacher;
-use Blog\Views\Layout;
+use Blog\Views\layout\Layout;
 use Includes\Database;
-use Blog\Views\Homepage as HomepageView;
-use Blog\Models\Homepage as HomepageModel;
 
 class Homepage {
     private Layout $layout;
@@ -40,7 +39,7 @@ class Homepage {
         $teacherModel = new Teacher($db);
         $departmentModel = new Department($db);
 
-        $view = new \Blog\Views\Homepage($internshipModel, $studentModel, $teacherModel, $departmentModel);
+        $view = new \Blog\Views\homepage\Homepage($internshipModel, $studentModel, $teacherModel, $departmentModel);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_POST['action'])) {

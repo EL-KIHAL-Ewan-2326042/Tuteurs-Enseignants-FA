@@ -1,5 +1,5 @@
 <?php
-namespace Blog\Views;
+namespace Blog\Views\intramu;
 
 class Intramu {
 

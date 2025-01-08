@@ -16,7 +16,7 @@
  * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
  */
 
-namespace Blog\Views;
+namespace Blog\Views\mentions_legales;
 
 /**
  * Classe gérant l'affichage de la page 'Mentions Légales'

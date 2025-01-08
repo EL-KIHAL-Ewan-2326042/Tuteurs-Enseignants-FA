@@ -3,7 +3,7 @@ namespace Blog\Controllers;
 
 use Blog\Models\Teacher;
 use Blog\Models\User;
-use Blog\Views\Layout;
+use Blog\Views\layout\Layout;
 use Includes\Database;
 
 /**
@@ -62,7 +62,7 @@ class Intramu {
         $title = "Connexion";
         $cssFilePath = '_assets/styles/login.css';
         $jsFilePath = '';
-        $view = new \Blog\Views\Intramu($errorMessage);
+        $view = new \Blog\Views\intramu\Intramu($errorMessage);
 
         $this->layout->renderTop($title, $cssFilePath);
         $view->showView();
