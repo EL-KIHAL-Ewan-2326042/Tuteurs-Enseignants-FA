@@ -20,6 +20,7 @@ namespace Blog\Views\dispatcher;
 
 use Blog\Models\Department;
 use Blog\Models\Internship;
+use Blog\Models\Teacher;
 use Blog\Models\User;
 
 /**
@@ -48,6 +49,8 @@ readonly class Dispatcher
      *                                            servant de modèle
      * @param User       $userModel               Instance de la classe User
      *                                            servant de modèle
+     * @param Teacher    $teacherModel            Instance de la classe Teacher
+     *                                            servant de modèle
      * @param Department $departmentModel         Instance de la classe Department
      *                                            servant de modèle
      * @param string     $errorMessageAfterSort   Message d'erreur s'affichant quand
@@ -59,8 +62,10 @@ readonly class Dispatcher
      * @param string     $checkMessageAfterSort   Message s'affichant quand
      *                                            l'association a fonctionné
      */
-    public function __construct(private Internship $internshipModel,
+    public function __construct(
+        private Internship $internshipModel,
         private User $userModel,
+        private Teacher $teacherModel,
         private Department $departmentModel,
         private string $errorMessageAfterSort,
         private string $errorMessageDirectAssoc,
@@ -111,7 +116,7 @@ readonly class Dispatcher
                                 <?php foreach ($saves as $save): ?>
                                     <?php
                                     $id_backup = $save['id_backup'];
-                                    if (isset($_POST['save-selector']) 
+                                    if (isset($_POST['save-selector'])
                                         && $id_backup == $_POST['save-selector']
                                     ) {
                                         continue;
@@ -269,43 +274,6 @@ readonly class Dispatcher
                 </div>
                 <?php endif;
 
-                /**
-                 * Renvoie les éléments HTML correspondant à l'affichage
-                 * en étoiles du score passé en paramètre
-                 *
-                 * @param float $score Score de pertinence que
-                 *                     l'on veut convertir en étoiles
-                 *
-                 * @return string Chaîne de caractères contenant
-                 * les étoiles correspondant au score
-                 */
-                function renderStars(float $score): string
-                {
-                    $fullStars = floor($score);
-
-                    $decimalPart = $score - $fullStars;
-
-                    $halfStars = (abs($decimalPart - 0.5) <= 0.1) ? 1 : 0;
-
-                    $emptyStars = 5 - $fullStars - $halfStars;
-
-                    $stars = '';
-
-                    for ($i = 0; $i < $fullStars; $i++) {
-                        $stars .= '<span class="filled"></span>';
-                    }
-
-                    if ($halfStars) {
-                        $stars .= '<span class="half"></span>';
-                    }
-
-                    for ($i = 0; $i < $emptyStars; $i++) {
-                        $stars .= '<span class="empty"></span>';
-                    }
-
-                    return $stars;
-                }
-
                 if (isset($_POST['coef']) && isset($_POST['action'])
                     && $_POST['action'] === 'generate'
                 ) : ?>
@@ -350,11 +318,12 @@ readonly class Dispatcher
                             header('location: ./dispatcher');
                         }
 
-                                $resultDispatchList = $this->internshipModel
-                                    ->dispatcher(
-                                        $this->departmentModel,
-                                        $dictCoef
-                                    )[0];
+                        $resultDispatchList = $this->internshipModel
+                            ->dispatcher(
+                                $this->departmentModel,
+                                $this->teacherModel,
+                                $dictCoef
+                            )[0];
                         foreach ($resultDispatchList as $resultDispatch):
                             ?>
                             <tr class="dispatch-row" data-internship-identifier='
@@ -394,7 +363,8 @@ readonly class Dispatcher
                                     <?php echo $resultDispatch['score']; ?>
                                     " data-position="top">
                                         <?php
-                                        echo renderStars($resultDispatch['score']);
+                                        echo $this
+                                            ->renderStars($resultDispatch['score']);
                                         ?>
                                     </div>
                                 </td>
@@ -479,5 +449,42 @@ readonly class Dispatcher
             </div>
         </main>
         <?php
+    }
+
+    /**
+     * Renvoie les éléments HTML correspondant à l'affichage
+     * en étoiles du score passé en paramètre
+     *
+     * @param float $score Score de pertinence que
+     *                     l'on veut convertir en étoiles
+     *
+     * @return string Chaîne de caractères contenant
+     * les étoiles correspondant au score
+     */
+    function renderStars(float $score): string
+    {
+        $fullStars = floor($score);
+
+        $decimalPart = $score - $fullStars;
+
+        $halfStars = (abs($decimalPart - 0.5) <= 0.1) ? 1 : 0;
+
+        $emptyStars = 5 - $fullStars - $halfStars;
+
+        $stars = '';
+
+        for ($i = 0; $i < $fullStars; $i++) {
+            $stars .= '<span class="filled"></span>';
+        }
+
+        if ($halfStars) {
+            $stars .= '<span class="half"></span>';
+        }
+
+        for ($i = 0; $i < $emptyStars; $i++) {
+            $stars .= '<span class="empty"></span>';
+        }
+
+        return $stars;
     }
 }

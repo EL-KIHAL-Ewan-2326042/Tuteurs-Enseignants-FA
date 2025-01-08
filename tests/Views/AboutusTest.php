@@ -2,7 +2,7 @@
 
 namespace Views;
 
-use Blog\Views\Aboutus;
+use Blog\Views\aboutus\Aboutus;
 use PHPUnit\Framework\TestCase;
 
 /**

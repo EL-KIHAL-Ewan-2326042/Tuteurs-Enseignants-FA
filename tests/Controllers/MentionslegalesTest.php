@@ -4,7 +4,7 @@ namespace Controllers;
 
 use Blog\Controllers\Mentionslegales;
 use Blog\Views\layout\Layout;
-use Blog\Views\mentionslegales\Mentionslegales as MentionLegView;
+use Blog\Views\mentions_legales\Mentionslegales as MentionLegView;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 

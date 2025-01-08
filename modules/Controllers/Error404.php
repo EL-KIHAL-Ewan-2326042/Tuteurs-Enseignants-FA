@@ -24,9 +24,9 @@ class Error404 {
     public function show(): void
     {
         $title = "Erreur 404";
-        $cssFilePath = '/_assets/styles/error404.css';
+        $cssFilePath = '/_assets/styles/erreur404.css';
         $jsFilePath = '';
-        $view = new \Blog\Views\erreur404\Error404();
+        $view = new \Blog\Views\errors\Error404();
 
         $this->layout->renderTop($title, $cssFilePath);
         $view->showView();

@@ -9,6 +9,7 @@ class User extends Model {
     private Database $db;
 
     public function __construct(Database $db) {
+        parent::__construct($db);
         $this->db = $db;
     }
 
@@ -198,4 +199,36 @@ class User extends Model {
 
         return $defaultCriteria;
     }
+
+
+
+
+    /**
+     * Insère un utilisateur dans la table user_connect
+     * @param string $userId Identifiant de l'utilisateur
+     * @param string $user_pass Mot de passe de l'utilisateur
+     * @return void
+     */
+    public function insertUserConnect(string $userId, string $user_pass): void {
+        $query = "INSERT INTO user_connect (user_id, user_pass) VALUES (:user_id, :user_pass)";
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindValue(':user_id', $userId);
+        $stmt->bindValue(':user_pass', password_hash($user_pass, PASSWORD_DEFAULT));
+        $stmt->execute();
+    }
+
+    /**
+     * Insère une association utilisateur-départment dans la table has_role
+     * @param string $userId Identifiant de l'utilisateur
+     * @param string $department Nom du département
+     * @return void
+     */
+    public function insertHasRole(string $userId, string $department): void {
+        $query = "INSERT INTO has_role (user_id, role_name, department_name) VALUES (:user_id, 'Professeur' ,:department)";
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindValue(':user_id', $userId);
+        $stmt->bindValue(':department', $department);
+        $stmt->execute();
+    }
+
 }

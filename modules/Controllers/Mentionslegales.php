@@ -26,7 +26,7 @@ class Mentionslegales{
         $title = "Mentions légales";
         $cssFilePath = '_assets/styles/mentionLeg.css';
         $jsFilePath = '';
-        $view = new \Blog\Views\mentionslegales\Mentionslegales();
+        $view = new \Blog\Views\mentions_legales\Mentionslegales();
 
         $this->layout->renderTop($title, $cssFilePath);
         $view->showView();
