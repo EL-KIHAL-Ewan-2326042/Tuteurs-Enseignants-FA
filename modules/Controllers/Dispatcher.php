@@ -1,4 +1,20 @@
 <?php
+/**
+ * Fichier contenant le contrôleur de la page 'Répartiteur'
+ *
+ * PHP version 8.3
+ *
+ * @category View
+ * @package  TutorMap/modules/Controllers
+ *
+ * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
+ * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
+ * @author Kerbadou Islem <islem.kerbadou@etu.univ-amu.fr>
+ * @author Pellet Casimir <casimir.pellet@etu.univ-amu.fr>
+ *
+ * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
+ * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
+ */
 
 namespace Blog\Controllers;
 
@@ -10,34 +26,71 @@ use Blog\Models\User;
 use Blog\Views\layout\Layout;
 use Includes\Database;
 
-class Dispatcher {
+/**
+ * Classe gérant les échanges de données entre
+ * le modèle et la vue de la page 'Répartiteur'
+ *
+ * PHP version 8.3
+ *
+ * @category Controller
+ * @package  TutorMap/modules/Controllers
+ *
+ * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
+ * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
+ * @author Kerbadou Islem <islem.kerbadou@etu.univ-amu.fr>
+ * @author Pellet Casimir <casimir.pellet@etu.univ-amu.fr>
+ *
+ * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
+ * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
+ */
+class Dispatcher
+{
     /**
-     * Cette méthode permet d'associer directement un enseignant à un stage, en fonction des données soumises via un formulaire `POST`, elle renvoie des messages d'erreurs appropriées si besoin sinon un message de validation.
+     * Cette méthode permet d'associer directement un enseignant à un stage,
+     * en fonction des données soumises via un formulaire `POST`, elle renvoie
+     * des messages d'erreurs appropriées si besoin sinon un message de validation.
      *
-     * @param $teacherModel
-     * @param $internshipModel
-     * @return array Retourne un message de succès ou d'erreur concernant l'association ou la demande de remplissage des champs.
+     * @param Teacher    $teacherModel    Instance de la classe Teacher
+     *                                    servant de modèle
+     * @param Internship $internshipModel Instance de la classe Internship
+     *                                    servant de modèle
+     *
+     * @return array Retourne un message de succès ou d'erreur concernant
+     * l'association ou la demande de remplissage des champs.
      */
-    public function association_direct($teacherModel, $internshipModel): array {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['searchInternship']) && isset($_POST['searchTeacher']) && $_POST['searchInternship'] !== '' && $_POST['searchTeacher'] !== '') {
+    public function associationDirect(Teacher $teacherModel,
+        Internship $internshipModel
+    ): array {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST'
+            && isset($_POST['searchInternship'])
+            && isset($_POST['searchTeacher'])
+            && $_POST['searchInternship'] !== ''
+            && $_POST['searchTeacher'] !== ''
+        ) {
 
             $listTeacher = $teacherModel->createListTeacher();
             $listStudent = $internshipModel->createListInternship();
             $listAssociate = $internshipModel->createListAssociate();
 
-            if (in_array($_POST['searchTeacher'], $listTeacher) && in_array($_POST['searchInternship'], $listStudent)){
-                if (!(in_array([$_POST['searchTeacher'], $_POST['searchInternship']], $listAssociate))) {
+            if (in_array($_POST['searchTeacher'], $listTeacher)
+                && in_array($_POST['searchInternship'], $listStudent)
+            ) {
+                if (!(in_array(
+                    [$_POST['searchTeacher'],
+                    $_POST['searchInternship']],
+                    $listAssociate
+                ))
+                ) {
                     return ["", $internshipModel->insertResponsible()];
-                }
-                else {
+                } else {
                     return ["Cette association existe déjà", ""];
                 }
+            } else {
+                return
+                ["Internship_identifier ou Id_Teacher 
+                inexistant dans ce departement", ""];
             }
-            else {
-                return ["Internship_identifier ou Id_Teacher inexistant dans ce departement", ""];
-            }
-        }
-        elseif ($_SERVER['REQUEST_METHOD'] === 'POST'){
+        } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             return ["Merci de remplir tout les champs", ""];
         }
         return ['',''];
@@ -50,7 +103,8 @@ class Dispatcher {
      *
      * @return array Retourne une chaîne de caractères contenant des messages d'information ou d'erreur concernant l'état des associations.
      */
-    public function association_after_sort($teacherModel, $internshipModel): array {
+    public function association_after_sort($teacherModel, $internshipModel): array
+    {
         $listTeacher = $teacherModel->createListTeacher();
         $listInternship = $internshipModel->createListInternship();
         $listAssociate = $internshipModel->createListAssociate();
@@ -59,7 +113,7 @@ class Dispatcher {
 
         foreach($_POST['listTupleAssociate'] as $tupleAssociate){
             $tmp = explode("$", $tupleAssociate);
-            if (in_array($tmp[0], $listTeacher) && in_array($tmp[1], $listInternship)){
+            if (in_array($tmp[0], $listTeacher) && in_array($tmp[1], $listInternship)) {
                 if (!(in_array([$tmp[0], $tmp[1]], $listAssociate))) {
                     $returnCheckMessage .= $internshipModel->insertIs_responsible($tmp[0], $tmp[1], floatval($tmp[2]));
                 }
@@ -79,12 +133,13 @@ class Dispatcher {
      *
      * @return void
      */
-    public function show(): void {
+    public function show(): void
+    {
 
 
-        if (isset($_SESSION['role_name']) && (
-                (is_array($_SESSION['role_name']) && in_array('Admin_dep', $_SESSION['role_name'])) ||
-                ($_SESSION['role_name'] === 'Admin_dep'))) {
+        if (isset($_SESSION['role_name']) && (            (is_array($_SESSION['role_name']) && in_array('Admin_dep', $_SESSION['role_name'])) 
+            || ($_SESSION['role_name'] === 'Admin_dep'))
+        ) {
             $db = Database::getInstance();
 
             $teacherModel = new Teacher($db);
@@ -176,7 +231,7 @@ class Dispatcher {
             }
 
             if (isset($_POST['searchInternship']) && isset($_POST['searchTeacher'])) {
-                $tmpmessage = $this->association_direct($teacherModel, $internshipModel);
+                $tmpmessage = $this->associationDirect($teacherModel, $internshipModel);
                 $errorMessageDirectAssoc = $tmpmessage[0];
                 $checkMessageDirectAssoc = $tmpmessage[1];
             }
