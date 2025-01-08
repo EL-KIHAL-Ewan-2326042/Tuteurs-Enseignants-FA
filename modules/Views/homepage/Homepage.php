@@ -52,7 +52,7 @@ readonly class Homepage
     }
 
     /**
-     * Vue de la homepage
+     * Affiche la page 'Accueil'
      *
      * @return void
      */

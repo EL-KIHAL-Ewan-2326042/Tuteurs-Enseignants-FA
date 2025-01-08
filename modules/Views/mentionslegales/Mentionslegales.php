@@ -35,7 +35,7 @@ namespace Blog\Views\mentionslegales;
 class Mentionslegales
 {
     /**
-     * Vue de la page mentions légales
+     * Affiche la page 'Mentions Légales'
      *
      * @return void
      */

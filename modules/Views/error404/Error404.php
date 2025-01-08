@@ -38,7 +38,7 @@ namespace Blog\Views\erreur404;
 class Error404
 {
     /**
-     * Vue de la page 'Erreur 404'
+     * Affiche la page 'Erreur 404'
      *
      * @return void
      */
