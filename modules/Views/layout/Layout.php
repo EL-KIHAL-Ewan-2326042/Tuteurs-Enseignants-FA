@@ -40,8 +40,8 @@ class Layout
     /**
      * Affiche le rendu du haut de page (header)
      *
-     * @param string $title       titre de la page
-     * @param string $cssFilePath chemin styles
+     * @param string $title       Titre de la page
+     * @param string $cssFilePath Chemin vers le fichier CSS de la page
      *
      * @return void
      */
@@ -145,7 +145,7 @@ class Layout
     /**
      * Affiche le rendu du pied de page (footer)
      *
-     * @param string $jsFilePath fichier js
+     * @param string $jsFilePath Chemin vers le fichier JavaScript de la page
      *
      * @return void
      */

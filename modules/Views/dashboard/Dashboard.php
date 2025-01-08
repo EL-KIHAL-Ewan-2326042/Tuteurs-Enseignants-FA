@@ -51,7 +51,7 @@ readonly class Dashboard
     }
 
     /**
-     * Vue de la pas de Gestion des données
+     * Vue de la page de Gestion des données
      *
      * @return void
      */
