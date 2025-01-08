@@ -3,7 +3,7 @@
 namespace Controllers;
 
 use Blog\Controllers\Aboutus;
-use Blog\Views\Aboutus as AboutUsView;
+use Blog\Views\aboutus\Aboutus as AboutUsView;
 use Blog\Views\layout\Layout;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;

@@ -3,12 +3,11 @@
 namespace Blog\Controllers;
 
 use Blog\Models\Department;
-use Blog\Models\GlobalModel;
 use Blog\Models\Internship;
 use Blog\Models\Student;
 use Blog\Models\Teacher;
 use Blog\Models\User;
-use Blog\Views\Layout;
+use Blog\Views\layout\Layout;
 use Includes\Database;
 
 class Dispatcher {
@@ -87,7 +86,6 @@ class Dispatcher {
                 (is_array($_SESSION['role_name']) && in_array('Admin_dep', $_SESSION['role_name'])) ||
                 ($_SESSION['role_name'] === 'Admin_dep'))) {
             $db = Database::getInstance();
-            $globalModel = new GlobalModel($db);
 
             $teacherModel = new Teacher($db);
             $studentModel = new Student($db);
@@ -140,7 +138,7 @@ class Dispatcher {
 
             if (isset($_POST['action']) && ($_POST['action'] === 'getHistory') && isset($_POST['Student_number'])) {
 
-                $history = $globalModel->getStudentHistory($_POST['Student_number']);
+                $history = $internshipModel->getStudentHistory($_POST['Student_number']);
 
                 header('Content-Type: application/json');
                 echo json_encode($history);
@@ -149,7 +147,7 @@ class Dispatcher {
 
             if (isset($_POST['action']) && ($_POST['action'] === 'getDisciplines') && isset($_POST['Id_teacher'])) {
 
-                $discipline = $globalModel->getDisciplines($_POST['Id_teacher']);
+                $discipline = $teacherModel->getDisciplines($_POST['Id_teacher']);
                 header('Content-Type: application/json');
                 echo json_encode($discipline);
                 exit();
@@ -192,7 +190,7 @@ class Dispatcher {
             $title = "Repartiteur";
             $cssFilePath = '_assets/styles/dispatcher.css';
             $jsFilePath = '_assets/scripts/dispatcher.js';
-            $view = new \Blog\Views\dispatcher\Dispatcher($internshipModel, $userModel, $departmentModel, $errorMessageAfterSort, $errorMessageDirectAssoc, $checkMessageDirectAssoc, $checkMessageAfterSort);
+            $view = new \Blog\Views\dispatcher\Dispatcher($internshipModel, $userModel, $teacherModel, $departmentModel, $errorMessageAfterSort, $errorMessageDirectAssoc, $checkMessageDirectAssoc, $checkMessageAfterSort);
 
             $layout = new Layout();
             $layout->renderTop($title, $cssFilePath);

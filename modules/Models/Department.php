@@ -9,6 +9,7 @@ class Department extends Model {
     private Database $db;
 
     public function __construct(Database $db) {
+        parent::__construct($db);
         $this->db = $db;
     }
 
@@ -31,19 +32,6 @@ class Department extends Model {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Renvoie tous les départements de l'enseignant passé en paramètre
-     * @param string $teacher_id identifiant de l'enseignant
-     * @return false|array tableau contenant tous les départements dont l'enseignant connecté fait partie, false sinon
-     */
-    public function getDepTeacher(string $teacher_id): false|array {
-        $query = 'SELECT DISTINCT department_name
-                    FROM has_role
-                    WHERE user_id = :teacher_id';
-        $stmt = $this->db->getConn()->prepare($query);
-        $stmt->bindParam(':teacher_id', $teacher_id);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+
 
 }

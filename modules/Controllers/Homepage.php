@@ -1,6 +1,11 @@
 <?php
 namespace Blog\Controllers;
 
+use Blog\Models\Department;
+use Blog\Models\Homepage as HomepageModel;
+use Blog\Models\Internship;
+use Blog\Models\Student;
+use Blog\Models\Teacher;
 use Blog\Views\layout\Layout;
 use Includes\Database;
 
@@ -29,14 +34,17 @@ class Homepage {
         }
 
         $db = Database::getInstance();
-        $globalModel = new \Blog\Models\GlobalModel($db);
-        $homepageModel = new \Blog\Models\Homepage($db, $globalModel);
-        $view = new \Blog\Views\homepage\Homepage($homepageModel, $globalModel);
+        $internshipModel = new Internship($db);
+        $studentModel = new Student($db);
+        $teacherModel = new Teacher($db);
+        $departmentModel = new Department($db);
+
+        $view = new \Blog\Views\homepage\Homepage($internshipModel, $studentModel, $teacherModel, $departmentModel);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_POST['action'])) {
                 if ($_POST['action'] === 'search' && isset($_POST['search'])) {
-                    $results = $homepageModel->correspondTerms();
+                    $results = $studentModel->correspondTerms();
                     header('Content-Type: application/json');
                     echo json_encode($results);
                     return;
@@ -46,7 +54,7 @@ class Homepage {
                     $studentId = $_POST['student_id'];
                     $firstName = $_POST['student_firstName'];
                     $secondName = $_POST['student_lastName'];
-                    $address = $homepageModel->getStudentAddress($studentId);
+                    $address = $internshipModel->getInternshipAddress($studentId);
 
                     $_SESSION['selected_student'] = [
                         'id' => $studentId,

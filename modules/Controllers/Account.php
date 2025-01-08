@@ -4,9 +4,9 @@ namespace Blog\Controllers;
 
 use Blog\Models\Internship;
 use Blog\Models\Teacher;
-use Blog\Views\Layout;
+use Blog\Views\account\Account as AccountView;
+use Blog\Views\layout\Layout;
 use Includes\Database;
-use Blog\Views\Account as AccountView;
 
 class Account {
     private Layout $layout;

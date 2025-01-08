@@ -17,7 +17,7 @@
  * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
  */
 
-namespace Blog\Views\erreur404;
+namespace Blog\Views\errors;
 
 /**
  * Classe gérant l'affichage de la page 'Erreur 404'

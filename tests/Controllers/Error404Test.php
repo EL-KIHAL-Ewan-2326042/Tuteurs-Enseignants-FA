@@ -3,7 +3,7 @@
 namespace Controllers;
 
 use Blog\Controllers\Error404;
-use Blog\Views\erreur404\Error404 as Error404View;
+use Blog\Views\errors\Error404 as Error404View;
 use Blog\Views\layout\Layout;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
@@ -28,7 +28,7 @@ class Error404Test extends TestCase{
         //attentes pour le mock du layout
         $mockLayout->expects($this->once())
             ->method('renderTop')
-            ->with($this->equalTo('Erreur 404'),$this->equalTo('/_assets/styles/error404.css'));
+            ->with($this->equalTo('Erreur 404'),$this->equalTo('/_assets/styles/erreur404.css'));
 
         $mockLayout->expects($this->once())
             ->method('renderBottom')

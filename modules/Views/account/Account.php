@@ -1,10 +1,10 @@
 <?php
 
-namespace Blog\Views;
+namespace Blog\Views\account;
 
 use Blog\Models\Internship;
-use Blog\Models\Student;
 use Blog\Models\Teacher;
+use function Blog\Views\gettype;
 
 class Account {
 

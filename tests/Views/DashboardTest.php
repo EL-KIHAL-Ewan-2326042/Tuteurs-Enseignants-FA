@@ -2,7 +2,7 @@
 
 namespace Views;
 
-use Blog\Views\dashboard;
+use Blog\Views\dashboard\dashboard;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -23,7 +23,7 @@ class Aboutus {
         $title = "A Propos";
         $cssFilePath = '';
         $jsFilePath = '';
-        $view = new \Blog\Views\Aboutus();
+        $view = new \Blog\Views\aboutus\Aboutus();
 
         $this->layout->renderTop($title, $cssFilePath);
         $view->showView();
