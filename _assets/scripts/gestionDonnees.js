@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(function() {
         updateSelectOptions();
     }, 500);
+    initTooltips();
 });
 
 function updateSelectOptions() {
