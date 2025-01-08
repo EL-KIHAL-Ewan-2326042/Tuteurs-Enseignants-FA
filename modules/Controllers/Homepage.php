@@ -1,32 +1,72 @@
 <?php
+/**
+ * Fichier contenant le contrôleur de la page 'Accueil'
+ *
+ * PHP version 8.3
+ *
+ * @category View
+ * @package  TutorMap/modules/Controllers
+ *
+ * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
+ * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
+ * @author Kerbadou Islem <islem.kerbadou@etu.univ-amu.fr>
+ * @author Pellet Casimir <casimir.pellet@etu.univ-amu.fr>
+ *
+ * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
+ * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
+ */
+
 namespace Blog\Controllers;
 
 use Blog\Models\Department;
-use Blog\Models\Homepage as HomepageModel;
 use Blog\Models\Internship;
 use Blog\Models\Student;
 use Blog\Models\Teacher;
 use Blog\Views\layout\Layout;
 use Includes\Database;
 
-class Homepage {
-    private Layout $layout;
+/**
+ * Classe gérant les échanges de données entre
+ * le modèle et la vue de la page 'Accueil'
+ *
+ * PHP version 8.3
+ *
+ * @category View
+ * @package  TutorMap/modules/Controllers
+ *
+ * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
+ * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
+ * @author Kerbadou Islem <islem.kerbadou@etu.univ-amu.fr>
+ * @author Pellet Casimir <casimir.pellet@etu.univ-amu.fr>
+ *
+ * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
+ * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
+ */
+class Homepage
+{
+    private Layout $_layout;
 
     /**
-     * Constructeur de la classe Homepage (controller)
+     * Initialise les attributs passés en paramètre
+     *
      * @param Layout $layout Instance de la classe Layout
+     *                       servant de vue pour la mise en page
      */
-    public function __construct(Layout $layout) {
-        $this->layout = $layout;
+    public function __construct(Layout $layout)
+    {
+        $this->_layout = $layout;
     }
 
     /**
      * Controlleur de la homepage.
-     * Elle gere des requetes post, via le model, pour recuperer des informations
-     * tels que les resultats de recherche ou les informations de l'etudiant selectione
+     * Elle gere des requêtes post, via le modèle, pour récupérer
+     * des informations telles que les résultats de recherche
+     * ou les informations de l'étudiant selectioné
+     *
      * @return void
      */
-    public function show(): void {
+    public function show(): void
+    {
 
         if (!isset($_SESSION['identifier'])) {
             header('Location: /intramu');
@@ -39,7 +79,9 @@ class Homepage {
         $teacherModel = new Teacher($db);
         $departmentModel = new Department($db);
 
-        $view = new \Blog\Views\homepage\Homepage($internshipModel, $studentModel, $teacherModel, $departmentModel);
+        $view = new \Blog\Views\homepage\Homepage(
+            $internshipModel, $studentModel, $teacherModel, $departmentModel
+        );
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (isset($_POST['action'])) {
@@ -50,7 +92,11 @@ class Homepage {
                     return;
                 }
 
-                if ($_POST['action'] === 'select_student' && isset($_POST['student_id']) && isset($_POST['student_firstName']) && isset($_POST['student_lastName'])) {
+                if ($_POST['action'] === 'select_student'
+                    && isset($_POST['student_id'])
+                    && isset($_POST['student_firstName'])
+                    && isset($_POST['student_lastName'])
+                ) {
                     $studentId = $_POST['student_id'];
                     $firstName = $_POST['student_firstName'];
                     $secondName = $_POST['student_lastName'];
@@ -74,8 +120,8 @@ class Homepage {
         $cssFilePath = '/_assets/styles/homepage.css';
         $jsFilePath = '/_assets/scripts/homepage.js';
 
-        $this->layout->renderTop($title, $cssFilePath);
+        $this->_layout->renderTop($title, $cssFilePath);
         $view->showView();
-        $this->layout->renderBottom($jsFilePath);
+        $this->_layout->renderBottom($jsFilePath);
     }
 }
