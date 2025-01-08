@@ -178,7 +178,7 @@ readonly class Homepage
                                 echo '<div class="center-align">';
                             }
                             ?>
-                                <table class="highlight centered">
+                                <table class="highlight centered" id="search-table">
                                     <thead>
                                     <tr>
                                         <th>FORMATION</th>
@@ -187,8 +187,19 @@ readonly class Homepage
                                         <th>ENTREPRISE</th>
                                         <th>SUJET</th>
                                         <th>ADRESSE</th>
-                                        <th>DISTANCE</th>
-                                        <th>CHOIX</th>
+                                        <th>
+                                            <div class="tooltip-container tooltip"
+                                                data-tooltip="Distance moyenne vous
+                                                séparant du lieu du stage"
+                                                data-position="top">(?)</div>
+                                            DISTANCE
+                                        </th>
+                                        <th>
+                                            <div class="tooltip-container tooltip"
+                                                data-tooltip="Voeux formulés"
+                                                data-position="top">(?)</div>
+                                            CHOIX
+                                        </th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -393,11 +404,19 @@ readonly class Homepage
                                     <th class="clickable">ENTREPRISE</th>
                                     <th class="clickable">SUJET</th>
                                     <th class="clickable">ADRESSE</th>
-                                    <th class="clickable tooltip" data-tooltip
-                                    ="Distance moyenne vous séparant du lieu du
-                                    stage" data-position="top">DISTANCE</th>
-                                    <th class="clickable tooltip" data-tooltip
-                                    ="Voeux formulés" data-position="top">CHOIX</th>
+                                    <th class="clickable">
+                                        <div class="tooltip-container tooltip"
+                                            data-tooltip="Distance moyenne vous
+                                            séparant du lieu du stage"
+                                            data-position="top">(?)</div>
+                                        DISTANCE
+                                    </th>
+                                    <th class="clickable">
+                                        <div class="tooltip-container tooltip"
+                                            data-tooltip="Voeux formulés"
+                                            data-position="top">(?)</div>
+                                        CHOIX
+                                    </th>
                                 </tr>
                                 </thead>
                                 <tbody>
