@@ -38,7 +38,7 @@ class Layout
 {
 
     /**
-     * Rendu du haut de page(header)
+     * Affiche le rendu du haut de page (header)
      *
      * @param string $title       titre de la page
      * @param string $cssFilePath chemin styles
@@ -142,7 +142,7 @@ class Layout
     }
 
     /**
-     * Rendu du pied de page(footer)
+     * Affiche le rendu du pied de page (footer)
      *
      * @param string $jsFilePath fichier js
      *

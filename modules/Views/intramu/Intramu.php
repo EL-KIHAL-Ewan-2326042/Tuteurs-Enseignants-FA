@@ -1,6 +1,6 @@
 <?php
 /**
- * Fichier contenant la vue de la page 'Intramu'
+ * Fichier contenant la vue de la page de connexion à l'Intramu
  *
  * PHP version 8.3
  *
@@ -19,7 +19,7 @@
 namespace Blog\Views\intramu;
 
 /**
- * Classe gérant l'affichage de la page 'Intramu'
+ * Classe gérant l'affichage de la page de connexion à l'Intramu
  *
  * @category View
  * @package  TutorMap/modules/Views/intramu
@@ -45,7 +45,7 @@ readonly class Intramu
     }
 
     /**
-     * Vue de la homepage
+     * Affiche la page de connexion à l'Intramu
      *
      * @return void
      */
