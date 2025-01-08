@@ -4,6 +4,7 @@ namespace Blog\Models;
 
 use Includes\Database;
 use PDO;
+use PDOException;
 
 class Teacher extends Model {
     private Database $db;
@@ -142,4 +143,64 @@ class Teacher extends Model {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
+
+    /**
+     * Renvoie un tableau contenant tous les stages à venir des étudiants faisant partie des départements passés en paramètre et n'ayant pas encore de tuteur, et leurs informations
+     * Les stages sélectionnés sont uniquement ceux des élèves faisant partie d'au moins un des départements passés en paramètre
+     * Les stages n'ont pas encore débuté et n'ont aucun tuteur attribué
+     * @param array $departments liste des départements dont on veut récupérer les stages des élèves
+     * @param string $identifier identifiant de l'enseignant
+     * @return array tableau contenant les informations relatives à chaque stage, le nombre fois où l'enseignant connecté a été le tuteur de l'élève ainsi qu'une note représentant la pertinence du stage pour l'enseignant
+     */
+    public function getStudentsList(array $departments, string $identifier, Internship $internshipModel, Department $departmentModel): array {
+        // on récupère pour chaque élève des départements de $departments les informations de leur prochain stage s'ils ont en un et s'ils n'ont pas encore de tuteur
+        $studentsList = array();
+        foreach($departments as $department) {
+            $newList = $departmentModel->getInternshipsPerDepartment($department);
+            if($newList) $studentsList = array_merge($studentsList, $newList);
+        }
+
+        // on supprime les doubles s'il y en a
+        $studentsList = array_unique($studentsList, 0);
+
+        // on stocke les stages déjà demandés par l'enseignant
+        $requests = $internshipModel->getRequests($identifier);
+        if(!$requests) $requests = array();
+
+        // pour chaque stage on initialise de nouveaux attributs qui leur sont relatifs
+        foreach($studentsList as &$row) {
+            // le nombre de stages complétés par l'étudiant
+            $internships = $internshipModel->getInternships($row['student_number']);
+
+            // l'année durant laquelle le dernier stage/alternance de l'étudiant a eu lieu avec l'enseignant comme tuteur
+            $row['year'] = "";
+
+            // le nombre de fois où l'enseignant a été le tuteur de l'étudiant
+            $row['internshipTeacher'] = $internships ? $internshipModel->getInternshipTeacher($internships, $identifier, $row['year']) : 0;
+
+            // true si l'enseignant a déjà demandé à tutorer le stage, false sinon
+            $row['requested'] = in_array($row['internship_identifier'], $requests);
+
+            // durée en minute séparant l'enseignant de l'adresse de l'entreprise où l'étudiant effectue son stage
+            $row['duration'] = $internshipModel->getDistance($row['internship_identifier'], $identifier, isset($row['id_teacher']));
+        }
+
+        return $studentsList;
+    }
+
+    /**
+     * Renvoie tous les départements de l'enseignant passé en paramètre
+     * @param string $teacher_id identifiant de l'enseignant
+     * @return false|array tableau contenant tous les départements dont l'enseignant connecté fait partie, false sinon
+     */
+    public function getDepTeacher(string $teacher_id): false|array {
+        $query = 'SELECT DISTINCT department_name
+                    FROM has_role
+                    WHERE user_id = :teacher_id';
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindParam(':teacher_id', $teacher_id);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }
