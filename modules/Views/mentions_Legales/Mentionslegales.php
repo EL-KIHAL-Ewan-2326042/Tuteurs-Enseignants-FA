@@ -5,7 +5,7 @@
  * PHP version 8.3
  *
  * @category View
- * @package  TutorMap/modules/Views/mentions_legales
+ * @package  TutorMap/modules/Views/mentions_Legales
  *
  * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
  * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
@@ -16,13 +16,13 @@
  * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
  */
 
-namespace Blog\Views\mentions_legales;
+namespace Blog\Views\mentions_Legales;
 
 /**
  * Classe gérant l'affichage de la page 'Mentions Légales'
  *
  * @category View
- * @package  TutorMap/modules/Views/mentions_legales
+ * @package  TutorMap/modules/Views/mentions_Legales
  *
  * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
  * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
