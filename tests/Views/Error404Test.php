@@ -2,7 +2,7 @@
 
 namespace Views;
 
-use Blog\Views\Error404;
+use Blog\Views\erreur404\Error404;
 use PHPUnit\Framework\TestCase;
 
 /**
