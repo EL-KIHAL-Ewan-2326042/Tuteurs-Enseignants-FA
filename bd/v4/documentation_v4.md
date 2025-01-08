@@ -1,7 +1,5 @@
-### Documentation des tables de la base de données
+### Documentation des tables de la base de données ###  
 ### Schéma MLD
-![Schéma MLD](https://cdn.discordapp.com/attachments/1292735811959394304/1316351413726482484/image.png?ex=6761fb89&is=6760aa09&hm=70c67724b6d8150d8df5fad7747cda8f7d475c84a558642d0dc854254e0fbaef&)
-La table company n'a pas été implémenter.
 
 ---
 
@@ -11,180 +9,327 @@ La table company n'a pas été implémenter.
 - **Table** : `Teacher`
 - **Description** : Contient les informations des enseignants.
 - **Colonnes** :
-  - `Id_teacher` : Identifiant unique de l'enseignant (clé primaire) (ce numéro est nécessairement un `user_id` permettant à l'enseignant d'accéder au site).
-  - `Teacher_name` : Nom de l'enseignant.
-  - `Teacher_firstname` : Prénom de l'enseignant.
-  - `Maxi_number_trainees` : Nombre maximum de stagiaires qu'un enseignant peut superviser.
+  - `Id_teacher` (`VARCHAR(10)`) : Identifiant unique de l'enseignant (clé primaire)(ce numéro est nécessairement un `user_id` permettant à l'enseignant d'accéder au site).
+  - `Teacher_name` (`VARCHAR(50)`) : Nom de l'enseignant.
+  - `Teacher_firstname` (`VARCHAR(50)`) : Prénom de l'enseignant.
+  - `Maxi_number_trainees` (`INT`) : Nombre maximum de stagiaires qu'un enseignant peut superviser.
 
 #### 1.2 **Student**
 - **Table** : `Student`
 - **Description** : Contient les informations des étudiants.
 - **Colonnes** :
-  - `Student_number` : Numéro d'identification unique de l'étudiant (clé primaire).
-  - `Student_name` : Nom de l'étudiant.
-  - `Student_firstname` : Prénom de l'étudiant.
-  - `Formation` : Formation de l'étudiant.
-  - `Class_group` : Groupe de classe de l'étudiant.
+  - `Student_number` (`VARCHAR(10)`) : Numéro d'identification unique de l'étudiant (clé primaire).
+  - `Student_name` (`VARCHAR(50)`, NOT NULL) : Nom de l'étudiant.
+  - `Student_firstname` (`VARCHAR(50)`, NOT NULL) : Prénom de l'étudiant.
+  - `Formation` (`VARCHAR(50)`) : Formation de l'étudiant.
+  - `Class_group` (`VARCHAR(50)`) : Groupe de classe de l'étudiant.
 
 #### 1.3 **Discipline**
 - **Table** : `Discipline`
 - **Description** : Contient les disciplines enseignées par les enseignants.
 - **Colonnes** :
-  - `Discipline_name` : Nom de la discipline (clé primaire).
+  - `Discipline_name` (`VARCHAR(50)`) : Nom de la discipline (clé primaire).
 
-#### 1.4 **User_connect**
-- **Table** : `User_connect`
+#### 1.4 **User**
+- **Table** : `User`
 - **Description** : Contient les informations d'authentification des utilisateurs.
 - **Colonnes** :
-  - `User_id` : Identifiant unique de l'utilisateur (clé primaire) (peut être un `Id_teacher`).
-  - `User_pass` : Mot de passe de l'utilisateur.
+  - `User_id` (`VARCHAR(10)`) : Identifiant unique de l'utilisateur (clé primaire).
+  - `User_pass` (`VARCHAR(100)`) : Mot de passe de l'utilisateur.
 
 #### 1.5 **Role**
 - **Table** : `Role`
 - **Description** : Contient les rôles attribués aux utilisateurs.
 - **Colonnes** :
-  - `Role_name` : Nom du rôle (clé primaire).
+  - `Role_name` (`VARCHAR(50)`) : Nom du rôle (clé primaire).
 
 #### 1.6 **Distribution_criteria**
 - **Table** : `Distribution_criteria`
-- **Description** : Contient les critères utilisés pour la distribution des stages (définit les critères disponible pour l'utilisateur).
+- **Description** : Contient les critères utilisés pour la distribution des stages.
 - **Colonnes** :
-  - `Name_criteria` : Nom du critère (clé primaire).
+  - `Name_criteria` (`VARCHAR(50)`) : Nom du critère (clé primaire).
+  - `Description` (`VARCHAR(500)`, NOT NULL) : Description du critère.
 
 #### 1.7 **Addr_name**
 - **Table** : `Addr_name`
 - **Description** : Contient les adresses.
 - **Colonnes** :
-  - `Address` : Adresse (clé primaire).
+  - `Address` (`VARCHAR(100)`) : Adresse (clé primaire).
 
 #### 1.8 **Address_type**
 - **Table** : `Address_type`
 - **Description** : Contient les types d'adresses.
 - **Colonnes** :
-  - `Type` : Type de l'adresse (clé primaire).
+  - `Type` (`VARCHAR(50)`) : Type de l'adresse (clé primaire).
 
 #### 1.9 **Id_backup**
 - **Table** : `Id_backup`
-- **Description** : Contient des identifiants pour les sauvegardes (le nombre de sauvegarde maximum par utilisateur est géré par cette table).
+- **Description** : Contient des identifiants pour les sauvegardes.
 - **Colonnes** :
-  - `Id_backup` : Identifiant de sauvegarde (clé primaire).
+  - `Id_backup` (`INT`) : Identifiant de sauvegarde (clé primaire).
 
 #### 1.10 **Internship**
 - **Table** : `Internship`
 - **Description** : Contient les informations relatives aux stages.
 - **Colonnes** :
-  - `Internship_identifier` : Identifiant unique du stage (clé primaire).
-  - `Company_name` : Nom de l'entreprise dans lequel se passe le stage.
-  - `Keywords` : Mots-clés décrivant le stage.
-  - `Start_date_internship` : Date de début du stage.
-  - `End_date_internship` : Date de fin du stage.
-  - `Internship_subject` : Sujet détaillé du stage.
-  - `Address` : Adresse du stage.
-  - `Student_number` : Identifiant de l'étudiant en stage (clé étrangère vers `Student`).
-  - `Relevance_score` : Score de pertinence du stage par rapport à l'enseignant attribué.
-  - `Id_teacher` : Identifiant de l'enseignant responsable du stage (clé étrangère vers `Teacher`).
+  - `Internship_identifier` (`VARCHAR(20)`) : Identifiant unique du stage (clé primaire).
+  - `Company_name` (`VARCHAR(50)`, NOT NULL) : Nom de l'entreprise où se passe le stage.
+  - `Keywords` (`VARCHAR(200)`) : Mots-clés décrivant le stage.
+  - `Start_date_internship` (`DATE`, NOT NULL) : Date de début du stage.
+  - `Type` (`VARCHAR(50)`) : Type du stage.
+  - `End_date_internship` (`DATE`, NOT NULL) : Date de fin du stage.
+  - `Internship_subject` (`VARCHAR(150)`, NOT NULL) : Sujet détaillé du stage.
+  - `Address` (`VARCHAR(100)`, NOT NULL) : Adresse du stage.
+  - `Student_number` (`VARCHAR(10)`, NOT NULL) : Identifiant de l'étudiant en stage.
+  - `Relevance_score` (`FLOAT`) : Score de pertinence du stage par rapport à l'enseignant.
+  - `Id_teacher` (`VARCHAR(10)`) : Identifiant de l'enseignant responsable du stage.
+
 
 #### 1.11 **Department**
 - **Table** : `Department`
-- **Description** : Contient les départements où les différents personnels et étudiants peuvent être affectés.
+- **Description** : Contient les informations sur les départements.
 - **Colonnes** :
-  - `Department_name` : Nom du département (clé primaire).
-  - `Address` : Adresse du département (clé étrangère vers `Addr_name`).
+  - `Department_name` (`VARCHAR(50)`) : Nom unique du département (clé primaire).
+  - `Address` (`VARCHAR(100)`, NOT NULL) : Adresse associée au département.
 
 #### 1.12 **Is_requested**
 - **Table** : `Is_requested`
-- **Description** : Indique les stages demandé par des enseignants.
+- **Description** : Relie les stages demandés à des enseignants spécifiques.
 - **Colonnes** :
-  - `Id_teacher` : Identifiant de l'enseignant (clé étrangère vers `Teacher`).
-  - `Internship_identifier` : Identifiant du stage (clé étrangère vers `Internship`).
+  - `Id_teacher` (`VARCHAR(10)`) : Identifiant de l'enseignant (clé étrangère).
+  - `Internship_identifier` (`VARCHAR(50)`) : Identifiant du stage (clé étrangère).
 
 #### 1.13 **Is_taught**
 - **Table** : `Is_taught`
-- **Description** : Contient les enseignements effectués par les enseignants dans chaque discipline.
+- **Description** : Associe les disciplines enseignées aux enseignants.
 - **Colonnes** :
-  - `Id_teacher` : Identifiant de l'enseignant (clé étrangère vers `Teacher`).
-  - `Discipline_name` : Nom de la discipline (clé étrangère vers `Discipline`).
+  - `Id_teacher` (`VARCHAR(10)`) : Identifiant de l'enseignant (clé étrangère).
+  - `Discipline_name` (`VARCHAR(50)`) : Nom de la discipline (clé étrangère).
 
 #### 1.14 **Has_role**
 - **Table** : `Has_role`
-- **Description** : Contient les rôles des utilisateurs dans chaque département.
+- **Description** : Attribue des rôles spécifiques aux utilisateurs.
 - **Colonnes** :
-  - `User_id` : Identifiant de l'utilisateur (clé étrangère vers `User_connect`).
-  - `Role_name` : Nom du rôle (clé étrangère vers `Role`).
-  - `Department_name` : Nom du département (clé étrangère vers `Department`).
+  - `User_id` (`VARCHAR(10)`) : Identifiant de l'utilisateur (clé étrangère).
+  - `Role_name` (`VARCHAR(50)`, NOT NULL) : Nom du rôle (clé étrangère).
+  - `Department_name` (`VARCHAR(50)`, NOT NULL) : Département associé au rôle.
 
 #### 1.15 **Study_at**
 - **Table** : `Study_at`
-- **Description** : Contient les affectations des étudiants aux départements.
+- **Description** : Associe les étudiants à leurs départements respectifs.
 - **Colonnes** :
-  - `Student_number` : Identifiant de l'étudiant (clé étrangère vers `Student`).
-  - `Department_name` : Nom du département (clé étrangère vers `Department`).
+  - `Student_number` (`VARCHAR(10)`) : Identifiant de l'étudiant (clé étrangère).
+  - `Department_name` (`VARCHAR(50)`) : Nom du département (clé étrangère).
 
 #### 1.16 **Has_address**
 - **Table** : `Has_address`
-- **Description** : Contient les adresses associées aux enseignants.
+- **Description** : Associe des adresses et types d'adresses à un enseignant.
 - **Colonnes** :
-  - `Id_teacher` : Identifiant de l'enseignant (clé étrangère vers `Teacher`).
-  - `Address` : Adresse de l'enseignant (clé étrangère vers `Addr_name`).
-  - `Type` : Type d'adresse (clé étrangère vers `Address_type`).
+  - `Id_teacher` (`VARCHAR(10)`) : Identifiant de l'enseignant (clé étrangère).
+  - `Address` (`VARCHAR(100)`) : Adresse associée (clé étrangère).
+  - `Type` (`VARCHAR(50)`) : Type d'adresse (clé étrangère).
 
 #### 1.17 **Distance**
 - **Table** : `Distance`
-- **Description** : Contient les distances entre enseignants et stages.
+- **Description** : Indique la distance entre un enseignant et un stage.
 - **Colonnes** :
-  - `Id_teacher` : Identifiant de l'enseignant (clé étrangère vers `Teacher`).
-  - `Internship_identifier` : Identifiant du stage (clé étrangère vers `Internship`).
-  - `Distance` : Distance entre l'enseignant et le stage.
+  - `Id_teacher` (`VARCHAR(10)`) : Identifiant de l'enseignant (clé étrangère).
+  - `Internship_identifier` (`VARCHAR(20)`) : Identifiant du stage (clé étrangère).
+  - `Distance` (`INT`) : Distance mesurée en kilomètres.
 
-#### 1.18 **Backup**
-- **Table** : `Backup`
-- **Description** : Contient des informations sur les critères de sauvegarde pour les utilisateurs.
+#### 1.18 **coeff_save**
+- **Table** : `coeff_save`
+- **Description** : Contient les coefficients et sauvegardes associés à des critères de distribution.
 - **Colonnes** :
-  - `User_id` : Identifiant de l'utilisateur (clé étrangère vers `User_connect`).
-  - `Name_criteria` : Critère de sauvegarde (clé étrangère vers `Distribution_criteria`).
-  - `Id_backup` : Identifiant de sauvegarde (clé étrangère vers `Id_backup`).
-  - `Coef` : Coefficient associé au critère.
-  - `Is_checked` : Statut de vérification de la sauvegarde.
+  - `User_id` (`VARCHAR(10)`) : Identifiant de l'utilisateur (clé étrangère).
+  - `Name_criteria` (`VARCHAR(50)`) : Nom du critère (clé étrangère).
+  - `Id_backup` (`INT`) : Identifiant de sauvegarde (clé étrangère).
+  - `Coef` (`INT`) : Valeur du coefficient associé.
+  - `Name_save` (`VARCHAR(100)`) : Nom de la sauvegarde.
+  - `Is_checked` (`BOOLEAN`, défaut : `TRUE`) : Indique si le critère est activé.
 
 ---
 
 ### 2. **Triggers et Fonctions**
 
-#### 2.1 **Trigger `check_is_requested_assignment`**
-- **Objectif** : Empêcher l'ajout d'une demande de stage si un enseignant est déjà assigné à un stage.
-- **Fonction** : Vérifie si un enseignant est déjà assigné à un stage. Si c'est le cas, une exception est levée.
-- **Exécution** : Avant toute insertion dans la table `Is_requested`.
+#### 2.1 **check_is_requested_assignment**
+- **Fonction** : Vérifie qu’un stage n’a pas déjà un enseignant assigné avant d’ajouter une demande (`Is_requested`).
+- **Trigger** :
+  - Type : `BEFORE INSERT`
+  - Table : `Is_requested`
 
-#### 2.2 **Trigger `check_internship_assignment`**
-- **Objectif** : Supprimer les demandes de stage et les distances associées lorsqu'un enseignant est assigné à un stage.
-- **Fonction** : Si un enseignant est assigné à un stage, les demandes de stage et distances associées sont supprimées.
-- **Exécution** : Avant toute mise à jour ou insertion dans la table `Internship`.
+```sql
+CREATE OR REPLACE FUNCTION check_is_requested_assignment()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF EXISTS (
+        SELECT 1 FROM Internship 
+        WHERE Internship_identifier = NEW.Internship_identifier AND Id_teacher IS NOT NULL
+    ) THEN
+        RAISE EXCEPTION 'Un professeur est déjà assigné à ce stage';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
-#### 2.3 **Trigger `check_distance_assignment`**
-- **Objectif** : Empêcher l'ajout d'une distance si un enseignant est déjà assigné au stage.
-- **Fonction** : Vérifie si un enseignant est déjà assigné au stage. Si oui, l'ajout de la distance est empêché.
-- **Exécution** : Avant toute insertion dans la table `Distance`.
+CREATE TRIGGER check_Is_requested_assignment
+    BEFORE INSERT ON Is_requested
+    FOR EACH ROW
+    EXECUTE FUNCTION check_is_requested_assignment();
+```
 
-#### 2.4 **Trigger `insert_backup`**
-- **Objectif** : Insérer automatiquement des entrées de sauvegarde pour chaque nouvel utilisateur connecté.
-- **Fonction** : Lors de l'insertion d'un utilisateur, des lignes sont ajoutées à la table `Backup` pour chaque critère de distribution et chaque identifiant de sauvegarde.
-- **Exécution** : Après l'insertion dans la table `User_connect`.
+#### 2.2 **check_internship_assignment**
+- **Fonction** : Supprime les relations dans `Is_requested` et `Distance` lorsqu’un enseignant est assigné à un stage.
+- **Trigger** :
+  - Type : `BEFORE UPDATE OR INSERT`
+  - Table : `Internship`
 
-#### 2.5 **Trigger `create_addr_for_insert_internship`**
-- **Objectif** : Créer automatiquement une nouvelle entrée dans la table `Addr_name` si l'adresse du stage n'existe pas déjà.
-- **Fonction** : Vérifie si l'adresse existe, et l'insère dans la table `Addr_name` si ce n'est pas le cas.
-- **Exécution** : Avant l'insertion dans la table `Internship`.
+```sql
+CREATE OR REPLACE FUNCTION check_internship_assignment()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.Id_teacher IS NOT NULL THEN
+        DELETE FROM Is_requested WHERE Internship_identifier = NEW.Internship_identifier;
+        DELETE FROM Distance WHERE Internship_identifier = NEW.Internship_identifier;
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
+CREATE TRIGGER check_internship_assignment
+    BEFORE UPDATE OR INSERT ON Internship
+    FOR EACH ROW
+    EXECUTE FUNCTION check_internship_assignment();
+```
 
-#### **2.6 Trigger `update_backup_new_criteria`**
+#### 2.3 **create_addr_for_insert**
+- **Fonction** : Ajoute une adresse dans `Addr_name` si elle n’existe pas avant un `INSERT`.
+- **Trigger** :
+  - Type : `BEFORE INSERT`
+  - Tables : `Internship`, `Has_address`
 
-- **Objectif** : Mettre à jour la table `Backup` avec de nouveaux critères de distribution après l'insertion dans la table `Distribution_criteria`.
-- **Fonction** : Lors de l'insertion d'un nouveau critère de distribution, des lignes sont ajoutées à la table Backup pour chaque utilisateur et chaque identifiant de sauvegarde.
-- **Exécution** : Ce trigger est exécuté après l'insertion dans la table `Distribution_criteria`.
+```sql
+CREATE OR REPLACE FUNCTION create_addr_for_insert()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (SELECT Address FROM Addr_name WHERE Address = NEW.Address) IS NULL THEN
+        INSERT INTO Addr_name (Address) VALUES (NEW.Address);
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
+CREATE TRIGGER create_addr_for_insert_internship
+    BEFORE INSERT ON Internship
+    FOR EACH ROW
+    EXECUTE FUNCTION create_addr_for_insert();
 
-#### **2.7 Trigger `update_backup_new_id_backup`**
+CREATE TRIGGER create_addr_for_insert_has_address
+    BEFORE INSERT ON Has_address
+    FOR EACH ROW
+    EXECUTE FUNCTION create_addr_for_insert();
+```
 
-- **Objectif** : Mettre à jour la table `Backup` en utilisant un nouvel identifiant de sauvegarde après l'insertion dans la table `Id_backup`.
-- **Fonction** : Lors de l'insertion d'un nouveau identifiant de backup, des lignes sont ajoutées à la table Backup pour chaque utilisateur et chaque critère de distribution.
-- **Exécution** : Ce trigger est exécuté après l'insertion dans la table `Distribution_criteria`.
+---
+
+#### 2.4 **check_distance_assignment**
+- **Fonction** : Vérifie qu’un stage n’a pas déjà un enseignant assigné avant d’ajouter une distance à `Distance`.
+- **Trigger** :
+  - Type : `BEFORE INSERT`
+  - Table : `Distance`
+
+```sql
+CREATE OR REPLACE FUNCTION check_distance_assignment()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (SELECT Id_teacher FROM Internship WHERE Internship_identifier = NEW.Internship_identifier) IS NULL THEN
+        RETURN NEW;
+    ELSE
+        RAISE EXCEPTION 'Un professeur est déjà assigné à ce stage';
+    END IF;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER check_distance_assignment
+    BEFORE INSERT ON Distance
+    FOR EACH ROW
+    EXECUTE FUNCTION check_distance_assignment();
+```
+
+#### 2.5 **update_backup_new_criteria**
+- **Fonction** : Met à jour `coeff_save` avec de nouveaux critères ajoutés à `Distribution_criteria`.
+- **Trigger** :
+  - Type : `AFTER INSERT`
+  - Table : `Distribution_criteria`
+
+```sql
+CREATE OR REPLACE FUNCTION update_backup_new_criteria()
+RETURNS TRIGGER AS $$
+DECLARE
+    user_id TEXT;
+    id_backup INT;
+BEGIN
+    FOR user_id IN SELECT User_id FROM User LOOP
+        FOR id_backup IN SELECT Id_backup FROM Id_backup LOOP
+            INSERT INTO coeff_save (User_id, Name_criteria, Id_backup, Coef, Is_checked)
+            VALUES (user_id, NEW.Name_criteria, id_backup, 1, FALSE);
+        END LOOP;
+    END LOOP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_backup_new_criteria
+    AFTER INSERT ON Distribution_criteria
+    FOR EACH ROW
+    EXECUTE FUNCTION update_backup_new_criteria();
+```
+
+#### 2.6 **create_discipline_for_insert**
+- **Fonction** : Ajoute une discipline dans `Discipline` si elle n’existe pas avant un `INSERT`.
+- **Trigger** :
+  - Type : `BEFORE INSERT`
+  - Table : `Is_taught`
+
+```sql
+CREATE OR REPLACE FUNCTION create_discipline_for_insert()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (SELECT Discipline_name FROM Discipline WHERE Discipline_name = NEW.Discipline_name) IS NULL THEN
+        INSERT INTO Discipline (Discipline_name) VALUES (NEW.Discipline_name);
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER create_discipline_for_insert_is_taught
+    BEFORE INSERT ON Is_taught
+    FOR EACH ROW
+    EXECUTE FUNCTION create_discipline_for_insert();
+```
+
+#### 2.7 **create_id_backup_for_insert**
+- **Fonction** : Ajoute un identifiant de sauvegarde à `Id_backup` si inexistant avant un `INSERT`.
+- **Trigger** :
+  - Type : `BEFORE INSERT`
+  - Table : `coeff_save`
+
+```sql
+CREATE OR REPLACE FUNCTION create_id_backup_for_insert()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF (SELECT Id_backup FROM Id_backup WHERE Id_backup = NEW.Id_backup) IS NULL THEN
+        INSERT INTO Id_backup (Id_backup) VALUES (NEW.Id_backup);
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER create_id_backup_for_insert_coeff_save
+    BEFORE INSERT ON coeff_save
+    FOR EACH ROW
+    EXECUTE FUNCTION create_id_backup_for_insert();
+```
+
+---
+
