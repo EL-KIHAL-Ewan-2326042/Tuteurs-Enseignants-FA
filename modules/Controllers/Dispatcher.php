@@ -7,9 +7,8 @@ use Blog\Models\Internship;
 use Blog\Models\Student;
 use Blog\Models\Teacher;
 use Blog\Models\User;
-use Blog\Views\Layout;
+use Blog\Views\layout\Layout;
 use Includes\Database;
-use PDO;
 
 class Dispatcher {
     /**
@@ -191,7 +190,7 @@ class Dispatcher {
             $title = "Repartiteur";
             $cssFilePath = '_assets/styles/dispatcher.css';
             $jsFilePath = '_assets/scripts/dispatcher.js';
-            $view = new \Blog\Views\Dispatcher($internshipModel, $userModel, $teacherModel, $departmentModel, $errorMessageAfterSort, $errorMessageDirectAssoc, $checkMessageDirectAssoc, $checkMessageAfterSort);
+            $view = new \Blog\Views\dispatcher\Dispatcher($internshipModel, $userModel, $teacherModel, $departmentModel, $errorMessageAfterSort, $errorMessageDirectAssoc, $checkMessageDirectAssoc, $checkMessageAfterSort);
 
             $layout = new Layout();
             $layout->renderTop($title, $cssFilePath);

@@ -9,6 +9,7 @@ use PDOException;
 class Teacher extends Model {
     private Database $db;
     public function __construct(Database $db) {
+        parent::__construct($db);
         $this->db = $db;
     }
 
@@ -30,7 +31,7 @@ class Teacher extends Model {
 
     /**
      * Recuperer toute une ligne selon la cle primaire dans la table teacher
-     * @param string $identifier l'identifiant du professeur
+     * @param string $Id_teacher
      * @return false|mixed renvoie la ligne dans la DB
      */
     public function getAddress(string $Id_teacher): false|array {

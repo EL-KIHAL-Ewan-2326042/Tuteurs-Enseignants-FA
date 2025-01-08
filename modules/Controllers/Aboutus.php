@@ -1,8 +1,7 @@
 <?php
 namespace Blog\Controllers;
 
-use Blog\Views\Layout;
-use Blog\Views\Aboutus as AboutUsView;
+use Blog\Views\layout\Layout;
 
 class Aboutus {
 
@@ -24,7 +23,7 @@ class Aboutus {
         $title = "A Propos";
         $cssFilePath = '';
         $jsFilePath = '';
-        $view = new \Blog\Views\Aboutus();
+        $view = new \Blog\Views\aboutus\Aboutus();
 
         $this->layout->renderTop($title, $cssFilePath);
         $view->showView();

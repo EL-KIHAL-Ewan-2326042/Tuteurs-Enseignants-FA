@@ -1,6 +1,5 @@
 <?php
-namespace Blog\Views;
-use Includes\Database;
+namespace Blog\Views\layout;
 
 class Layout {
 

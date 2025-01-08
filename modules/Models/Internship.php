@@ -2,6 +2,7 @@
 
 namespace Blog\Models;
 
+use Exception;
 use Includes\Database;
 use PDO;
 use PDOException;
@@ -10,6 +11,7 @@ class Internship extends Model {
     private Database $db;
 
     public function __construct(Database $db){
+        parent::__construct($db);
         $this->db = $db;
     }
 
@@ -652,5 +654,27 @@ class Internship extends Model {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
     }
+
+    /**
+     * Vérifie si une association id_teacher et student_number existe déjà avant insertion
+     * @param string $idTeacher L'identifiant de l'enseignant
+     * @param string $studentNumber Le numéro d'étudiant
+     * @return bool Retourne true si l'association existe déjà, sinon false
+     */
+    public function internshipExists(string $idTeacher, string $studentNumber): bool {
+        $query = "
+        SELECT COUNT(*) 
+        FROM internship 
+        WHERE id_teacher = :id_teacher AND student_number = :student_number
+    ";
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindValue(':id_teacher', $idTeacher);
+        $stmt->bindValue(':student_number', $studentNumber);
+        $stmt->execute();
+
+        // Retourne True si un enregistrement existe, False sinon
+        return $stmt->fetchColumn() > 0;
+    }
+
 
 }

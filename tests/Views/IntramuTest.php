@@ -2,7 +2,7 @@
 
 namespace Views;
 
-use Blog\Views\Intramu;
+use Blog\Views\intramu\Intramu;
 use PHPUnit\Framework\TestCase;
 
 /**

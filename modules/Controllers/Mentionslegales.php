@@ -2,8 +2,7 @@
 
 namespace Blog\Controllers;
 
-use Blog\Views\Layout;
-use Blog\Views\Mentionslegales as MentionLegView;
+use Blog\Views\layout\Layout;
 
 /**
  * Contrôleur de la page mentions légales
@@ -27,7 +26,7 @@ class Mentionslegales{
         $title = "Mentions légales";
         $cssFilePath = '_assets/styles/mentionLeg.css';
         $jsFilePath = '';
-        $view = new \Blog\Views\Mentionslegales();
+        $view = new \Blog\Views\mentions_legales\Mentionslegales();
 
         $this->layout->renderTop($title, $cssFilePath);
         $view->showView();

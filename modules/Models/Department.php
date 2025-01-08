@@ -9,6 +9,7 @@ class Department extends Model {
     private Database $db;
 
     public function __construct(Database $db) {
+        parent::__construct($db);
         $this->db = $db;
     }
 
@@ -30,6 +31,7 @@ class Department extends Model {
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
 
 }

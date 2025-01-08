@@ -2,10 +2,9 @@
 
 namespace Blog\Controllers;
 
-use Blog\Views\Layout;
-use Includes\Database;
-use Blog\Views\dashboard as GestionDonneesView;
 use Blog\Models\dashboard as GestioinDonneesModel;
+use Blog\Models\Model;
+use Blog\Views\layout\Layout;
 use Exception;
 
 class Dashboard {
@@ -51,7 +50,7 @@ class Dashboard {
     public function show(): void {
         // Récupération de l'instance de la base de données et des classes associées
         $db = \Includes\Database::getInstance();
-        $model = new \Blog\Models\Dashboard($db);
+        $model = new Model($db);
 
         // Initialisation du message à afficher
         $message = '';
@@ -146,7 +145,7 @@ class Dashboard {
             $title = "Gestion des données";
             $cssFilePath = '_assets/styles/gestionDonnees.css';
             $jsFilePath = '_assets/scripts/gestionDonnees.js';
-            $view = new \Blog\Views\Dashboard($message,$errorMessage);
+            $view = new \Blog\Views\dashboard\Dashboard($message,$errorMessage);
 
             // Affichage de la vue dashboard
             $this->layout->renderTop($title, $cssFilePath);

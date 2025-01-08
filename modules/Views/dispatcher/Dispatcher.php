@@ -1,10 +1,11 @@
 <?php
-namespace Blog\Views;
+namespace Blog\Views\dispatcher;
 
 use Blog\Models\Department;
 use Blog\Models\Internship;
 use Blog\Models\Teacher;
 use Blog\Models\User;
+use function Blog\Views\renderStars;
 
 /**
  * Vue du Dispatcher
@@ -138,35 +139,7 @@ class Dispatcher {
                         <div class="indeterminate"></div>
                     </div>
                 </div>
-                    <?php endif?>
-
-                <?php
-                function renderStars($score) {
-                    $fullStars = floor($score);
-
-                    $decimalPart = $score - $fullStars;
-
-                    $halfStars = (abs($decimalPart - 0.5) <= 0.1) ? 1 : 0;
-
-                    $emptyStars = 5 - $fullStars - $halfStars;
-
-                    $stars = '';
-
-                    for ($i = 0; $i < $fullStars; $i++) {
-                        $stars .= '<span class="filled"></span>';
-                    }
-
-                    if ($halfStars) {
-                        $stars .= '<span class="half"></span>';
-                    }
-
-                    for ($i = 0; $i < $emptyStars; $i++) {
-                        $stars .= '<span class="empty"></span>';
-                    }
-
-                    return $stars;
-                }
-                ?>
+                <?php endif?>
 
 
                 <?php if (isset($_POST['coef']) && isset($_POST['action']) && $_POST['action'] === 'generate'): ?>
@@ -216,7 +189,7 @@ class Dispatcher {
                                                 <td><?= $resultDispatch['address'] ?></td>
                                                 <td>
                                                     <div class="star-rating" data-tooltip="<?= $resultDispatch['score']; ?>" data-position="top">
-                                                        <?php echo renderStars($resultDispatch['score']); ?>
+                                                        <?php echo $this->renderStars($resultDispatch['score']); ?>
                                                     </div>
                                                 </td>
                                                 <td>
@@ -273,5 +246,31 @@ class Dispatcher {
             </div>
         </main>
 <?php
+    }
+    private function renderStars(mixed $score)
+    {
+        $fullStars = floor($score);
+
+        $decimalPart = $score - $fullStars;
+
+        $halfStars = (abs($decimalPart - 0.5) <= 0.1) ? 1 : 0;
+
+        $emptyStars = 5 - $fullStars - $halfStars;
+
+        $stars = '';
+
+        for ($i = 0; $i < $fullStars; $i++) {
+            $stars .= '<span class="filled"></span>';
+        }
+
+        if ($halfStars) {
+            $stars .= '<span class="half"></span>';
+        }
+
+        for ($i = 0; $i < $emptyStars; $i++) {
+            $stars .= '<span class="empty"></span>';
+        }
+
+        return $stars;
     }
 }

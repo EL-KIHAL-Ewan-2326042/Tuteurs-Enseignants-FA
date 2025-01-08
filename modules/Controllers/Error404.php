@@ -3,7 +3,7 @@
 
 namespace Blog\Controllers;
 
-use Blog\Views\Layout;
+use Blog\Views\layout\Layout;
 
 class Error404 {
 
@@ -26,7 +26,7 @@ class Error404 {
         $title = "Erreur 404";
         $cssFilePath = '/_assets/styles/erreur404.css';
         $jsFilePath = '';
-        $view = new \Blog\Views\Error404();
+        $view = new \Blog\Views\errors\Error404();
 
         $this->layout->renderTop($title, $cssFilePath);
         $view->showView();

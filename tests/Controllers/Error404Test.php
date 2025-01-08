@@ -2,9 +2,9 @@
 
 namespace Controllers;
 
-use Blog\Views\Layout;
 use Blog\Controllers\Error404;
-use Blog\Views\Error404 as Error404View;
+use Blog\Views\errors\Error404 as Error404View;
+use Blog\Views\layout\Layout;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 
