@@ -1,5 +1,0 @@
-INSERT INTO Is_responsible (Id_teacher, Student_number, Distance_minute, relevance_score, responsible_start_date, responsible_end_date) VALUES ('B22662146','B82656814',23, 0, '2001-10-05', '2002-10-05');
-INSERT INTO Is_responsible (Id_teacher, Student_number, Distance_minute, relevance_score, responsible_start_date, responsible_end_date) VALUES ('B22662146','Y26472238',56, 1, '2001-10-05', '2002-10-05');
-INSERT INTO Is_responsible (Id_teacher, Student_number, Distance_minute, relevance_score, responsible_start_date, responsible_end_date) VALUES ('R14328249','S47843997',89, 4, '2001-10-05', '2002-10-05');
-INSERT INTO Is_responsible (Id_teacher, Student_number, Distance_minute, relevance_score, responsible_start_date, responsible_end_date) VALUES ('R14328249','Z21392555',5, 3, '2001-10-05', '2002-10-05');
-INSERT INTO Is_responsible (Id_teacher, Student_number, Distance_minute, relevance_score, responsible_start_date, responsible_end_date) VALUES ('R14328249','P43090772',7, 2, '2001-10-05', '2002-10-05');
