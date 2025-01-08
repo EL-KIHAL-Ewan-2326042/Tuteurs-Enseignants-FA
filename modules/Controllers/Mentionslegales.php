@@ -53,7 +53,7 @@ class Mentionslegales
     }
 
     /**
-     * Controlleur de la page mentions légales
+     * Contrôleur de la page 'Mentions légales'
      *
      * @return void
      */

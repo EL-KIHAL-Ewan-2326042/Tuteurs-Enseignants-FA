@@ -56,9 +56,9 @@ class Intramu
     }
 
     /**
-     * Liaison entre la vue et le layout et affichage
+     * Liaison entre la vue et le layout, et affichage
      * Gestion de la soumission du formulaire de connexion
-     * Si l'utilisateur est connecte, alors il est deconnecte
+     * Si l'utilisateur est connecté, alors il est deconnecté
      *
      * @return void
      */
