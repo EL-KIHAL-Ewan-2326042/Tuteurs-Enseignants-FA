@@ -4,7 +4,7 @@
  *
  * PHP version 8.3
  *
- * @category View
+ * @category Controller
  * @package  TutorMap/modules/Controllers
  *
  * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
@@ -31,7 +31,7 @@ use Includes\Database;
  *
  * PHP version 8.3
  *
- * @category View
+ * @category Controller
  * @package  TutorMap/modules/Controllers
  *
  * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
