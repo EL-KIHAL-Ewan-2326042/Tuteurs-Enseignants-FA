@@ -55,12 +55,13 @@ class Layout
                 <meta name="viewport" content="width=device-width, initial-scale=1">
                 <title><?php echo $title; ?></title>
                 <link rel="icon" type="image/x-icon" href="/favicon.ico">
-                <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0
-                /css/materialize.min.css" rel="stylesheet">
+                <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+                      rel="stylesheet">
                 <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
                 rel="stylesheet">
-                <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/openlayers
-                /openlayers.github.io@master/en/v6.5.0/css/ol.css" type="text/css">
+                <link rel="stylesheet"
+                      href="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/css/ol.css"
+                      type="text/css">
                 <link href="/_assets/styles/layout.css" rel="stylesheet">
                 <?php
                 echo '<link href="' . $cssFilePath . '" rel="stylesheet">';
@@ -165,8 +166,7 @@ class Layout
             </div>
         </footer>
         <script src="/_assets/scripts/layout.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize
-        /1.0.0/js/materialize.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
         <?php
         if ($jsFilePath) {
             echo '<script src="' . $jsFilePath . '"></script>';
@@ -177,8 +177,7 @@ class Layout
             || $currentUri === '/dispatcher'
         ) {
             echo '<script 
-            src="https://cdn.jsdelivr.net/gh/openlayers
-            /openlayers.github.io@master/en/v6.5.0/build/ol.js" 
+            src="https://cdn.jsdelivr.net/gh/openlayers/openlayers.github.io@master/en/v6.5.0/build/ol.js" 
             async defer 
             onload="initMap()">
           </script>';
