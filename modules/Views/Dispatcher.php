@@ -3,6 +3,7 @@ namespace Blog\Views;
 
 use Blog\Models\Department;
 use Blog\Models\Internship;
+use Blog\Models\Teacher;
 use Blog\Models\User;
 
 /**
@@ -20,7 +21,7 @@ class Dispatcher {
      * @param string $checkMessageDirectAssoc
      * @param string $checkMessageAfterSort
      */
-    public function __construct(private readonly Internship $internshipModel, private readonly User $userModel, private readonly Department $departmentModel, private readonly string $errorMessageAfterSort,private readonly string $errorMessageDirectAssoc, private readonly string $checkMessageDirectAssoc,private readonly string $checkMessageAfterSort) {
+    public function __construct(private readonly Internship $internshipModel, private readonly User $userModel, private readonly Teacher $teacherModel, readonly Department $departmentModel, private readonly string $errorMessageAfterSort,private readonly string $errorMessageDirectAssoc, private readonly string $checkMessageDirectAssoc,private readonly string $checkMessageAfterSort) {
     }
 
     public function showView(): void {
@@ -202,7 +203,7 @@ class Dispatcher {
                                             header('location: ./dispatcher');
                                         }
 
-                                        $resultDispatchList = $this->internshipModel->dispatcher($this->departmentModel, $dictCoef)[0];
+                                        $resultDispatchList = $this->internshipModel->dispatcher($this->departmentModel, $this->teacherModel, $dictCoef)[0];
                                         foreach ($resultDispatchList as $resultDispatch):
                                             ?>
                                             <tr class="dispatch-row" data-internship-identifier='<?= $resultDispatch['internship_identifier'] . '$' . $resultDispatch['id_teacher'] . '$' . $resultDispatch['address']; ?>'>

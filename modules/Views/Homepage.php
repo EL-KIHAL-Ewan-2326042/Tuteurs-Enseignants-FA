@@ -1,9 +1,14 @@
 <?php
 namespace Blog\Views;
 
+use Blog\Models\Department;
+use Blog\Models\Internship;
+use Blog\Models\Student;
+use Blog\Models\Teacher;
+
 class   Homepage {
 
-    public function __construct(private readonly \Blog\Models\Homepage $model, private readonly \Blog\Models\GlobalModel $globalModel) { }
+    public function __construct(private readonly Internship $internshipModel, private readonly Student $studentModel, private readonly Teacher $teacherModel, private readonly Department $departmentModel) { }
 
     /**
      * Vue de la homepage
@@ -38,7 +43,7 @@ class   Homepage {
 
                 if(isset($_POST['searchedStudentSubmitted'])) {
 
-                    $update = $this->model->updateSearchedStudent(isset($_POST['searchedStudent']), $_SESSION['identifier'], $_POST['searchedStudentSubmitted']);
+                    $update = $this->internshipModel->updateSearchedStudentInternship(isset($_POST['searchedStudent']), $_SESSION['identifier'], $_POST['searchedStudentSubmitted']);
 
                     if(!$update || gettype($update) !== 'boolean') {
                         echo '<h6 class="red-text">Une erreur est survenue</h6>';
@@ -46,7 +51,7 @@ class   Homepage {
                 }
 
                 if(isset($_POST['selecInternshipSubmitted'])) {
-                    $update = $this->model->updateRequests($_POST['selecInternship'] ?? array(), $_SESSION['identifier']);
+                    $update = $this->internshipModel->updateRequests($_POST['selecInternship'] ?? array(), $_SESSION['identifier']);
 
                     if(!$update || gettype($update) !== 'boolean') {
                         echo '<h6 class="red-text">Une erreur est survenue</h6>';
@@ -59,19 +64,19 @@ class   Homepage {
                         echo "<p>Cet étudiant n'a pas de stage ...</p>";
                     }
                     else {
-                        $internshipInfos = $this->model->getInternshipStudent($_SESSION['selected_student']['id']);
+                        $internshipInfos = $this->internshipModel->getInternshipStudent($_SESSION['selected_student']['id']);
                         if ($internshipInfos) {
-                            $internships = $this->globalModel->getInternships($_SESSION['selected_student']['id']);
+                            $internships = $this->internshipModel->getInternships($_SESSION['selected_student']['id']);
                             $year = "";
-                            $nbInternships = $this->globalModel->getInternshipTeacher($internships, $_SESSION['identifier'], $year);
-                            $distance = $this->globalModel->getDistance($internshipInfos['internship_identifier'], $_SESSION['identifier'], isset($internshipInfos['id_teacher']));
+                            $nbInternships = $this->internshipModel->getInternshipTeacher($internships, $_SESSION['identifier'], $year);
+                            $distance = $this->internshipModel->getDistance($internshipInfos['internship_identifier'], $_SESSION['identifier'], isset($internshipInfos['id_teacher']));
                             ?>
                             <div id="map"></div>
                             <div class="row"></div>
                             <?
                             $inDep = false;
-                            foreach ($this->model->getDepStudent($_SESSION['selected_student']['id']) as $dep) {
-                                if (in_array($dep, $this->globalModel->getDepTeacher($_SESSION['identifier']))) {
+                            foreach ($this->studentModel->getDepStudent($_SESSION['selected_student']['id']) as $dep) {
+                                if (in_array($dep, $this->teacherModel->getDepTeacher($_SESSION['identifier']))) {
                                     $inDep = true;
                                     break;
                                 }
@@ -122,7 +127,7 @@ class   Homepage {
                                                     } else {
                                                         ?>
                                                         <label class="center">
-                                                            <input type="checkbox" name="searchedStudent" class="center-align filled-in" value="1" <?= in_array($internshipInfos["internship_identifier"], $this->model->getRequests($_SESSION['identifier'])) ? 'checked="checked"' : '' ?> />
+                                                            <input type="checkbox" name="searchedStudent" class="center-align filled-in" value="1" <?= in_array($internshipInfos["internship_identifier"], $this->internshipModel->getRequests($_SESSION['identifier'])) ? 'checked="checked"' : '' ?> />
                                                             <span></span>
                                                         </label>
                                                         <?
@@ -173,7 +178,7 @@ class   Homepage {
                 }
             }
 
-            $departments = $this->globalModel->getDepTeacher($_SESSION['identifier']);
+            $departments = $this->teacherModel->getDepTeacher($_SESSION['identifier']);
             if(!$departments): ?>
                 <h6 class="left-align">Vous ne faîtes partie d'aucun département</h6>
             <?
@@ -194,7 +199,7 @@ class   Homepage {
 
                 <?
                 if(!empty($_SESSION['selecDep'])):
-                    $table = $this->model->getStudentsList($_SESSION['selecDep'], $_SESSION['identifier']);
+                    $table = $this->teacherModel->getStudentsList($_SESSION['selecDep'], $_SESSION['identifier'], $this->internshipModel, $this->departmentModel);
                     if(empty($table)):
                         echo "<h6 class='left-align'>Aucun stage disponible</h6>";
                     else: ?>

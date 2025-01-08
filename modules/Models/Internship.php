@@ -182,12 +182,12 @@ class Internship extends Model {
      * @param array $dictCoef Tableau associatif des critères de calcul et leurs coefficients
      * @return array|array[] Tableau d'associations ('id_teacher', 'internship_identifier', 'score' et type')
      */
-    public function RelevanceTeacher(Department $departmentModel, array $teacher, array $dictCoef): array
+    public function RelevanceTeacher(Department $departmentModel, Teacher $teacherModel, array $teacher, array $dictCoef): array
     {
         $identifier = $teacher['id_teacher'];
 
         $internshipList = array();
-        $departments = $departmentModel->getDepTeacher($identifier);
+        $departments = $teacherModel->getDepTeacher($identifier);
         foreach($departments as $listDepTeacher) {
             foreach($listDepTeacher as $department) {
                 $newList = $departmentModel->getInternshipsPerDepartment($department);
@@ -367,7 +367,7 @@ class Internship extends Model {
      * @param array $dicoCoef dictionnaire cle->nom_critere et valeur->coef
      * @return array|array[] resultat final sous forme de matrice
      */
-    public function dispatcher(Department $departmentModel, array $dicoCoef): array
+    public function dispatcher(Department $departmentModel, Teacher $teacherModel, array $dicoCoef): array
     {
         $db = $this->db;
 
@@ -404,7 +404,7 @@ class Internship extends Model {
         $listEleveFinal = [];
 
         foreach ($teacherData as $teacher) {
-            foreach ($this->RelevanceTeacher($departmentModel, $teacher, $dicoCoef) as $association) {
+            foreach ($this->RelevanceTeacher($departmentModel, $teacherModel, $teacher, $dicoCoef) as $association) {
                 $listStart[] = $association;
             }
         }
@@ -558,4 +558,99 @@ class Internship extends Model {
 
         return $stmt->fetchColumn();
     }
+
+    /**
+     * Insère ou supprime de la table is_requested l'enseignant et le stage passés en paramètre
+     * @param bool $add est true s'il faut ajouter la ligne, false s'il faut la supprimer
+     * @param string $teacher numéro de l'enseignant
+     * @param string $internship numéro du stage
+     * @return true|string renvoie true si la requête a fonctionné, sinon l'erreur dans un string
+     */
+    public function updateSearchedStudentInternship(bool $add, string $teacher, string $internship): true|string {
+        $current_requests = $this->getRequests($teacher);
+        if ($add) {
+            if (!in_array($internship, $current_requests)) {
+                $query = 'INSERT INTO is_requested(id_teacher, internship_identifier)
+                            VALUES(:teacher, :internship)';
+                $stmt = $this->db->getConn()->prepare($query);
+                $stmt->bindParam(':teacher', $teacher);
+                $stmt->bindParam(':internship', $internship);
+            } else return true;
+        } else {
+            if (in_array($internship, $current_requests)) {
+                $query = 'DELETE FROM is_requested
+                            WHERE  id_teacher = :teacher
+                            AND internship_identifier = :internship';
+                $stmt = $this->db->getConn()->prepare($query);
+                $stmt->bindParam(':teacher', $teacher);
+                $stmt->bindParam(':internship', $internship);
+            } else return true;
+        }
+        try {
+            $stmt->execute();
+        } catch(PDOException $e) {
+            return $e->getMessage();
+        }
+        return true;
+    }
+
+    /**
+     * Met à jour la table is_requested en fonction des stages demandés par l'enseignant passé en paramètre
+     * @param array $requests tableau contenant les numéro de stage que l'enseignant souhaite tutorer
+     * @param string $teacher numéro de l'enseignant
+     * @return true|string renvoie true si les insert et delete ont fonctionné, sinon l'erreur dans un string
+     */
+    public function updateRequests(array $requests, string $teacher): true|string {
+        $current_requests = $this->getRequests($teacher);
+        if(!$current_requests) $current_requests = array();
+
+        $to_add = array_diff($requests, $current_requests);
+        $to_delete = array_diff($current_requests, $requests);
+
+        foreach($to_add as $request) {
+            $query = 'INSERT INTO is_requested(id_teacher, internship_identifier)
+                        VALUES(:teacher, :internship)';
+            $stmt = $this->db->getConn()->prepare($query);
+            $stmt->bindParam(':teacher', $teacher);
+            $stmt->bindParam(':internship', $request);
+
+            try {
+                $stmt->execute();
+            } catch(PDOException $e) {
+                return $e->getMessage();
+            }
+        }
+
+        foreach($to_delete as $request) {
+            $query = 'DELETE FROM is_requested
+                        WHERE  id_teacher = :teacher
+                        AND internship_identifier = :internship';
+            $stmt = $this->db->getConn()->prepare($query);
+            $stmt->bindParam(':teacher', $teacher);
+            $stmt->bindParam(':internship', $request);
+
+            try {
+                $stmt->execute();
+            } catch(PDOException $e) {
+                return $e->getMessage();
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Renvoie tous les stages que l'enseignant passé en paramètre a demandé à tutorer
+     * @param string $teacher numéro de l'enseignant
+     * @return false|array tableau contenant le numéro d'étudiant de l'élève du stage dont l'enseignant connecté a fait la demande, false sinon
+     */
+    public function getRequests(string $teacher): false|array {
+        $query = 'SELECT internship_identifier
+                    FROM is_requested
+                    WHERE  id_teacher = :teacher';
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindParam(':teacher', $teacher);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_COLUMN);
+    }
+
 }

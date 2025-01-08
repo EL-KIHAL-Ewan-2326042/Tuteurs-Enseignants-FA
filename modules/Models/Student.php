@@ -97,4 +97,19 @@ class Student extends Model {
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Récupère les départements dont fait partie l'étudiant passé en paramètre
+     * @param string $student numéro de l'étudiant dont on récupère les départements
+     * @return false|array tableau contenant les départements dont l'étudiant fait partie s'il en a, false sinon
+     */
+    public function getDepStudent(string $student): false|array {
+        $query = 'SELECT department_name
+                    FROM study_at
+                    WHERE student_number = :student';
+        $stmt = $this->db->getConn()->prepare($query);
+        $stmt->bindParam(':student', $student);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

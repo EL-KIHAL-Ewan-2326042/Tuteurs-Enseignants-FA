@@ -156,4 +156,55 @@ class Model {
 
         return [[]];
     }
+
+    /**
+     * Algorithme de calcul du score de pertinence d'un stage pour un enseignant
+     * @param array $dictValues tableau contenant les données relatives à chaque critère pour calculer le score final
+     * @return float score sur 5
+     */
+    public function calculateScore(array $dictValues): float {
+        $dictCoef = $this->getCoef($_SESSION['identifier']);
+
+        $totalScore = 0;
+        $totalCoef = 0;
+        foreach ($dictValues as $criteria => $value) {
+            if (isset($dictCoef[$criteria])) {
+                $coef = $dictCoef[$criteria];
+
+                switch ($criteria) {
+                    case 'Distance':
+                        $scoreDuration = $coef / (1 + 0.02 * $value);
+                        $totalScore += $scoreDuration;
+                        break;
+
+                    case 'A été responsable':
+                        $numberOfInternships = $value;
+                        $baselineScore = 0.7 * $coef;
+
+                        if ($numberOfInternships > 0) {
+                            $ScoreInternship = $coef * min(1, log(1 + $numberOfInternships, 2));
+                        } else {
+                            $ScoreInternship = $baselineScore;
+                        }
+
+                        $totalScore += $ScoreInternship;
+                        break;
+
+
+                    case 'Cohérence':
+                        $scoreRelevance = $value * $coef;
+                        $totalScore += $scoreRelevance;
+                        break;
+
+                    default:
+                        $totalScore += $value * $coef;
+                        break;
+                }
+
+                $totalCoef += $coef;
+            }
+        }
+
+        return (($totalScore * 5) / $totalCoef);
+    }
 }
