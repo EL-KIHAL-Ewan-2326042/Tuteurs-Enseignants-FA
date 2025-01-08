@@ -2,8 +2,8 @@
 
 namespace Views;
 
-use Blog\Views\Dispatcher;
 use Blog\Models\Dispatcher as DispatcherModel;
+use Blog\Views\dispatcher\Dispatcher;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 
