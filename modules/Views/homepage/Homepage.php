@@ -221,63 +221,58 @@ readonly class Homepage
                                                 ~<?php echo $distance ?> minutes
                                             </td>
                                             <td>
-                                            <?php
-                                            if (!$inDep) {
-                                                echo "<strong>" .
-                                                $_SESSION['selected_student']
-                                                ['firstName']. ' ' .
-                                                $_SESSION['selected_student']
-                                                ['lastName']
-                                                . "</strong>
-                                                ne fait partie d'aucun
-                                                de vos départements";
-                                            } else {
-                                                if ($internshipInfos['id_teacher']) {
-                                                    if ($internshipInfos['id_teacher'] === $_SESSION['identifier']) {
-                                                        echo "Vous êtes déjà le 
-                                                        tuteur de " . "<strong>" .
-                                                        $_SESSION['selected_student']
-                                                        ['firstName'] . ' ' .
-                                                        $_SESSION['selected_student']
-                                                        ['lastName'] . "</strong> !";
-                                                    } else {
-                                                        echo "<strong>";
-                                                        if ($internshipInfos['teacher_name']
-                                                            && $internshipInfos['teacher_firstname']
-                                                        ) {
-                                                            echo $internshipInfos
-                                                                ['teacher_name'] .
-                                                                " " .
-                                                                $internshipInfos['teacher_firstname'];
-                                                        } else {
-                                                            echo $internshipInfos['id_teacher'];
-                                                        }
-                                                        echo "</strong>";
-                                                    }
-                                                } else {
-                                                    ?>
-                                                <label class="center">
-                                                    <input type="checkbox"
-                                                           name="searchedStudent"
-                                                           class="center-align
-                                                           filled-in" value="1"
-                                                        <?php echo in_array(
-                                                            $internshipInfos
-                                                            ["internship
-                                                            _identifier"], $this->model->getRequests(
-                                                                $_SESSION
-                                                                    ['identifier']
-                                                            )
-                                                        )
-                                                                ? 'checked
-                                                                ="checked"' : ''
-                                                        ?> />
-                                                    <span></span>
-                                                </label>
-                                                    <?php
-                                                }
-                                            }
-                                            ?>
+                            <?php
+                            if (!$inDep) {
+                                echo "<strong>" .
+                                $_SESSION['selected_student']['firstName']. ' ' .
+                                $_SESSION['selected_student']['lastName']
+                                . "</strong> ne fait partie d'aucun
+                                de vos départements";
+                            } else {
+                                $id_teacher = $internshipInfos['id_teacher'];
+                                if ($id_teacher) {
+                                    if ($id_teacher === $_SESSION['identifier']
+                                    ) {
+                                        echo "Vous êtes déjà le tuteur de " .
+                                        "<strong>" . $_SESSION['selected_student']
+                                        ['firstName'] . ' ' .
+                                        $_SESSION['selected_student']
+                                        ['lastName'] . "</strong> !";
+                                    } else {
+                                        echo "<strong>";
+                                        if ($internshipInfos['teacher_name']
+                                            && $internshipInfos['teacher_firstname']
+                                        ) {
+                                            echo $internshipInfos
+                                                ['teacher_name'] . " " .
+                                                $internshipInfos
+                                                ['teacher_firstname'];
+                                        } else {
+                                            echo $id_teacher;
+                                        }
+                                        echo "</strong>";
+                                    }
+                                } else {
+                                    ?>
+                                    <label class="center">
+                                        <input type="checkbox"
+                                               name="searchedStudent"
+                                               class="center-align
+                                               filled-in" value="1"
+                                            <?php echo in_array(
+                                                $internshipInfos
+                                                ["internship_identifier"],
+                                                $this->model->getRequests(
+                                                    $_SESSION['identifier']
+                                                )
+                                            ) ? 'checked="checked"' : ''
+                                            ?> />
+                                        <span></span>
+                                    </label>
+                                    <?php
+                                }
+                            }
+                            ?>
                                             </td>
                                         </tr>
                                     </tbody>
