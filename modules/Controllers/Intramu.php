@@ -60,7 +60,7 @@ class Intramu {
         }
 
         $title = "Connexion";
-        $cssFilePath = '_assets/styles/login.css';
+        $cssFilePath = '_assets/styles/intramu.css';
         $jsFilePath = '';
         $view = new \Blog\Views\intramu\Intramu($errorMessage);
 
