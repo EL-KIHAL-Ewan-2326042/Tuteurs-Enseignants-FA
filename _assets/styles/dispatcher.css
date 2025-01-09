@@ -27,6 +27,18 @@ h3, h4 {
     background-color: #E8CE7E;
 }
 
+main a {
+    color: black;
+}
+
+main a:hover {
+    color: var(--main-color);
+}
+
+main a:visited {
+    color: black;
+}
+
 input[type="checkbox"].filled-in:checked + span:after {
     background-color: #00558B !important;
     border-color: #00558B !important;
