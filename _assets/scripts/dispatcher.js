@@ -1,80 +1,99 @@
 /**
  * Partie 1
  */
-document.addEventListener('DOMContentLoaded', function () {
-    const elems = document.querySelectorAll('select');
-    const instances = M.FormSelect.init(elems);
+document.addEventListener(
+    'DOMContentLoaded', function () {
+        const elems = document.querySelectorAll('select');
+        const instances = M.FormSelect.init(elems);
 
-    const searchInputTeacher = document.getElementById('searchTeacher');
-    const searchInputInternship = document.getElementById('searchInternship');
+        const searchInputTeacher = document.getElementById('searchTeacher');
+        const searchInputInternship = document.getElementById('searchInternship');
 
-    const searchResults = document.getElementById('searchResults');
+        const searchResults = document.getElementById('searchResults');
 
-    if (!searchResults) {
-        return;
+        if (!searchResults) {
+            return;
+        }
+        searchResults.innerHTML = '<p></p>';
+
+        searchInputTeacher.addEventListener(
+            'input', function () {
+                const searchTerm = searchInputTeacher.value.trim();
+
+                if (searchTerm.length > 0) {
+                    fetchResults(searchTerm, 'searchTeacher');
+                } else {
+                    searchResults.innerHTML = '<p></p>';
+                }
+            }
+        );
+
+        searchInputInternship.addEventListener(
+            'input', function () {
+                const searchTerm = searchInputInternship.value.trim();
+
+                if (searchTerm.length > 0) {
+                    fetchResults(searchTerm, 'searchInternship');
+                } else {
+                    searchResults.innerHTML = '<p>Barre de recherche vide</p>';
+                }
+            }
+        );
     }
-    searchResults.innerHTML = '<p></p>';
-
-    searchInputTeacher.addEventListener('input', function () {
-        const searchTerm = searchInputTeacher.value.trim();
-
-        if (searchTerm.length > 0) {
-            fetchResults(searchTerm, 'searchTeacher');
-        } else {
-            searchResults.innerHTML = '<p></p>';
-        }
-    });
-
-    searchInputInternship.addEventListener('input', function () {
-        const searchTerm = searchInputInternship.value.trim();
-
-        if (searchTerm.length > 0) {
-            fetchResults(searchTerm, 'searchInternship');
-        } else {
-            searchResults.innerHTML = '<p>Barre de recherche vide</p>';
-        }
-    });
-});
+);
 
 /**
  * Prendre les requetes avec une requête AJAX
+ *
  * @param query The search query.
  * @param searchType
  */
-function fetchResults(query, searchType) {
-    fetch(window.location.href, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-            action: 'search',
-            searchType: searchType,
-            search: query,
-        }),
-    })
-        .then(response => {
-            if (!response.ok) {
+function fetchResults(query, searchType)
+{
+    fetch(
+        window.location.href, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams(
+                {
+                    action: 'search',
+                    searchType: searchType,
+                    search: query,
+                }
+            ),
+        }
+    ).then(
+        response =>
+        { if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
-            }
+        }
             return response.json();
-        })
-        .then(data => {
+        }
+    ).then(
+        data =>
+        {
             displayResults(data, searchType);
-        })
-        .catch(error => {
+        }
+    ).catch(
+        error =>
+        {
             console.error('Erreur fetch resultats:', error);
             searchResults.innerHTML = '<p>Erreur lors de la récupération des résultats</p>';
-        });
+        }
+    );
 }
 
 
 /**
  * Afficher les résultats avec la requête AJAX
+ *
  * @param data The data received from the server.
  * @param action The action used to determine how to display the results.
  */
-function displayResults(data, action) {
+function displayResults(data, action)
+{
     if (searchResults) {
         searchResults.innerHTML = '';
     }
@@ -85,140 +104,173 @@ function displayResults(data, action) {
     }
 
     const ul = document.createElement('ul');
-    data.forEach(item => {
-        const li = document.createElement('li');
-        const a = document.createElement('a');
+    data.forEach(
+        item =>
+        {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            if (action === 'searchTeacher') {
+                a.textContent = `${item.teacher_name} ${item.teacher_firstname} (ID: ${item.id_teacher})`;
+                a.href = '#';
+                a.addEventListener(
+                    'click', (event) =>
+                    {
+                        event.preventDefault();
+                        const inputField = document.getElementById('searchTeacher');
+                        if (inputField) {
+                            inputField.value = `${item.id_teacher}`;
+                        }
+                    }
+                );
+            } else if (action === 'searchInternship') {
+                    a.textContent = item.company_name
+                    ? `${item.company_name}: ${item.internship_identifier} - ${item.student_name} ${item.student_firstname}`
+                    : `${item.student_number} - ${item.student_name} ${item.student_firstname}`;
+                    a.href = '#';
+                    a.addEventListener(
+                        'click', (event) =>
+                        {
+                            event.preventDefault();
+                            const inputField = document.getElementById('searchInternship');
+                            if (inputField) {
+                                inputField.value = `${item.internship_identifier}`;
+                            }
+                        }
+                    );
+            }
 
-        if (action === 'searchTeacher') {
-            a.textContent = `${item.teacher_name} ${item.teacher_firstname} (ID: ${item.id_teacher})`;
-            a.href = '#';
-            a.addEventListener('click', (event) => {
-                event.preventDefault();
-                const inputField = document.getElementById('searchTeacher');
-                if (inputField) {
-                    inputField.value = `${item.id_teacher}`;
-                }
-            });
-        } else if (action === 'searchInternship') {
-            a.textContent = item.company_name
-                ? `${item.company_name}: ${item.internship_identifier} - ${item.student_name} ${item.student_firstname}`
-                : `${item.student_number} - ${item.student_name} ${item.student_firstname}`;
-            a.href = '#';
-            a.addEventListener('click', (event) => {
-                event.preventDefault();
-                const inputField = document.getElementById('searchInternship');
-                if (inputField) {
-                    inputField.value = `${item.internship_identifier}`;
-                }
-            });
+                a.classList.add('left-align');
+            li.appendChild(a);
+            ul.appendChild(li);
         }
-
-        a.classList.add('left-align');
-
-        li.appendChild(a);
-        ul.appendChild(li);
-    });
+    );
     searchResults.appendChild(ul);
 }
 
 /**
  * Partie 2: Coefficients
  */
-document.addEventListener('DOMContentLoaded', function () {
-    const selects = document.querySelectorAll('select');
-    M.FormSelect.init(selects);
+document.addEventListener(
+    'DOMContentLoaded', function () {
+        const selects = document.querySelectorAll('select');
+        M.FormSelect.init(selects);
 
-    const saveSelector = document.getElementById('save-selector');
-    if (saveSelector) {
-        saveSelector.addEventListener('change', function () {
-            const form = this.closest('form');
-            form.submit();
-        });
-    }
-
-    const checkboxes = document.querySelectorAll('.criteria-checkbox');
-
-    checkboxes.forEach(checkbox => {
-        const hiddenInput = document.querySelector(`input[name="is_checked[${checkbox.dataset.coefInputId}]"]`);
-
-        if (checkbox.checked) {
-            hiddenInput.value = '1';
-        } else {
-            hiddenInput.value = '0';
+        const saveSelector = document.getElementById('save-selector');
+        if (saveSelector) {
+            saveSelector.addEventListener(
+                'change', function () {
+                    const form = this.closest('form');
+                    form.submit();
+                }
+            );
         }
 
-        checkbox.addEventListener('change', function () {
-            if (this.checked) {
-                hiddenInput.value = '1';
+        const checkboxes = document.querySelectorAll('.criteria-checkbox');
+
+        checkboxes.forEach(
+            checkbox =>
+            {
+                const hiddenInput = document.querySelector(`input[name="is_checked[${checkbox.dataset.coefInputId}]"]`);
+                if (checkbox.checked) {
+                    hiddenInput.value = '1';
+                } else {
+                        hiddenInput.value = '0';
+                }
+
+                    checkbox.addEventListener(
+                        'change', function () {
+                            if (this.checked) {
+                                hiddenInput.value = '1';
+                            } else {
+                                hiddenInput.value = '0';
+                            }
+                        }
+                    );
+            }
+        );
+
+        document.querySelectorAll('.coef-input').forEach(
+            input =>
+            {
+                input.addEventListener(
+                    'change', function () {
+                            let value = parseInt(this.value);
+
+                        if (isNaN(value) || value < 1) {
+                            this.value = 1;
+                        } else if (value > 100) {
+                            this.value = 100;
+                        }
+                    }
+                );
+            }
+        );
+
+        const criteriaCheckboxes = document.querySelectorAll('.criteria-checkbox');
+        const errorMessageElement = document.getElementById('checkboxError');
+        const button = document.getElementById('generate-btn');
+
+        function validateCheckboxes()
+        {
+            const anyChecked = Array.from(criteriaCheckboxes).some(checkbox => checkbox.checked);
+
+            if (!anyChecked) {
+                errorMessageElement.textContent = 'Veuillez sélectionner au moins un critère.';
+                button.disabled = true;
             } else {
-                hiddenInput.value = '0';
-            }
-        });
-    });
-
-    document.querySelectorAll('.coef-input').forEach(input => {
-        input.addEventListener('change', function () {
-            let value = parseInt(this.value);
-
-            if (isNaN(value) || value < 1) {
-                this.value = 1;
-            } else if (value > 100) {
-                this.value = 100;
-            }
-        });
-    });
-
-    const criteriaCheckboxes = document.querySelectorAll('.criteria-checkbox');
-    const errorMessageElement = document.getElementById('checkboxError');
-    const button = document.getElementById('generate-btn');
-
-    function validateCheckboxes() {
-        const anyChecked = Array.from(criteriaCheckboxes).some(checkbox => checkbox.checked);
-
-        if (!anyChecked) {
-            errorMessageElement.textContent = 'Veuillez sélectionner au moins un critère.';
-            button.disabled = true;
-        } else {
-            errorMessageElement.textContent = '';
-            if (button.disabled) {
-                button.disabled = false;
+                errorMessageElement.textContent = '';
+                if (button.disabled) {
+                    button.disabled = false;
+                }
             }
         }
-    }
 
-    criteriaCheckboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', validateCheckboxes);
-    });
+        criteriaCheckboxes.forEach(
+            checkbox =>
+            {
+                checkbox.addEventListener(
+                    'change', validateCheckboxes
+                );
+            }
+        );
 
-    const select = document.getElementById('save-selector');
-    const saveButton = document.getElementById('save-btn');
+        const select = document.getElementById('save-selector');
+        const saveButton = document.getElementById('save-btn');
 
-    function updateButtonState() {
-        if (select.value === 'default') {
-            saveButton.disabled = true;
-        } else {
-            saveButton.disabled = false;
+        function updateButtonState()
+        {
+            if (select.value === 'default') {
+                saveButton.disabled = true;
+            } else {
+                saveButton.disabled = false;
+            }
         }
+
+        if (!select) {
+            return;
+        }
+
+        select.addEventListener('change', updateButtonState);
+
+        updateButtonState();
+        validateCheckboxes();
     }
+);
 
-    if (!select) {
-        return;
+document.querySelectorAll('.criteria-checkbox').forEach(
+    checkbox =>
+    {
+        checkbox.addEventListener(
+            'change', function () {
+                const hiddenInput = document.querySelector(`input[name="is_checked[${this.dataset.coefInputId}]"]`);
+                hiddenInput.value = this.checked ? '1' : '0';
+            }
+        );
     }
+);
 
-    select.addEventListener('change', updateButtonState);
-
-    updateButtonState();
-    validateCheckboxes();
-});
-
-document.querySelectorAll('.criteria-checkbox').forEach(checkbox => {
-    checkbox.addEventListener('change', function () {
-        const hiddenInput = document.querySelector(`input[name="is_checked[${this.dataset.coefInputId}]"]`);
-        hiddenInput.value = this.checked ? '1' : '0';
-    });
-});
-
-function showLoading() {
+function showLoading()
+{
     const loadingSection = document.getElementById('loading-section');
     const formsSection = document.getElementById('forms-section');
 
@@ -232,188 +284,208 @@ function showLoading() {
  *  Partie3: Pagination et bouton tout cocher
  */
 
-document.addEventListener('DOMContentLoaded', function () {
-    M.Tooltip.init(document.querySelectorAll('.star-rating'), {
-        exitDelay: 100,
-    });
+document.addEventListener(
+    'DOMContentLoaded', function () {
+        M.Tooltip.init(
+            document.querySelectorAll('.star-rating'), {
+                exitDelay: 100,
+            }
+        );
 
-    // Initialize the Materialize select dropdown
-    M.FormSelect.init(document.querySelectorAll('select'));
+        // Initialize the Materialize select dropdown
+        M.FormSelect.init(document.querySelectorAll('select'));
 
-    if (document.getElementById("dispatch-table") === null) {
-        return;
-    }
+        if (document.getElementById("dispatch-table") === null) {
+            return;
+        }
 
-    const rowsPerPageDropdown = document.getElementById('rows-per-page');
-    let rowsPerPage = sessionStorage.getItem("rowsCount") ? Number(sessionStorage.getItem("rowsCount")) : parseInt(rowsPerPageDropdown.value); // Set default to 10
-    if (rowsPerPage !== 10) {
-        rowsPerPageDropdown.options[rowsPerPage === 20 ? 1 : rowsPerPage === 50 ? 2 : rowsPerPage === 100 ? 3 : 4].selected = true;
-    }
-    sessionStorage.setItem("rowsCount", String(rowsPerPage));
+        const rowsPerPageDropdown = document.getElementById('rows-per-page');
+        let rowsPerPage = sessionStorage.getItem("rowsCount") ? Number(sessionStorage.getItem("rowsCount")) : parseInt(rowsPerPageDropdown.value); // Set default to 10
+        if (rowsPerPage !== 10) {
+            rowsPerPageDropdown.options[rowsPerPage === 20 ? 1 : rowsPerPage === 50 ? 2 : rowsPerPage === 100 ? 3 : 4].selected = true;
+        }
+        sessionStorage.setItem("rowsCount", String(rowsPerPage));
 
-    let rows = document.querySelectorAll('.dispatch-row');
-    let totalRows = rows.length;
-    let totalPages = Math.ceil(totalRows / rowsPerPage);
-    let currentPage = 1;
+        let rows = document.querySelectorAll('.dispatch-row');
+        let totalRows = rows.length;
+        let totalPages = Math.ceil(totalRows / rowsPerPage);
+        let currentPage = 1;
 
-    const prevButton = document.getElementById('prev-page');
-    const nextButton = document.getElementById('next-page');
-    const firstButton = document.getElementById('first-page');
-    const lastButton = document.getElementById('last-page');
-    const pageNumbersContainer = document.getElementById('page-numbers');
+        const prevButton = document.getElementById('prev-page');
+        const nextButton = document.getElementById('next-page');
+        const firstButton = document.getElementById('first-page');
+        const lastButton = document.getElementById('last-page');
+        const pageNumbersContainer = document.getElementById('page-numbers');
 
-    sortTable(7);
+        sortTable(7);
 
-    for (let i = 0; i < document.getElementById("dispatch-table").rows[0].cells.length; ++i) {
-        document.getElementById("dispatch-table").rows[0].getElementsByTagName("TH")[i].addEventListener('click', () => {
-            sortTable(i);
-        });
-    }
-
-    /**
-     * Trie la table prenant pour id "dispatch-table"
-     * @param n numéro désignant la colonne par laquelle on trie le tableau
-     */
-    function sortTable(n) {
-        let dir, rows, switching, i, x, y, shouldSwitch, column;
-        const table = document.getElementById("dispatch-table");
-        switching = true;
-
-        if (table.rows[0].getElementsByTagName("TH")[n].innerHTML.substring(table.rows[0].getElementsByTagName("TH")[n].innerHTML.length - 1) === "▲") dir = "desc";
-        else dir = "asc";
-
-        while (switching) {
-            switching = false;
-            rows = table.rows;
-            for (i = 1; i < (rows.length - 1); ++i) {
-                shouldSwitch = false;
-                if (rows[i].id === 'select-all-row'
-                    || rows[i + 1].id === 'select-all-row') {
-                    continue;
+        for (let i = 0; i < document.getElementById("dispatch-table").rows[0].cells.length; ++i) {
+            document.getElementById("dispatch-table").rows[0].getElementsByTagName("TH")[i].addEventListener(
+                'click', () =>
+                {
+                    sortTable(i);
                 }
+            );
+        }
 
-                x = rows[i].getElementsByTagName("TD")[n];
-                y = rows[i + 1].getElementsByTagName("TD")[n];
+        /**
+         * Trie la table prenant pour id "dispatch-table"
+         *
+         * @param n numéro désignant la colonne par laquelle on trie le tableau
+         */
+        function sortTable(n)
+        {
+            let dir, rows, switching, i, x, y, shouldSwitch, column;
+            const table = document.getElementById("dispatch-table");
+            switching = true;
 
-                if (dir === "asc") {
-                    if ((n < 7 && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase())
-                        || (n === 7 && Number(x.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')) < Number(y.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')))
-                        || (n === 8 && x.getElementsByTagName("INPUT")[0].checked < y.getElementsByTagName("INPUT")[0].checked)) {
-                        shouldSwitch = true;
-                        break;
+            if (table.rows[0].getElementsByTagName("TH")[n].innerHTML.substring(table.rows[0].getElementsByTagName("TH")[n].innerHTML.length - 1) === "▲") { dir = "desc";
+            } else { dir = "asc";
+            }
+
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); ++i) {
+                    shouldSwitch = false;
+                    if (rows[i].id === 'select-all-row'
+                        || rows[i + 1].id === 'select-all-row'
+                    ) {
+                        continue;
                     }
-                } else if (dir === "desc") {
-                    if ((n < 7 && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())
-                        || (n === 7 && Number(x.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')) > Number(y.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')))
-                        || (n === 8 && x.getElementsByTagName("INPUT")[0].checked > y.getElementsByTagName("INPUT")[0].checked)) {
-                        shouldSwitch = true;
-                        break;
+
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+
+                    if (dir === "asc") {
+                        if ((n < 7 && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase())
+                            || (n === 7 && Number(x.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')) < Number(y.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')))
+                            || (n === 8 && x.getElementsByTagName("INPUT")[0].checked < y.getElementsByTagName("INPUT")[0].checked)
+                        ) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir === "desc") {
+                        if ((n < 7 && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())
+                            || (n === 7 && Number(x.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')) > Number(y.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')))
+                            || (n === 8 && x.getElementsByTagName("INPUT")[0].checked > y.getElementsByTagName("INPUT")[0].checked)
+                        ) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                }
+            }
+            for (i = 0; i < rows[0].cells.length; ++i) {
+                column = rows[0].getElementsByTagName("TH")[i].innerHTML;
+                if (column.substring(column.length-1) === "▲" || column.substring(column.length-1) === "▼") { table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-2);
+                }
+                if (i === n) {
+                    if (dir === "asc") { table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▲";
+                    } else { table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▼";
                     }
                 }
             }
-            if (shouldSwitch) {
-                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                switching = true;
+
+            showPage(currentPage);
+        }
+
+        function showPage(page)
+        {
+            if (page < 1 || page > totalPages) { return;
+            }
+
+            rows = document.querySelectorAll('.dispatch-row');
+
+            currentPage = page;
+            updatePageNumbers();
+
+            rows.forEach(row => (row.style.display = 'none'));
+            addSelectAllRow();
+
+            const start = (currentPage - 1) * rowsPerPage;
+            const end = currentPage * rowsPerPage;
+            const visibleRows = Array.from(rows).slice(start, end);
+            visibleRows.forEach(row => (row.style.display = ''));
+
+            prevButton.disabled = currentPage === 1;
+            nextButton.disabled = currentPage === totalPages;
+            firstButton.disabled = currentPage === 1;
+            lastButton.disabled = currentPage === totalPages;
+        }
+
+        function updatePageNumbers()
+        {
+            pageNumbersContainer.innerHTML = '';
+
+            const maxVisiblePages = 5;
+            const halfWindow = Math.floor(maxVisiblePages / 2);
+            let startPage = Math.max(currentPage - halfWindow, 1);
+            let endPage = Math.min(currentPage + halfWindow, totalPages);
+
+            if (endPage - startPage + 1 < maxVisiblePages) {
+                if (startPage === 1) {
+                    endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+                } else if (endPage === totalPages) {
+                    startPage = Math.max(endPage - maxVisiblePages + 1, 1);
+                }
+            }
+
+            if (startPage > 1) {
+                createPageButton(1);
+                if (startPage > 2) {
+                    addEllipsis();
+                }
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                createPageButton(i, i === currentPage);
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    addEllipsis();
+                }
+                createPageButton(totalPages);
             }
         }
-        for (i = 0; i < rows[0].cells.length; ++i) {
-            column = rows[0].getElementsByTagName("TH")[i].innerHTML;
-            if (column.substring(column.length-1) === "▲" || column.substring(column.length-1) === "▼") table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-2);
-            if (i === n) {
-                if (dir === "asc") table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▲";
-                else table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▼";
+
+        function createPageButton(page, isActive = false)
+        {
+            const pageNumberButton = document.createElement('button');
+            pageNumberButton.textContent = page;
+            pageNumberButton.classList.add('waves-effect', 'waves-light', 'btn');
+            pageNumberButton.classList.add('page-number');
+            pageNumberButton.disabled = isActive;
+            pageNumberButton.addEventListener('click', () => showPage(page));
+            pageNumbersContainer.appendChild(pageNumberButton);
+        }
+
+        function addEllipsis()
+        {
+            const ellipsis = document.createElement('span');
+            ellipsis.textContent = '...';
+            ellipsis.classList.add('pagination-ellipsis');
+            pageNumbersContainer.appendChild(ellipsis);
+        }
+
+        function addSelectAllRow()
+        {
+            const tbody = document.querySelector('#dispatch-table tbody');
+            let selectAllRow = document.querySelector('#select-all-row');
+
+            if (selectAllRow) {
+                selectAllRow.remove();
             }
-        }
 
-        showPage(currentPage);
-    }
+            selectAllRow = document.createElement('tr');
+            selectAllRow.id = 'select-all-row';
 
-    function showPage(page) {
-        if (page < 1 || page > totalPages) return;
-
-        rows = document.querySelectorAll('.dispatch-row');
-
-        currentPage = page;
-        updatePageNumbers();
-
-        rows.forEach(row => (row.style.display = 'none'));
-        addSelectAllRow();
-
-        const start = (currentPage - 1) * rowsPerPage;
-        const end = currentPage * rowsPerPage;
-        const visibleRows = Array.from(rows).slice(start, end);
-        visibleRows.forEach(row => (row.style.display = ''));
-
-        prevButton.disabled = currentPage === 1;
-        nextButton.disabled = currentPage === totalPages;
-        firstButton.disabled = currentPage === 1;
-        lastButton.disabled = currentPage === totalPages;
-    }
-
-    function updatePageNumbers() {
-        pageNumbersContainer.innerHTML = '';
-
-        const maxVisiblePages = 5;
-        const halfWindow = Math.floor(maxVisiblePages / 2);
-        let startPage = Math.max(currentPage - halfWindow, 1);
-        let endPage = Math.min(currentPage + halfWindow, totalPages);
-
-        if (endPage - startPage + 1 < maxVisiblePages) {
-            if (startPage === 1) {
-                endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
-            } else if (endPage === totalPages) {
-                startPage = Math.max(endPage - maxVisiblePages + 1, 1);
-            }
-        }
-
-        if (startPage > 1) {
-            createPageButton(1);
-            if (startPage > 2) {
-                addEllipsis();
-            }
-        }
-
-        for (let i = startPage; i <= endPage; i++) {
-            createPageButton(i, i === currentPage);
-        }
-
-        if (endPage < totalPages) {
-            if (endPage < totalPages - 1) {
-                addEllipsis();
-            }
-            createPageButton(totalPages);
-        }
-    }
-
-    function createPageButton(page, isActive = false) {
-        const pageNumberButton = document.createElement('button');
-        pageNumberButton.textContent = page;
-        pageNumberButton.classList.add('waves-effect', 'waves-light', 'btn');
-        pageNumberButton.classList.add('page-number');
-        pageNumberButton.disabled = isActive;
-        pageNumberButton.addEventListener('click', () => showPage(page));
-        pageNumbersContainer.appendChild(pageNumberButton);
-    }
-
-    function addEllipsis() {
-        const ellipsis = document.createElement('span');
-        ellipsis.textContent = '...';
-        ellipsis.classList.add('pagination-ellipsis');
-        pageNumbersContainer.appendChild(ellipsis);
-    }
-
-    function addSelectAllRow() {
-        const tbody = document.querySelector('#dispatch-table tbody');
-        let selectAllRow = document.querySelector('#select-all-row');
-
-        if (selectAllRow) {
-            selectAllRow.remove();
-        }
-
-        selectAllRow = document.createElement('tr');
-        selectAllRow.id = 'select-all-row';
-
-        selectAllRow.innerHTML = `<td></td>
+            selectAllRow.innerHTML = `<td></td>
                                                           <td></td>
                                                           <td></td>
                                                           <td></td>
@@ -429,212 +501,258 @@ document.addEventListener('DOMContentLoaded', function () {
                                                                    </label>
                                                               </p>
                                                            </td>`;
-        tbody.appendChild(selectAllRow);
+            tbody.appendChild(selectAllRow);
 
-        const selectAllCheckboxElem = document.getElementById('select-all-checkbox');
+            const selectAllCheckboxElem = document.getElementById('select-all-checkbox');
 
-        selectAllCheckboxElem.addEventListener('change', function () {
+            selectAllCheckboxElem.addEventListener(
+                'change', function () {
+                    const visibleRows = Array.from(rows).slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
+                    visibleRows.forEach(
+                        row =>
+                        {
+                            const checkbox = row.querySelector('input[type="checkbox"]');
+                            checkbox.checked = selectAllCheckboxElem.checked;
+                        }
+                    );
+                }
+            );
+        }
+
+        function toggleSelectAllCheckbox()
+        {
+            const selectAllCheckbox = document.getElementById('select-all-checkbox');
             const visibleRows = Array.from(rows).slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-            visibleRows.forEach(row => {
-                const checkbox = row.querySelector('input[type="checkbox"]');
-                checkbox.checked = selectAllCheckboxElem.checked;
-            });
-        });
-    }
+            selectAllCheckbox.checked = visibleRows.every(row => row.querySelector('input[type="checkbox"]').checked);
+        }
 
-    function toggleSelectAllCheckbox() {
-        const selectAllCheckbox = document.getElementById('select-all-checkbox');
-        const visibleRows = Array.from(rows).slice((currentPage - 1) * rowsPerPage, currentPage * rowsPerPage);
-        selectAllCheckbox.checked = visibleRows.every(row => row.querySelector('input[type="checkbox"]').checked);
-    }
+        document.querySelectorAll('.dispatch-row input[type="checkbox"]:not(#select-all-checkbox)').forEach(
+            checkbox =>
+            {
+                checkbox.addEventListener('change', toggleSelectAllCheckbox);
+            }
+        );
 
-    document.querySelectorAll('.dispatch-row input[type="checkbox"]:not(#select-all-checkbox)').forEach(checkbox => {
-        checkbox.addEventListener('change', toggleSelectAllCheckbox);
-    });
+        rowsPerPageDropdown.addEventListener(
+            'change', function () {
+                rowsPerPage = parseInt(rowsPerPageDropdown.value);
+                sessionStorage.setItem("rowsCount", String(rowsPerPage));
+                totalPages = Math.ceil(rows.length / rowsPerPage);
+                currentPage = 1;
+                showPage(currentPage);
+            }
+        );
 
-    rowsPerPageDropdown.addEventListener('change', function () {
-        rowsPerPage = parseInt(rowsPerPageDropdown.value);
-        sessionStorage.setItem("rowsCount", String(rowsPerPage));
-        totalPages = Math.ceil(rows.length / rowsPerPage);
-        currentPage = 1;
+        firstButton.addEventListener('click', () => showPage(1));
+        lastButton.addEventListener('click', () => showPage(totalPages));
+        prevButton.addEventListener('click', () => showPage(currentPage - 1));
+        nextButton.addEventListener('click', () => showPage(currentPage + 1));
+
+        window.addEventListener(
+            'resize', function () {
+                totalRows = rows.length;
+                totalPages = Math.ceil(totalRows / rowsPerPage);
+                if (currentPage > totalPages) { currentPage = totalPages;
+                }
+                showPage(currentPage);
+            }
+        );
+
         showPage(currentPage);
-    });
-
-    firstButton.addEventListener('click', () => showPage(1));
-    lastButton.addEventListener('click', () => showPage(totalPages));
-    prevButton.addEventListener('click', () => showPage(currentPage - 1));
-    nextButton.addEventListener('click', () => showPage(currentPage + 1));
-
-    window.addEventListener('resize', function () {
-        totalRows = rows.length;
-        totalPages = Math.ceil(totalRows / rowsPerPage);
-        if (currentPage > totalPages) currentPage = totalPages;
-        showPage(currentPage);
-    });
-
-    showPage(currentPage);
-});
+    }
+);
 
 /**
  * Partie 4: Vue Etudiante
  */
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener(
+    'DOMContentLoaded', function () {
 
-    function getDictCoef() {
-        var jsonString = document.getElementById('dictCoefJson').value;
-        try {
-            return JSON.parse(jsonString);
-        } catch (e) {
-            console.error("Invalid JSON string in dictCoefJson:", e);
-            return {};
-        }
-    }
-
-    function getTeachersForInternship(Internship_identifier) {
-        fetch(window.location.href, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: new URLSearchParams({
-                action: 'TeachersForinternship',
-                Internship_identifier: Internship_identifier,
-                dicoCoef: JSON.stringify(getDictCoef())
-            })
-        })
-            .then(response => {
-                if (!response.ok) {
-                    return response.text().then(errorText => {
-                        console.error('Fetch error response:', errorText);
-                        throw new Error('Network response was not ok');
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                createNewTable(data);
-                createTeacherMarkers(data);
-            })
-            .catch(error => {
-                console.error('Fetch error:', error);
-            });
-    }
-
-
-
-    const tableBody = document.querySelector('#dispatch-table tbody');
-
-    if (tableBody) {
-        let lastTapTime = 0;
-        let tapTimeout;
-
-        ['click', 'touchstart'].forEach(eventType => {
-            tableBody.addEventListener(eventType, function (event) {
-
-                if ((event.target.tagName === 'SPAN' && event.target.dataset.type === 'checkbox') || event.target.tagName === 'INPUT') {
-                    return;
-                }
-
-                clearTimeout(tapTimeout);
-
-                const currentTime = new Date().getTime();
-                const timeSinceLastTap = currentTime - lastTapTime;
-
-                const clickedRow = getClickedRow(event.target);
-                if (!clickedRow) {
-                    return;
-                }
-                const clickedRowIdentifier = clickedRow.getAttribute('data-internship-identifier');
-
-                if (timeSinceLastTap < 300 && timeSinceLastTap > 100) {
-                    const [Internship_identifier, Id_teacher, Internship_address] = clickedRowIdentifier.split('$');
-                    getTeachersForInternship(Internship_identifier);
-
-                    lastTapTime = 0;
-                    event.preventDefault();
-                    return;
-                }
-
-                tapTimeout = setTimeout(function () {
-                    const [Internship_identifier, Id_teacher, Internship_address] = clickedRowIdentifier.split('$');
-
-                    updateMap(Internship_address, Id_teacher);
-                    lastTapTime = 0;
-                }, 300);
-
-                lastTapTime = currentTime;
-                event.preventDefault();
-            });
-        });
-    }
-
-    function getClickedRow(element) {
-        while (element && element.tagName !== 'TR') {
-            element = element.parentElement;
-        }
-        return element;
-    }
-
-    async function createTeacherMarkers(data) {
-        for (const row of data) {
-            const teacherAddresses = getTeacherAddresses(data.id_teacher);
-            if (Array.isArray(teacherAddresses)) {
-                for (const teacher of teacherAddresses) {
-                    const location = await geocodeAddress(teacher.address);
-                    const distance = await calculateDistanceOnly(internshipLocation, location);
-
-                    if (distance < minDistance) {
-                        minDistance = distance;
-                        closestTeacherAddress = location;
-                    }
-                }
-            } else {
-                closestTeacherAddress = await geocodeAddress(teacherAddresses.address);
+        function getDictCoef()
+        {
+            var jsonString = document.getElementById('dictCoefJson').value;
+            try {
+                return JSON.parse(jsonString);
+            } catch (e) {
+                console.error("Invalid JSON string in dictCoefJson:", e);
+                return {};
             }
-            const marker = new ol.Overlay({
-                position: ol.proj.fromLonLat([closestTeacherAddress.lon, closestTeacherAddress.lat]),
-                element: createMarkerElement(data.teacher_name),
-            });
-        }
-    }
-    async function createNewTable(data) {
-        const container = document.querySelector('.dispatch-table-wrapper');
-
-        const existingTable = document.getElementById('student-dispatch-table');
-        const existingHeader = document.getElementById('student-dispatch-header');
-
-        if (existingTable) {
-            existingTable.remove();
-        }
-        if (existingHeader) {
-            existingHeader.remove();
         }
 
-        const header = document.createElement('h3');
-        header.id = 'student-dispatch-header';
-        header.textContent = `Résultat pour ${data[0].student_firstname} ${data[0].student_name}`;
-        header.className = 'center-align flow-text';
-        container.appendChild(header);
+        function getTeachersForInternship(Internship_identifier)
+        {
+            fetch(
+                window.location.href, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams(
+                        {
+                            action: 'TeachersForinternship',
+                            Internship_identifier: Internship_identifier,
+                            dicoCoef: JSON.stringify(getDictCoef())
+                        }
+                    )
+                }
+            )
+                .then(
+                    response =>
+                    {
+                        if (!response.ok) {
+                            return response.text().then(
+                                errorText =>
+                                {
+                                    console.error('Fetch error response:', errorText);
+                                    throw new Error('Network response was not ok');
+                                }
+                            );
+                        }
+                        return response.json();
+                    }
+                )
+                .then(
+                    data =>
+                    {
+                        createNewTable(data);
+                        createTeacherMarkers(data);
+                    }
+                )
+                .catch(
+                    error =>
+                    {
+                        console.error('Fetch error:', error);
+                    }
+                );
+        }
 
 
-        const loadingContainer = document.createElement('div');
-        loadingContainer.className = 'center-align loading-indicator';
-        loadingContainer.innerHTML = `
-        <p style="font-size: 24px;">Chargement en cours, veuillez patienter...</p>
-        <div class="progress">
+
+        const tableBody = document.querySelector('#dispatch-table tbody');
+
+        if (tableBody) {
+            let lastTapTime = 0;
+            let tapTimeout;
+
+            ['click', 'touchstart'].forEach(
+                eventType =>
+                {
+                    tableBody.addEventListener(
+                        eventType, function (event) {
+
+                            if ((event.target.tagName === 'SPAN' && event.target.dataset.type === 'checkbox') || event.target.tagName === 'INPUT') {
+                                return;
+                            }
+
+                            clearTimeout(tapTimeout);
+
+                            const currentTime = new Date().getTime();
+                            const timeSinceLastTap = currentTime - lastTapTime;
+
+                            const clickedRow = getClickedRow(event.target);
+                            if (!clickedRow) {
+                                return;
+                            }
+                            const clickedRowIdentifier = clickedRow.getAttribute('data-internship-identifier');
+
+                            if (timeSinceLastTap < 300 && timeSinceLastTap > 100) {
+                                const [Internship_identifier, Id_teacher, Internship_address] = clickedRowIdentifier.split('$');
+                                getTeachersForInternship(Internship_identifier);
+
+                                lastTapTime = 0;
+                                event.preventDefault();
+                                return;
+                            }
+
+                            tapTimeout = setTimeout(
+                                function () {
+                                    const [Internship_identifier, Id_teacher, Internship_address] = clickedRowIdentifier.split('$');
+
+                                    updateMap(Internship_address, Id_teacher);
+                                    lastTapTime = 0;
+                                }, 300
+                            );
+
+                            lastTapTime = currentTime;
+                            event.preventDefault();
+                        }
+                    );
+                }
+            );
+        }
+
+        function getClickedRow(element)
+        {
+            while (element && element.tagName !== 'TR') {
+                element = element.parentElement;
+            }
+            return element;
+        }
+
+        async function createTeacherMarkers(data)
+        {
+            for (const row of data) {
+                const teacherAddresses = getTeacherAddresses(data.id_teacher);
+                if (Array.isArray(teacherAddresses)) {
+                    for (const teacher of teacherAddresses) {
+                        const location = await geocodeAddress(teacher.address);
+                        const distance = await calculateDistanceOnly(internshipLocation, location);
+
+                        if (distance < minDistance) {
+                            minDistance = distance;
+                            closestTeacherAddress = location;
+                        }
+                    }
+                } else {
+                    closestTeacherAddress = await geocodeAddress(teacherAddresses.address);
+                }
+                const marker = new ol.Overlay(
+                    {
+                        position: ol.proj.fromLonLat([closestTeacherAddress.lon, closestTeacherAddress.lat]),
+                        element: createMarkerElement(data.teacher_name),
+                    }
+                );
+            }
+        }
+        async function createNewTable(data)
+        {
+            const container = document.querySelector('.dispatch-table-wrapper');
+
+            const existingTable = document.getElementById('student-dispatch-table');
+            const existingHeader = document.getElementById('student-dispatch-header');
+
+            if (existingTable) {
+                existingTable.remove();
+            }
+            if (existingHeader) {
+                existingHeader.remove();
+            }
+
+            const header = document.createElement('h3');
+            header.id = 'student-dispatch-header';
+            header.textContent = `Résultat pour ${data[0].student_firstname} ${data[0].student_name}`;
+            header.className = 'center-align flow-text';
+            container.appendChild(header);
+
+
+            const loadingContainer = document.createElement('div');
+            loadingContainer.className = 'center-align loading-indicator';
+            loadingContainer.innerHTML = `
+            <p style="font-size: 24px;">Chargement en cours, veuillez patienter...</p>
+            <div class="progress">
             <div class="indeterminate"></div>
-        </div>`;
-        container.appendChild(loadingContainer);
+            </div>`;
+            container.appendChild(loadingContainer);
 
-        loadingContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            loadingContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-        const newTable = document.createElement('table');
-        newTable.className = 'highlight centered responsive-table';
-        newTable.id = 'student-dispatch-table';
+            const newTable = document.createElement('table');
+            newTable.className = 'highlight centered responsive-table';
+            newTable.id = 'student-dispatch-table';
 
-        const thead = document.createElement('thead');
-        thead.innerHTML = `
-        <tr>
+            const thead = document.createElement('thead');
+            thead.innerHTML = `
+            <tr>
             <th>Enseignant</th>
             <th>Historique</th>
             <th>Position</th>
@@ -642,39 +760,39 @@ document.addEventListener('DOMContentLoaded', function () {
             <th>Entreprise</th>
             <th>Score</th>
             <th>Associer</th>
-        </tr>`;
-        newTable.appendChild(thead);
+            </tr>`;
+            newTable.appendChild(thead);
 
-        const tbody = document.createElement('tbody');
+            const tbody = document.createElement('tbody');
 
-        for (const row of data) {
-            const tr = document.createElement('tr');
-            row.distance = await getDistance(row.internship_identifier, row.id_teacher);
-            row.discipline = await getDisciplines(row.id_teacher);
-            let studentHistory = await getStudentHistory(row.student_number);
+            for (const row of data) {
+                const tr = document.createElement('tr');
+                row.distance = await getDistance(row.internship_identifier, row.id_teacher);
+                row.discipline = await getDisciplines(row.id_teacher);
+                let studentHistory = await getStudentHistory(row.student_number);
 
-            if (studentHistory) {
-                row.date_experience = studentHistory;
-            }
-            else {
-                row.date_experience = '❌';
-            }
+                if (studentHistory) {
+                    row.date_experience = studentHistory;
+                }
+                else {
+                    row.date_experience = '❌';
+                }
 
-            tr.className = 'dispatch-row';
-            tr.dataset.internshipIdentifier = `${row.internship_identifier}$${row.id_teacher}`;
+                tr.className = 'dispatch-row';
+                tr.dataset.internshipIdentifier = `${row.internship_identifier}$${row.id_teacher}`;
 
-            tr.innerHTML = `
-            <td>${row.teacher_firstname} ${row.teacher_name} (${row.id_teacher})</td>
-            <td>${row.date_experience || 'dd/mm/yyyy'}</td>
-            <td>${row.distance} min</td>
-            <td>${row.discipline}</td>
-            <td>${row.company_name}</td>
-            <td>
+                tr.innerHTML = `
+                <td>${row.teacher_firstname} ${row.teacher_name} (${row.id_teacher})</td>
+                <td>${row.date_experience || 'dd/mm/yyyy'}</td>
+                <td>${row.distance} min</td>
+                <td>${row.discipline}</td>
+                <td>${row.company_name}</td>
+                <td>
                 <div class="star-rating" data-tooltip="${row.score}" data-position="top">
                     ${renderStarsJS(row.score)}
                 </div>
-            </td>
-            <td>
+                </td>
+                <td>
                 <p>
                     <label class="center">
                         <input type="checkbox" class="dispatch-checkbox center-align filled-in" name="listTupleAssociate[]" 
@@ -682,52 +800,58 @@ document.addEventListener('DOMContentLoaded', function () {
                         <span data-type="checkbox"></span>
                     </label>
                 </p>
-            </td>`;
+                </td>`;
 
-            tbody.appendChild(tr);
+                tbody.appendChild(tr);
+            }
+
+            newTable.appendChild(tbody);
+            container.appendChild(newTable);
+
+            loadingContainer.remove();
         }
 
-        newTable.appendChild(tbody);
-        container.appendChild(newTable);
+        function renderStarsJS(score)
+        {
+            const fullStars = Math.floor(score);
+            const decimalPart = score - fullStars;
+            const halfStars = Math.abs(decimalPart - 0.5) <= 0.1 ? 1 : 0;
+            const emptyStars = 5 - fullStars - halfStars;
 
-        loadingContainer.remove();
+            let stars = '';
+
+            for (let i = 0; i < fullStars; i++) {
+                stars += '<span class="filled"></span>';
+            }
+
+            if (halfStars) {
+                stars += '<span class="half"></span>';
+            }
+
+            for (let i = 0; i < emptyStars; i++) {
+                stars += '<span class="empty"></span>';
+            }
+
+            return stars;
+        }
+
     }
-
-    function renderStarsJS(score) {
-        const fullStars = Math.floor(score);
-        const decimalPart = score - fullStars;
-        const halfStars = Math.abs(decimalPart - 0.5) <= 0.1 ? 1 : 0;
-        const emptyStars = 5 - fullStars - halfStars;
-
-        let stars = '';
-
-        for (let i = 0; i < fullStars; i++) {
-            stars += '<span class="filled"></span>';
-        }
-
-        if (halfStars) {
-            stars += '<span class="half"></span>';
-        }
-
-        for (let i = 0; i < emptyStars; i++) {
-            stars += '<span class="empty"></span>';
-        }
-
-        return stars;
-    }
-
-});
+);
 
 
-/** Partie 5: map OSM **/
+/**
+ * Partie 5: map OSM 
+**/
 
 let map, routeLayer, companyMarker, teacherMarker;
 
 /**
  * Initialise la carte, centree sur la France
+ *
  * @returns {Promise<void>}
  */
-async function initMap() {
+async function initMap()
+{
     const mapElement = document.getElementById("map");
 
     if (!mapElement) {
@@ -737,40 +861,52 @@ async function initMap() {
     try {
         const franceCenter = ol.proj.fromLonLat([2.337, 46.227]);
 
-        map = new ol.Map({
-            target: mapElement,
-            layers: [
-                new ol.layer.Tile({
-                    source: new ol.source.OSM(),
-                }),
+        map = new ol.Map(
+            {
+                target: mapElement,
+                layers: [
+                new ol.layer.Tile(
+                    {
+                        source: new ol.source.OSM(),
+                    }
+                ),
             ],
-            view: new ol.View({
-                center: franceCenter,
-                zoom: 5,
-            }),
-        });
+            view: new ol.View(
+                {
+                    center: franceCenter,
+                    zoom: 5,
+                }
+            ),
+            }
+        );
     } catch (error) {
-        return;
     }
 }
 
 /**
  * Obtenir les différentes adresses d'un professeur
+ *
  * @param Id_teacher Identifiant du professeur
+ *
  * @returns {Promise<Array<string>>}
  */
-async function getTeacherAddresses(Id_teacher) {
+async function getTeacherAddresses(Id_teacher)
+{
     try {
-        const response = await fetch(window.location.href, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: new URLSearchParams({
-                action: "getTeacherAddresses",
-                Id_teacher: Id_teacher,
-            }),
-        });
+        const response = await fetch(
+            window.location.href, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams(
+                    {
+                        action: "getTeacherAddresses",
+                        Id_teacher: Id_teacher,
+                    }
+                ),
+            }
+        );
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -787,23 +923,30 @@ async function getTeacherAddresses(Id_teacher) {
 
 /**
  * Requête au serveur pour avoir la distance minimale entre un prof et un stage
+ *
  * @param Internship_identifier
  * @param Id_teacher
+ *
  * @returns {Promise<number|*[]>}
  */
-async function getDistance(Internship_identifier, Id_teacher) {
+async function getDistance(Internship_identifier, Id_teacher)
+{
     try {
-        const response = await fetch(window.location.href, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: new URLSearchParams({
-                action: "getDistance",
-                Internship_identifier: Internship_identifier,
-                Id_teacher: Id_teacher
-            }),
-        });
+        const response = await fetch(
+            window.location.href, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams(
+                    {
+                        action: "getDistance",
+                        Internship_identifier: Internship_identifier,
+                        Id_teacher: Id_teacher
+                    }
+                ),
+            }
+        );
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -821,21 +964,28 @@ async function getDistance(Internship_identifier, Id_teacher) {
 
 /**
  * Requête au serveur pour avoir les disciplines d'un professeur
+ *
  * @param Id_teacher
+ *
  * @returns {Promise<number|*[]>}
  */
-async function getDisciplines(Id_teacher) {
+async function getDisciplines(Id_teacher)
+{
     try {
-        const response = await fetch(window.location.href, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: new URLSearchParams({
-                action: "getDisciplines",
-                Id_teacher: Id_teacher
-            }),
-        });
+        const response = await fetch(
+            window.location.href, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams(
+                    {
+                        action: "getDisciplines",
+                        Id_teacher: Id_teacher
+                    }
+                ),
+            }
+        );
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -850,18 +1000,23 @@ async function getDisciplines(Id_teacher) {
     }
 }
 
-async function getStudentHistory(Student_number) {
+async function getStudentHistory(Student_number)
+{
     try {
-        const response = await fetch(window.location.href, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-            body: new URLSearchParams({
-                action: "getHistory",
-                Student_number: Student_number
-            }),
-        });
+        const response = await fetch(
+            window.location.href, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams(
+                    {
+                        action: "getHistory",
+                        Student_number: Student_number
+                    }
+                ),
+            }
+        );
 
         if (!response.ok) {
             const errorText = await response.text();
@@ -878,10 +1033,12 @@ async function getStudentHistory(Student_number) {
 
 /**
  * Mise à jour de la carte avec deux nouvelles adresses
+ *
  * @param {string} InternshipAddress Première adresse
  * @param {string} Id_teacher Deuxième adresse
  */
-async function updateMap(InternshipAddress, Id_teacher) {
+async function updateMap(InternshipAddress, Id_teacher)
+{
     if (!map) {
         console.error("La carte n'est pas initialisée. Appelez initMap d'abord.");
         return;
@@ -919,22 +1076,28 @@ async function updateMap(InternshipAddress, Id_teacher) {
     }
 }
 
-function centerMap(location1, location2) {
+function centerMap(location1, location2)
+{
     const view = map.getView();
     view.setCenter(
-        ol.proj.fromLonLat([
+        ol.proj.fromLonLat(
+            [
             (location1.lon + location2.lon) / 2,
             (location1.lat + location2.lat) / 2,
-        ])
+            ]
+        )
     );
 }
 
 /**
  * Géocode une adresse
+ *
  * @param {string} address Adresse à géocoder
+ *
  * @returns {Promise<Object>} Localisation géocodée { lat, lon }
  */
-async function geocodeAddress(address) {
+async function geocodeAddress(address)
+{
     const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
         address
     )}&format=json&limit=1`;
@@ -954,7 +1117,8 @@ async function geocodeAddress(address) {
     }
 }
 
-async function calculateDistanceOnly(origin, destination) {
+async function calculateDistanceOnly(origin, destination)
+{
     const url = `https://router.project-osrm.org/route/v1/driving/${origin.lon},${origin.lat};${destination.lon},${destination.lat}?overview=false`;
 
     const response = await fetch(url);
@@ -968,7 +1132,8 @@ async function calculateDistanceOnly(origin, destination) {
     }
 }
 
-async function displayRoute(origin, destination) {
+async function displayRoute(origin, destination)
+{
     const url = `https://router.project-osrm.org/route/v1/driving/${origin.lon},${origin.lat};${destination.lon},${destination.lat}?overview=full&geometries=geojson`;
 
     try {
@@ -977,30 +1142,43 @@ async function displayRoute(origin, destination) {
 
         if (data.routes && data.routes.length > 0) {
             const route = data.routes[0];
-            const routeCoords = route.geometry.coordinates.map((coord) =>
+            const routeCoords = route.geometry.coordinates.map(
+                (coord) =>
                 ol.proj.fromLonLat(coord)
             );
 
             if (!routeLayer) {
-                routeLayer = new ol.layer.Vector({
-                    source: new ol.source.Vector(),
-                    style: new ol.style.Style({
-                        stroke: new ol.style.Stroke({
-                            color: "red",
-                            width: 3,
-                        }),
-                    }),
-                });
+                routeLayer = new ol.layer.Vector(
+                    {
+                        source: new ol.source.Vector(),
+                        style: new ol.style.Style(
+                            {
+                                stroke: new ol.style.Stroke(
+                                    {
+                                        color: "red",
+                                        width: 3,
+                                    }
+                                ),
+                            }
+                        ),
+                    }
+                );
                 map.addLayer(routeLayer);
             }
 
-            const routeFeature = new ol.Feature({
-                geometry: new ol.geom.LineString(routeCoords),
-            });
+            const routeFeature = new ol.Feature(
+                {
+                    geometry: new ol.geom.LineString(routeCoords),
+                }
+            );
 
-            routeLayer.setSource(new ol.source.Vector({
-                features: [routeFeature],
-            }));
+            routeLayer.setSource(
+                new ol.source.Vector(
+                    {
+                        features: [routeFeature],
+                    }
+                )
+            );
 
             map.render();
         }
@@ -1009,17 +1187,20 @@ async function displayRoute(origin, destination) {
     }
 }
 
-function placeMarker(location, label, isCompany) {
+function placeMarker(location, label, isCompany)
+{
     if (isCompany && companyMarker) {
         map.removeOverlay(companyMarker);
     } else if (!isCompany && teacherMarker) {
         map.removeOverlay(teacherMarker);
     }
 
-    const marker = new ol.Overlay({
-        position: ol.proj.fromLonLat([location.lon, location.lat]),
-        element: createMarkerElement(label),
-    });
+    const marker = new ol.Overlay(
+        {
+            position: ol.proj.fromLonLat([location.lon, location.lat]),
+            element: createMarkerElement(label),
+        }
+    );
 
     if (isCompany) {
         companyMarker = marker;
@@ -1033,10 +1214,13 @@ function placeMarker(location, label, isCompany) {
 
 /**
  * Crée un élément de marqueur
+ *
  * @param {string} label Étiquette du marqueur
+ *
  * @returns {HTMLElement} Élément du marqueur
  */
-function createMarkerElement(label) {
+function createMarkerElement(label)
+{
     const marker = document.createElement("div");
     marker.className = "marker";
     marker.textContent = label;
