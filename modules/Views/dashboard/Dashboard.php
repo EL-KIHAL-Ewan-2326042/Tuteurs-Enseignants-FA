@@ -156,8 +156,8 @@ readonly class Dashboard
                     <form action="/dashboard" method="POST">
                         <div>
                             <select name="export_list" required>
-                                <option value="" disabled selected>
-                                    Choisissez la liste à exporter
+                                <option value="" disabled
+                                        selected>Choisissez la liste à exporter
                                 </option>
                                 <option value="student">Etudiants</option>
                                 <option value="teacher">Professeurs</option>

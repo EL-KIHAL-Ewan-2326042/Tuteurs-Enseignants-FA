@@ -549,8 +549,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 event.preventDefault();
             });
         });
-    } else {
-        console.error('Table with ID "dispatch-table" not found.');
     }
 
     function getClickedRow(element) {
