@@ -124,7 +124,7 @@ class Teacher extends Model
 
     /**
      * Recherche des termes correspondants dans la base de données
-     * en fonction des paramètres fournis dans le POST.
+     * en fonction des paramètres fournis dans le POST
      *
      * @return array|false Renvoie un tableau associatif contenant
      * les résultats de la recherche, false sinon
