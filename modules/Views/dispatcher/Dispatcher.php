@@ -316,11 +316,15 @@ readonly class Dispatcher
                                 $dictCoef
                             )[0];
                         foreach ($resultDispatchList as $resultDispatch):
+                            $internship = $resultDispatch['internship_identifier'];
+                            $id_teacher = $resultDispatch['id_teacher'];
+                            $address = $resultDispatch['address'];
                             ?>
-                            <tr class="dispatch-row" data-internship-identifier='
-                                <?php echo $resultDispatch['internship_identifier']
-                                . '$' . $resultDispatch['id_teacher'] . '$' .
-                                $resultDispatch['address']; ?>'>
+                            <tr class="dispatch-row"
+                                data-internship-identifier=
+                                "<?php
+                                echo $internship . '$'. $id_teacher . '$' . $address;
+                                ?>">
                                 <td>
                                     <?php echo $resultDispatch['teacher_firstname'] .
                                     ' ' . $resultDispatch['teacher_name'] . ' (' .
