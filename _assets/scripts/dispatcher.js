@@ -45,8 +45,8 @@ document.addEventListener(
 /**
  * Prendre les requetes avec une requête AJAX
  *
- * @param query The search query.
- * @param searchType
+ * @param query La requête
+ * @param searchType Le type de recheche
  */
 function fetchResults(query, searchType)
 {

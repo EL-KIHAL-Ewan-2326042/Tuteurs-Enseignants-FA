@@ -18,8 +18,8 @@ document.addEventListener(
             }
         );
 
-        var elems = document.querySelectorAll('select');
-        var instances = M.FormSelect.init(elems);
+        let elems = document.querySelectorAll('select');
+        let instances = M.FormSelect.init(elems);
 
         const searchInput = document.getElementById('search');
         const searchResults = document.getElementById('searchResults');
@@ -83,9 +83,10 @@ function fetchResults(query, searchType)
  * Selon les resultats renvoyés par la BD, on affiche le num, nom et prenom etudiant
  * On entour autour d'une balise a, et dès qu'elle est enclenché, on choisi l'etudiant
  *
- * @param data
+ * @param data résultats renvoyés par la BD
  */
-function displayResults(data) {
+function displayResults(data)
+{
     if (searchResults) {
         searchResults.innerHTML = '';
     }
@@ -98,35 +99,43 @@ function displayResults(data) {
     }
 
     const ul = document.createElement('ul');
-    data.forEach(student => {
-        const li = document.createElement('li');
-        const a = document.createElement('a');
-        a.href = '#';
-        if (student.company_name) {
-            a.textContent = `${student.company_name}: ${student.student_number} - ${student.student_name} ${student.student_firstname}`;
+    data.forEach(
+        student =>
+        {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = '#';
+            if (student.company_name) {
+                a.textContent = `${student.company_name}: ${student.student_number} - ${student.student_name} ${student.student_firstname}`;
+            }
+            else {
+                a.textContent = `${student.student_number} - ${student.student_name} ${student.student_firstname}`;
+            }
+            a.classList.add('left-align');
+            a.addEventListener(
+                'click', function (event)
+                {
+                    event.preventDefault();
+                    selectStudent(student.student_number, student.student_name, student.student_firstname);
+                }
+            );
+            li.appendChild(a);
+            ul.appendChild(li);
         }
-        else {
-            a.textContent = `${student.student_number} - ${student.student_name} ${student.student_firstname}`;
-        }
-        a.classList.add('left-align');
-        a.addEventListener('click', function(event) {
-            event.preventDefault();
-            selectStudent(student.student_number, student.student_name, student.student_firstname);
-        });
-        li.appendChild(a);
-        ul.appendChild(li);
-    });
+    );
     searchResults.appendChild(ul);
 }
 
 /**
  * Pour l'étudiant choisie, on crée un form discret et on l'envoie en tant que requête POST
  * Avec les informations données en paramètre
- * @param studentId
- * @param studentFirstName
- * @param studentLastName
+ *
+ * @param studentId        Numéro de l'étudiant
+ * @param studentFirstName Prénom de l'étudiant
+ * @param studentLastName  Nom de l'étudiant
  */
-function selectStudent(studentId, studentFirstName, studentLastName) {
+function selectStudent(studentId, studentFirstName, studentLastName)
+{
     const form = document.createElement('form');
     form.method = 'POST';
     form.action = window.location.href;
@@ -167,9 +176,11 @@ function selectStudent(studentId, studentFirstName, studentLastName) {
 
 /**
  * Initialise la carte en fonction des adresses du professeur et de l'entreprise
+ *
  * @returns {Promise<void>}
  */
-async function initMap() {
+async function initMap()
+{
     const mapElement = document.getElementById("map");
 
     if (!mapElement) {
@@ -185,14 +196,17 @@ async function initMap() {
         const companyLocation = await geocodeAddress(companyAddress);
         const teacherLocation = await geocodeAddress(teacherAddress);
 
-        const map = new ol.Map({
+        const map = new ol.Map(
+        {
             target: mapElement,
             layers: [
-                new ol.layer.Tile({
+                new ol.layer.Tile(
+                {
                     source: new ol.source.OSM(),
                 }),
             ],
-            view: new ol.View({
+            view: new ol.View(
+            {
                 center: ol.proj.fromLonLat([
                     (companyLocation.lon + teacherLocation.lon) / 2,
                     (companyLocation.lat + teacherLocation.lat) / 2,
@@ -201,11 +215,13 @@ async function initMap() {
             }),
         });
 
-        const companyMarker = new ol.Overlay({
+        const companyMarker = new ol.Overlay(
+        {
             position: ol.proj.fromLonLat([companyLocation.lon, companyLocation.lat]),
             element: createMarkerElement("Entreprise"),
         });
-        const teacherMarker = new ol.Overlay({
+        const teacherMarker = new ol.Overlay(
+        {
             position: ol.proj.fromLonLat([teacherLocation.lon, teacherLocation.lat]),
             element: createMarkerElement("Vous"),
         });
@@ -221,10 +237,13 @@ async function initMap() {
 
 /**
  * Géocode une adresse
+ *
  * @param {string} address Adresse à géocoder
+ *
  * @returns {Promise<Object>} Localisation géocodée { lat, lon }
  */
-async function geocodeAddress(address) {
+async function geocodeAddress(address)
+{
     const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
         address
     )}&format=json&limit=1`;
@@ -246,6 +265,7 @@ async function geocodeAddress(address) {
 
 /**
  * Calcule et affiche la route entre deux points
+ *
  * @param {Object} origin Coordonnées de l'origine { lat, lon }
  * @param {Object} destination Coordonnées de la destination { lat, lon }
  * @param {Object} map Instance de la carte OpenLayers
