@@ -497,6 +497,7 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then(data => {
                 createNewTable(data);
+                createTeacherMarkers(data);
             })
             .catch(error => {
                 console.error('Fetch error:', error);
@@ -558,6 +559,28 @@ document.addEventListener('DOMContentLoaded', function () {
         return element;
     }
 
+    async function createTeacherMarkers(data) {
+        for (const row of data) {
+            const teacherAddresses = getTeacherAddresses(data.id_teacher);
+            if (Array.isArray(teacherAddresses)) {
+                for (const teacher of teacherAddresses) {
+                    const location = await geocodeAddress(teacher.address);
+                    const distance = await calculateDistanceOnly(internshipLocation, location);
+
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        closestTeacherAddress = location;
+                    }
+                }
+            } else {
+                closestTeacherAddress = await geocodeAddress(teacherAddresses.address);
+            }
+            const marker = new ol.Overlay({
+                position: ol.proj.fromLonLat([closestTeacherAddress.lon, closestTeacherAddress.lat]),
+                element: createMarkerElement(data.teacher_name),
+            });
+        }
+    }
     async function createNewTable(data) {
         const container = document.querySelector('.dispatch-table-wrapper');
 
@@ -707,7 +730,7 @@ async function initMap() {
             ],
             view: new ol.View({
                 center: franceCenter,
-                zoom: 6,
+                zoom: 5,
             }),
         });
     } catch (error) {
