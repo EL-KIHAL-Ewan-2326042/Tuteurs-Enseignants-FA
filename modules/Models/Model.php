@@ -146,13 +146,17 @@ class Model
     }
 
     /**
+     * Calcule les scores de pertinence entre chaque enseignant
+     * et stage/alternance passés en paramètre
      *
+     * @param array $teacher    Tableau contenant l'identifiant de l'enseignant
+     * @param array $dictCoef   Tableau contenant les coefficients associés à chaque
+     *                          critère
+     * @param array $internship Tableau contenant le stage/alternance
      *
-     * @param array $teacher
-     * @param array $dictCoef
-     * @param array $internship
-     *
-     * @return array|array[]
+     * @return array|array[] Renvoie un tableau contenant toutes les informations des
+     * associations entre l'enseignant et le stage/alternance
+     * ainsi que le score associé
      */
     public function calculateRelevanceTeacherStudentsAssociate(
         array $teacher,
