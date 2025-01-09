@@ -1,27 +1,75 @@
 <?php
+/**
+ * Fichier contenant le modèle associé aux informations des stages/alternances
+ *
+ * PHP version 8.3
+ *
+ * @category Model
+ * @package  TutorMap/modules/Models
+ *
+ * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
+ * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
+ * @author Kerbadou Islem <islem.kerbadou@etu.univ-amu.fr>
+ * @author Pellet Casimir <casimir.pellet@etu.univ-amu.fr>
+ *
+ * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
+ * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
+ */
 
 namespace Blog\Models;
 
-use Exception;
 use Includes\Database;
 use PDO;
 use PDOException;
 
-class Internship extends Model {
+/**
+ * Classe gérant toutes les fonctionnalités du site associées
+ * aux informations des stages/alternances. Elle hérite de la classe 'Model'
+ *
+ * PHP version 8.3
+ *
+ * @category Model
+ * @package  TutorMap/modules/Models
+ *
+ * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
+ * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
+ * @author Kerbadou Islem <islem.kerbadou@etu.univ-amu.fr>
+ * @author Pellet Casimir <casimir.pellet@etu.univ-amu.fr>
+ *
+ * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
+ * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
+ */
+class Internship extends Model
+{
     private Database $db;
 
-    public function __construct(Database $db){
+    /**
+     * Initialise les attributs passés en paramètre
+     *
+     * @param Database $db Instance de la classe Database
+     *                     servant de lien avec la base de données
+     */
+    public function __construct(Database $db)
+    {
         parent::__construct($db);
         $this->db = $db;
     }
 
     /**
-     * Renvoie un tableau contenant les informations de chaque tutorat terminé de l'élève passé en paramètre
-     * @param string $student le numéro de l'étudiant dont on récupère les informations
-     * @return false|array tableau contenant, pour chaque tutorat, le numéro d'enseignant du tuteur, le numéro de l'élève et les dates, false sinon
+     * Renvoie un tableau contenant les informations de
+     * chaque tutorat terminé de l'élève passé en paramètre
+     *
+     * @param string $student le numéro de l'étudiant dont on
+     *                        récupère les informations
+     *
+     * @return false|array tableau contenant, pour chaque tutorat,
+     * le numéro d'enseignant du tuteur, le numéro de l'élève et les dates,
+     * false sinon
      */
-    public function getInternships(string $student): false|array {
-        $query = 'SELECT id_teacher, student_number, Start_date_internship, End_date_internship
+    public function getInternships(string $student): false|array
+    {
+        $query = 'SELECT id_teacher, student_number, 
+                    Start_date_internship, End_date_internship
                     FROM internship
                     WHERE student_number = :student
                     AND end_date_internship < CURRENT_DATE
@@ -34,16 +82,26 @@ class Internship extends Model {
     }
 
     /**
-     * Renvoie le nombre de fois où l'enseignant passé en paramètre a été tuteur dans le tableau passé en paramètre
-     * @param array $internshipStudent tableau renvoyé par la méthode 'getInternships()'
-     * @param string $teacher numéro de l'enseignant
-     * @param string $year dernière année durant laquelle l'enseignant a été tuteur
-     * @return int nombre de fois où l'enseignant connecté a été tuteur dans le tablau passé en paramètre
+     * Renvoie le nombre de fois où l'enseignant passé
+     * en paramètre a été tuteur dans le tableau passé en paramètre
+     *
+     * @param array  $internshipStudent Tableau renvoyé par la méthode
+     *                                  'getInternships()'
+     * @param string $teacher           Numéro de l'enseignant
+     * @param string $year              Dernière année durant laquelle
+     *                                  l'enseignant a été tuteur
+     *
+     * @return int nombre de fois où l'enseignant connecté a été tuteur
+     * dans le tablau passé en paramètre
      */
-    public function getInternshipTeacher(array $internshipStudent, string $teacher, string &$year): int {
+    public function getInternshipTeacher(
+        array $internshipStudent,
+        string $teacher,
+        string &$year
+    ): int {
         $internshipTeacher = 0;
-        foreach($internshipStudent as $row) {
-            if($row['id_teacher'] == $teacher) {
+        foreach ($internshipStudent as $row) {
+            if ($row['id_teacher'] == $teacher) {
                 ++$internshipTeacher;
                 if ($internshipTeacher == 1) {
                     $year = substr($row['start_date_internship'], 0, 4);
@@ -54,14 +112,24 @@ class Internship extends Model {
     }
 
     /**
-     * Récupère les informations relatives aux stages et alternances à venir ou en cours dont l'enseignant passé en paramètre est le tuteur
-     * @param string $teacher numéro de l'enseignant
-     * @return array tableau (pouvant être vide s'il n'y a aucun résultat ou qu'il y a eu une erreur) contenant le nom de l'entreprise, son adresse, le sujet du stage, son type, le nom et prénom de l'étudiant, sa formation et son groupe
+     * Récupère les informations relatives aux stages et alternances
+     * à venir ou en cours dont l'enseignant passé en paramètre est le tuteur
+     *
+     * @param string $teacher Numéro de l'enseignant
+     *
+     * @return array Renvoie un tableau (pouvant être vide s'il n'y a aucun résultat
+     * ou qu'il y a eu une erreur) contenant le nom de l'entreprise, son adresse, le
+     * sujet du stage, son type, le nom et prénom de l'étudiant,
+     * sa formation et son groupe
      */
-    public function getInterns(string $teacher): array {
-        $query = 'SELECT company_name, internship_subject, address, student_name, student_firstname, type, formation, class_group, internship.student_number, internship_identifier, id_teacher
+    public function getInterns(string $teacher): array
+    {
+        $query = 'SELECT company_name, internship_subject, address, student_name, 
+                    student_firstname, type, formation, class_group, 
+                    internship.student_number, internship_identifier, id_teacher
                     FROM internship
-                    JOIN student ON internship.student_number = student.student_number
+                    JOIN student 
+                        ON internship.student_number = student.student_number
                     WHERE id_teacher = :teacher
                     AND end_date_internship > CURRENT_DATE';
         $stmt = $this->db->getConn()->prepare($query);
@@ -69,35 +137,57 @@ class Internship extends Model {
         $stmt->execute();
         $studentsList = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        if (!$studentsList) return array();
+        if (!$studentsList) {
+            return array();
+        }
 
-        foreach($studentsList as &$row) {
+        foreach ($studentsList as &$row) {
             // le nombre de stages complétés par l'étudiant
             $internships = $this->getInternships($row['student_number']);
 
-            // l'année durant laquelle le dernier stage/alternance de l'étudiant a eu lieu avec l'enseignant comme tuteur
+            // l'année durant laquelle le dernier stage/alternance
+            // de l'étudiant a eu lieu avec l'enseignant comme tuteur
             $row['year'] = "";
 
             // le nombre de fois où l'enseignant a été le tuteur de l'étudiant
-            $row['internshipTeacher'] = $internships ? $this->getInternshipTeacher($internships, $teacher, $row['year']) : 0;
+            $row['internshipTeacher'] = $internships ? $this->getInternshipTeacher(
+                $internships,
+                $teacher,
+                $row['year']
+            ) : 0;
 
-            // durée en minute séparant l'enseignant de l'adresse de l'entreprise où l'étudiant effectue son stage
-            $row['duration'] = $this->getDistance($row['internship_identifier'], $teacher, isset($row['id_teacher']));
+            // durée en minute séparant l'enseignant de l'adresse
+            // de l'entreprise où l'étudiant effectue son stage
+            $row['duration'] = $this->getDistance(
+                $row['internship_identifier'],
+                $teacher,
+                isset($row['id_teacher'])
+            );
         }
 
         return $studentsList;
     }
 
     /**
-     * Calcul de distance entre un stage et un professeur
-     * @param string $internship_identifier l'identifiant du stage
-     * @param string $id_teacher l'identifiant du professeur
-     * @param bool $bound true si un enseignant est déjà associé au stage, false sinon
+     * Calcule la distance entre un stage et un enseignant
+     *
+     * @param string $internship_identifier L'identifiant du stage
+     * @param string $id_teacher            L'identifiant du professeur
+     * @param bool   $bound                 True si un enseignant est déjà associé
+     *                                      au stage, false sinon
+     *
      * @return int distance en minute entre les deux
      */
-    public function getDistance(string $internship_identifier, string $id_teacher, bool $bound): int {
+    public function getDistance(
+        string $internship_identifier,
+        string $id_teacher,
+        bool $bound
+    ): int {
 
-        $query = 'SELECT * from Distance WHERE internship_identifier = :idInternship AND id_teacher = :idTeacher';
+        $query = 'SELECT * 
+                    FROM Distance 
+                    internship_identifier = :idInternship 
+                    AND id_teacher = :idTeacher';
         $stmt0 = $this->db->getConn()->prepare($query);
         $stmt0->bindParam(':idInternship', $internship_identifier);
         $stmt0->bindParam(':idTeacher', $id_teacher);
@@ -108,7 +198,9 @@ class Internship extends Model {
             return $minDuration[0]['distance'];
         }
 
-        $query = 'SELECT Address FROM Internship WHERE internship_identifier = :internship_identifier';
+        $query = 'SELECT Address 
+                    FROM Internship 
+                    WHERE internship_identifier = :internship_identifier';
         $stmt1 = $this->db->getConn()->prepare($query);
         $stmt1->bindParam(':internship_identifier', $internship_identifier);
         $stmt1->execute();
@@ -144,10 +236,11 @@ class Internship extends Model {
         }
 
         if (!$bound) {
-            $query = 'INSERT INTO Distance (id_teacher, internship_identifier, distance)
-                  VALUES (:id_teacher, :id_internship, :distance)
-                  ON CONFLICT (id_teacher, internship_identifier)
-                  DO UPDATE SET distance = EXCLUDED.distance;';
+            $query =
+                'INSERT INTO Distance (id_teacher, internship_identifier, distance)
+                 VALUES (:id_teacher, :id_internship, :distance)
+                 ON CONFLICT (id_teacher, internship_identifier)
+                 DO UPDATE SET distance = EXCLUDED.distance;';
 
             $stmt3 = $this->db->getConn()->prepare($query);
             $stmt3->bindParam(':id_teacher', $id_teacher);
@@ -160,28 +253,33 @@ class Internship extends Model {
     }
 
     /**
-     * @param array $interns
-     * @param $internship
-     * @param $alternance
+     * @param  array $interns
+     * @param  $internship
+     * @param  $alternance
      * @return void
      */
-    public function getCountInternsPerType(array $interns, &$internship, &$alternance): void {
+    public function getCountInternsPerType(array $interns, &$internship, &$alternance): void
+    {
         $internship = 0;
         $alternance = 0;
-        if (empty($interns)) return;
+        if (empty($interns)) { return;
+        }
 
         foreach ($interns as $intern) {
-            if (strtolower($intern['type']) == 'internship') ++$internship;
-            if (strtolower($intern['type']) == 'alternance') ++$alternance;
+            if (strtolower($intern['type']) == 'internship') { ++$internship;
+            }
+            if (strtolower($intern['type']) == 'alternance') { ++$alternance;
+            }
         }
     }
 
     /**
      * Calcule la pertinence des stages pour un professeur et des stages en fonction de plusieurs critères de pondération.
      *
-     * @param Department $departmentModel
-     * @param array $teacher
-     * @param array $dictCoef Tableau associatif des critères de calcul et leurs coefficients
+     * @param  Department $departmentModel
+     * @param  array      $teacher
+     * @param  array      $dictCoef        Tableau associatif des critères de calcul et
+     *                                     leurs coefficients
      * @return array|array[] Tableau d'associations ('id_teacher', 'internship_identifier', 'score' et type')
      */
     public function RelevanceTeacher(Department $departmentModel, Teacher $teacherModel, array $teacher, array $dictCoef): array
@@ -193,7 +291,7 @@ class Internship extends Model {
         foreach($departments as $listDepTeacher) {
             foreach($listDepTeacher as $department) {
                 $newList = $departmentModel->getInternshipsPerDepartment($department);
-                if ($newList)  {
+                if ($newList) {
                     $internshipList = array_merge($internshipList, $newList);
                 }
             }
@@ -269,11 +367,13 @@ class Internship extends Model {
 
     /**
      * Renvoie un score associé à la pertinence entre le sujet du stage et les disciplines enseignées par le professeur, tous deux passés en paramètre
-     * @param string $internshipId numéro du stage
-     * @param string $identifier identifiant de l'enseignant
+     *
+     * @param  string $internshipId numéro du stage
+     * @param  string $identifier   identifiant de l'enseignant
      * @return float score associé à la pertinence entre le sujet de stage et les disciplines enseignées par le professeur connecté
      */
-    public function scoreDiscipSubject(string $internshipId, string $identifier): float {
+    public function scoreDiscipSubject(string $internshipId, string $identifier): float
+    {
         $pdo = $this->db;
 
         // on récupère les mots-clés relatifs au sujet du stage
@@ -286,7 +386,8 @@ class Internship extends Model {
         $result = $stmt1->fetch(PDO::FETCH_ASSOC);
 
         // si on n'a trouvé aucun mot-clé, alors on renvoie 0
-        if (!$result) return 0;
+        if (!$result) { return 0;
+        }
         $searchTerm1 = $result['keywords'];
 
         $searchTerm1 = trim($searchTerm1);
@@ -301,12 +402,14 @@ class Internship extends Model {
         $result = $stmt2->fetchAll(PDO::FETCH_ASSOC);
 
         // si on n'a trouvé aucune discipline, alors on renvoie 0
-        if (!$result) return 0;
+        if (!$result) { return 0;
+        }
         $searchTerm2 = "";
 
         for($i = 0; $i < count($result); ++$i) {
             $searchTerm2 .= $result[$i]['discipline_name'];
-            if($i < count($result) - 1) $searchTerm2 .= ' ';
+            if($i < count($result) - 1) { $searchTerm2 .= ' ';
+            }
         }
 
         $searchTerm2 = trim($searchTerm2);
@@ -331,27 +434,31 @@ class Internship extends Model {
             $subj = explode(' & ', $subject);
             foreach ($disciplines as $discipline) {
                 // si un mot-clé et une discipline sont égaux, alors on rajoute 1/[nombre de mots-clés]
-                if ($subject == $discipline) $score += 1/count($internship);
-                else {  // sinon si un mot dans le mot-clé correspond à un mot dans la discipline, alors on rajoute 1/([nombre de mots-clés] * [nombre de mot dans le mot-clé])
+                if ($subject == $discipline) { $score += 1/count($internship);
+                } else {  // sinon si un mot dans le mot-clé correspond à un mot dans la discipline, alors on rajoute 1/([nombre de mots-clés] * [nombre de mot dans le mot-clé])
                     foreach ($subj as $sub) {
                         foreach (explode(' & ', $discipline) as $discip) {
-                            if ($discip == $sub) $score += 1/(count($internship)*count($subj));
+                            if ($discip == $sub) { $score += 1/(count($internship)*count($subj));
+                            }
                         }
                     }
                     // si le score est égal à 1, alors le maximum a été atteint, aucun point ne sera rajouté au score donc on sort de la boucle
-                } if ($score === 1) break;
-            } if ($score === 1) break;
+                } if ($score === 1) { break;
+                }
+            } if ($score === 1) { break;
+            }
         }
 
         return $score;
     }
 
     /**
-     * @param string $internship_identifier
-     * @param string $id_teacher
+     * @param  string $internship_identifier
+     * @param  string $id_teacher
      * @return bool
      */
-    public function isRequested(string $internship_identifier, string $id_teacher): bool {
+    public function isRequested(string $internship_identifier, string $id_teacher): bool
+    {
 
         $query = "SELECT * FROM is_requested WHERE internship_identifier = :internship_identifier AND id_teacher = :id_teacher";
         $stmt = $this->db->getConn()->prepare($query);
@@ -360,13 +467,15 @@ class Internship extends Model {
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$result) return 0;
+        if (!$result) { return 0;
+        }
         return 1;
     }
 
     /**
      * Permet de trouver la meilleure combinaison possible tuteur-stage et le renvoie sous forme de tableau
-     * @param array $dicoCoef dictionnaire cle->nom_critere et valeur->coef
+     *
+     * @param  array $dicoCoef dictionnaire cle->nom_critere et valeur->coef
      * @return array|array[] resultat final sous forme de matrice
      */
     public function dispatcher(Department $departmentModel, Teacher $teacherModel, array $dicoCoef): array
@@ -420,22 +529,25 @@ class Internship extends Model {
         while (!empty($listStart)) {
             usort($listStart, fn($a, $b) => $b['score'] <=> $a['score']);
             $topCandidate = $listStart[0];
-            if ($assignedCounts[$topCandidate['id_teacher']] < $listTeacherMax[$topCandidate['id_teacher']] &&
-                !in_array($topCandidate['internship_identifier'], $listEleveFinal) && $topCandidate['type'] === 'Internship') {
-                if ($topCandidate['type'] === 'Internship' && $listTeacherMax[$topCandidate['id_teacher']] - $assignedCounts[$topCandidate['id_teacher']] > 1)  {
+            if ($assignedCounts[$topCandidate['id_teacher']] < $listTeacherMax[$topCandidate['id_teacher']] 
+                && !in_array($topCandidate['internship_identifier'], $listEleveFinal) && $topCandidate['type'] === 'Internship'
+            ) {
+                if ($topCandidate['type'] === 'Internship' && $listTeacherMax[$topCandidate['id_teacher']] - $assignedCounts[$topCandidate['id_teacher']] > 1) {
                     $listFinal[] = $topCandidate;
                     $listEleveFinal[] = $topCandidate['internship_identifier'];
                     $assignedCounts[$topCandidate['id_teacher']] += 1;
                 }
-                elseif ($topCandidate['type'] === 'alternance' && $listTeacherMax[$topCandidate['id_teacher']] - $assignedCounts[$topCandidate['id_teacher']] > 2){
+                elseif ($topCandidate['type'] === 'alternance' && $listTeacherMax[$topCandidate['id_teacher']] - $assignedCounts[$topCandidate['id_teacher']] > 2) {
                     $listFinal[] = $topCandidate;
                     $listEleveFinal[] = $topCandidate['internship_identifier'];
                     $assignedCounts[$topCandidate['id_teacher']] += 2;
                 }
-                else array_shift($listStart);
+                else { array_shift($listStart);
+                }
             }
-            else
+            else {
                 array_shift($listStart);
+            }
         }
         return [$listFinal, $assignedCounts];
     }
@@ -445,7 +557,8 @@ class Internship extends Model {
      *
      * @return array|false Un tableau contenant les identifiants des stages ou `false` en cas d'erreur ou si aucun stage n'est trouvé pour les départements spécifiés.
      */
-    public function createListInternship() {
+    public function createListInternship()
+    {
         $roleDepartments = $_SESSION['role_department'];
         $placeholders = implode(',', array_fill(0, count($roleDepartments), '?'));
 
@@ -461,7 +574,8 @@ class Internship extends Model {
      *
      * @return array|false Un tableau contenant les paires (id_teacher, internship_identifier) pour chaque étudiant dans les départements concernés, ou `false` en cas d'erreur ou si aucun résultat n'est trouvé.
      */
-    public function createListAssociate() {
+    public function createListAssociate()
+    {
         $roleDepartments = $_SESSION['role_department'];
         $placeholders = implode(',', array_fill(0, count($roleDepartments), '?'));
 
@@ -477,7 +591,8 @@ class Internship extends Model {
      *
      * @return string Un message confirmant l'enregistrement de l'association entre l'enseignant et le stage.
      */
-    public function insertResponsible() {
+    public function insertResponsible()
+    {
         $query = 'UPDATE internship SET Id_teacher = :Id_teacher WHERE Internship_identifier = :Internship_identifier';
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':Internship_identifier', $_POST['searchInternship']);
@@ -496,7 +611,8 @@ class Internship extends Model {
      *
      * @return string Message confirmant l'enregistrement de l'association entre l'enseignant et le stage.."
      */
-    public function insertIs_responsible(String $id_prof, String $Internship_id, float $Score) {
+    public function insertIs_responsible(String $id_prof, String $Internship_id, float $Score)
+    {
         $query = 'UPDATE internship SET Id_teacher = :id_prof, Relevance_score = :Score WHERE Internship_identifier = :Internship_id';
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':id_prof', $id_prof);
@@ -508,10 +624,12 @@ class Internship extends Model {
 
     /**
      * Renvoie l'historique (de stage) le plus recent d'un etudiant s'il en a un
-     * @param string $student_number
+     *
+     * @param  string $student_number
      * @return mixed
      */
-    public function getStudentHistory(string $student_number): mixed {
+    public function getStudentHistory(string $student_number): mixed
+    {
         $query = "SELECT End_date_internship FROM Internship WHERE Student_number = :student_number AND Start_date_internship < CURRENT_DATE";
         $stmt = $this->db->getConn()->prepare($query);
         $stmt->bindParam(':student_number', $student_number);
@@ -521,10 +639,12 @@ class Internship extends Model {
 
     /**
      * Récupère les informations relatives au prochain stage de l'étudiant passé en paramètre
-     * @param string $student numéro de l'étudiant
+     *
+     * @param  string $student numéro de l'étudiant
      * @return false|array tableau contenant le numéro de stage, le nom de l'entreprise, le sujet du stage et le numéro de l'enseignant tuteur
      */
-    public function getInternshipStudent(string $student): false|array {
+    public function getInternshipStudent(string $student): false|array
+    {
         $query = 'SELECT internship_identifier, company_name, internship_subject, address, internship.id_teacher, teacher_name, teacher_firstname, formation, class_group
                     FROM internship
                     JOIN student ON internship.student_number = student.student_number
@@ -541,10 +661,12 @@ class Internship extends Model {
 
     /**
      * renvoie l'adresse de l'entreprise de l'etudiant.
-     * @param string $studentId le numero de l'etudiant
+     *
+     * @param  string $studentId le numero de l'etudiant
      * @return string|false l'addresse de l'etudiant, false si ce n'est pas le même étudiant
      */
-    public function getInternshipAddress(string $studentId): string|false {
+    public function getInternshipAddress(string $studentId): string|false
+    {
         if ($studentId !== $_POST['student_id']) {
             return false;
         }
@@ -563,12 +685,15 @@ class Internship extends Model {
 
     /**
      * Insère ou supprime de la table is_requested l'enseignant et le stage passés en paramètre
-     * @param bool $add est true s'il faut ajouter la ligne, false s'il faut la supprimer
-     * @param string $teacher numéro de l'enseignant
-     * @param string $internship numéro du stage
+     *
+     * @param  bool   $add        est true s'il faut ajouter la ligne, false s'il faut la supprimer
+     * @param  string $teacher    numéro de
+     *                            l'enseignant
+     * @param  string $internship numéro du stage
      * @return true|string renvoie true si la requête a fonctionné, sinon l'erreur dans un string
      */
-    public function updateSearchedStudentInternship(bool $add, string $teacher, string $internship): true|string {
+    public function updateSearchedStudentInternship(bool $add, string $teacher, string $internship): true|string
+    {
         $current_requests = $this->getRequests($teacher);
         if ($add) {
             if (!in_array($internship, $current_requests)) {
@@ -577,7 +702,8 @@ class Internship extends Model {
                 $stmt = $this->db->getConn()->prepare($query);
                 $stmt->bindParam(':teacher', $teacher);
                 $stmt->bindParam(':internship', $internship);
-            } else return true;
+            } else { return true;
+            }
         } else {
             if (in_array($internship, $current_requests)) {
                 $query = 'DELETE FROM is_requested
@@ -586,7 +712,8 @@ class Internship extends Model {
                 $stmt = $this->db->getConn()->prepare($query);
                 $stmt->bindParam(':teacher', $teacher);
                 $stmt->bindParam(':internship', $internship);
-            } else return true;
+            } else { return true;
+            }
         }
         try {
             $stmt->execute();
@@ -598,13 +725,18 @@ class Internship extends Model {
 
     /**
      * Met à jour la table is_requested en fonction des stages demandés par l'enseignant passé en paramètre
-     * @param array $requests tableau contenant les numéro de stage que l'enseignant souhaite tutorer
-     * @param string $teacher numéro de l'enseignant
+     *
+     * @param  array  $requests tableau contenant les numéro de stage que l'enseignant souhaite
+     *                          tutorer
+     * @param  string $teacher  numéro de
+     *                          l'enseignant
      * @return true|string renvoie true si les insert et delete ont fonctionné, sinon l'erreur dans un string
      */
-    public function updateRequests(array $requests, string $teacher): true|string {
+    public function updateRequests(array $requests, string $teacher): true|string
+    {
         $current_requests = $this->getRequests($teacher);
-        if(!$current_requests) $current_requests = array();
+        if(!$current_requests) { $current_requests = array();
+        }
 
         $to_add = array_diff($requests, $current_requests);
         $to_delete = array_diff($current_requests, $requests);
@@ -642,10 +774,12 @@ class Internship extends Model {
 
     /**
      * Renvoie tous les stages que l'enseignant passé en paramètre a demandé à tutorer
-     * @param string $teacher numéro de l'enseignant
+     *
+     * @param  string $teacher numéro de l'enseignant
      * @return false|array tableau contenant le numéro d'étudiant de l'élève du stage dont l'enseignant connecté a fait la demande, false sinon
      */
-    public function getRequests(string $teacher): false|array {
+    public function getRequests(string $teacher): false|array
+    {
         $query = 'SELECT internship_identifier
                     FROM is_requested
                     WHERE  id_teacher = :teacher';
@@ -657,11 +791,13 @@ class Internship extends Model {
 
     /**
      * Vérifie si une association id_teacher et student_number existe déjà avant insertion
-     * @param string $idTeacher L'identifiant de l'enseignant
-     * @param string $studentNumber Le numéro d'étudiant
+     *
+     * @param  string $idTeacher     L'identifiant de l'enseignant
+     * @param  string $studentNumber Le numéro d'étudiant
      * @return bool Retourne true si l'association existe déjà, sinon false
      */
-    public function internshipExists(string $idTeacher, string $studentNumber): bool {
+    public function internshipExists(string $idTeacher, string $studentNumber): bool
+    {
         $query = "
         SELECT COUNT(*) 
         FROM internship 
