@@ -377,6 +377,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 else table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▼";
             }
         }
+        if (n > 6) {
+            M.Tooltip.init(document.querySelectorAll('.tooltip'), {
+                exitDelay: 100,
+            });
+        }
 
         sessionStorage.setItem('columnNumber', n);
         sessionStorage.setItem('direction', dir);
