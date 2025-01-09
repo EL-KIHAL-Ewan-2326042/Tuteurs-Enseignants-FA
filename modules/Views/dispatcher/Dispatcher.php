@@ -335,14 +335,14 @@ readonly class Dispatcher
                                         ' ' . $resultDispatch['student_name'] . ' ('
                                         . $resultDispatch['student_number'] . ')'; ?>
                                     <br>
-                                    <i class="material-icons">face</i>
+                                    <i class="material-icons clickable">face</i>
                                 </td>
                                 <td>
                                     <?php echo $resultDispatch['company_name'] . ' ('
                                         . $resultDispatch['internship_identifier']
                                         . ')'; ?>
                                     <br>
-                                    <i class="material-icons">map</i>
+                                    <i class="material-icons clickable">map</i>
                                 </td>
                                 <td>
                                     <?php echo $resultDispatch['formation']; ?>
