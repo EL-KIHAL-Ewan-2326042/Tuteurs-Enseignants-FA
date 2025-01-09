@@ -91,7 +91,7 @@ class Intramu
                 $_SESSION['roles'] = $userModel->getRoles($identifierLogs);
                 $_SESSION['role_name'] = $userModel->getHighestRole($identifierLogs);
                 $_SESSION['role_department'] = $userModel
-                    ->getRole_department($identifierLogs);
+                    ->getRoleDepartment($identifierLogs);
                 $_SESSION['address'] = $teacherModel->getAddress($identifierLogs);
                 header('Location: /homepage');
                 exit();
