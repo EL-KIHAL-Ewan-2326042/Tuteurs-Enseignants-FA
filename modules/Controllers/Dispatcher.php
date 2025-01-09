@@ -132,7 +132,7 @@ class Dispatcher
                         . $tmp[1] . ", cette association existe déjà<br>";
                 }
             } else {
-                $returnErrorMessage .=  $tmp[0] . "ou"
+                $returnErrorMessage .=  $tmp[0] . " ou "
                     . $tmp[1] . ", inexistant dans ce departement<br>";
             }
         }

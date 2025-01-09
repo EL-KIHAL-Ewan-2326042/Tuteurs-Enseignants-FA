@@ -196,12 +196,10 @@ readonly class Dispatcher
                             <?php endforeach; ?>
 
 
-                            <p class="red-text" id="checkboxError">
-                                <?php echo $this->errorMessageAfterSort; ?>
-                            </p>
-                            <p class="green-text">
-                                <?php echo $this->checkMessageAfterSort; ?>
-                            </p>
+                            <p class="red-text" id="checkboxError"><?php
+                                echo $this->errorMessageAfterSort; ?></p>
+                            <p class="green-text"><?php
+                                echo $this->checkMessageAfterSort; ?></p>
                             <button class="btn waves-effect waves-light
                                 button-margin" type="submit" name="action-save"
                                 value="<?php echo $id_backup ?>" id="save-btn">
@@ -319,6 +317,8 @@ readonly class Dispatcher
                             $internship = $resultDispatch['internship_identifier'];
                             $id_teacher = $resultDispatch['id_teacher'];
                             $address = $resultDispatch['address'];
+                            $score = $resultDispatch['score'];
+
                             ?>
                             <tr class="dispatch-row"
                                 data-internship-identifier=
@@ -334,11 +334,15 @@ readonly class Dispatcher
                                     <?php echo $resultDispatch['student_firstname'] .
                                         ' ' . $resultDispatch['student_name'] . ' ('
                                         . $resultDispatch['student_number'] . ')'; ?>
+                                    <br>
+                                    <i class="material-icons">face</i>
                                 </td>
                                 <td>
                                     <?php echo $resultDispatch['company_name'] . ' ('
                                         . $resultDispatch['internship_identifier']
                                         . ')'; ?>
+                                    <br>
+                                    <i class="material-icons">map</i>
                                 </td>
                                 <td>
                                     <?php echo $resultDispatch['formation']; ?>
@@ -367,15 +371,12 @@ readonly class Dispatcher
                                     <p>
                                         <label class="center">
                                             <input type="checkbox"
-                                               class="dispatch-checkbox center-align
-                                               filled-in" id="listTupleAssociate[]"
-                                               name="listTupleAssociate[]" value="
-                                               <?php
-                                                echo $resultDispatch['id_teacher'] .
-                                                "$". $resultDispatch
-                                                ['internship_identifier'] . "$".
-                                                $resultDispatch['score'];
-                                                ?>" />
+                                           class="dispatch-checkbox center-align
+                                           filled-in" id="listTupleAssociate[]"
+                                           name="listTupleAssociate[]" value="<?php
+                                            echo
+                                            $id_teacher."$".$internship."$".$score;
+                                            ?>" />
                                             <span data-type="checkbox"></span>
                                         </label>
                                     </p>
