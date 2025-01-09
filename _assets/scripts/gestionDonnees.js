@@ -1,7 +1,7 @@
 document.addEventListener(
     'DOMContentLoaded', function () {
-        var elems = document.querySelectorAll('select');
-        var instances = M.FormSelect.init(elems);
+        let elems = document.querySelectorAll('select');
+        let instances = M.FormSelect.init(elems);
 
         // Attendre un moment avant de mettre à jour les options
         setTimeout(
@@ -15,11 +15,11 @@ document.addEventListener(
 
 function updateSelectOptions()
 {
-    var selectElements = document.querySelectorAll('select');
+    let selectElements = document.querySelectorAll('select');
     selectElements.forEach(
         select =>
         {
-            var selectInstance = M.FormSelect.getInstance(select);
+            let selectInstance = M.FormSelect.getInstance(select);
             if (selectInstance) {
                 selectInstance.update();
             }
@@ -35,7 +35,7 @@ function initTooltips()
         container =>
         {
             container.addEventListener(
-                'mouseenter', (e) =>
+                'mouseenter', () =>
                 {
                     // Vérifie s'il existe déjà un tooltip pour éviter les doublons
                     let existingTooltip = document.querySelector('.tooltip');
