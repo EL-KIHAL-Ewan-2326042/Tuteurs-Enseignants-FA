@@ -4,63 +4,85 @@
 
 /**
  * A chaque input de la recherche etudiant, on fetch les resultats
+ *
  * @type {HTMLElement}
  */
-document.addEventListener('DOMContentLoaded', function() {
-    M.Tooltip.init(document.querySelectorAll('.tooltip'), {
-        exitDelay: 100,
-    });
+document.addEventListener(
+    'DOMContentLoaded', function () {
+        M.Tooltip.init(
+            document.querySelectorAll(
+                '.tooltip'
+            ),
+            {
+                exitDelay: 100,
+            }
+        );
 
-    var elems = document.querySelectorAll('select');
-    var instances = M.FormSelect.init(elems);
+        var elems = document.querySelectorAll('select');
+        var instances = M.FormSelect.init(elems);
 
-    const searchInput = document.getElementById('search');
-    const searchResults = document.getElementById('searchResults');
-    const searchType = document.getElementById('searchType');
-    searchResults.innerHTML = '<p>Barre de recherche vide</p>'
+        const searchInput = document.getElementById('search');
+        const searchResults = document.getElementById('searchResults');
+        const searchType = document.getElementById('searchType');
+        searchResults.innerHTML = '<p>Barre de recherche vide</p>'
 
-    searchInput.addEventListener('input', function() {
-        const searchTerm = searchInput.value.trim();
+        searchInput.addEventListener(
+            'input', function () {
+                const searchTerm = searchInput.value.trim();
 
-        if (searchTerm.length > 0) {
-            fetchResults(searchTerm, searchType.value);
-        }
-        else {
-            searchResults.innerHTML = '<p>Barre de recherche vide</p>'
-        }
-    })
-});
+                if (searchTerm.length > 0) {
+                    fetchResults(searchTerm, searchType.value);
+                }
+                else {
+                    searchResults.innerHTML = '<p>Barre de recherche vide</p>'
+                }
+            }
+        )
+    }
+);
 
 /**
  * Pour un string, on fait un post faisant une requête SQL à la BD
  * Enfin, on affiche les resultats retournés par la BD selon le type de recherche
+ *
  * @param query la recherche en elle-même
  * @param searchType numéro etudiant, nom de famille, ...
  */
-function fetchResults(query, searchType) {
-    fetch(window.location.href, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-            action: 'search',
-            search: query,
-            searchType: searchType
-        })
-    })
-        .then(response => response.json())
-        .then(data => {
+function fetchResults(query, searchType)
+{
+    fetch(
+        window.location.href, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: new URLSearchParams(
+                {
+                    action: 'search',
+                    search: query,
+                    searchType: searchType
+                }
+            )
+        }
+    ).then(
+        response => response.json()
+    ).then(
+        data =>
+        {
             displayResults(data);
-        })
-        .catch(error => {
+        }
+    ).catch(
+        error =>
+        {
             console.error('Erreur fetch resultats:', error);
-    });
+        }
+    );
 }
 
 /**
  * Selon les resultats renvoyés par la BD, on affiche le num, nom et prenom etudiant
  * On entour autour d'une balise a, et dès qu'elle est enclenché, on choisi l'etudiant
+ *
  * @param data
  */
 function displayResults(data) {
