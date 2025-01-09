@@ -103,15 +103,15 @@ readonly class Dispatcher
                                     <select id="save-selector" name="save-selector">
                                 <?php
                                 if (isset($_POST['save-selector'])
-                                    && $_POST['save-selector'] !== 'new'
-                                ) : ?>
-                                    <option value='new'>Sauvegarde #
-                                        <?php echo $_POST['save-selector'] ?>
-                                    </option>
+                                    && $_POST['save-selector'] !== 'i'
+                                ) :
+                                    $selected = $_POST['save-selector'];
+                                    ?>
+                                <option value="i">Sauvegarde #<?php echo $selected;?>
+                                </option>
                                 <?php else: ?>
-                                    <option value='default'>
-                                        Choisir une sauvegarde
-                                    </option>
+                                <option value="default">Choisir une sauvegarde
+                                </option>
                                 <?php endif; ?>
                                 <?php foreach ($saves as $save): ?>
                                     <?php
@@ -121,8 +121,7 @@ readonly class Dispatcher
                                     ) {
                                         continue;
                                     } ?>
-                                    <option value="
-                                        <?php echo $id_backup; ?>">
+                                    <option value="<?php echo $id_backup; ?>">
                                         Sauvegarde #<?php echo $id_backup; ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -135,7 +134,7 @@ readonly class Dispatcher
                             unset($id_backup);
                             $id_backup = $_POST['save-selector'] ?? 'default';
 
-                            if ($id_backup === 'default' || $id_backup === 'new') {
+                            if ($id_backup === 'default' || $id_backup === 'i') {
                                 $defaultCriteria = $this
                                     ->userModel->getDefaultCoef();
                                 $listCriteria = [];
@@ -152,34 +151,31 @@ readonly class Dispatcher
                             }
                             ?>
 
-                            <?php foreach ($listCriteria as $criteria): ?>
+                            <?php foreach ($listCriteria as $criteria):
+                                $value = $criteria['coef'];
+                                $name = $criteria['name_criteria'];
+                                ?>
                                 <div class="row">
                                     <div class="col s6">
                                         <p>
                                             <label>
-                                                <input type="hidden"
-                                                       name="is_checked[
-                                                       <?php echo $criteria
-                                                        ['name_criteria']; ?>
-                                                       ]" value="0">
+                                               <input type="hidden"
+                                               name="is_checked[<?php echo $name;?>]"
+                                               value="0">
                                                 <input type="checkbox"
-                                                       class="filled-in
-                                                        criteria-checkbox"
-                                                       name="criteria_enabled[
-                                                       <?php echo $criteria
-                                                        ['name_criteria']; ?>
-                                                       ]" data-coef-input-id="
-                                                       <?php echo $criteria
-                                                        ['name_criteria']; ?>"
-                                                       <?php
-                                                        if ($criteria['is_checked']
-                                                        ) : ?>
-                                                           checked="checked"
-                                                            <?php
-                                                        endif; ?> />
+                                                   class="filled-in
+                                                    criteria-checkbox"
+                                                   name=
+                                                   "criteria_on[<?php echo $name;?>]"
+                                           data-coef-input-id="<?php echo $name; ?>"
+                                                   <?php
+                                                    if ($criteria['is_checked']
+                                                    ) : ?>
+                                                   checked="checked"
+                                                        <?php
+                                                    endif; ?> />
                                                 <span>
-                                                    <?php echo $criteria
-                                                     ['name_criteria']; ?>
+                                                    <?php echo $name; ?>
                                                 </span>
                                             </label>
                                         </p>
@@ -187,18 +183,13 @@ readonly class Dispatcher
                                     <div class="col s6">
                                         <div class="input-field">
                                             <input type="number" class="coef-input"
-                                               name="coef[
-                                               <?php echo $criteria
-                                                ['name_criteria']; ?>
-                                                ]" id="
-                                                <?php echo $criteria
-                                                 ['name_criteria']; ?>"
-                                                min="1" max="100" value="
-                                                <?php echo $criteria['coef']; ?>"
+                                               name="coef[<?php echo $name; ?>]"
+                                               id="<?php echo $name; ?>"
+                                               min="1" max="100"
+                                               value="<?php echo $value ?>"
                                             />
-                                            <label for="
-                                            <?php echo $criteria['name_criteria']; ?>
-                                            ">Coefficient</label>
+                                            <label for="<?php echo $name; ?>">Coeff
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -302,7 +293,7 @@ readonly class Dispatcher
                         <?php
                         $dictCoef = array_filter(
                             $_POST['coef'], function ($coef, $key) {
-                                return isset($_POST['criteria_enabled'][$key]);
+                                return isset($_POST['criteria_on'][$key]);
                             }, ARRAY_FILTER_USE_BOTH
                         );
 
