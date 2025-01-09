@@ -126,7 +126,7 @@ class Dispatcher
             ) {
                 if (!(in_array([$tmp[0], $tmp[1]], $listAssociate))) {
                     $returnCheckMessage .= $internshipModel
-                        ->insertIs_responsible($tmp[0], $tmp[1], floatval($tmp[2]));
+                        ->insertIsResponsible($tmp[0], $tmp[1], floatval($tmp[2]));
                 } else {
                     $returnErrorMessage .= $tmp[0] . " et "
                         . $tmp[1] . ", cette association existe déjà<br>";
@@ -200,7 +200,7 @@ class Dispatcher
                     exit();
                 }
 
-                $studentView = $internshipModel->RelevanceInternship(
+                $studentView = $internshipModel->relevanceInternship(
                     $_POST['Internship_identifier'],
                     $dictCoef
                 );

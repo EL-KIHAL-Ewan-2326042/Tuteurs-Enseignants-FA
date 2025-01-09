@@ -1,9 +1,43 @@
 <?php
+/**
+ * Fichier contenant l'autoloader de l'application web
+ *
+ * PHP version 8.3
+ *
+ * @category Includes
+ * @package  Assetsincludes
+ *
+ * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
+ * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
+ * @author Kerbadou Islem <islem.kerbadou@etu.univ-amu.fr>
+ * @author Pellet Casimir <casimir.pellet@etu.univ-amu.fr>
+ *
+ * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
+ * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
+ */
 namespace Includes;
-class Autoloader {
 
+/**
+ * Autoloader qui permet de charger les fichiers nécessaires automatiquement
+ *
+ * PHP version 8.3
+ *
+ * @category Includes
+ * @package  Assetsincludes
+ *
+ * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
+ * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
+ * @author Kerbadou Islem <islem.kerbadou@etu.univ-amu.fr>
+ * @author Pellet Casimir <casimir.pellet@etu.univ-amu.fr>
+ *
+ * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
+ * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
+ */
+class Autoloader
+{
     /**
      * Enregistre l'autoloader
+     *
      * @return void
      */
     static function register(): void
@@ -13,14 +47,16 @@ class Autoloader {
 
     /**
      * Inclut le fichier de la classe correspondante
-     * @param $class
+     *
+     * @param string $class la classe à charger
+     *
      * @return void
      */
-    static function autoload($class): void
+    static function autoload(string $class): void
     {
 
         if ($class === 'Includes\Database') {
-            require '_assets/includes/Database.php';
+            include '_assets/includes/Database.php';
             return;
         }
 
@@ -30,7 +66,10 @@ class Autoloader {
                 'Blog/' => '',
             ];
 
-            $filename = str_replace(array_keys($replacements), array_values($replacements), $class);
+            $filename = str_replace(
+                array_keys($replacements),
+                array_values($replacements), $class
+            );
             $path = 'modules/' . $filename . '.php';
         } elseif (str_contains($class, 'Test')) {
             $replacements = [
@@ -38,8 +77,11 @@ class Autoloader {
                 'Test/' => '',
             ];
 
-            $filename = str_replace(array_keys($replacements), array_values($replacements), $class);
-            require 'tests/' . $filename . '.php';
+            $filename = str_replace(
+                array_keys($replacements),
+                array_values($replacements), $class
+            );
+            include 'tests/' . $filename . '.php';
         } else {
             $class = strtoupper(substr($class, 0, 1)) . substr($class, 1);
 
@@ -51,9 +93,9 @@ class Autoloader {
 
         }
         if (file_exists($path)) {
-            require $path;
+            include $path;
         } else {
-            require 'modules/Controllers/Error404.php';
+            include 'modules/Controllers/Error404.php';
         }
     }
 
