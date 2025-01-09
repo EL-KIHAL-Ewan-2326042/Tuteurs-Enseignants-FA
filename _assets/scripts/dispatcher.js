@@ -87,19 +87,35 @@ function displayResults(data, action) {
     const ul = document.createElement('ul');
     data.forEach(item => {
         const li = document.createElement('li');
-        const p = document.createElement('p');
+        const a = document.createElement('a');
 
         if (action === 'searchTeacher') {
-            p.textContent = `${item.teacher_name} ${item.teacher_firstname} (ID: ${item.id_teacher})`;
+            a.textContent = `${item.teacher_name} ${item.teacher_firstname} (ID: ${item.id_teacher})`;
+            a.href = '#';
+            a.addEventListener('click', (event) => {
+                event.preventDefault();
+                const inputField = document.getElementById('searchTeacher');
+                if (inputField) {
+                    inputField.value = `${item.id_teacher}`;
+                }
+            });
         } else if (action === 'searchInternship') {
-            p.textContent = item.company_name
+            a.textContent = item.company_name
                 ? `${item.company_name}: ${item.internship_identifier} - ${item.student_name} ${item.student_firstname}`
                 : `${item.student_number} - ${item.student_name} ${item.student_firstname}`;
+            a.href = '#';
+            a.addEventListener('click', (event) => {
+                event.preventDefault();
+                const inputField = document.getElementById('searchInternship');
+                if (inputField) {
+                    inputField.value = `${item.internship_identifier}`;
+                }
+            });
         }
 
-        p.classList.add('left-align');
+        a.classList.add('left-align');
 
-        li.appendChild(p);
+        li.appendChild(a);
         ul.appendChild(li);
     });
     searchResults.appendChild(ul);
