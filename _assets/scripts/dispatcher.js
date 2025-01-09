@@ -614,8 +614,8 @@ document.addEventListener(
                 .then(
                     data =>
                     {
-                        createNewTable(data);
-                        createTeacherMarkers(data);
+                        createNewTable(data).then();
+                        createTeacherMarkers(data).then();
                     }
                 )
                 .catch(
@@ -626,59 +626,30 @@ document.addEventListener(
                 );
         }
 
-
-
         const tableBody = document.querySelector('#dispatch-table tbody');
 
         if (tableBody) {
-            let lastTapTime = 0;
-            let tapTimeout;
+            ['click', 'touchstart'].forEach(eventType => {
+                tableBody.addEventListener(eventType, function (event) {
+                    if (event.target.tagName === 'I' && event.target.classList.contains('material-icons')) {
+                        const clickedRow = getClickedRow(event.target);
+                        if (!clickedRow) {
+                            return;
+                        }
 
-            ['click', 'touchstart'].forEach(
-                eventType =>
-                {
-                    tableBody.addEventListener(
-                        eventType, function (event) {
+                        const clickedRowIdentifier = clickedRow.getAttribute('data-internship-identifier');
+                        const [Internship_identifier, Id_teacher, Internship_address] = clickedRowIdentifier.split('$');
 
-                            if ((event.target.tagName === 'SPAN' && event.target.dataset.type === 'checkbox') || event.target.tagName === 'INPUT') {
-                                return;
-                            }
-
-                            clearTimeout(tapTimeout);
-
-                            const currentTime = new Date().getTime();
-                            const timeSinceLastTap = currentTime - lastTapTime;
-
-                            const clickedRow = getClickedRow(event.target);
-                            if (!clickedRow) {
-                                return;
-                            }
-                            const clickedRowIdentifier = clickedRow.getAttribute('data-internship-identifier');
-
-                            if (timeSinceLastTap < 300 && timeSinceLastTap > 100) {
-                                const [Internship_identifier, Id_teacher, Internship_address] = clickedRowIdentifier.split('$');
-                                getTeachersForInternship(Internship_identifier);
-
-                                lastTapTime = 0;
-                                event.preventDefault();
-                                return;
-                            }
-
-                            tapTimeout = setTimeout(
-                                function () {
-                                    const [Internship_identifier, Id_teacher, Internship_address] = clickedRowIdentifier.split('$');
-
-                                    updateMap(Internship_address, Id_teacher);
-                                    lastTapTime = 0;
-                                }, 300
-                            );
-
-                            lastTapTime = currentTime;
+                        if (event.target.textContent === 'face') {
+                            getTeachersForInternship(Internship_identifier);
+                            event.preventDefault();
+                        } else if (event.target.textContent === 'map') {
+                            updateMap(Internship_address, Id_teacher).then();
                             event.preventDefault();
                         }
-                    );
-                }
-            );
+                    }
+                });
+            });
         }
 
         function getClickedRow(element)
@@ -691,11 +662,15 @@ document.addEventListener(
 
         async function createTeacherMarkers(data)
         {
+            let minDistance;
             for (const row of data) {
-                const teacherAddresses = getTeacherAddresses(data.id_teacher);
+                const teacherAddresses = await getTeacherAddresses(row.id_teacher);
+                const internshipLocation = await geocodeAddress(row.address);
+                minDistance = Infinity;
+
                 if (Array.isArray(teacherAddresses)) {
-                    for (const teacher of teacherAddresses) {
-                        const location = await geocodeAddress(teacher.address);
+                    for (const item of teacherAddresses) {
+                        const location = await geocodeAddress(item.address);
                         const distance = await calculateDistanceOnly(internshipLocation, location);
 
                         if (distance < minDistance) {
@@ -709,9 +684,17 @@ document.addEventListener(
                 const marker = new ol.Overlay(
                     {
                         position: ol.proj.fromLonLat([closestTeacherAddress.lon, closestTeacherAddress.lat]),
-                        element: createMarkerElement(data.teacher_name),
+                        element: createMarkerElement(row.teacher_name),
                     }
                 );
+                const markerFeature = new ol.Feature({
+                    geometry: new ol.geom.Point(
+                        ol.proj.fromLonLat([closestTeacherAddress.lon, closestTeacherAddress.lat])
+                    ),
+                    name: row.teacher_name,
+                });
+
+                markerSource.addFeature(markerFeature);
             }
         }
         async function createNewTable(data)
@@ -850,38 +833,62 @@ let map, routeLayer, companyMarker, teacherMarker;
  *
  * @returns {Promise<void>}
  */
-async function initMap()
-{
+
+async function initMap() {
     const mapElement = document.getElementById("map");
 
-    if (!mapElement) {
-        return;
-    }
+    if (!mapElement) return;
 
     try {
         const franceCenter = ol.proj.fromLonLat([2.337, 46.227]);
 
-        map = new ol.Map(
-            {
-                target: mapElement,
-                layers: [
-                new ol.layer.Tile(
-                    {
-                        source: new ol.source.OSM(),
-                    }
-                ),
+        map = new ol.Map({
+            target: mapElement,
+            layers: [
+                new ol.layer.Tile({
+                    source: new ol.source.OSM(),
+                }),
             ],
-            view: new ol.View(
-                {
-                    center: franceCenter,
-                    zoom: 5,
-                }
-            ),
-            }
-        );
+            view: new ol.View({
+                center: franceCenter,
+                zoom: 5,
+            }),
+        });
+
+        markerSource = new ol.source.Vector();
+
+        clusterSource = new ol.source.Cluster({
+            distance: 25,
+            source: markerSource,
+        });
+
+        clusterLayer = new ol.layer.Vector({
+            source: clusterSource,
+            style: function (feature) {
+                const size = feature.get("features").length;
+                const color = size > 1 ? "red" : "blue";
+                return new ol.style.Style({
+                    image: new ol.style.Circle({
+                        radius: size > 1 ? 30 : 20,
+                        fill: new ol.style.Fill({ color }),
+                        stroke: new ol.style.Stroke({ color: "white", width: 2 }),
+                    }),
+                    text: new ol.style.Text({
+                        text: size > 1 ? size.toString() : feature.get("features")[0].get("name"),
+                        fill: new ol.style.Fill({ color: "white" }),
+                        stroke: new ol.style.Stroke({ color: "black", width: 2 }),
+                        font: "12px Arial",
+                    }),
+                });
+            },
+        });
+        map.addLayer(clusterLayer);
     } catch (error) {
+        console.error("Error initializing map:", error);
     }
 }
+
+
 
 /**
  * Obtenir les différentes adresses d'un professeur
@@ -1067,7 +1074,6 @@ async function updateMap(InternshipAddress, Id_teacher)
 
 
         placeMarker(internshipLocation, "Entreprise", true);
-        placeMarker(closestTeacherAddress, "Professeur", false);
 
         centerMap(internshipLocation, closestTeacherAddress);
         displayRoute(internshipLocation, closestTeacherAddress);
@@ -1211,26 +1217,53 @@ function placeMarker(location, label, isCompany)
     map.addOverlay(marker);
 }
 
-
 /**
- * Crée un élément de marqueur
+ * Crée un élément de marqueur amélioré
  *
  * @param {string} label Étiquette du marqueur
  *
  * @returns {HTMLElement} Élément du marqueur
  */
-function createMarkerElement(label)
-{
+function createMarkerElement(label) {
     const marker = document.createElement("div");
-    marker.className = "marker";
-    marker.textContent = label;
-    marker.style.backgroundColor = "blue";
-    marker.style.color = "white";
-    marker.style.padding = "5px";
-    marker.style.borderRadius = "50%";
-    marker.style.textAlign = "center";
+    marker.className = "enhanced-marker";
+
+    const markerLabel = document.createElement("div");
+    markerLabel.className = "marker-label";
+    markerLabel.textContent = label;
+
+    const pointer = document.createElement("div");
+    pointer.className = "marker-pointer";
+
+    marker.appendChild(markerLabel);
+    marker.appendChild(pointer);
+
+    marker.style.position = "absolute";
+    marker.style.display = "flex";
+    marker.style.flexDirection = "column";
+    marker.style.alignItems = "center";
+    marker.style.zIndex = "1"
+
+    const offsetX = Math.random() * 10 - 5;
+    const offsetY = Math.random() * 10 - 5;
+    marker.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
+
+    markerLabel.style.backgroundColor = "blue";
+    markerLabel.style.color = "white";
+    markerLabel.style.padding = "2px 5px";
+    markerLabel.style.borderRadius = "3px";
+    markerLabel.style.fontSize = "10px";
+    markerLabel.style.textAlign = "center";
+    markerLabel.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.2)";
+
+    pointer.style.width = "0";
+    pointer.style.height = "0";
+    pointer.style.borderLeft = "4px solid transparent";
+    pointer.style.borderRight = "4px solid transparent";
+    pointer.style.borderTop = "6px solid blue";
+    pointer.style.marginTop = "-1px";
+
     return marker;
 }
-
 
 initMap();

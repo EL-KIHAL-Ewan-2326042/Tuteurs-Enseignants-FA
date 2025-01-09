@@ -102,7 +102,6 @@ input[type="checkbox"].filled-in:checked + span:after {
 
 #dispatch-table tbody tr:hover {
     background-color: #ffffcc;
-    cursor: pointer;
 }
 
 @media screen and (max-width: 768px) {
