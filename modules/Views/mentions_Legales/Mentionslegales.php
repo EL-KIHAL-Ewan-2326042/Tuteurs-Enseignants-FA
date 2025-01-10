@@ -94,11 +94,9 @@ _la_protection_des_%C5%93uvres_litt%C3%A9raires_et_artistiques">
                 de la même protection que celle que cet État accorde aux oeuvres
                 de ses propres nationaux. <br>
                 L'ensemble du site Web et des oeuvres disponibles sont soumises
-                à la licence
-                <a href="http://creativecommons.org/licenses/by-nc-sa/3.0/">
-                    Creative Commons Attribution-NonCommercial-ShareAlike</a>.
-                L'Offrant ne peut retirer les autorisations concédées par la
-                licence tant que vous appliquez les termes de cette licence.</p>
+                à la
+                <a href="https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/edit/main/LICENSE">
+                    licence MIT</a>.</p>
 
                 <h4>DONNÉES PERSONNELLES</h4>
                 <p>Soucieux du respect de la vie privée des utilisateurs du site
