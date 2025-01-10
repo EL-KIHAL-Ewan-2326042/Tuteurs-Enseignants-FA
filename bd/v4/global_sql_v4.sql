@@ -17,9 +17,6 @@ DROP TABLE IF EXISTS Discipline;
 DROP TABLE IF EXISTS Student;
 DROP TABLE IF EXISTS Teacher;
 
-(ce numéro est nécessairement un `user_id` permettant à l'enseignant d'accéder au site)
-
-
 CREATE TABLE Teacher(
     Id_teacher VARCHAR(10),
     Teacher_name VARCHAR(50),
@@ -291,6 +288,8 @@ CREATE TRIGGER create_discipline_for_insert_is_taught
     FOR EACH ROW
     EXECUTE FUNCTION create_id_backup_for_insert();
 
+
+/* Les lignes suivantes servent de données de test */
 
 
 INSERT INTO Distribution_criteria (Name_criteria, Description) VALUES ('A été responsable', 'Prendre en compte le fait que le prof ait déjà travaillé avec l élève');
