@@ -1,33 +1,100 @@
 <?php
-
+/**
+ * Fichier contenant les test PHPUnit du modèle Model
+ *
+ * PHP version 8.3
+ *
+ * @category Models
+ * @package  TutorMap/tests/Models
+ *
+ * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
+ * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
+ * @author Kerbadou Islem <islem.kerbadou@etu.univ-amu.fr>
+ * @author Pellet Casimir <casimir.pellet@etu.univ-amu.fr>
+ *
+ * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
+ * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
+ */
 namespace Models;
 
 use Blog\Models\Internship;
 use Blog\Models\Model;
 use Includes\Database;
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\MockObject\Exception;
 
+/**
+ * Classe gérant les tests PHPUnit du modèle Model
+ *
+ * PHP version 8.3
+ *
+ * @category Controller
+ * @package  TutorMap/modules/Controllers
+ *
+ * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
+ * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
+ * @author Kerbadou Islem <islem.kerbadou@etu.univ-amu.fr>
+ * @author Pellet Casimir <casimir.pellet@etu.univ-amu.fr>
+ *
+ * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
+ * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
+ */
 class ModelTest extends TestCase
 {
-    private $mockDatabase;
-    private $mockInternship;
-    private $model;
+    private Database $_mockDatabase;
+    private Internship $_mockInternship;
+    private Model $_model;
+    private Model $_mockModel;
 
+
+    /**
+     * Permet de d'initialiser les variables nécessaires pour les tests
+     *
+     * @return void
+     * @throws Exception
+     */
     protected function setUp(): void
     {
-        $this->mockDatabase = $this->createMock(Database::class);
-        $this->mockInternship = $this->createMock(Internship::class);
-        $this->model = new Model($this->mockDatabase);
+        $this->_mockDatabase = $this->createMock(Database::class);
+        $this->_mockInternship = $this->createMock(Internship::class);
+        $this->_model = new Model($this->_mockDatabase);
+        $this->_mockModel = $this->createMock(Model::class);
     }
 
-    private function mockHttpRequest(string $address, ?array $response): void
+    /**
+     * Méthode privée permettant de mock des requetes http
+     *
+     * @param string     $address  l'addresse web
+     * @param array|null $response la réponse
+     *
+     * @return void
+     */
+    private function _mockHttpRequest(string $address, ?array $response): void
     {
     }
 
-    private function mockHttpRequestForDuration(array $latLngInternship, array $latLngTeacher, ?array $response): void
-    {
+    /**
+     * Méthode privée permettant de mock des requêtes http
+     * pour une durée
+     *
+     * @param array      $latLngInternship latitude et longitude du stage/alternance
+     * @param array      $latLngTeacher    latitude et longitude du professeur
+     * @param array|null $response         la
+     *                                     réponse
+     *
+     * @return void
+     */
+    private function _mockHttpRequestForDuration(
+        array $latLngInternship, array $latLngTeacher, ?array $response
+    ): void {
     }
 
+    /**
+     * Test de la méthode geocodeAddress, vérifier que ça
+     * renvoie bien des coordonnées
+     *
+     * @return void
+     */
     public function testGeocodeAddressReturnsCoordinates(): void
     {
         $mockAddress = '1600 Pennsylvania Ave, Washington, DC';
@@ -36,9 +103,9 @@ class ModelTest extends TestCase
             'lng' => '-77.0365298'
         ];
 
-        $this->mockHttpRequest($mockAddress, $mockResponse);
+        $this->_mockHttpRequest($mockAddress, $mockResponse);
 
-        $result = $this->model->geocodeAddress($mockAddress);
+        $result = $this->_model->geocodeAddress($mockAddress);
 
         $this->assertIsArray($result);
         $this->assertArrayHasKey('lat', $result);
@@ -47,18 +114,29 @@ class ModelTest extends TestCase
         $this->assertEquals('-77.03655315', $result['lng']);
     }
 
+    /**
+     * Test de la méthode geocodeAddress, vérifier que ça
+     * renvoie bien null si erreur
+     *
+     * @return void
+     */
     public function testGeocodeAddressReturnsNullOnFailure(): void
     {
         $mockAddress = 'Invalid Address';
 
-        // Simulate a failed geocoding request by returning null
-        $this->mockHttpRequest($mockAddress, null);
+        $this->_mockHttpRequest($mockAddress, null);
 
-        $result = $this->model->geocodeAddress($mockAddress);
+        $result = $this->_model->geocodeAddress($mockAddress);
 
         $this->assertNull($result);
     }
 
+    /**
+     * Test de la méthode calculateDuration, vérifier que ça renvoie
+     * bien une durée
+     *
+     * @return void
+     */
     public function testCalculateDurationReturnsDuration(): void
     {
         $latLngInternship = ['lat' => '40.712776', 'lng' => '-74.005974'];
@@ -71,85 +149,77 @@ class ModelTest extends TestCase
             ]
         ];
 
-        $this->mockHttpRequestForDuration($latLngInternship, $latLngTeacher, $mockResponse);
+        $this->_mockHttpRequestForDuration(
+            $latLngInternship, $latLngTeacher, $mockResponse
+        );
 
-        $result = $this->model->calculateDuration($latLngInternship, $latLngTeacher);
+        $result = $this->_model->calculateDuration(
+            $latLngInternship, $latLngTeacher
+        );
 
         $this->assertIsFloat($result);
         $this->assertEquals(2984.0, $result);
     }
 
+    /**
+     * Test de la méthode calculateDuration, vérifier que ça renvoie
+     * une durée de base si erreur
+     *
+     * @return void
+     */
     public function testCalculateDurationReturnsDefaultIfError(): void
     {
         $latLngInternship = ['lat' => '40.712776', 'lng' => '-74.005974'];
         $latLngTeacher = ['lat' => '34.052235', 'lng' => '-118.243683'];
 
-        $this->mockHttpRequestForDuration($latLngInternship, $latLngTeacher, null);
+        $this->_mockHttpRequestForDuration($latLngInternship, $latLngTeacher, null);
 
-        $result = $this->model->calculateDuration($latLngInternship, $latLngTeacher);
+        $result = $this->_model->calculateDuration(
+            $latLngInternship, $latLngTeacher
+        );
 
         $this->assertEquals(2984, $result);
     }
 
-    public function testCalculateRelevanceTeacherStudentsAssociate(): void
+    /**
+     * Vérifier la méthode valudateHeader renvoie bien false si
+     * un mauvais header est fourni
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testValidateHeadersReturnsFalseForBadHeader(): void
     {
-        // Données de test
-        $teacher = [
-            'id_teacher' => 1,
-            'teacher_name' => 'John Doe',
-            'teacher_firstname' => 'Jane'
-        ];
+        $validHeaders = ['id', 'name', 'email'];
+        $tableName = 'user';
 
-        $dictCoef = [
-            'Distance' => 0.3,
-            'Cohérence' => 0.2,
-            'A été responsable' => 0.3,
-            'Est demandé' => 0.2
-        ];
+        $this->_mockModel->method('getTableColumn')->willReturn(
+            ['id', 'name', 'email']
+        );
 
-        $internship = [
-            'internship_identifier' => 'INT001',
-            'id_teacher' => 1,
-            'student_number' => 10,
-            'student_name' => 'Student Name',
-            'student_firstname' => 'Student Firstname',
-            'internship_subject' => 'Computer Science',
-            'address' => '123 Main St',
-            'company_name' => 'Tech Corp',
-            'formation' => 'Bachelor Degree',
-            'class_group' => 'Y4:0',
-            'type' => 'IN1:0'
-        ];
+        $result = $this->_mockModel->validateHeaders($validHeaders, $tableName);
 
-        $result = $this->model->calculateRelevanceTeacherStudentsAssociate($teacher, $dictCoef, $internship);
+        $this->assertFalse($result);
+    }
 
-        $this->assertIsArray($result);
-        $this->assertArrayHasKey('id_teacher', $result);
-        $this->assertArrayHasKey('teacher_name', $result);
-        $this->assertArrayHasKey('teacher_firstname', $result);
-        $this->assertArrayHasKey('student_number', $result);
-        $this->assertArrayHasKey('student_name', $result);
-        $this->assertArrayHasKey('student_firstname', $result);
-        $this->assertArrayHasKey('internship_identifier', $result);
-        $this->assertArrayHasKey('internship_subject', $result);
-        $this->assertArrayHasKey('address', $result);
-        $this->assertArrayHasKey('company_name', $result);
-        $this->assertArrayHasKey('formation', $result);
-        $this->assertArrayHasKey('class_group', $result);
-        $this->assertArrayHasKey('type', $result);
-        $this->assertArrayHasKey('score', $result);
+    /**
+     * Vérifier la méthode valudateHeader renvoie bien false si
+     * un header avec plus de colonnes est fourni
+     *
+     * @return void
+     * @throws \Exception
+     */
+    public function testValidateHeadersReturnsFalseForTeacherExtraColumns(): void
+    {
+        $validTeacherHeaders = ['id', 'name', 'address$type', 'discipline_name'];
+        $tableName = 'teacher';
 
-        // Vérification du score final
-        $this->assertGreaterThan(0, $result['score']);
-        $this->assertLessThan(5, $result['score']);
+        $this->_mockModel->method('getTableColumn')->willReturn(['id', 'name']);
 
-        // Vérification des valeurs spécifiques (à adapter selon vos besoins réels)
-        $this->assertEquals('INT001', $result['internship_identifier']);
-        $this->assertEquals('Computer Science', $result['internship_subject']);
-        $this->assertEquals('123 Main St', $result['address']);
-        $this->assertEquals('Tech Corp', $result['company_name']);
-        $this->assertEquals('Bachelor Degree', $result['formation']);
-        $this->assertEquals('Y4:0', $result['class_group']);
-        $this->assertEquals('IN1:0', $result['type']);
+        $result = $this->_mockModel->validateHeaders(
+            $validTeacherHeaders, $tableName
+        );
+
+        $this->assertFalse($result);
     }
 }

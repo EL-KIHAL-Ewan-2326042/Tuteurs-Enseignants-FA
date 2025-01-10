@@ -160,7 +160,12 @@ function createAction(string $uri, mixed $layout): Closure
     if ($uri === '/') {
         $uri = 'homepage';
     }
-    $uri = str_replace('-', '', $uri);
+    $uri = preg_replace_callback(
+        '/-(.)/', function ($matches) {
+            return strtoupper($matches[1]);
+        }, $uri
+    );
+
 
     $controllerName = ucfirst(ltrim($uri, '/'));
     $className = "Blog\\Controllers\\$controllerName";
