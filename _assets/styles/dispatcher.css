@@ -1,5 +1,9 @@
 @import "global.css";
 
+main {
+    margin: 0 64px;
+}
+
 .button-margin {
     margin-top: var(--medium-spacing);
 }
@@ -21,6 +25,18 @@ h3, h4 {
 /* Style au survol de la souris sur pour les boutons de la page */
 .btn:hover{
     background-color: #E8CE7E;
+}
+
+main a {
+    color: black;
+}
+
+main a:hover {
+    color: var(--main-color);
+}
+
+main a:visited {
+    color: black;
 }
 
 input[type="checkbox"].filled-in:checked + span:after {
@@ -86,7 +102,6 @@ input[type="checkbox"].filled-in:checked + span:after {
 
 #dispatch-table tbody tr:hover {
     background-color: #ffffcc;
-    cursor: pointer;
 }
 
 @media screen and (max-width: 768px) {
