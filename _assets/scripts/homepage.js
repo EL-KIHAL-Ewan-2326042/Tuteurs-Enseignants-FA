@@ -196,34 +196,41 @@ async function initMap()
         const teacherLocation = await geocodeAddress(teacherAddress);
 
         const map = new ol.Map(
-        {
-            target: mapElement,
-            layers: [
-                new ol.layer.Tile(
-                {
-                    source: new ol.source.OSM(),
-                }),
-            ],
-            view: new ol.View(
             {
-                center: ol.proj.fromLonLat([
-                    (companyLocation.lon + teacherLocation.lon) / 2,
-                    (companyLocation.lat + teacherLocation.lat) / 2,
-                ]),
+                target: mapElement,
+                layers: [
+                    new ol.layer.Tile(
+                        {
+                            source: new ol.source.OSM(),
+                        }
+                    ),
+                ],
+            view: new ol.View(
+                {
+                    center: ol.proj.fromLonLat(
+                        [
+                            (companyLocation.lon + teacherLocation.lon) / 2,
+                            (companyLocation.lat + teacherLocation.lat) / 2,
+                            ]
+                    ),
                 zoom: 6,
-            }),
-        });
+                    }
+            ),
+            }
+        );
 
         const companyMarker = new ol.Overlay(
-        {
-            position: ol.proj.fromLonLat([companyLocation.lon, companyLocation.lat]),
-            element: createMarkerElement("Entreprise"),
-        });
-        const teacherMarker = new ol.Overlay(
-        {
-            position: ol.proj.fromLonLat([teacherLocation.lon, teacherLocation.lat]),
-            element: createMarkerElement("Vous"),
-        });
+            {
+                position: ol.proj.fromLonLat([companyLocation.lon, companyLocation.lat]),
+                element: createMarkerElement("Entreprise"),
+            }
+        );
+            const teacherMarker = new ol.Overlay(
+                {
+                    position: ol.proj.fromLonLat([teacherLocation.lon, teacherLocation.lat]),
+                    element: createMarkerElement("Vous"),
+                }
+            );
 
         map.addOverlay(companyMarker);
         map.addOverlay(teacherMarker);
@@ -280,30 +287,36 @@ async function calculateDistance(origin, destination, map)
         if (data.routes && data.routes.length > 0) {
             const route = data.routes[0];
 
-            const routeCoords = route.geometry.coordinates.map((coord) =>
+            const routeCoords = route.geometry.coordinates.map(
+                (coord) =>
                 ol.proj.fromLonLat(coord)
             );
 
             const routeLayer = new ol.layer.Vector(
-            {
-                source: new ol.source.Vector(
                 {
-                    features: [
-                        new ol.Feature(
+                    source: new ol.source.Vector(
                         {
-                            geometry: new ol.geom.LineString(routeCoords),
-                        }),
-                    ],
-                }),
+                            features: [
+                            new ol.Feature(
+                                {
+                                    geometry: new ol.geom.LineString(routeCoords),
+                                }
+                            ),
+                        ],
+                        }
+                    ),
                 style: new ol.style.Style(
-                {
-                    stroke: new ol.style.Stroke(
                     {
-                        color: "red",
-                        width: 3,
-                    }),
-                }),
-            });
+                        stroke: new ol.style.Stroke(
+                            {
+                                color: "red",
+                                width: 3,
+                            }
+                        ),
+                    }
+                ),
+                }
+            );
 
             map.addLayer(routeLayer);
         } else {
@@ -393,8 +406,9 @@ document.addEventListener(
             switching = true;
 
             if (!firstLoad) {
-                if (table.rows[0].getElementsByTagName("TH")[n].innerHTML.substring(table.rows[0].getElementsByTagName("TH")[n].innerHTML.length - 1) === "▲") dir = "desc";
-                else dir = "asc";
+                if (table.rows[0].getElementsByTagName("TH")[n].innerHTML.substring(table.rows[0].getElementsByTagName("TH")[n].innerHTML.length - 1) === "▲") { dir = "desc";
+                } else { dir = "asc";
+                }
             } else {
                 dir = sessionStorage.getItem('direction');
             }
@@ -409,14 +423,16 @@ document.addEventListener(
                     if (dir === "asc") {
                         if ((n < 7 && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase())
                             || (n === 7 && Number(x.innerHTML.substring(1, x.innerHTML.indexOf(' '))) > Number(y.innerHTML.substring(1, y.innerHTML.indexOf(' '))))
-                            || (n === 8 && x.getElementsByTagName("INPUT")[0].checked < y.getElementsByTagName("INPUT")[0].checked)) {
+                            || (n === 8 && x.getElementsByTagName("INPUT")[0].checked < y.getElementsByTagName("INPUT")[0].checked)
+                        ) {
                             shouldSwitch = true;
                             break;
                         }
                     } else if (dir === "desc") {
                         if ((n < 7 && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())
                             || (n === 7 && Number(x.innerHTML.substring(1, x.innerHTML.indexOf(' '))) < Number(y.innerHTML.substring(1, y.innerHTML.indexOf(' '))))
-                            || (n === 8 && x.getElementsByTagName("INPUT")[0].checked > y.getElementsByTagName("INPUT")[0].checked)) {
+                            || (n === 8 && x.getElementsByTagName("INPUT")[0].checked > y.getElementsByTagName("INPUT")[0].checked)
+                        ) {
                             shouldSwitch = true;
                             break;
                         }
@@ -433,8 +449,9 @@ document.addEventListener(
                     table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-2);
                 }
                 if (i === n) {
-                    if (dir === "asc") table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▲";
-                    else table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▼";
+                    if (dir === "asc") { table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▲";
+                    } else { table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▼";
+                    }
                 }
             }
 
@@ -445,7 +462,8 @@ document.addEventListener(
 
         function showPage(page)
         {
-            if (page < 1 || page > totalPages) return;
+            if (page < 1 || page > totalPages) { return;
+            }
 
             rows = document.querySelectorAll('.homepage-row');
 
@@ -503,9 +521,11 @@ document.addEventListener(
             }
         }
         if (n > 6) {
-            M.Tooltip.init(document.querySelectorAll('.tooltip'), {
-                exitDelay: 100,
-            });
+            M.Tooltip.init(
+                document.querySelectorAll('.tooltip'), {
+                    exitDelay: 100,
+                }
+            );
         }
 
         function createPageButton(page, isActive = false)
@@ -546,7 +566,8 @@ document.addEventListener(
             'resize', function () {
                 totalRows = rows.length;
                 totalPages = Math.ceil(totalRows / rowsPerPage);
-                if (currentPage > totalPages) currentPage = totalPages;
+                if (currentPage > totalPages) { currentPage = totalPages;
+                }
                 showPage(currentPage);
             }
         );
