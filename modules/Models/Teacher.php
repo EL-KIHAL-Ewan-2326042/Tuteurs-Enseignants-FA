@@ -182,12 +182,12 @@ class Teacher extends Model
      * @param int    $maxi_number_trainees nouveau nombre maximum
      *                                     de stagiaires et alternants
      *
-     * @return true|string renvoie true si l'update a fonctionné,
+     * @return string renvoie true si l'update a fonctionné,
      * sinon une chaîne de caractères contenant l'erreur
      */
     public function updateMaxiNumberTrainees(
         string $teacher, int $maxi_number_trainees
-    ): true|string {
+    ): string {
         $query = 'UPDATE teacher
                     SET maxi_number_trainees = :maxi_number_trainees
                     WHERE id_teacher = :teacher';

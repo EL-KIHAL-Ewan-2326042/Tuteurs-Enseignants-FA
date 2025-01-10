@@ -216,7 +216,6 @@ class Internship extends Model
 
         $minDuration = PHP_INT_MAX;
 
-        // On cherche l'addresse avec la distance la plus courte
         foreach ($addressesTeacher as $address) {
             $latLngTeacher = $this->geocodeAddress($address['address']);
 
@@ -819,12 +818,12 @@ class Internship extends Model
      *                           l'enseignant
      * @param string $internship numéro du stage
      *
-     * @return true|string renvoie true si la requête a fonctionné,
+     * @return string renvoie true si la requête a fonctionné,
      * sinon l'erreur dans un string
      */
     public function updateSearchedStudentInternship(
         bool $add, string $teacher, string $internship
-    ): true|string {
+    ): string {
         $current_requests = $this->getRequests($teacher);
         if ($add) {
             if (!in_array($internship, $current_requests)) {
@@ -860,16 +859,15 @@ class Internship extends Model
      * Met à jour la table is_requested en
      * fonction des stages demandés par l'enseignant passé en paramètre
      *
-     * @param array  $requests tableau contenant
+     * @param array $requests tableau contenant
      *                         les numéro de stage que l'enseignant souhaite
      *                         tutorer
-     * @param string $teacher  numéro de
+     * @param string $teacher numéro de
      *                         l'enseignant
      *
-     * @return true|string renvoie true si les insert
-     * et delete ont fonctionné, sinon l'erreur dans un string
+     * @return bool|string
      */
-    public function updateRequests(array $requests, string $teacher): true|string
+    public function updateRequests(array $requests, string $teacher): bool|string
     {
         $current_requests = $this->getRequests($teacher);
         if (!$current_requests) { 
