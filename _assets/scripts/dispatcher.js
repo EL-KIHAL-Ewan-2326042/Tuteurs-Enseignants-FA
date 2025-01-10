@@ -239,11 +239,7 @@ document.addEventListener(
 
         function updateButtonState()
         {
-            if (select.value === 'default') {
-                saveButton.disabled = true;
-            } else {
-                saveButton.disabled = false;
-            }
+            saveButton.disabled = select.value === 'default';
         }
 
         if (!select) {
@@ -629,27 +625,38 @@ document.addEventListener(
         const tableBody = document.querySelector('#dispatch-table tbody');
 
         if (tableBody) {
-            ['click', 'touchstart'].forEach(eventType => {
-                tableBody.addEventListener(eventType, function (event) {
-                    if (event.target.tagName === 'I' && event.target.classList.contains('material-icons')) {
-                        const clickedRow = getClickedRow(event.target);
-                        if (!clickedRow) {
-                            return;
-                        }
+            ['click', 'touchstart'].forEach(
+                function (eventType) {
+                    tableBody.addEventListener(
+                        eventType, function (event) {
+                            if (event.target.tagName === 'I' 
+                                && event.target.classList.contains('material-icons')
+                            ) {
+                                const clickedRow = getClickedRow(event.target);
+                                if (!clickedRow) {
+                                    return;
+                                }
 
-                        const clickedRowIdentifier = clickedRow.getAttribute('data-internship-identifier');
-                        const [Internship_identifier, Id_teacher, Internship_address] = clickedRowIdentifier.split('$');
+                                const clickedRowIdentifier =
+                                clickedRow.getAttribute('data-internship-identifier');
+                                const [
+                                internshipIdentifier,
+                                idTeacher,
+                                internshipAddress
+                                ] = clickedRowIdentifier.split('$');
 
-                        if (event.target.textContent === 'face') {
-                            getTeachersForInternship(Internship_identifier);
-                            event.preventDefault();
-                        } else if (event.target.textContent === 'map') {
-                            updateMap(Internship_address, Id_teacher).then();
-                            event.preventDefault();
+                                if (event.target.textContent === 'face') {
+                                    getTeachersForInternship(internshipIdentifier);
+                                    event.preventDefault();
+                                } else if (event.target.textContent === 'map') {
+                                    updateMap(internshipAddress, idTeacher).then();
+                                    event.preventDefault();
+                                }
+                            }
                         }
-                    }
-                });
-            });
+                    );
+                }
+            );
         }
 
         function getClickedRow(element)
@@ -663,6 +670,7 @@ document.addEventListener(
         async function createTeacherMarkers(data)
         {
             let minDistance;
+            let closestTeacherAddress;
             for (const row of data) {
                 const teacherAddresses = await getTeacherAddresses(row.id_teacher);
                 const internshipLocation = await geocodeAddress(row.address);
@@ -687,12 +695,14 @@ document.addEventListener(
                         element: createMarkerElement(row.teacher_name),
                     }
                 );
-                const markerFeature = new ol.Feature({
-                    geometry: new ol.geom.Point(
-                        ol.proj.fromLonLat([closestTeacherAddress.lon, closestTeacherAddress.lat])
-                    ),
+                const markerFeature = new ol.Feature(
+                    {
+                        geometry: new ol.geom.Point(
+                            ol.proj.fromLonLat([closestTeacherAddress.lon, closestTeacherAddress.lat])
+                        ),
                     name: row.teacher_name,
-                });
+                    }
+                );
 
                 markerSource.addFeature(markerFeature);
             }
@@ -834,54 +844,72 @@ let map, routeLayer, companyMarker, teacherMarker;
  * @returns {Promise<void>}
  */
 
-async function initMap() {
+async function initMap()
+{
     const mapElement = document.getElementById("map");
 
-    if (!mapElement) return;
+    if (!mapElement) { return;
+    }
 
     try {
         const franceCenter = ol.proj.fromLonLat([2.337, 46.227]);
 
-        map = new ol.Map({
-            target: mapElement,
-            layers: [
-                new ol.layer.Tile({
-                    source: new ol.source.OSM(),
-                }),
+        map = new ol.Map(
+            {
+                target: mapElement,
+                layers: [
+                new ol.layer.Tile(
+                    {
+                        source: new ol.source.OSM(),
+                    }
+                ),
             ],
-            view: new ol.View({
-                center: franceCenter,
-                zoom: 5,
-            }),
-        });
+            view: new ol.View(
+                {
+                    center: franceCenter,
+                    zoom: 5,
+                }
+            ),
+            }
+        );
 
         markerSource = new ol.source.Vector();
 
-        clusterSource = new ol.source.Cluster({
-            distance: 25,
-            source: markerSource,
-        });
+        clusterSource = new ol.source.Cluster(
+            {
+                distance: 25,
+                source: markerSource,
+            }
+        );
 
-        clusterLayer = new ol.layer.Vector({
-            source: clusterSource,
-            style: function (feature) {
-                const size = feature.get("features").length;
-                const color = size > 1 ? "red" : "blue";
-                return new ol.style.Style({
-                    image: new ol.style.Circle({
-                        radius: size > 1 ? 30 : 20,
-                        fill: new ol.style.Fill({ color }),
-                        stroke: new ol.style.Stroke({ color: "white", width: 2 }),
-                    }),
-                    text: new ol.style.Text({
-                        text: size > 1 ? size.toString() : feature.get("features")[0].get("name"),
-                        fill: new ol.style.Fill({ color: "white" }),
-                        stroke: new ol.style.Stroke({ color: "black", width: 2 }),
-                        font: "12px Arial",
-                    }),
-                });
-            },
-        });
+        clusterLayer = new ol.layer.Vector(
+            {
+                source: clusterSource,
+                style: function (feature) {
+                    const size = feature.get("features").length;
+                    const color = size > 1 ? "red" : "blue";
+                    return new ol.style.Style(
+                        {
+                            image: new ol.style.Circle(
+                                {
+                                    radius: size > 1 ? 30 : 20,
+                                    fill: new ol.style.Fill({ color }),
+                                    stroke: new ol.style.Stroke({ color: "white", width: 2 }),
+                                }
+                            ),
+                        text: new ol.style.Text(
+                            {
+                                text: size > 1 ? size.toString() : feature.get("features")[0].get("name"),
+                                fill: new ol.style.Fill({ color: "white" }),
+                                stroke: new ol.style.Stroke({ color: "black", width: 2 }),
+                                font: "12px Arial",
+                            }
+                        ),
+                        }
+                    );
+                },
+            }
+        );
         map.addLayer(clusterLayer);
     } catch (error) {
         console.error("Error initializing map:", error);
@@ -918,7 +946,6 @@ async function getTeacherAddresses(Id_teacher)
         if (!response.ok) {
             const errorText = await response.text();
             console.error("Fetch error response:", errorText);
-            throw new Error("Network response was not ok");
         }
 
         return response.json();
@@ -958,7 +985,6 @@ async function getDistance(Internship_identifier, Id_teacher)
         if (!response.ok) {
             const errorText = await response.text();
             console.error("Fetch error response:", errorText);
-            throw new Error("Network response was not ok");
         }
 
         const data = await response.json();
@@ -997,7 +1023,6 @@ async function getDisciplines(Id_teacher)
         if (!response.ok) {
             const errorText = await response.text();
             console.error("Fetch error response:", errorText);
-            throw new Error("Network response was not ok");
         }
 
         return await response.json();
@@ -1028,7 +1053,6 @@ async function getStudentHistory(Student_number)
         if (!response.ok) {
             const errorText = await response.text();
             console.error("Fetch error response:", errorText);
-            throw new Error("Network response was not ok");
         }
 
         return await response.json();
@@ -1114,12 +1138,9 @@ async function geocodeAddress(address)
 
         if (data.length > 0 && data[0].lat && data[0].lon) {
             return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon) };
-        } else {
-            throw new Error("Le géocodage n'a retourné aucun résultat.");
         }
     } catch (error) {
         console.error("Erreur de géocodage :", error);
-        throw error;
     }
 }
 
@@ -1224,7 +1245,8 @@ function placeMarker(location, label, isCompany)
  *
  * @returns {HTMLElement} Élément du marqueur
  */
-function createMarkerElement(label) {
+function createMarkerElement(label)
+{
     const marker = document.createElement("div");
     marker.className = "enhanced-marker";
 
