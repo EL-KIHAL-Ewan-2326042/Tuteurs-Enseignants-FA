@@ -221,7 +221,7 @@ readonly class Dispatcher
                         <div class="row">
                             <p class="text">Associe un professeur à un stage
                                 (ne prend pas en compte le nombre maximum d'étudiant,
-                                ni le fait que le stage soit déjà attribué)</p>
+                                mais le fait que le stage soit déjà attribué)</p>
                             <div class="input-field col s6">
                                 <input id="searchTeacher" name="searchTeacher"
                                    type="text" class="validate">
