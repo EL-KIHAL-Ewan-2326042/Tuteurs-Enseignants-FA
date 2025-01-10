@@ -454,6 +454,13 @@ document.addEventListener(
                     }
                 }
             }
+            if (n > 6) {
+                M.Tooltip.init(
+                    document.querySelectorAll('.tooltip'), {
+                        exitDelay: 100,
+                    }
+                );
+            }
 
             sessionStorage.setItem('columnNumber', n);
             sessionStorage.setItem('direction', dir);
@@ -519,13 +526,6 @@ document.addEventListener(
                 }
                 createPageButton(totalPages);
             }
-        }
-        if (n > 6) {
-            M.Tooltip.init(
-                document.querySelectorAll('.tooltip'), {
-                    exitDelay: 100,
-                }
-            );
         }
 
         function createPageButton(page, isActive = false)
