@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS coeff_save;
+DROP TABLE IF EXISTS backup;
 DROP TABLE IF EXISTS Distance;
 DROP TABLE IF EXISTS Has_address;
 DROP TABLE IF EXISTS Study_at;
@@ -148,7 +148,7 @@ CREATE TABLE Distance(
     FOREIGN KEY(Internship_identifier) REFERENCES Internship(Internship_identifier)
 );
 
-CREATE TABLE coeff_save(
+CREATE TABLE backup (
     User_id VARCHAR(10),
     Name_criteria VARCHAR(50),
     Id_backup INT,
@@ -235,7 +235,7 @@ RETURNS TRIGGER AS $$
             LOOP
             FOR id_backup IN SELECT Id_backup.id_backup FROM Id_backup
                 LOOP
-                INSERT INTO coeff_save (user_id, name_Criteria, id_backup, coef, Is_checked) VALUES (user_id, NEW.name_criteria, id_backup, 1, False);
+                INSERT INTO backup (user_id, name_Criteria, id_backup, coef, Is_checked) VALUES (user_id, NEW.name_criteria, id_backup, 1, False);
                 END LOOP;
             END LOOP;
         RETURN NEW;
@@ -270,8 +270,6 @@ CREATE TRIGGER create_discipline_for_insert_is_taught
     EXECUTE FUNCTION create_discipline_for_insert();
 
 
-
-
 CREATE OR REPLACE FUNCTION create_id_backup_for_insert()
 RETURNS TRIGGER AS $$
     BEGIN
@@ -283,13 +281,61 @@ END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER create_discipline_for_insert_is_taught
-    BEFORE INSERT ON coeff_save
+    BEFORE INSERT ON backup
     FOR EACH ROW
     EXECUTE FUNCTION create_id_backup_for_insert();
+
+CREATE OR REPLACE FUNCTION update_backup_new_id_backup()
+RETURNS TRIGGER AS $$
+    DECLARE
+        user_id TEXT;
+        name_criteria TEXT;
+    BEGIN
+        FOR user_id IN SELECT user_connect.user_id FROM User_connect
+            LOOP
+            FOR name_criteria IN SELECT Distribution_criteria.name_criteria FROM Distribution_criteria
+                LOOP
+                INSERT INTO backup (user_id, name_Criteria, id_backup, coef) VALUES (user_id, name_criteria, NEW.id_backup, 1);
+            END LOOP;
+        END LOOP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER update_backup_new_id_backup
+    AFTER INSERT ON Distribution_criteria
+    FOR EACH ROW
+    EXECUTE FUNCTION update_backup_new_id_backup();
+
+
+CREATE OR REPLACE FUNCTION insert_backup()
+RETURNS TRIGGER AS $$
+    DECLARE
+        name_criteria TEXT;
+        id_backup integer;
+    BEGIN
+        FOR name_criteria IN SELECT Distribution_criteria.name_criteria FROM Distribution_criteria
+            LOOP
+            FOR id_backup IN SELECT Id_backup.id_backup FROM Id_backup
+                LOOP
+                INSERT INTO backup (user_id, name_Criteria, id_backup, coef) VALUES (NEW.user_id, name_criteria, id_backup, 1);
+            END LOOP;
+        END LOOP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER insert_backup
+    AFTER INSERT ON user_connect
+    FOR EACH ROW
+    EXECUTE FUNCTION insert_backup();
 
 
 /* Les lignes suivantes servent de données de test */
 
+INSERT INTO Id_backup (Id_backup) VALUES (1);
+INSERT INTO Id_backup (Id_backup) VALUES (2);
+INSERT INTO Id_backup (Id_backup) VALUES (3);
 
 INSERT INTO Distribution_criteria (Name_criteria, Description) VALUES ('A été responsable', 'Prendre en compte le fait que le prof ait déjà travaillé avec l élève');
 INSERT INTO Distribution_criteria (Name_criteria, Description) VALUES ('Distance', 'Prendre en compte la distance entre le lieu du stage et l adresse renseigné la plus proche pour le responsable');
