@@ -37,7 +37,7 @@ use Blog\Models\Teacher;
  * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
  * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
  */
-readonly class Account
+class Account
 {
 
     /**

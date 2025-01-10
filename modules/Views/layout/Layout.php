@@ -159,7 +159,7 @@ class Layout
                         &copy; 2024 TutorMap
                     </div>
                     <div class="col s6 right-align">
-                        <a href="/mentions-legales">Mentions Légales -</a>
+                        <a href="/legal-notices">Mentions Légales -</a>
                         <a href="/aboutus"> A Propos</a>
                     </div>
                 </div>

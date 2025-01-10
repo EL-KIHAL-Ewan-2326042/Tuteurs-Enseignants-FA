@@ -1,11 +1,11 @@
 <?php
 /**
- * Fichier contenant le contrôleur de la page 'Mentions légales'
+ * Fichier contenant les test PHPUnit du controlleur AboutUs
  *
  * PHP version 8.3
  *
- * @category Controller
- * @package  TutorMap/modules/Controllers
+ * @category Models
+ * @package  TutorMap/tests/Models
  *
  * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
  * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
@@ -15,14 +15,16 @@
  * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
  * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
  */
+namespace Controllers;
 
-namespace Blog\Controllers;
-
+use Blog\Controllers\Account;
 use Blog\Views\layout\Layout;
+use Includes\Database;
+use PHPUnit\Framework\MockObject\Exception;
+use PHPUnit\Framework\TestCase;
 
 /**
- * Classe gérant les échanges de données entre
- * le modèle et la vue de la page 'Mentions légales'
+ * Classe gérant les tests PHPUnit du controlleur Account
  *
  * PHP version 8.3
  *
@@ -37,35 +39,33 @@ use Blog\Views\layout\Layout;
  * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
  * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
  */
-class Mentionslegales
+class AccountTest extends TestCase
 {
-    private Layout $_layout;
+    private $_layoutMock;
+    private $_accountController;
 
     /**
-     * Initialise les attributs passés en paramètre
+     * Permet d'initialiser les variables nécessaires pour les tests
      *
-     * @param Layout $layout Instance de la classe Layout
-     *                       servant de vue pour la mise en page
+     * @return void
+     * @throws Exception
      */
-    public function __construct(Layout $layout)
+    protected function setUp(): void
     {
-        $this->_layout = $layout;
+        $this->_layoutMock = $this->createMock(Layout::class);
+
+        $this->_accountController = new Account($this->_layoutMock);
     }
 
     /**
-     * Contrôleur de la page 'Mentions légales'
+     * Vérifier que les roles non autorisée sont
+     * bien redirigés
      *
      * @return void
      */
-    public function show(): void
+    public function testShowRedirectsIfNotAdminDep(): void
     {
-        $title = "Mentions légales";
-        $cssFilePath = '_assets/styles/mentionLeg.css';
-        $jsFilePath = '';
-        $view = new \Blog\Views\mentions_legales\Mentionslegales();
-
-        $this->_layout->renderTop($title, $cssFilePath);
-        $view->showView();
-        $this->_layout->renderBottom($jsFilePath);
+        $this->expectOutputString('');
+        $this->_accountController->show();
     }
 }
