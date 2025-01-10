@@ -87,8 +87,8 @@ class Dispatcher
                 }
             } else {
                 return
-                ["Internship_identifier ou Id_Teacher 
-                inexistant dans ce departement", ""];
+                ["Internship_identifier ou Id_Teacher "
+                . "inexistant dans ce departement", ""];
             }
         } elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
             return ["Merci de remplir tout les champs", ""];

@@ -69,20 +69,20 @@ class Department extends Model
      */
     public function getInternshipsPerDepartment(string $department): false|array
     {
-        $query = 'SELECT internship_identifier, internship.company_name, 
-                  internship.internship_subject, 
-                  internship.address, internship.student_number, 
-                  internship.type, 
-                  student.student_name, student.student_firstname, 
-                  student.formation, student.class_group
-                    FROM internship
-                    JOIN student ON 
-                        internship.student_number = student.student_number
-                    JOIN study_at ON 
-                        internship.student_number = study_at.student_number
-                    WHERE department_name = :department_name
-                    AND id_teacher IS NULL
-                    AND start_date_internship > CURRENT_DATE';
+        $query = 'SELECT internship_identifier, internship.company_name, '
+                  . 'internship.internship_subject, '
+                  . 'internship.address, internship.student_number, '
+                  . 'internship.type, '
+                  . 'student.student_name, student.student_firstname, '
+                  . 'student.formation, student.class_group '
+                    . 'FROM internship '
+                    . 'JOIN student ON '
+                        . 'internship.student_number = student.student_number '
+                    . 'JOIN study_at ON '
+                        . 'internship.student_number = study_at.student_number '
+                    . 'WHERE department_name = :department_name '
+                    . 'AND id_teacher IS NULL '
+                    . 'AND start_date_internship > CURRENT_DATE';
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindParam(':department_name', $department);
         $stmt->execute();
