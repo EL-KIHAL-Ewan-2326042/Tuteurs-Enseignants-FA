@@ -62,7 +62,7 @@ class Mentionslegales
         $title = "Mentions légales";
         $cssFilePath = '_assets/styles/mentionLeg.css';
         $jsFilePath = '';
-        $view = new \Blog\Views\mentions_legales\Mentionslegales();
+        $view = new \Blog\Views\mentions_Legales\Mentionslegales();
 
         $this->_layout->renderTop($title, $cssFilePath);
         $view->showView();
