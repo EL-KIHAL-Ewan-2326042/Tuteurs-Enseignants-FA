@@ -16,13 +16,13 @@
  * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
  */
 
-namespace Blog\Views\mentions_Legales;
+namespace Blog\Views\legal_Notices;
 
 /**
  * Classe gérant l'affichage de la page 'Mentions Légales'
  *
  * @category View
- * @package  TutorMap/modules/Views/mentions_Legales
+ * @package  TutorMap/modules/Views/legal_Notices
  *
  * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
  * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
@@ -32,7 +32,7 @@ namespace Blog\Views\mentions_Legales;
  * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
  * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
  */
-class Mentionslegales
+class LegalNotices
 {
     /**
      * Affiche la page 'Mentions Légales'

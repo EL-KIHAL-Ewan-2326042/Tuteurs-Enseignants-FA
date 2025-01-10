@@ -110,10 +110,6 @@ class Homepage
                     ];
                 }
             }
-
-            if (isset($_POST['durationMin'])) {
-                echo 'ici';
-            }
         }
 
         $title = "Accueil";
