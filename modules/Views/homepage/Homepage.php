@@ -248,9 +248,9 @@ readonly class Homepage
                             if (!$inDep) {
                                 echo "<strong>" .
                                 $_SESSION['selected_student']['firstName']. ' ' .
-                                $_SESSION['selected_student']['lastName']
-                                . "</strong> ne fait partie d'aucun
-                                de vos départements";
+                                $_SESSION['selected_student']['lastName'] .
+                                "</strong> ne fait partie d'aucun " .
+                                "de vos départements";
                             } else {
                                 $id_teacher = $internshipInfos['id_teacher'];
                                 if ($id_teacher) {
@@ -280,8 +280,8 @@ readonly class Homepage
                                     <label class="center">
                                         <input type="checkbox"
                                                name="searchedStudent"
-                                               class="center-align
-                                               filled-in" value="1"
+                                               class="center-align filled-in"
+                                               value="1"
                                             <?php echo in_array(
                                                 $internshipInfos
                                                 ["internship_identifier"],
@@ -307,16 +307,16 @@ readonly class Homepage
                                 <button class="waves-effect waves-light btn tooltip"
                                     name="searchedStudentSubmitted" value="<?php echo
                                     $internshipInfos["internship_identifier"] ?>"
-                                    type="submit" formmethod="post" data-tooltip
-                                    ="Valider votre choix" data-position="top">
+                                    type="submit" formmethod="post" data-tooltip=
+                                    "Valider votre choix" data-position="top">
                                     Valider
                                 </button>
-                                                    <?php
-                                                    echo "</form>";
+                                    <?php
+                                    echo "</form>";
                                 } else {
                                     echo "</div>";
                                 }
-                                                echo '<div class="row"></div>';
+                                echo '<div class="row"></div>';
                         } else {
                             echo "<p>Cet étudiant n'a pas de stage ...</p>";
                         }
@@ -377,8 +377,9 @@ readonly class Homepage
                     <div class="row"></div>
                     <button class="waves-effect waves-light btn tooltip"
                         name="selecDepSubmitted" value="1" type="submit"
-                        formmethod="post" data-tooltip="Afficher les tutorats
-                        disponibles" data-position="top">Afficher</button>
+                        formmethod="post"
+                        data-tooltip="Afficher les tutorats disponibles"
+                        data-position="top">Afficher</button>
                 </form>
 
                 <div class="row"></div>
@@ -495,19 +496,27 @@ readonly class Homepage
                             </div>
 
                             <div id="pagination-controls" class="center-align">
-                                <button type="button" class="waves-effect waves-light
-                                    btn" id="first-page"><i class="material-icons"
-                                    type="button">first_page</i></button>
-                                <button type="button" class="waves-effect waves-light
-                                    btn" id="prev-page"><i class="material-icons"
-                                    type="button">arrow_back</i></button>
+                                <button type="button" class=
+                                    "waves-effect waves-light btn" id="first-page">
+                                    <i class="material-icons" type="button">
+                                        first_page
+                                </i></button>
+                                <button type="button" class=
+                                    "waves-effect waves-light btn" id="prev-page">
+                                    <i class="material-icons" type="button">
+                                        arrow_back
+                                </i></button>
                                 <div id="page-numbers"></div>
-                                <button type="button" class="waves-effect waves-light
-                                    btn" id="next-page"><i class="material-icons"
-                                    type="button">arrow_forward</i></button>
-                                <button type="button" class="waves-effect waves-light
-                                    btn" id="last-page"><i class="material-icons"
-                                    type="button">last_page</i></button>
+                                <button type="button" class=
+                                    "waves-effect waves-light btn" id="next-page">
+                                    <i class="material-icons" type="button">
+                                        arrow_forward
+                                </i></button>
+                                <button type="button" class=
+                                    "waves-effect waves-light btn" id="last-page">
+                                    <i class="material-icons" type="button">
+                                        last_page
+                                </i></button>
                             </div>
 
                             <div class="row"></div>
@@ -515,11 +524,11 @@ readonly class Homepage
                             <div class="selection"> <div class="formCell">
                                 <button class="waves-effect waves-light btn tooltip"
                                     name="selecInternshipSubmitted" value="1"
-                                    type="submit" data-tooltip="Envoyer vos
-                                    choix" data-position="top">Valider</button>
+                                    type="submit" data-tooltip="Envoyer vos choix"
+                                    data-position="top">Valider</button>
                                 <button class="waves-effect waves-light btn tooltip"
-                                    type="reset" data-tooltip="Annuler les
-                                    modifications" data-position="top">
+                                    type="reset" data-tooltip=
+                                    "Annuler les modifications" data-position="top">
                                     Annuler
                                 </button>
                             </div>

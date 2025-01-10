@@ -101,8 +101,8 @@ class User extends Model
         }
 
         $db = $this->_db;
-        $query = 'SELECT role_name FROM has_role 
-                    WHERE has_role.user_id = :user_id';
+        $query = 'SELECT role_name FROM has_role '
+                . 'WHERE has_role.user_id = :user_id';
 
         $stmt = $db->getConn()->prepare($query);
         $stmt->bindParam(':user_id', $identifier);
@@ -157,8 +157,8 @@ class User extends Model
         }
 
         $db = $this->_db;
-        $query = 'SELECT DISTINCT department_name FROM has_role 
-                    WHERE has_role.user_id = :user_id';
+        $query = 'SELECT DISTINCT department_name FROM has_role '
+                . 'WHERE has_role.user_id = :user_id';
 
         $stmt = $db->getConn()->prepare($query);
         $stmt->bindParam(':user_id', $identifier);
@@ -178,8 +178,8 @@ class User extends Model
     public function showCoefficients(): ?array
     {
         try {
-            $query = "SELECT DISTINCT id_backup
-                        FROM id_backup ORDER BY id_backup ASC";
+            $query = "SELECT DISTINCT id_backup "
+                    . "FROM id_backup ORDER BY id_backup ASC";
             $stmt = $this->_db->getConn()->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -202,11 +202,11 @@ class User extends Model
     public function loadCoefficients(string $user_id, int $id_backup): array|false
     {
         try {
-            $query = "SELECT name_criteria, coef, is_checked
-                        FROM backup
-                        WHERE user_id = :user_id
-                        AND id_backup = :id_backup
-                        ORDER BY name_criteria ASC";
+            $query = "SELECT name_criteria, coef, is_checked "
+                    . "FROM backup "
+                    . "WHERE user_id = :user_id "
+                    . "AND id_backup = :id_backup "
+                    . "ORDER BY name_criteria ASC";
             $stmt = $this->_db->getConn()->prepare($query);
             $stmt->bindParam(':user_id', $user_id);
             $stmt->bindParam(':id_backup', $id_backup);
@@ -236,11 +236,11 @@ class User extends Model
         array $data, string $user_id, int $id_backup = 0
     ): bool {
         try {
-            $query = "UPDATE backup 
-                        SET coef = :coef, is_checked = :is_checked 
-                        WHERE user_id = :user_id
-                        AND id_backup = :id_backup
-                        AND name_criteria = :name_criteria";
+            $query = "UPDATE backup "
+                    . "SET coef = :coef, is_checked = :is_checked "
+                    . "WHERE user_id = :user_id "
+                    . "AND id_backup = :id_backup "
+                    . "AND name_criteria = :name_criteria";
 
             foreach ($data as $singleData) {
                 $stmt = $this->_db->getConn()->prepare($query);
@@ -267,9 +267,9 @@ class User extends Model
      **/
     public function getDefaultCoef(): array
     {
-        $query = "SELECT name_criteria
-                    FROM distribution_criteria
-                    ORDER BY name_criteria ASC";
+        $query = "SELECT name_criteria "
+                . "FROM distribution_criteria "
+                . "ORDER BY name_criteria ASC";
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->execute();
         $defaultCriteria = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -292,8 +292,8 @@ class User extends Model
      */
     public function insertUserConnect(string $userId, string $user_pass): void
     {
-        $query = "INSERT INTO user_connect (user_id, user_pass)
-                    VALUES (:user_id, :user_pass)";
+        $query = "INSERT INTO user_connect (user_id, user_pass) "
+                . "VALUES (:user_id, :user_pass)";
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindValue(':user_id', $userId);
         $stmt->bindValue(':user_pass', password_hash($user_pass, PASSWORD_DEFAULT));
@@ -310,8 +310,8 @@ class User extends Model
      */
     public function insertHasRole(string $userId, string $department): void
     {
-        $query = "INSERT INTO has_role (user_id, role_name, department_name)
-                    VALUES (:user_id, 'Professeur' ,:department)";
+        $query = "INSERT INTO has_role (user_id, role_name, department_name) "
+                . "VALUES (:user_id, 'Professeur' ,:department)";
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindValue(':user_id', $userId);
         $stmt->bindValue(':department', $department);
