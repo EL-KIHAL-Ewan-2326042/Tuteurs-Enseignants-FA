@@ -68,13 +68,13 @@ class Internship extends Model
      */
     public function getInternships(string $student): false|array
     {
-        $query = 'SELECT id_teacher, student_number, 
-                    Start_date_internship, End_date_internship
-                    FROM internship
-                    WHERE student_number = :student
-                    AND end_date_internship < CURRENT_DATE
-                    AND id_teacher IS NOT NULL
-                    ORDER BY start_date_internship ASC';
+        $query = 'SELECT id_teacher, student_number, '
+                    . 'Start_date_internship, End_date_internship '
+                    . 'FROM internship '
+                    . 'WHERE student_number = :student '
+                    . 'AND end_date_internship < CURRENT_DATE '
+                    . 'AND id_teacher IS NOT NULL '
+                    . 'ORDER BY start_date_internship ASC';
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindParam(':student', $student);
         $stmt->execute();
@@ -124,14 +124,14 @@ class Internship extends Model
      */
     public function getInterns(string $teacher): array
     {
-        $query = 'SELECT company_name, internship_subject, address, student_name, 
-                    student_firstname, type, formation, class_group, 
-                    internship.student_number, internship_identifier, id_teacher
-                    FROM internship
-                    JOIN student 
-                        ON internship.student_number = student.student_number
-                    WHERE id_teacher = :teacher
-                    AND end_date_internship > CURRENT_DATE';
+        $query = 'SELECT company_name, internship_subject, address, student_name, '
+                    . 'student_firstname, type, formation, class_group, '
+                    . 'internship.student_number, internship_identifier, id_teacher '
+                    . 'FROM internship '
+                    . 'JOIN student '
+                        . 'ON internship.student_number = student.student_number '
+                    . 'WHERE id_teacher = :teacher '
+                    . 'AND end_date_internship > CURRENT_DATE';
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindParam(':teacher', $teacher);
         $stmt->execute();
@@ -184,10 +184,10 @@ class Internship extends Model
         bool $bound
     ): int {
 
-        $query = 'SELECT * 
-                    FROM Distance 
-                    WHERE internship_identifier = :idInternship 
-                    AND id_teacher = :idTeacher';
+        $query = 'SELECT * '
+                    . 'FROM Distance '
+                    . 'WHERE internship_identifier = :idInternship '
+                    . 'AND id_teacher = :idTeacher';
         $stmt0 = $this->_db->getConn()->prepare($query);
         $stmt0->bindParam(':idInternship', $internship_identifier);
         $stmt0->bindParam(':idTeacher', $id_teacher);
@@ -198,9 +198,9 @@ class Internship extends Model
             return $minDuration[0]['distance'];
         }
 
-        $query = 'SELECT Address 
-                    FROM Internship 
-                    WHERE internship_identifier = :internship_identifier';
+        $query = 'SELECT Address '
+                    . 'FROM Internship '
+                    . 'WHERE internship_identifier = :internship_identifier';
         $stmt1 = $this->_db->getConn()->prepare($query);
         $stmt1->bindParam(':internship_identifier', $internship_identifier);
         $stmt1->execute();
@@ -235,11 +235,11 @@ class Internship extends Model
         }
 
         if (!$bound) {
-            $query = 'INSERT INTO Distance 
-                     (id_teacher, internship_identifier, distance)
-                     VALUES (:id_teacher, :id_internship, :distance)
-                     ON CONFLICT (id_teacher, internship_identifier)
-                     DO UPDATE SET distance = EXCLUDED.distance;';
+            $query = 'INSERT INTO Distance '
+                     . '(id_teacher, internship_identifier, distance) '
+                     . 'VALUES (:id_teacher, :id_internship, :distance) '
+                     . 'ON CONFLICT (id_teacher, internship_identifier) '
+                     . 'DO UPDATE SET distance = EXCLUDED.distance;';
 
             $stmt3 = $this->_db->getConn()->prepare($query);
             $stmt3->bindParam(':id_teacher', $id_teacher);
@@ -338,52 +338,53 @@ class Internship extends Model
     {
         $_db = $this->_db;
 
-        $query = "SELECT Teacher.Id_teacher, Teacher.teacher_name, 
-                  Teacher.teacher_firstname, Teacher.maxi_number_trainees, 
-                    SUM(CASE 
-                    WHEN internship.type = 'alternance' THEN 2 
-                    WHEN internship.type = 'Internship' THEN 1 
-                    ELSE 0
-                    END) AS Current_count FROM Teacher 
-                  JOIN has_role ON Teacher.Id_teacher = has_role.user_id
-                  JOIN Study_at ON
-                      Study_at.department_name = has_role.department_name
-                  JOIN Student ON Student.student_number = Study_at.student_number
-                  JOIN INTERNSHIP ON 
-                      Internship.student_number = Student.student_number
-                  WHERE has_role.department_name IN (SELECT department_name 
-                    FROM Study_at 
-                    JOIN Student ON Study_at.student_number = Student.student_number
-                    JOIN Internship ON 
-                        Internship.student_number = Internship.student_number
-                    WHERE Internship.internship_identifier = :internship
-                    GROUP BY department_name) AND 
-                      Internship.internship_identifier = :internship
-                  GROUP BY Teacher.Id_teacher, 
-                           Teacher.teacher_name, Teacher.teacher_firstname, 
-                           Teacher.maxi_number_trainees
-                    HAVING Teacher.maxi_number_trainees > SUM(
-                    CASE 
-                        WHEN internship.type = 'alternance' THEN 2
-                        WHEN internship.type = 'Internship' THEN 1
-                        ELSE 0
-                    END) 
-                  ";
+        $query = "SELECT Teacher.Id_teacher, Teacher.teacher_name, "
+                  . "Teacher.teacher_firstname, Teacher.maxi_number_trainees, "
+                    . "SUM(CASE "
+                    . "WHEN internship.type = 'alternance' THEN 2 "
+                    . "WHEN internship.type = 'Internship' THEN 1 "
+                    . "ELSE 0 "
+                    . "END) AS Current_count FROM Teacher "
+                  . "JOIN has_role ON Teacher.Id_teacher = has_role.user_id "
+                  . "JOIN Study_at ON "
+                      . "Study_at.department_name = has_role.department_name "
+                  . "JOIN Student "
+                      . "ON Student.student_number = Study_at.student_number "
+                  . "JOIN INTERNSHIP ON "
+                      . "Internship.student_number = Student.student_number "
+                  . "WHERE has_role.department_name IN (SELECT department_name "
+                    . "FROM Study_at "
+                    . "JOIN Student "
+                     . "ON Study_at.student_number = Student.student_number "
+                    . "JOIN Internship ON "
+                        . "Internship.student_number = Internship.student_number "
+                    . "WHERE Internship.internship_identifier = :internship "
+                    . "GROUP BY department_name) AND "
+                      . "Internship.internship_identifier = :internship "
+                  . "GROUP BY Teacher.Id_teacher, "
+                           . "Teacher.teacher_name, Teacher.teacher_firstname, "
+                           . "Teacher.maxi_number_trainees "
+                    . "HAVING Teacher.maxi_number_trainees > SUM("
+                    . "CASE "
+                        . "WHEN internship.type = 'alternance' THEN 2 "
+                        . "WHEN internship.type = 'Internship' THEN 1 "
+                        . "ELSE 0 "
+                    . "END)";
 
         $stmt = $_db->getConn()->prepare($query);
         $stmt->bindValue(':internship', $internship);
         $stmt->execute();
         $teacherList = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $query = "SELECT Internship.Internship_identifier, 
-                  Internship.Company_name, Internship.Internship_subject,
-                  Internship.Address, Internship.Student_number, 
-                  Internship.Type, Student.Student_name, 
-                  Student.Student_firstname, Student.Formation, 
-                  Student.Class_group
-                    FROM Internship JOIN Student ON 
-                        Internship.Student_number = Student.Student_number
-                    WHERE Internship.internship_identifier = :internship";
+        $query = "SELECT Internship.Internship_identifier, "
+                  . "Internship.Company_name, Internship.Internship_subject, "
+                  . "Internship.Address, Internship.Student_number, "
+                  . "Internship.Type, Student.Student_name, "
+                  . "Student.Student_firstname, Student.Formation, "
+                  . "Student.Class_group "
+                    . "FROM Internship JOIN Student ON "
+                        . "Internship.Student_number = Student.Student_number "
+                    . "WHERE Internship.internship_identifier = :internship";
 
         $stmt = $_db->getConn()->prepare($query);
         $stmt->bindValue(':internship', $internship);
@@ -425,9 +426,9 @@ class Internship extends Model
         $pdo = $this->_db;
 
         // on récupère les mots-clés relatifs au sujet du stage
-        $query = "SELECT keywords
-                    FROM internship
-                    WHERE internship_identifier = :internshipId";
+        $query = "SELECT keywords "
+                    . "FROM internship "
+                    . "WHERE internship_identifier = :internshipId";
         $stmt1 = $pdo->getConn()->prepare($query);
         $stmt1->bindParam(':internshipId', $internshipId);
         $stmt1->execute();
@@ -468,8 +469,8 @@ class Internship extends Model
         $tsQuery2 = implode(' & ', explode('_', $tsQuery2));
 
         // on convertit les mots-clés et les disciplines pour pouvoir les comparer
-        $query = "SELECT to_tsquery('french', :searchTerm1) AS
-                  internship, to_tsquery('french', :searchTerm2) AS discip";
+        $query = "SELECT to_tsquery('french', :searchTerm1) AS "
+                  . "internship, to_tsquery('french', :searchTerm2) AS discip";
         $stmt3 = $pdo->getConn()->prepare($query);
         $stmt3->BindValue(':searchTerm1', $tsQuery1);
         $stmt3->bindValue(':searchTerm2', $tsQuery2);
@@ -517,9 +518,9 @@ class Internship extends Model
     public function isRequested(
         string $internship_identifier, string $id_teacher
     ): bool {
-        $query = "SELECT * FROM is_requested WHERE 
-                  internship_identifier = :internship_identifier 
-                  AND id_teacher = :id_teacher";
+        $query = "SELECT * FROM is_requested WHERE "
+                  . "internship_identifier = :internship_identifier "
+                  . "AND id_teacher = :id_teacher";
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindParam(':internship_identifier', $internship_identifier);
         $stmt->bindParam(':id_teacher', $id_teacher);
@@ -552,19 +553,20 @@ class Internship extends Model
         $roleDepartments = $_SESSION['role_department'];
         $placeholders = implode(',', array_fill(0, count($roleDepartments), '?'));
 
-        $query = "SELECT Teacher.Id_teacher, Teacher.teacher_name, 
-                  Teacher.teacher_firstname,
-                  MAX(maxi_number_trainees) AS Max_trainees, 
-                  SUM(CASE 
-                  WHEN internship.type = 'alternance' THEN 2 
-                  WHEN internship.type = 'Internship' THEN 1 
-                  ELSE 0
-                  END) AS Current_count
-                  FROM Teacher
-                  JOIN has_role ON Teacher.Id_teacher = Has_role.user_id
-                  LEFT JOIN internship ON Teacher.Id_teacher = internship.Id_teacher
-                  WHERE department_name IN ($placeholders)
-                  GROUP BY Teacher.Id_teacher";
+        $query = "SELECT Teacher.Id_teacher, Teacher.teacher_name, "
+                  . "Teacher.teacher_firstname,"
+                  . "MAX(maxi_number_trainees) AS Max_trainees, "
+                  . "SUM(CASE "
+                  . "WHEN internship.type = 'alternance' THEN 2 "
+                  . "WHEN internship.type = 'Internship' THEN 1 "
+                  . "ELSE 0 "
+                  . "END) AS Current_count "
+                  . "FROM Teacher "
+                  . "JOIN has_role ON Teacher.Id_teacher = Has_role.user_id "
+                  . "LEFT JOIN internship "
+                  . "ON Teacher.Id_teacher = internship.Id_teacher "
+                  . "WHERE department_name IN ($placeholders) "
+                  . "GROUP BY Teacher.Id_teacher";
 
         $stmt = $_db->getConn()->prepare($query);
         $stmt->execute($roleDepartments);
@@ -640,10 +642,10 @@ class Internship extends Model
         $roleDepartments = $_SESSION['role_department'];
         $placeholders = implode(',', array_fill(0, count($roleDepartments), '?'));
 
-        $query = "SELECT Internship.Internship_identifier
-                  FROM Internship JOIN Study_at 
-                  ON Internship.Student_number = Study_at.Student_number
-                  WHERE Department_name IN ($placeholders)";
+        $query = "SELECT Internship.Internship_identifier "
+                  . "FROM Internship JOIN Study_at "
+                  . "ON Internship.Student_number = Study_at.Student_number "
+                  . "WHERE Department_name IN ($placeholders)";
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->execute($roleDepartments);
         return $stmt->fetchAll(PDO::FETCH_COLUMN);
@@ -663,12 +665,12 @@ class Internship extends Model
         $roleDepartments = $_SESSION['role_department'];
         $placeholders = implode(',', array_fill(0, count($roleDepartments), '?'));
 
-        $query = "SELECT internship.Id_teacher, internship.Internship_identifier 
-                  FROM internship JOIN Study_at 
-                  ON internship.Student_number = Study_at.Student_number
-                  WHERE Department_name 
-                  IN ($placeholders) 
-                  AND internship.Id_teacher IS NOT NULL";
+        $query = "SELECT internship.Id_teacher, internship.Internship_identifier "
+                  . "FROM internship JOIN Study_at "
+                  . "ON internship.Student_number = Study_at.Student_number "
+                  . "WHERE Department_name "
+                  . "IN ($placeholders) "
+                  . "AND internship.Id_teacher IS NOT NULL";
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->execute($roleDepartments);
         return $stmt->fetchAll(PDO::FETCH_NUM);
@@ -682,8 +684,8 @@ class Internship extends Model
      */
     public function insertResponsible(): string
     {
-        $query = 'UPDATE internship SET Id_teacher = :Id_teacher 
-                  WHERE Internship_identifier = :Internship_identifier';
+        $query = 'UPDATE internship SET Id_teacher = :Id_teacher '
+                  . 'WHERE Internship_identifier = :Internship_identifier';
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindParam(':Internship_identifier', $_POST['searchInternship']);
         $stmt->bindParam(':Id_teacher', $_POST['searchTeacher']);
@@ -718,9 +720,9 @@ class Internship extends Model
     public function insertIsResponsible(
         String $id_prof, String $Internship_id, float $Score
     ): string {
-        $query = 'UPDATE internship 
-                  SET Id_teacher = :id_prof, Relevance_score = :Score 
-                  WHERE Internship_identifier = :Internship_id';
+        $query = 'UPDATE internship '
+                  . 'SET Id_teacher = :id_prof, Relevance_score = :Score '
+                  . 'WHERE Internship_identifier = :Internship_id';
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindParam(':id_prof', $id_prof);
         $stmt->bindParam(':Score', $Score);
@@ -741,10 +743,10 @@ class Internship extends Model
      */
     public function getStudentHistory(string $student_number): mixed
     {
-        $query = "SELECT End_date_internship 
-                  FROM Internship 
-                  WHERE Student_number = :student_number 
-                  AND Start_date_internship < CURRENT_DATE";
+        $query = "SELECT End_date_internship "
+                  . "FROM Internship "
+                  . "WHERE Student_number = :student_number "
+                  . "AND Start_date_internship < CURRENT_DATE";
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindParam(':student_number', $student_number);
         $stmt->execute();
@@ -763,19 +765,19 @@ class Internship extends Model
      */
     public function getInternshipStudent(string $student): false|array
     {
-        $query = 'SELECT internship_identifier, company_name, 
-                  internship_subject, address, 
-                  internship.id_teacher, teacher_name, 
-                  teacher_firstname, formation, class_group
-                  FROM internship
-                  JOIN student 
-                      ON internship.student_number = student.student_number
-                  LEFT JOIN teacher 
-                      ON internship.id_teacher = teacher.id_teacher
-                  WHERE internship.student_number = :student
-                  AND start_date_internship > CURRENT_DATE
-                  ORDER BY start_date_internship ASC
-                  LIMIT 1';
+        $query = 'SELECT internship_identifier, company_name, '
+                  . 'internship_subject, address, '
+                  . 'internship.id_teacher, teacher_name, '
+                  . 'teacher_firstname, formation, class_group '
+                  . 'FROM internship '
+                  . 'JOIN student '
+                      . 'ON internship.student_number = student.student_number '
+                  . 'LEFT JOIN teacher '
+                      . 'ON internship.id_teacher = teacher.id_teacher '
+                  . 'WHERE internship.student_number = :student '
+                  . 'AND start_date_internship > CURRENT_DATE '
+                  . 'ORDER BY start_date_internship ASC '
+                  . 'LIMIT 1';
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindParam(':student', $student);
         $stmt->execute();
@@ -798,8 +800,8 @@ class Internship extends Model
 
         $pdo = $this->_db;
 
-        $query = 'SELECT address FROM internship 
-                  WHERE internship.student_number = :student_number';
+        $query = 'SELECT address FROM internship '
+                  . 'WHERE internship.student_number = :student_number';
 
         $stmt = $pdo->getConn()->prepare($query);
         $stmt->bindValue(':student_number', $studentId);
@@ -827,8 +829,9 @@ class Internship extends Model
         $current_requests = $this->getRequests($teacher);
         if ($add) {
             if (!in_array($internship, $current_requests)) {
-                $query = 'INSERT INTO is_requested(id_teacher, internship_identifier)
-                            VALUES(:teacher, :internship)';
+                $query
+                    = 'INSERT INTO is_requested(id_teacher, internship_identifier) '
+                    . 'VALUES(:teacher, :internship)';
                 $stmt = $this->_db->getConn()->prepare($query);
                 $stmt->bindParam(':teacher', $teacher);
                 $stmt->bindParam(':internship', $internship);
@@ -837,9 +840,9 @@ class Internship extends Model
             }
         } else {
             if (in_array($internship, $current_requests)) {
-                $query = 'DELETE FROM is_requested
-                            WHERE  id_teacher = :teacher
-                            AND internship_identifier = :internship';
+                $query = 'DELETE FROM is_requested '
+                            . 'WHERE  id_teacher = :teacher '
+                            . 'AND internship_identifier = :internship';
                 $stmt = $this->_db->getConn()->prepare($query);
                 $stmt->bindParam(':teacher', $teacher);
                 $stmt->bindParam(':internship', $internship);
@@ -859,11 +862,9 @@ class Internship extends Model
      * Met à jour la table is_requested en
      * fonction des stages demandés par l'enseignant passé en paramètre
      *
-     * @param array $requests tableau contenant
-     *                         les numéro de stage que l'enseignant souhaite
-     *                         tutorer
-     * @param string $teacher numéro de
-     *                         l'enseignant
+     * @param array  $requests tableau contenant les numéros de stage que
+     *                         l'enseignant souhaite tutorer
+     * @param string $teacher  numéro de l'enseignant
      *
      * @return bool|string
      */
@@ -878,8 +879,8 @@ class Internship extends Model
         $to_delete = array_diff($current_requests, $requests);
 
         foreach ($to_add as $request) {
-            $query = 'INSERT INTO is_requested(id_teacher, internship_identifier)
-                        VALUES(:teacher, :internship)';
+            $query = 'INSERT INTO is_requested(id_teacher, internship_identifier) '
+                        . 'VALUES(:teacher, :internship)';
             $stmt = $this->_db->getConn()->prepare($query);
             $stmt->bindParam(':teacher', $teacher);
             $stmt->bindParam(':internship', $request);
@@ -892,9 +893,9 @@ class Internship extends Model
         }
 
         foreach ($to_delete as $request) {
-            $query = 'DELETE FROM is_requested
-                        WHERE  id_teacher = :teacher
-                        AND internship_identifier = :internship';
+            $query = 'DELETE FROM is_requested '
+                        . 'WHERE  id_teacher = :teacher '
+                        . 'AND internship_identifier = :internship';
             $stmt = $this->_db->getConn()->prepare($query);
             $stmt->bindParam(':teacher', $teacher);
             $stmt->bindParam(':internship', $request);
@@ -920,9 +921,9 @@ class Internship extends Model
      */
     public function getRequests(string $teacher): false|array
     {
-        $query = 'SELECT internship_identifier
-                    FROM is_requested
-                    WHERE  id_teacher = :teacher';
+        $query = 'SELECT internship_identifier '
+                    . 'FROM is_requested '
+                    . 'WHERE  id_teacher = :teacher';
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindParam(':teacher', $teacher);
         $stmt->execute();
@@ -941,11 +942,10 @@ class Internship extends Model
      */
     public function internshipExists(string $idTeacher, string $studentNumber): bool
     {
-        $query = "
-        SELECT COUNT(*) 
-        FROM internship 
-        WHERE id_teacher = :id_teacher AND student_number = :student_number
-    ";
+        $query
+            = "SELECT COUNT(*) "
+            . "FROM internship "
+            . "WHERE id_teacher = :id_teacher AND student_number = :student_number";
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindValue(':id_teacher', $idTeacher);
         $stmt->bindValue(':student_number', $studentNumber);
