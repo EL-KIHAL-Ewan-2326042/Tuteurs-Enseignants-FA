@@ -189,10 +189,10 @@ readonly class Homepage
                                         <th>ADRESSE</th>
                                         <th>
                                             <div class="tooltip-container tooltip"
-                                                data-tooltip="Distance moyenne vous
+                                                data-tooltip="Durée moyenne vous
                                                 séparant du lieu du stage"
                                                 data-position="top">(?)</div>
-                                            DISTANCE
+                                            POSITION
                                         </th>
                                         <th>
                                             <div class="tooltip-container tooltip"
@@ -407,10 +407,10 @@ readonly class Homepage
                                     <th class="clickable">ADRESSE</th>
                                     <th class="clickable">
                                         <div class="tooltip-container tooltip"
-                                            data-tooltip="Distance moyenne vous
+                                            data-tooltip="Durée moyenne vous
                                             séparant du lieu du stage"
                                             data-position="top">(?)</div>
-                                        DISTANCE
+                                        POSITION
                                     </th>
                                     <th class="clickable">
                                         <div class="tooltip-container tooltip"

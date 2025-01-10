@@ -143,6 +143,13 @@ tbody {
     }
 }
 
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+    color: #E8CE7E;
+    font-weight: bold;
+}
+
 /** Pagination **/
 
 #pagination-controls {
