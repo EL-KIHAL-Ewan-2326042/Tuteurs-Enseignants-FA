@@ -68,15 +68,15 @@ class Student extends Model
 
         $searchTerm = trim($searchTerm);
 
-        $query = "
-        SELECT student.student_number, student_name,
-        student_firstname, company_name, internship_identifier
-        FROM student
-        JOIN internship ON student.student_number = internship.student_number
-        WHERE internship_identifier ILIKE :searchTerm
-        ORDER BY company_name ASC
-        LIMIT 5
-        ";
+        $query
+            = "SELECT student.student_number, student_name, "
+            . "student_firstname, company_name, internship_identifier "
+            . "FROM student "
+            . "JOIN internship "
+            . "ON student.student_number = internship.student_number "
+            . "WHERE internship_identifier ILIKE :searchTerm "
+            . "ORDER BY company_name ASC "
+            . "LIMIT 5";
         $searchTerm = "$searchTerm%";
 
         $stmt = $pdo->getConn()->prepare($query);
@@ -105,41 +105,39 @@ class Student extends Model
         $query = '';
 
         if ($searchType === 'studentNumber') {
-            $query = "
-            SELECT student_number, student_name, student_firstname,
-            ts_rank_cd(to_tsvector('french', student_number),
-            to_tsquery('french', :searchTerm), 32) AS rank
-            FROM student
-            WHERE student_number ILIKE :searchTerm
-            ORDER BY student_number
-            LIMIT 5
-        ";
+            $query
+                = "SELECT student_number, student_name, student_firstname, "
+                . "ts_rank_cd(to_tsvector('french', student_number), "
+                . "to_tsquery('french', :searchTerm), 32) AS rank "
+                . "FROM student "
+                . "WHERE student_number ILIKE :searchTerm "
+                . "ORDER BY student_number "
+                . "LIMIT 5";
             $searchTerm = "$searchTerm%";
         } elseif ($searchType === 'name') {
-            $query = "
-            SELECT student_number, student_name, student_firstname,
-            ts_rank_cd(to_tsvector(
-                'french', student_name || ' ' || student_firstname
-            ), to_tsquery('french', :searchTerm), 32) AS rank
-            FROM student
-            WHERE student_name ILIKE :searchTerm
-            OR student_firstname ILIKE :searchTerm
-            ORDER BY rank DESC
-            LIMIT 5
-            ";
+            $query
+                = "SELECT student_number, student_name, student_firstname, "
+                . "ts_rank_cd(to_tsvector( "
+                    . "'french', student_name || ' ' || student_firstname "
+                . "), to_tsquery('french', :searchTerm), 32) AS rank "
+                . "FROM student "
+                . "WHERE student_name ILIKE :searchTerm "
+                . "OR student_firstname ILIKE :searchTerm "
+                . "ORDER BY rank DESC "
+                . "LIMIT 5";
             $searchTerm = "%$searchTerm%";
         } elseif ($searchType === 'company') {
-            $query = "
-            SELECT student.student_number, student_name,
-            student_firstname, company_name,
-            ts_rank_cd(to_tsvector('french', internship.company_name),
-            to_tsquery('french', :searchTerm), 32) AS rank
-            FROM student
-            JOIN internship ON student.student_number = internship.student_number
-            WHERE company_name ILIKE :searchTerm
-            ORDER BY rank DESC
-            LIMIT 5
-            ";
+            $query
+                = "SELECT student.student_number, student_name, "
+                . "student_firstname, company_name, "
+                . "ts_rank_cd(to_tsvector('french', internship.company_name), "
+                . "to_tsquery('french', :searchTerm), 32) AS rank "
+                . "FROM student "
+                . "JOIN internship "
+                . "ON student.student_number = internship.student_number "
+                . "WHERE company_name ILIKE :searchTerm "
+                . "ORDER BY rank DESC "
+                . "LIMIT 5";
             $searchTerm = "$searchTerm%";
         }
 
@@ -160,9 +158,9 @@ class Student extends Model
      */
     public function getDepStudent(string $student): false|array
     {
-        $query = 'SELECT department_name
-                    FROM study_at
-                    WHERE student_number = :student';
+        $query = 'SELECT department_name '
+                . 'FROM study_at '
+                . 'WHERE student_number = :student';
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindParam(':student', $student);
         $stmt->execute();

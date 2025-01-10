@@ -280,10 +280,10 @@ class Model
     {
         try {
             // Requête SQL pour obtenir les noms des colonnes
-            $query = "
-                SELECT column_name
-                FROM information_schema.columns
-                WHERE table_name = :table_name";
+            $query
+                = "SELECT column_name "
+                . "FROM information_schema.columns "
+                . "WHERE table_name = :table_name";
 
             $stmt = $this->_db->getConn()->prepare($query);
             $stmt->bindParam(':table_name', $tableName);
@@ -407,8 +407,9 @@ class Model
         } catch (Exception) {
             fclose($handle);
             throw new Exception(
-                "Erreur lors du traitement du fichier CSV 
-                (merci de vérifier que vous repectez bien le guide utilisateur). "
+                "Erreur lors du traitement du fichier CSV "
+                . "(merci de vérifier que vous respectez bien le guide "
+                . "utilisateur avec un éditeur de texte)."
             );
         }
     }
@@ -476,8 +477,8 @@ class Model
      */
     public function insertStudyAt(string $student_number, string $department): void
     {
-        $query = "INSERT INTO study_at (student_number, department_name)
-                    VALUES (:student_number, :department)";
+        $query = "INSERT INTO study_at (student_number, department_name) "
+                    . "VALUES (:student_number, :department)";
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindValue(':student_number', $student_number);
         $stmt->bindValue(':department', $department);
@@ -588,14 +589,14 @@ class Model
         }
 
         // Réquee SQL d'insertion
-        $query = "INSERT INTO $tableName (" . implode(',', $tableColumns) . ")
-                  VALUES (" . implode(
-            ',', array_map(
-                fn($i) => ":column$i", range(
-                    1, count($tableColumns)
-                )
-            )
-        ) . ")";
+        $query = "INSERT INTO $tableName (" . implode(',', $tableColumns)
+                . ") VALUES (" . implode(
+                    ',', array_map(
+                        fn($i) => ":column$i", range(
+                            1, count($tableColumns)
+                        )
+                    )
+                ) . ")";
         $stmt = $this->_db->getConn()->prepare($query);
 
         // Lier les valeurs des données aux paramètres nommés dans le requête
@@ -662,28 +663,32 @@ class Model
             ) . " FROM $tableName";
 
             $query .= match ($tableName) {
-                'internship' => " JOIN student ON internship.student_number 
-                 = student.student_number JOIN study_at ON study_at.student_number 
-                 = student.student_number 
-                 WHERE study_at.department_name = :department",
-                'student' => " JOIN study_at ON student.student_number 
-                 = study_at.student_number 
-                 WHERE study_at.department_name = :department",
+                'internship' => " JOIN student ON internship.student_number "
+                 . "= student.student_number "
+                 . "JOIN study_at ON study_at.student_number "
+                 . "= student.student_number "
+                 . "WHERE study_at.department_name = :department",
+                'student' => " JOIN study_at ON student.student_number "
+                 . "= study_at.student_number "
+                 . "WHERE study_at.department_name = :department",
                 default => throw new Exception("Table non reconnue : " . $tableName),
             };
         } else {
-            $query = "SELECT teacher.maxi_number_trainees, teacher.id_teacher, 
-                        teacher.teacher_name, teacher.teacher_firstname, 
-                        CONCAT(has_address.address, '$', has_address.type) 
-                            AS address_type, is_taught.discipline_name AS discipline 
-                        FROM teacher  
-                        JOIN has_role ON teacher.id_teacher = has_role.user_id 
-                        JOIN department 
-                            ON department.department_name = has_role.department_name 
-                        JOIN has_address 
-                            ON teacher.id_teacher = has_address.id_teacher 
-                        JOIN is_taught ON teacher.id_teacher = is_taught.id_teacher 
-                        WHERE department.department_name = :department";
+            $query = "SELECT teacher.maxi_number_trainees, teacher.id_teacher, "
+                        . "teacher.teacher_name, teacher.teacher_firstname, "
+                        . "CONCAT(has_address.address, '$', has_address.type) "
+                            . "AS address_type, "
+                        . "is_taught.discipline_name AS discipline "
+                        . "FROM teacher "
+                        . "JOIN has_role ON teacher.id_teacher = has_role.user_id "
+                        . "JOIN department "
+                            . "ON department.department_name "
+                            . "= has_role.department_name "
+                        . "JOIN has_address "
+                            . "ON teacher.id_teacher = has_address.id_teacher "
+                        . "JOIN is_taught "
+                        . "ON teacher.id_teacher = is_taught.id_teacher "
+                        . "WHERE department.department_name = :department";
         }
 
         if (is_array($department)) {
