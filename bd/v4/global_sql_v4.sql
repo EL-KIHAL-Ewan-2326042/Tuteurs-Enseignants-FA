@@ -12,7 +12,7 @@ DROP TABLE IF EXISTS Address_type;
 DROP TABLE IF EXISTS Addr_name;
 DROP TABLE IF EXISTS Distribution_criteria;
 DROP TABLE IF EXISTS Role;
-DROP TABLE IF EXISTS User;
+DROP TABLE IF EXISTS User_connect;
 DROP TABLE IF EXISTS Discipline;
 DROP TABLE IF EXISTS Student;
 DROP TABLE IF EXISTS Teacher;
@@ -39,7 +39,7 @@ CREATE TABLE Discipline(
     PRIMARY KEY(Discipline_name)
 );
 
-CREATE TABLE User(
+CREATE TABLE User_connect(
     User_id VARCHAR(10),
     User_pass VARCHAR(100),
     PRIMARY KEY(User_id)
@@ -117,7 +117,7 @@ CREATE TABLE Has_role(
     Role_name VARCHAR(50) NOT NULL,
     Department_name VARCHAR(50) NOT NULL,
     PRIMARY KEY(User_id, Role_name),
-    FOREIGN KEY(User_id) REFERENCES User(User_id),
+    FOREIGN KEY(User_id) REFERENCES User_connect(User_id),
     FOREIGN KEY(Role_name) REFERENCES Role(Role_name)
 );
 
@@ -156,7 +156,7 @@ CREATE TABLE coeff_save(
     Name_save VARCHAR(100),
     Is_checked BOOLEAN DEFAULT TRUE,
     PRIMARY KEY(User_id, Name_criteria, Id_backup),
-    FOREIGN KEY(User_id) REFERENCES User(User_id),
+    FOREIGN KEY(User_id) REFERENCES User_connect(User_id),
     FOREIGN KEY(Name_criteria) REFERENCES Distribution_criteria(Name_criteria),
     FOREIGN KEY(Id_backup) REFERENCES Id_backup(Id_backup)
 );
@@ -208,7 +208,6 @@ CREATE TRIGGER check_distance_assignment
     BEFORE INSERT ON Distance
     FOR EACH ROW
     EXECUTE FUNCTION check_distance_assignment();
-CohDisciplineérence
 
 CREATE OR REPLACE FUNCTION create_addr_for_insert()
 RETURNS TRIGGER AS $$
@@ -232,7 +231,7 @@ RETURNS TRIGGER AS $$
         user_id TEXT;
         id_backup integer;
     BEGIN
-        FOR user_id IN SELECT User.user_id FROM User
+        FOR user_id IN SELECT User_connect.user_id FROM User_connect
             LOOP
             FOR id_backup IN SELECT Id_backup.id_backup FROM Id_backup
                 LOOP
@@ -519,37 +518,37 @@ INSERT INTO Discipline (Discipline_name) VALUES ('Marketing');
 INSERT INTO Discipline (Discipline_name) VALUES ('Communication digitale');
 INSERT INTO Discipline (Discipline_name) VALUES ('Vente et négociation');
 
-INSERT INTO User (User_id, User_pass) VALUES ('B22662146', '$2y$10$DNpKk6g77ufGETaD7A4FQua4ZrO9HwHl1J4qAwUgL1XwdpKPAXMRu'); -- mdp :
-INSERT INTO User (User_id, User_pass) VALUES ('R14328249', '$2y$10$TvPQhHaaEB1aTJ/FxvEo3O9GaFoIx2vOeZoyE5ahmKnhwSds6ZkiK');
-INSERT INTO User (User_id, User_pass) VALUES ('G42185815', '$2y$10$WG0pe2kKpQiEP0xYbfH/GuT.pr9eBvmzwdOgP.QUr34308q./ZM6a');
-INSERT INTO User (User_id, User_pass) VALUES ('R32281327', '$2y$10$V2YG65gZXZjCoPpxEpANtuFxtmyDPi9Qxe2D1rthC129SbeSuMG8.');
-INSERT INTO User (User_id, User_pass) VALUES ('O75041198', '$2y$10$YVWvia1C.bm1EDV5u/4yI.kb6pkwJM0DcGNmvDQ64Qs71rCRB/7ye');
-INSERT INTO User (User_id, User_pass) VALUES ('V73654623', '$2y$10$4GvAufarNFnQYAesWMWaPOcDNn3a1nZNuTy/OL/eoX9y7PpfbjEWO');
-INSERT INTO User (User_id, User_pass) VALUES ('Z17235374', '$2y$10$ulYwK4OEEbxpqusPRlXZXum4royyp5FUC/rRIWpdtjBzgNqMSBjuC');
-INSERT INTO User (User_id, User_pass) VALUES ('R84623671', '$2y$10$9.y/9zxukaG8yKJ7JOEK4OAXupNCZEnXGYCzXpd1au4coMY4j.iyC');
-INSERT INTO User (User_id, User_pass) VALUES ('D78106598', '$2y$10$iv4ZU3DVYRY6QQnIIN7VVusjbCmIZkVk82fqedfcuX23m9qDvvP8a');
-INSERT INTO User (User_id, User_pass) VALUES ('S85694088', '$2y$10$SwkcJmkKmvAGsuflQLacee6./yEHLpeHaqhnS3wUpSshKS/F11EMi');
-INSERT INTO User (User_id, User_pass) VALUES ('Y68664772', '$2y$10$CqU0sotf9LnlAlhT.Dbd0eb3tlqIRA5aH/ETRtH5vqVTq/K/V4qhW');
-INSERT INTO User (User_id, User_pass) VALUES ('Q66676064', '$2y$10$UFlM4t4JwnaRjVfWraUoo.XvaNk2LlIWR/jheXOFnfMa0QvMc/5fy');
-INSERT INTO User (User_id, User_pass) VALUES ('B10648624', '$2y$10$tdF/FDwEhV3lZ6DKa.Vesu98kBdIfPLZOyPxifs9k8C5i8ByMsiie');
-INSERT INTO User (User_id, User_pass) VALUES ('N26332417', '$2y$10$FdJ5wEicQxaX3d05.lLKS.P1Lujrdq/m79NGiXyGEc.KgMXt7Gnly');
-INSERT INTO User (User_id, User_pass) VALUES ('F42358144', '$2y$10$J9Bl5I2xx33d9qrawJDqluIULAW/NUZ.fEccpgSKTvFQwXdPlr4q2');
-INSERT INTO User (User_id, User_pass) VALUES ('I57332640', '$2y$10$G47oWpYdhJnN1OW.r1NYS.GdWq/jkrCMK2l5EhcUjs8Vk0HbRlw1O');
-INSERT INTO User (User_id, User_pass) VALUES ('B51423637', '$2y$10$WAFksdTEA2UkFuzwc02OqemZ1bardfPqc4yZM6Osiq6hfQdjbkv7G');
-INSERT INTO User (User_id, User_pass) VALUES ('C45328794', '$2y$10$d1t0mAYts3uDMQCHQ8InQeH.YZjDALitHrBxcyUqbVfi.ygbfn8dm');
-INSERT INTO User (User_id, User_pass) VALUES ('H48344613', '$2y$10$DqXmxG1udGp82W05ShrQc.FVp81iW4IEIKSwosD6fNXM0zGF0uMGu');
-INSERT INTO User (User_id, User_pass) VALUES ('R41814241', '$2y$10$UogEny9ZpSiEZ7FoFbLxmeW.FSmtTGFZ0rGNdvJkdf8H8zFidGAuC');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('B22662146', '$2y$10$DNpKk6g77ufGETaD7A4FQua4ZrO9HwHl1J4qAwUgL1XwdpKPAXMRu'); -- mdp :
+INSERT INTO User_connect (User_id, User_pass) VALUES ('R14328249', '$2y$10$TvPQhHaaEB1aTJ/FxvEo3O9GaFoIx2vOeZoyE5ahmKnhwSds6ZkiK');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('G42185815', '$2y$10$WG0pe2kKpQiEP0xYbfH/GuT.pr9eBvmzwdOgP.QUr34308q./ZM6a');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('R32281327', '$2y$10$V2YG65gZXZjCoPpxEpANtuFxtmyDPi9Qxe2D1rthC129SbeSuMG8.');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('O75041198', '$2y$10$YVWvia1C.bm1EDV5u/4yI.kb6pkwJM0DcGNmvDQ64Qs71rCRB/7ye');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('V73654623', '$2y$10$4GvAufarNFnQYAesWMWaPOcDNn3a1nZNuTy/OL/eoX9y7PpfbjEWO');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('Z17235374', '$2y$10$ulYwK4OEEbxpqusPRlXZXum4royyp5FUC/rRIWpdtjBzgNqMSBjuC');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('R84623671', '$2y$10$9.y/9zxukaG8yKJ7JOEK4OAXupNCZEnXGYCzXpd1au4coMY4j.iyC');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('D78106598', '$2y$10$iv4ZU3DVYRY6QQnIIN7VVusjbCmIZkVk82fqedfcuX23m9qDvvP8a');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('S85694088', '$2y$10$SwkcJmkKmvAGsuflQLacee6./yEHLpeHaqhnS3wUpSshKS/F11EMi');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('Y68664772', '$2y$10$CqU0sotf9LnlAlhT.Dbd0eb3tlqIRA5aH/ETRtH5vqVTq/K/V4qhW');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('Q66676064', '$2y$10$UFlM4t4JwnaRjVfWraUoo.XvaNk2LlIWR/jheXOFnfMa0QvMc/5fy');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('B10648624', '$2y$10$tdF/FDwEhV3lZ6DKa.Vesu98kBdIfPLZOyPxifs9k8C5i8ByMsiie');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('N26332417', '$2y$10$FdJ5wEicQxaX3d05.lLKS.P1Lujrdq/m79NGiXyGEc.KgMXt7Gnly');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('F42358144', '$2y$10$J9Bl5I2xx33d9qrawJDqluIULAW/NUZ.fEccpgSKTvFQwXdPlr4q2');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('I57332640', '$2y$10$G47oWpYdhJnN1OW.r1NYS.GdWq/jkrCMK2l5EhcUjs8Vk0HbRlw1O');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('B51423637', '$2y$10$WAFksdTEA2UkFuzwc02OqemZ1bardfPqc4yZM6Osiq6hfQdjbkv7G');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('C45328794', '$2y$10$d1t0mAYts3uDMQCHQ8InQeH.YZjDALitHrBxcyUqbVfi.ygbfn8dm');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('H48344613', '$2y$10$DqXmxG1udGp82W05ShrQc.FVp81iW4IEIKSwosD6fNXM0zGF0uMGu');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('R41814241', '$2y$10$UogEny9ZpSiEZ7FoFbLxmeW.FSmtTGFZ0rGNdvJkdf8H8zFidGAuC');
 -- insert pour les prof de TC et GEA
-INSERT INTO User (User_id, User_pass) VALUES ('A12345678', '$2y$10$Px3DIuPvY5UCPv8201EAOORdbch5tUUVOS8DyYsFeMYAM6WJIHo4G');
-INSERT INTO User (User_id, User_pass) VALUES ('B23456789', '$2y$10$XMfBq27RP1Mv3B6jOW9LbO/6Y9ngozLp0U6S9W0wBp3aRI7PjJFs2');
-INSERT INTO User (User_id, User_pass) VALUES ('C34567890', '$2y$10$Eb41ZbnjMKqAVnJBDXqFSe0MyDMU0NNX0R0XNoX7IgW57/K.0Bo2G');
-INSERT INTO User (User_id, User_pass) VALUES ('D45678901', '$2y$10$LqX4MIWZcOanXbPAXrG5zu9F/E.pvP9kYV1RVZqq2MewhihV8BRZ2');
-INSERT INTO User (User_id, User_pass) VALUES ('E56789012', '$2y$10$8A9M7wF2DXR9wbpdM1RLpO5FViBtT5By0lqbxNiyUXKLmkroBhYJi');
-INSERT INTO User (User_id, UsUser_connecter_pass) VALUES ('F67890123', '$2y$10$4BCm.CNTLl3wMMGkDyaT2OqJ0ur62Lk3b7vvRvF/CkxplJrBLfpxq');
-INSERT INTO User (User_id, User_pass) VALUES ('G78901234', '$2y$10$BMAaFUsO/1xgKiM4A7vg6ON9THfb9Hbfg9ZQKni6sC/3vqeBPJdi6');
-INSERT INTO User (User_id, User_pass) VALUES ('H89012345', '$2y$10$vbTkNDWh6Kr2SHcGH4yADONH8NKhM6VHZSkGCR3VoBr/LlbWGLwxi');
-INSERT INTO User (User_id, User_pass) VALUES ('I90123456', '$2y$10$ISrrFWkUhbb2b3y7/9NdHeEDJNOFqsV58CGuTqLp1Fg3clAho.U/q');
-INSERT INTO User (User_id, User_pass) VALUES ('J01234567', '$2y$10$QmPv1aWspu0UIz3F5uzgZeH2AwZfTS1XgKjv.XFXFQz06a/QwmWQW');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('A12345678', '$2y$10$Px3DIuPvY5UCPv8201EAOORdbch5tUUVOS8DyYsFeMYAM6WJIHo4G');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('B23456789', '$2y$10$XMfBq27RP1Mv3B6jOW9LbO/6Y9ngozLp0U6S9W0wBp3aRI7PjJFs2');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('C34567890', '$2y$10$Eb41ZbnjMKqAVnJBDXqFSe0MyDMU0NNX0R0XNoX7IgW57/K.0Bo2G');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('D45678901', '$2y$10$LqX4MIWZcOanXbPAXrG5zu9F/E.pvP9kYV1RVZqq2MewhihV8BRZ2');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('E56789012', '$2y$10$8A9M7wF2DXR9wbpdM1RLpO5FViBtT5By0lqbxNiyUXKLmkroBhYJi');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('F67890123', '$2y$10$4BCm.CNTLl3wMMGkDyaT2OqJ0ur62Lk3b7vvRvF/CkxplJrBLfpxq');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('G78901234', '$2y$10$BMAaFUsO/1xgKiM4A7vg6ON9THfb9Hbfg9ZQKni6sC/3vqeBPJdi6');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('H89012345', '$2y$10$vbTkNDWh6Kr2SHcGH4yADONH8NKhM6VHZSkGCR3VoBr/LlbWGLwxi');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('I90123456', '$2y$10$ISrrFWkUhbb2b3y7/9NdHeEDJNOFqsV58CGuTqLp1Fg3clAho.U/q');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('J01234567', '$2y$10$QmPv1aWspu0UIz3F5uzgZeH2AwZfTS1XgKjv.XFXFQz06a/QwmWQW');
 
 INSERT INTO Role (Role_name) VALUES ('Professeur');
 INSERT INTO Role (Role_name) VALUES ('Admin_dep');
@@ -665,6 +664,8 @@ INSERT INTO Addr_name (Address) VALUES ('Cassie');
 INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('NV22432349XN','Qwant','Aix-en-Provence','Architecture_des_ordinateurs Gestion_de_projet','2025-05-11','alternance','2026-11-22','Developpement_de_jeux_video','B82656814');
 INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('FO60456314IK','Unowhy','Marseille','Architecture_des_ordinateurs Gestion_de_projet','2026-11-21','Internship','2026-12-21','Systemes_informatiques_embarques','Y26472238');
 INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('VK73845811RP','Bull','Marseille 13e','Gestion_de_projet Communication','2025-12-16','alternance','2026-06-21','Big_data_et_visualisation','B14955698');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number, Id_teacher) VALUES ('VK73345811RP','Bull','Marseille 13e','Gestion_de_projet Communication','2023-12-16','alternance','2024-06-21','Big_data_et_visualisation','B14955698','B22662146');
+INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number, Id_teacher) VALUES ('YJ11370210YV','1Kubator','Aubagne','BD POO','2025-07-27','Internship','2026-05-21','Developpement_de_solution_devops','S47843997', 'B22662146');
 INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('YJ11570210YV','1Kubator','Aubagne','BD POO','2025-07-27','Internship','2026-05-21','Developpement_de_solution_devops','S47843997');
 INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('AR75067342MC','Quantmetry','La Ciotat','Gestion_de_projet Communication','2025-02-05','alternance','2026-04-03','Securite_informatique_et_tests_de_penetration','D83154177');
 INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('TM05282265IJ','OVH','Rognac','BD POO','2025-09-03','Internship','2026-08-30','Developpement_de_solution_devops','D97153746');
