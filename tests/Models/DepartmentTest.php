@@ -1,34 +1,79 @@
 <?php
-
+/**
+ * Fichier contenant les test PHPUnit du modèle Department
+ *
+ * PHP version 8.3
+ *
+ * @category Models
+ * @package  TutorMap/tests/Models
+ *
+ * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
+ * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
+ * @author Kerbadou Islem <islem.kerbadou@etu.univ-amu.fr>
+ * @author Pellet Casimir <casimir.pellet@etu.univ-amu.fr>
+ *
+ * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
+ * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
+ */
 namespace Models;
 
 use Includes\Database;
 use Blog\Models\Department;
 use PDO;
 use PDOStatement;
+use PHPUnit\Framework\MockObject\Exception;
+use PHPUnit\Framework\MockObject\MockClass;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Classe gérant les tests PHPUnit du modèle Department
+ *
+ * PHP version 8.3
+ *
+ * @category Controller
+ * @package  TutorMap/modules/Controllers
+ *
+ * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
+ * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
+ * @author Kerbadou Islem <islem.kerbadou@etu.univ-amu.fr>
+ * @author Pellet Casimir <casimir.pellet@etu.univ-amu.fr>
+ *
+ * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
+ * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
+ */
 class DepartmentTest extends TestCase
 {
-    private $mockDb;
-    private $mockPdo;
-    private $mockStmt;
-    private $department;
+    private Database $_mockDb;
+    private PDO $_mockPdo;
+    private PDOStatement $_mockStmt;
+    private Department $_department;
 
+    /**
+     * Permet de d'initialiser les variables nécessaires pour les tests
+     *
+     * @return void
+     * @throws Exception
+     */
     protected function setUp(): void
     {
-        $this->mockPdo = $this->createMock(PDO::class);
+        $this->_mockPdo = $this->createMock(PDO::class);
 
-        $this->mockDb = $this->getMockBuilder(Database::class)
+        $this->_mockDb = $this->getMockBuilder(Database::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->mockDb->method('getConn')->willReturn($this->mockPdo);
+        $this->_mockDb->method('getConn')->willReturn($this->_mockPdo);
 
-        $this->mockStmt = $this->createMock(PDOStatement::class);
+        $this->_mockStmt = $this->createMock(PDOStatement::class);
 
-        $this->department = new Department($this->mockDb);
+        $this->_department = new Department($this->_mockDb);
     }
 
+    /**
+     * Test pour vérifier la méthode getInternshipPerDepartment
+     * (qu'elle renvoie des données cohérentes)
+     *
+     * @return void
+     */
     public function testGetInternshipsPerDepartmentReturnsData(): void
     {
         $mockResults = [
@@ -46,49 +91,55 @@ class DepartmentTest extends TestCase
             ],
         ];
 
-        $this->mockPdo->expects($this->once())
+        $this->_mockPdo->expects($this->once())
             ->method('prepare')
             ->with($this->stringContains('SELECT internship_identifier'))
-            ->willReturn($this->mockStmt);
+            ->willReturn($this->_mockStmt);
 
-        $this->mockStmt->expects($this->once())
+        $this->_mockStmt->expects($this->once())
             ->method('bindParam')
             ->with(':department_name', $this->anything());
 
-        $this->mockStmt->expects($this->once())
+        $this->_mockStmt->expects($this->once())
             ->method('execute');
 
-        $this->mockStmt->expects($this->once())
+        $this->_mockStmt->expects($this->once())
             ->method('fetchAll')
             ->with(PDO::FETCH_ASSOC)
             ->willReturn($mockResults);
 
-        $result = $this->department->getInternshipsPerDepartment('IT');
+        $result = $this->_department->getInternshipsPerDepartment('IT');
         $this->assertIsArray($result);
         $this->assertCount(1, $result);
         $this->assertEquals('Company A', $result[0]['company_name']);
     }
 
+    /**
+     * Test pour vérifier la méthode getInternshipPerDepartment
+     * (qu'elle renvoie false)
+     *
+     * @return void
+     */
     public function testGetInternshipsPerDepartmentReturnsFalse(): void
     {
-        $this->mockPdo->expects($this->once())
+        $this->_mockPdo->expects($this->once())
             ->method('prepare')
             ->with($this->stringContains('SELECT internship_identifier'))
-            ->willReturn($this->mockStmt);
+            ->willReturn($this->_mockStmt);
 
-        $this->mockStmt->expects($this->once())
+        $this->_mockStmt->expects($this->once())
             ->method('bindParam')
             ->with(':department_name', $this->anything());
 
-        $this->mockStmt->expects($this->once())
+        $this->_mockStmt->expects($this->once())
             ->method('execute');
 
-        $this->mockStmt->expects($this->once())
+        $this->_mockStmt->expects($this->once())
             ->method('fetchAll')
             ->with(PDO::FETCH_ASSOC)
             ->willReturn([]);
 
-        $result = $this->department->getInternshipsPerDepartment('NonExistentDept');
+        $result = $this->_department->getInternshipsPerDepartment('NonExistentDept');
         $this->assertIsArray($result);
         $this->assertEmpty($result);
     }

@@ -41,31 +41,20 @@ class Database
     private string $_user = "tutormap";
     private string $_pass = "8exs7JcEpGVfsI";
     private string $_dbname = "tutormap_v4";
-    private PDO $_conn;
+    private ?PDO $_conn = null;
 
     /**
      * Constructeur de la classe database
-     * Lors de la construction de l'objet database,
-     * une tentative de connexion est faite vers la bd
      */
     public function __construct()
     {
-        try {
-            $this->_conn = new PDO(
-                "pgsql:host=$this->_host;dbname=$this->_dbname",
-                $this->_user, $this->_pass
-            );
-            $this->_conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch (PDOException $e) {
-            echo "Erreur de connexion: " . $e->getMessage();
-        }
     }
 
     /**
      * Méthode statique pour obtenir l'instance unique
-     * de la classe database(singleton)
+     * de la classe database (singleton)
      *
-     * @return database le singleton
+     * @return Database le singleton
      */
     public static function getInstance(): Database
     {
@@ -77,12 +66,36 @@ class Database
     }
 
     /**
+     * Initialise la connexion à la base de données si ce n'est pas déjà fait
+     *
+     * @return void
+     */
+    public function initConnection(): void
+    {
+        if ($this->_conn === null) {
+            try {
+                $this->_conn = new PDO(
+                    "pgsql:host=$this->_host;dbname=$this->_dbname",
+                    $this->_user, $this->_pass
+                );
+                $this->_conn->setAttribute(
+                    PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION
+                );
+            } catch (PDOException $e) {
+                echo "Erreur de connexion: " . $e->getMessage();
+            }
+        }
+    }
+
+    /**
      * Méthode pour récupérer la connexion PDO
+     * Cette méthode initialise la connexion si elle n'est pas déjà établie
      *
      * @return PDO
      */
     public function getConn(): PDO
     {
+        $this->initConnection();
         return $this->_conn;
     }
 }
