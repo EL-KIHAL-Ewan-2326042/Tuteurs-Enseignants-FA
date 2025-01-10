@@ -1,30 +1,69 @@
 <?php
+/**
+ * Fichier contenant le contrôleur de la page de connexion à l'Intramu
+ *
+ * PHP version 8.3
+ *
+ * @category Controller
+ * @package  TutorMap/modules/Controllers
+ *
+ * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
+ * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
+ * @author Kerbadou Islem <islem.kerbadou@etu.univ-amu.fr>
+ * @author Pellet Casimir <casimir.pellet@etu.univ-amu.fr>
+ *
+ * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
+ * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
+ */
+
 namespace Blog\Controllers;
 
-use Blog\Views\Layout;
+use Blog\Models\Teacher;
+use Blog\Models\User;
+use Blog\Views\layout\Layout;
 use Includes\Database;
 
 /**
- * Contrôleur de la page de connexion
+ * Classe gérant les échanges de données entre
+ * le modèle et la vue de la page de connexion à l'Intramu
+ *
+ * PHP version 8.3
+ *
+ * @category Controller
+ * @package  TutorMap/modules/Controllers
+ *
+ * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
+ * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
+ * @author Kerbadou Islem <islem.kerbadou@etu.univ-amu.fr>
+ * @author Pellet Casimir <casimir.pellet@etu.univ-amu.fr>
+ *
+ * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
+ * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
  */
-class Intramu {
-    private Layout $layout;
+class Intramu
+{
+    private Layout $_layout;
 
     /**
-     * Constructeur de la classe Intramu (contrôleur)
+     * Initialise les attributs passés en paramètre
+     *
      * @param Layout $layout Instance de la classe Layout
+     *                       servant de vue pour la mise en page
      */
-    public function __construct(Layout $layout) {
-        $this->layout = $layout;
+    public function __construct(Layout $layout)
+    {
+        $this->_layout = $layout;
     }
 
     /**
-     * Liaison entre la vue et le layout et affichage
+     * Liaison entre la vue et le layout, et affichage
      * Gestion de la soumission du formulaire de connexion
-     * Si l'utilisateur est connecte, alors il est deconnecte
+     * Si l'utilisateur est connecté, alors il est deconnecté
+     *
      * @return void
      */
-    public function show(): void {
+    public function show(): void
+    {
         if (isset($_SESSION['identifier'])) {
             unset($_SESSION['identifier']);
             unset($_SESSION['role_name']);
@@ -35,20 +74,25 @@ class Intramu {
 
         $errorMessage = '';
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['identifier']) && isset($_POST['password'])) {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST'
+            && isset($_POST['identifier'])
+            && isset($_POST['password'])
+        ) {
             $identifierLogs = $_POST['identifier'];
             $passwordLogs = $_POST['password'];
             $db = Database::getInstance();
 
-            $loginModel = new \Blog\Models\Intramu($db);
+            $userModel = new User($db);
+            $teacherModel = new Teacher($db);
 
-            if ($loginModel->doLogsExist($identifierLogs, $passwordLogs)) {
+            if ($userModel->doLogsExist($identifierLogs, $passwordLogs)) {
                 $_SESSION['identifier'] = $identifierLogs;
-                $_SESSION['fullName'] = $loginModel->getFullName($identifierLogs);
-                $_SESSION['roles'] = $loginModel->getRoles($identifierLogs);
-                $_SESSION['role_name'] = $loginModel->getHighestRole($identifierLogs);
-                $_SESSION['role_department'] = $loginModel->getRole_department($identifierLogs);
-                $_SESSION['address'] = $loginModel->getAddress($identifierLogs);
+                $_SESSION['fullName'] = $teacherModel->getFullName($identifierLogs);
+                $_SESSION['roles'] = $userModel->getRoles($identifierLogs);
+                $_SESSION['role_name'] = $userModel->getHighestRole($identifierLogs);
+                $_SESSION['role_department'] = $userModel
+                    ->getRoleDepartment($identifierLogs);
+                $_SESSION['address'] = $teacherModel->getAddress($identifierLogs);
                 header('Location: /homepage');
                 exit();
             } else {
@@ -57,12 +101,12 @@ class Intramu {
         }
 
         $title = "Connexion";
-        $cssFilePath = '_assets/styles/login.css';
+        $cssFilePath = '_assets/styles/intramu.css';
         $jsFilePath = '';
-        $view = new \Blog\Views\Intramu($errorMessage);
+        $view = new \Blog\Views\intramu\Intramu($errorMessage);
 
-        $this->layout->renderTop($title, $cssFilePath);
+        $this->_layout->renderTop($title, $cssFilePath);
         $view->showView();
-        $this->layout->renderBottom($jsFilePath);
+        $this->_layout->renderBottom($jsFilePath);
     }
 }
