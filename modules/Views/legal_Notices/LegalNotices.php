@@ -85,7 +85,7 @@ class LegalNotices
                 Tous les droits de reproduction sont réservés, y compris pour les
                 documents iconographiques et photographiques. <br>
                 Selon <a href="https://fr.wikipedia.org/wiki/Convention_de_Berne_pour
-                _la_protection_des_%C5%93uvres_litt%C3%A9raires_et_artistiques">
+_la_protection_des_%C5%93uvres_litt%C3%A9raires_et_artistiques">
                         convention de Berne pour la protection
                         des œuvres littéraires et artistiques</a>,
                 les oeuvres ayant pour pays d'origine l'un des États contractants,

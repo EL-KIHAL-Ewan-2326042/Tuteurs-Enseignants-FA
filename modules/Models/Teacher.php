@@ -70,9 +70,9 @@ class Teacher extends Model
             return null;
         }
         $db = $this->_db;
-        $query = 'SELECT teacher_name, teacher_firstname
-                    FROM teacher
-                    WHERE id_teacher = :id_teacher';
+        $query = 'SELECT teacher_name, teacher_firstname '
+                    . 'FROM teacher '
+                    . 'WHERE id_teacher = :id_teacher';
         $stmt = $db->getConn()->prepare($query);
         $stmt->bindParam(':id_teacher', $identifier);
         $stmt->execute();
@@ -112,10 +112,10 @@ class Teacher extends Model
         $roleDepartments = $_SESSION['role_department'];
         $placeholders = implode(',', array_fill(0, count($roleDepartments), '?'));
 
-        $query = "SELECT Teacher.Id_teacher
-                    FROM Teacher
-                    JOIN Has_role ON Teacher.Id_Teacher = Has_role.User_id
-                    where Department_name IN ($placeholders)";
+        $query = "SELECT Teacher.Id_teacher "
+                . "FROM Teacher "
+                . "JOIN Has_role ON Teacher.Id_Teacher = Has_role.User_id "
+                . "where Department_name IN ($placeholders)";
 
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->execute($roleDepartments);
@@ -136,13 +136,12 @@ class Teacher extends Model
 
         $searchTerm = trim($searchTerm);
 
-        $query = "
-            SELECT id_teacher, teacher_name, teacher_firstname
-            FROM teacher
-            WHERE id_teacher ILIKE :searchTerm
-            ORDER BY id_teacher ASC
-            LIMIT 5
-        ";
+        $query
+            = "SELECT id_teacher, teacher_name, teacher_firstname "
+            . "FROM teacher "
+            . "WHERE id_teacher ILIKE :searchTerm "
+            . "ORDER BY id_teacher ASC "
+            . "LIMIT 5";
 
         $searchTerm = "$searchTerm%";
 
@@ -164,9 +163,9 @@ class Teacher extends Model
      */
     public function getMaxNumberInterns(string $teacher): false|string
     {
-        $query = 'SELECT maxi_number_trainees
-                    FROM teacher
-                    WHERE id_teacher = :teacher';
+        $query = 'SELECT maxi_number_trainees '
+                . 'FROM teacher '
+                . 'WHERE id_teacher = :teacher';
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindParam(':teacher', $teacher);
         $stmt->execute();
@@ -188,9 +187,9 @@ class Teacher extends Model
     public function updateMaxiNumberTrainees(
         string $teacher, int $maxi_number_trainees
     ): string {
-        $query = 'UPDATE teacher
-                    SET maxi_number_trainees = :maxi_number_trainees
-                    WHERE id_teacher = :teacher';
+        $query = 'UPDATE teacher '
+                . 'SET maxi_number_trainees = :maxi_number_trainees '
+                . 'WHERE id_teacher = :teacher';
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindParam(':maxi_number_trainees', $maxi_number_trainees);
         $stmt->bindParam(':teacher', $teacher);
@@ -305,9 +304,9 @@ class Teacher extends Model
      */
     public function getDepTeacher(string $teacher_id): false|array
     {
-        $query = 'SELECT DISTINCT department_name
-                    FROM has_role
-                    WHERE user_id = :teacher_id';
+        $query = 'SELECT DISTINCT department_name '
+                . 'FROM has_role '
+                . 'WHERE user_id = :teacher_id';
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindParam(':teacher_id', $teacher_id);
         $stmt->execute();
