@@ -163,8 +163,8 @@ readonly class Dispatcher
                                                name="is_checked[<?php echo $name;?>]"
                                                value="0">
                                                 <input type="checkbox"
-                                                   class="filled-in
-                                                    criteria-checkbox"
+                                                   class=
+                                                   "filled-in criteria-checkbox"
                                                    name=
                                                    "criteria_on[<?php echo $name;?>]"
                                            data-coef-input-id="<?php echo $name; ?>"
@@ -200,14 +200,16 @@ readonly class Dispatcher
                                 echo $this->errorMessageAfterSort; ?></p>
                             <p class="green-text"><?php
                                 echo $this->checkMessageAfterSort; ?></p>
-                            <button class="btn waves-effect waves-light
-                                button-margin" type="submit" name="action-save"
+                            <button class=
+                                    "btn waves-effect waves-light button-margin"
+                                type="submit" name="action-save"
                                 value="<?php echo $id_backup ?>" id="save-btn">
                                 Enregister
                                 <i class="material-icons right">arrow_downward</i>
                             </button>
-                            <button class="btn waves-effect waves-light
-                                button-margin" type="submit" name="action"
+                            <button class=
+                                    "btn waves-effect waves-light button-margin"
+                                type="submit" name="action"
                                 value="generate" id="generate-btn">
                                 Générer
                                 <i class="material-icons right">send</i>
@@ -240,8 +242,9 @@ readonly class Dispatcher
                                 <?php echo $this->checkMessageDirectAssoc; ?>
                             </p>
                             <div class="col s12">
-                                <button class="btn waves-effect waves-light
-                                    button-margin" type="submit" name="action">
+                                <button class
+                                        ="btn waves-effect waves-light button-margin"
+                                    type="submit" name="action">
                                     Associer
                                     <i class="material-icons right">
                                         arrow_downward
@@ -270,10 +273,11 @@ readonly class Dispatcher
                     <div class="row"></div>
 
                     <form action="./dispatcher" method="post">
-                        <div class="dispatch-table-wrapper
-                        selection table-container">
-                            <table class="highlight centered
-                            responsive-table" id="dispatch-table">
+                        <div class=
+                             "dispatch-table-wrapper selection table-container">
+                            <table class
+                                   ="highlight centered responsive-table"
+                                id="dispatch-table">
                                 <thead>
                                 <tr>
                                     <th class="clickable">Enseignant</th>
@@ -370,10 +374,10 @@ readonly class Dispatcher
                                 <td>
                                     <p>
                                         <label class="center">
-                                            <input type="checkbox"
-                                           class="dispatch-checkbox center-align
-                                           filled-in" id="listTupleAssociate[]"
-                                           name="listTupleAssociate[]" value="<?php
+                                            <input type="checkbox" class=
+                                           "dispatch-checkbox center-align filled-in"
+                                            id="listTupleAssociate[]"
+                                            name="listTupleAssociate[]" value="<?php
                                             echo
                                             $id_teacher."$".$internship."$".$score;
                                             ?>" />
@@ -405,21 +409,25 @@ readonly class Dispatcher
                             </div>
 
                             <div id="pagination-controls" class="center-align">
-                                <button type="button" class="waves-effect waves-light
-                                    btn" id="first-page">
+                                <button type="button"
+                                        class="waves-effect waves-light btn"
+                                        id="first-page">
                                     <i class="material-icons">first_page</i>
                                 </button>
-                                <button type="button" class="waves-effect waves-light
-                                    btn" id="prev-page">
+                                <button type="button"
+                                        class="waves-effect waves-light btn"
+                                        id="prev-page">
                                     <i class="material-icons">arrow_back</i>
                                 </button>
                                 <div id="page-numbers"></div>
-                                <button type="button" class="waves-effect waves-light
-                                    btn" id="next-page">
+                                <button type="button"
+                                        class="waves-effect waves-light btn"
+                                        id="next-page">
                                     <i class="material-icons">arrow_forward</i>
                                 </button>
-                                <button type="button" class="waves-effect waves-light
-                                    btn" id="last-page">
+                                <button type="button"
+                                        class="waves-effect waves-light btn"
+                                        id="last-page">
                                     <i class="material-icons">last_page</i>
                                 </button>
                             </div>
