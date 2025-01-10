@@ -201,7 +201,13 @@ readonly class Account
                             <th class="clickable">ENTREPRISE</th>
                             <th class="clickable">SUJET</th>
                             <th class="clickable">ADRESSE</th>
-                            <th class="clickable">DISTANCE</th>
+                            <th class="clickable">
+                                <div class="tooltip-container tooltip"
+                                     data-tooltip=
+                                     "Durée moyenne vous séparant du lieu du stage"
+                                     data-position="top">(?)</div>
+                                POSITION
+                            </th>
                         </tr>
                         </thead>
                         <tbody>
