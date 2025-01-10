@@ -67,14 +67,16 @@ class Dashboard
     {
         // Correspondances entre mots-clés et message simplifiés
         $simplifyMessages = [
-            'SQLSTATE' => "Une erreur de base de données est survenue. 
-             Une donnée que vous souhaitez insérer existe peut-être déjà.",
-            'permission denied' => "Vous n'avez pas les droits nécessaires 
-             pour effectuer cette action.",
-            'file not found' => "Le fichier demandé est introuvable. 
-             Veuillez vérifier votre saisie.",
-            'Fatal' => "Erreur de taille mémoire, veuillez contacter 
-             l'administrateur du serveur.",
+            'SQLSTATE' => "Une erreur de base de données est survenue. "
+            . "Une donnée que vous souhaitez insérer existe peut-être déjà.",
+            'permission denied' => "Vous n'avez pas les droits nécessaires "
+             . "pour effectuer cette action.",
+            'file not found' => "Le fichier demandé est introuvable. "
+             . "Veuillez vérifier votre saisie.",
+            'Fatal' => "Erreur de taille mémoire, veuillez contacter "
+             . "l'administrateur du serveur.",
+            'guide utilisateur' => "Erreur lors du traitement du fichier CSV "
+            . "(merci de vérifier que vous respectez bien le guide utilisateur)."
         ];
 
         // Parcours des mots-clés pour personnaliser le message
@@ -85,8 +87,8 @@ class Dashboard
         }
 
         // Message générique si aucun mot-clé ne correspond
-        return "Une erreur inattendue est survenue. 
-        Veuillez contacter l'administrateur.".$this->handleExceptionMessage($e);
+        return "Une erreur inattendue est survenue. "
+        . "Veuillez contacter l'administrateur.".$this->handleExceptionMessage($e);
     }
 
     /**
@@ -141,27 +143,28 @@ class Dashboard
                                 $csvHeaders = $model->getCsvHeaders($csvFile);
 
                                 if (mime_content_type($csvFile) !== 'text/plain') {
-                                    $errorMessage = "Le fichier uploadé 
-                                    n'est pas un CSV valide.";
+                                    $errorMessage = "Le fichier uploadé "
+                                    . "n'est pas un CSV valide.";
                                     return;
 
                                 } elseif (!$model->validateHeaders(
                                     $csvHeaders, $tableName
                                 )
                                 ) {
-                                    $errorMessage = "Les en-têtes du fichier CSV ne 
-                                    correspondent pas à la structure de 
-                                    la table $tableName.";
+                                    $errorMessage = "Les en-têtes du fichier CSV ne "
+                                    . "correspondent pas à la structure de "
+                                    . "la table $tableName.";
                                     return;
 
                                     // Importation des données dans la table
                                 } elseif ($model->processCsv($csvFile, $tableName)) {
-                                    $message .= "L'importation du fichier CSV pour 
-                                    la table $tableName a été réalisée avec succès! 
-                                    <br>";
+                                    $message .= "L'importation du fichier CSV pour "
+                                    . "la table $tableName a été réalisée avec "
+                                    . "succès! <br>";
                                 } else {
-                                    $errorMessage .= "Une erreur est survenue lors 
-                                    de l'importation pour la table $tableName. <br>";
+                                    $errorMessage .= "Une erreur est survenue lors "
+                                    . "de l'importation pour la table $tableName. "
+                                    . "<br>";
                                 }
                             }
                         } catch (Exception $e) {
