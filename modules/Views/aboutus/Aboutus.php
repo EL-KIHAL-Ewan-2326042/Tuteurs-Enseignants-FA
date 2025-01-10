@@ -56,30 +56,29 @@ class Aboutus
                     <p> Ce site a été développé dans le cadre d'une Situation 
                         d'Apprentissage et d'Évaluation (SAE), avec pour objectif 
                         de faciliter la mise en relation entre les étudiants et les 
-                        tuteurs. Conçu pour encourager l'entraide académique, notre 
-                        plateforme permet aux tuteurs de trouver rapidement un 
-                        étudiant qui correspondent à leurs besoins, selon les 
-                        matières et les compétences recherchées. <br> </p>
+                        tuteurs. Conçu pour faciliter le travail long et fastidieux
+                        de la répartition des tuteurs, il permet de centraliser les
+                        informations et propose des solutions d'attribution
+                        semi-automatique. <br> </p>
 
-                    <p> Le site propose plusieurs fonctionnalités essentielles, 
-                        telles que la connexion des tuteurs, ainsi qu'a un 
-                        administrateur, un système de correspondance intelligent 
-                        pour aider les tuteurs à choisir l'étudiant
-                        adéquat. <br> </p>
+                    <p> Le site propose plusieurs fonctionnalités essentielles,
+                        telles que la gestion des données d'un département, la
+                        recherche d'un stage, la demande d'attribution de stage et
+                        l'aide à l'attribution des stages. <br> </p>
 
                     <p> Notre équipe de développement, composée d'étudiants en 
-                        informatique, s'est attelée à créer un outil fonctionnel et 
-                        intuitif pour améliorer l'apprentissage collaboratif au sein 
-                        de notre établissement.
+                        informatique, à créer un outil fonctionnel et
+                        intuitif pour facilité cette repartition au sein
+                        de notre établissement et ceux de structure similaire.
                         Chaque membre de l'équipe a contribué au projet avec ses 
                         compétences spécifiques en développement web, gestion de 
                         projet et en base de données <br> </p>
 
-                    <p> Ce projet s'inscrit dans notre cursus académique et nous 
+                    <p> Ce projet s'inscrit dans notre cursus scolaire et nous
                         permet de mettre en pratique les compétences acquises au 
-                        cours de nos études en informatique. En plus de l'aspect 
-                        technique, il nous permet de comprendre les défis liés à 
-                        la conception d'un site web dédié à l'éducation.</p>
+                        cours de notre BUT informatique. En plus de l'aspect
+                        technique, il nous permet de comprendre les contraintes liés
+                        à la conception d'un site web dédié à l'éducation.</p>
                 </div>
             </div>
         </main>
