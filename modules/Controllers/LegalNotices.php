@@ -37,7 +37,7 @@ use Blog\Views\layout\Layout;
  * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
  * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
  */
-class LegalNotices
+class Mentionslegales
 {
     private Layout $_layout;
 
@@ -60,9 +60,9 @@ class LegalNotices
     public function show(): void
     {
         $title = "Mentions légales";
-        $cssFilePath = '_assets/styles/legalNotices.css';
+        $cssFilePath = '_assets/styles/mentionLeg.css';
         $jsFilePath = '';
-        $view = new \Blog\Views\legal_Notices\LegalNotices();
+        $view = new \Blog\Views\mentions_Legales\Mentionslegales();
 
         $this->_layout->renderTop($title, $cssFilePath);
         $view->showView();
