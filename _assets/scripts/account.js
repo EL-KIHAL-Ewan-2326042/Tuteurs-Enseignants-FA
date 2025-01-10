@@ -32,6 +32,12 @@ document.addEventListener(
         // Initialize the Materialize select dropdown
         M.FormSelect.init(document.querySelectorAll('select'));
 
+        M.Tooltip.init(
+            document.querySelectorAll('.tooltip'), {
+                exitDelay: 100,
+            }
+        );
+
         const rowsPerPageDropdown = document.getElementById('rows-per-page');
         let rowsPerPage = sessionStorage.getItem("rowsCount") ? Number(sessionStorage.getItem("rowsCount")) : parseInt(rowsPerPageDropdown.value); // Set default to 10
         if (rowsPerPage !== 10) {
@@ -116,13 +122,29 @@ document.addEventListener(
             }
             for (i = 0; i < rows[0].cells.length; ++i) {
                 column = rows[0].getElementsByTagName("TH")[i].innerHTML;
-                if (column.substring(column.length-1) === "▲" || column.substring(column.length-1) === "▼") { table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-2);
+                if (column.substring(column.length-1) === "▲" || column.substring(column.length-1) === "▼") {
+                    table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-2);
+                    if (i > 7 && n <= 7) {
+                        M.Tooltip.init(
+                            document.querySelectorAll('.tooltip'), {
+                                exitDelay: 100,
+                            }
+                        );
+                    }
                 }
                 if (i === n) {
                     if (dir === "asc") { table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▲";
-                    } else { table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▼";
+                    } else {
+                        table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▼";
                     }
                 }
+            }
+            if (n > 7) {
+                M.Tooltip.init(
+                    document.querySelectorAll('.tooltip'), {
+                        exitDelay: 100,
+                    }
+                );
             }
 
             sessionStorage.setItem('columnNumber', n);
@@ -132,7 +154,8 @@ document.addEventListener(
 
         function showPage(page)
         {
-            if (page < 1 || page > totalPages) { return;
+            if (page < 1 || page > totalPages) {
+                return;
             }
 
             rows = document.querySelectorAll('.account-row');
