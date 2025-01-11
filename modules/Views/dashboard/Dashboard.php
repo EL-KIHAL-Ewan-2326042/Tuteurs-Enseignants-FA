@@ -139,8 +139,10 @@ class Dashboard
                                    accept=".csv" multiple>
                             </div>
                             <div class="file-path-wrapper">
-                                <input class="file-path validate" type="text"
-                                   placeholder="Choisissez un fichier CSV" required>
+                                <label>
+                                    <input class="file-path validate" type="text"
+                                       placeholder="Choisissez un fichier CSV" required>
+                                </label>
                             </div>
                             <button class="btn waves-effect waves-light"
                                 type="submit" name="submit_student">Valider
@@ -163,8 +165,10 @@ class Dashboard
                                     id="teacher" accept=".csv" multiple>
                             </div>
                             <div class="file-path-wrapper">
-                                <input class="file-path validate" type="text"
-                                    placeholder="Choisissez un fichier CSV" required>
+                                <label>
+                                    <input class="file-path validate" type="text"
+                                        placeholder="Choisissez un fichier CSV" required>
+                                </label>
                             </div>
                             <button class="btn waves-effect waves-light"
                                 type="submit" name="submit_teacher">Valider
@@ -187,8 +191,10 @@ class Dashboard
                                     id="internship" accept=".csv" multiple>
                             </div>
                             <div class="file-path-wrapper">
-                                <input class="file-path validate" type="text"
-                                    placeholder="Choisissez un fichier CSV" required>
+                                <label>
+                                    <input class="file-path validate" type="text"
+                                        placeholder="Choisissez un fichier CSV" required>
+                                </label>
                             </div>
                             <button class="btn waves-effect waves-light"
                                 type="submit" name="submit_internship">Valider

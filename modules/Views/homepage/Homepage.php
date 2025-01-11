@@ -71,24 +71,28 @@ readonly class Homepage
             <h3 class="center-align">Répartiteur de tuteurs enseignants</h3>
 
             <div class="card-panel white">
-                <form class="col table" id="searchForm"
-                onsubmit="return false;" method="POST">
+                <form class="col table" id="searchForm" onsubmit="return false;" method="POST">
                     <label for="searchType">Type de recherche:</label>
                     <div class="input-field">
-                        <select id="searchType" name="searchType">
-                            <option value="studentNumber"
-                                selected>Numéro Etudiant</option>
+                        <select id="searchType" name="searchType"
+                                aria-label="Type de recherche">
+                            <option value="studentNumber" selected>Numéro Etudiant</option>
                             <option value="name">Nom et Prénom</option>
                             <option value="company">Entreprise</option>
                         </select>
                     </div>
+
                     <label for="search">Rechercher:</label>
                     <input type="text" id="search" name="search"
-                        autocomplete="off" maxlength="50" required>
+                           autocomplete="off" maxlength="50" required
+                           aria-label="Rechercher"/>
+
                     <p>Etudiant(s):</p>
-                    <div id="searchResults"></div>
+                    <div id="searchResults" role="region" aria-live="polite"
+                         aria-label="Résultats de recherche"></div>
                 </form>
             </div>
+
             <div class="center">
                 <?php
                 if (isset($_POST['cancelSearch'])) {
