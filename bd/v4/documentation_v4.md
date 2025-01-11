@@ -1,6 +1,8 @@
 ### Documentation des tables de la base de données ###  
 ### Schéma MLD
 
+![Image Schéma MLD](https://i.imgur.com/N4K7Xnu.png)
+
 ---
 
 ### 1. **Tables**
@@ -30,8 +32,8 @@
 - **Colonnes** :
   - `Discipline_name` (`VARCHAR(50)`) : Nom de la discipline (clé primaire).
 
-#### 1.4 **User**
-- **Table** : `User`
+#### 1.4 **User_connect**
+- **Table** : `User_connect`
 - **Description** : Contient les informations d'authentification des utilisateurs.
 - **Colonnes** :
   - `User_id` (`VARCHAR(10)`) : Identifiant unique de l'utilisateur (clé primaire).
@@ -137,8 +139,8 @@
   - `Internship_identifier` (`VARCHAR(20)`) : Identifiant du stage (clé étrangère).
   - `Distance` (`INT`) : Distance mesurée en kilomètres.
 
-#### 1.18 **coeff_save**
-- **Table** : `coeff_save`
+#### 1.18 **Backup**
+- **Table** : `Backup`
 - **Description** : Contient les coefficients et sauvegardes associés à des critères de distribution.
 - **Colonnes** :
   - `User_id` (`VARCHAR(10)`) : Identifiant de l'utilisateur (clé étrangère).
@@ -257,7 +259,7 @@ CREATE TRIGGER check_distance_assignment
 ```
 
 #### 2.5 **update_backup_new_criteria**
-- **Fonction** : Met à jour `coeff_save` avec de nouveaux critères ajoutés à `Distribution_criteria`.
+- **Fonction** : Met à jour `Backup` avec de nouveaux critères ajoutés à `Distribution_criteria`.
 - **Trigger** :
   - Type : `AFTER INSERT`
   - Table : `Distribution_criteria`
@@ -269,9 +271,9 @@ DECLARE
     user_id TEXT;
     id_backup INT;
 BEGIN
-    FOR user_id IN SELECT User_id FROM User LOOP
+    FOR user_id IN SELECT User_id FROM User_connect LOOP
         FOR id_backup IN SELECT Id_backup FROM Id_backup LOOP
-            INSERT INTO coeff_save (User_id, Name_criteria, Id_backup, Coef, Is_checked)
+            INSERT INTO Backup (User_id, Name_criteria, Id_backup, Coef, Is_checked)
             VALUES (user_id, NEW.Name_criteria, id_backup, 1, FALSE);
         END LOOP;
     END LOOP;
@@ -312,7 +314,7 @@ CREATE TRIGGER create_discipline_for_insert_is_taught
 - **Fonction** : Ajoute un identifiant de sauvegarde à `Id_backup` si inexistant avant un `INSERT`.
 - **Trigger** :
   - Type : `BEFORE INSERT`
-  - Table : `coeff_save`
+  - Table : `Backup`
 
 ```sql
 CREATE OR REPLACE FUNCTION create_id_backup_for_insert()
@@ -325,8 +327,8 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER create_id_backup_for_insert_coeff_save
-    BEFORE INSERT ON coeff_save
+CREATE TRIGGER create_id_backup_for_insert_Backup
+    BEFORE INSERT ON Backup
     FOR EACH ROW
     EXECUTE FUNCTION create_id_backup_for_insert();
 ```
