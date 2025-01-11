@@ -294,7 +294,7 @@ readonly class Homepage
                                                 )
                                             ) ? 'checked="checked"' : ''
                                             ?> />
-                                        <span></span>
+                                        <span>Cocher</span>
                                     </label>
                                     <?php
                                 }
@@ -475,7 +475,7 @@ readonly class Homepage
                                                     <?php echo $row['requested'] ?
                                                     'checked="checked"' : '' ?>
                                                 />
-                                                <span></span>
+                                                <span>Cocher</span>
                                             </label>
                                         </td>
                                     </tr>
@@ -485,7 +485,6 @@ readonly class Homepage
 
                             <div class="row">
                                 <div class="input-field col s2">
-                                    <label for="rows-per-page"></label>
                                     <select id="rows-per-page">
                                         <option value="10" selected>10</option>
                                         <option value="20">20</option>
@@ -495,7 +494,7 @@ readonly class Homepage
                                             Tout
                                         </option>
                                     </select>
-                                    <label>Nombre de lignes par page</label>
+                                    <label for="rows-per-page">Nombre de lignes par page</label>
                                 </div>
                             </div>
 

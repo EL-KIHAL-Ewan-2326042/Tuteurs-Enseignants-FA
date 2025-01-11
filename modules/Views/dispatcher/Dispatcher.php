@@ -99,7 +99,9 @@ class Dispatcher
                             $saves = $this->userModel->showCoefficients();
                             if ($saves) : ?>
                                 <div class="input-field">
-                                    <label for="save-selector"></label>
+                                    <label
+                                    for="save-selector">Sélectionnez une sauvegarde</label>
+                                    <br><br>
                                     <select id="save-selector" name="save-selector">
                                 <?php
                                 if (isset($_POST['save-selector'])
@@ -110,7 +112,7 @@ class Dispatcher
                                 <option value="i">Sauvegarde #<?php echo $selected;?>
                                 </option>
                                 <?php else: ?>
-                                <option value="default">Choisir une sauvegarde
+                                <option value="default">Choisir
                                 </option>
                                 <?php endif; ?>
                                 <?php foreach ($saves as $save): ?>
@@ -394,7 +396,7 @@ class Dispatcher
                                             echo
                                             $id_teacher."$".$internship."$".$score;
                                             ?>" />
-                                            <span data-type="checkbox"></span>
+                                            <span data-type="checkbox">Cocher</span>
                                         </label>
                                     </p>
                                 </td>
@@ -407,7 +409,6 @@ class Dispatcher
 
                             <div class="row">
                                 <div class="input-field col s2">
-                                    <label for="rows-per-page"></label>
                                     <select id="rows-per-page">
                                         <option value="10" selected>10</option>
                                         <option value="20">20</option>
@@ -417,7 +418,7 @@ class Dispatcher
                                         <?php echo count($resultDispatchList); ?>
                                         ">Tout</option>
                                     </select>
-                                    <label>Nombre de lignes par page</label>
+                                    <label for="rows-per-page">Nombre de lignes par page</label>
                                 </div>
                             </div>
 
