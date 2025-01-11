@@ -71,15 +71,18 @@ class Dashboard
                     <h4>Exporter une liste :</h4>
                     <form action="/dashboard" method="POST">
                         <div>
-                            <select name="export_list" required>
-                                <option value="" disabled
-                                        selected>Choisissez la liste à exporter
-                                </option>
-                                <option value="student">Etudiants</option>
-                                <option value="teacher">Professeurs</option>
-                                <option value="internship">Stages</option>
-                            </select>
-                            <label>Choisissez la liste à exporter</label>
+                            <label>
+                                <span>Choisissez la liste à exporter</span>
+
+                                <select name="export_list" required>
+                                    <option value="" disabled
+                                            selected>Choisir
+                                    </option>
+                                    <option value="student">Etudiants</option>
+                                    <option value="teacher">Professeurs</option>
+                                    <option value="internship">Stages</option>
+                                </select>
+                            </label>
                         </div>
                         <div class="input-field">
                             <button class="btn waves-effect waves-light"
@@ -98,15 +101,17 @@ class Dashboard
                     <h4>Exporter un modèle:</h4>
                     <form action="/dashboard" method="POST">
                         <div>
-                            <select name="export_model" required>
-                                <option
-                                    disabled selected>Choisissez le modèle à exporter
-                                </option>
-                                <option value="student">Etudiants</option>
-                                <option value="teacher">Professeurs</option>
-                                <option value="internship">Stages</option>
-                            </select>
-                            <label>Choisissez la liste à exporter</label>
+                            <label>
+                                <span>Choisissez le modèle à exporter</span>
+                                <select name="export_model" required>
+                                    <option
+                                        disabled selected>Choisir
+                                    </option>
+                                    <option value="student">Etudiants</option>
+                                    <option value="teacher">Professeurs</option>
+                                    <option value="internship">Stages</option>
+                                </select>
+                            </label>
                         </div>
                         <div class="input-field">
                             <button class="btn waves-effect waves-light"
@@ -134,14 +139,17 @@ class Dashboard
                         <input type="hidden" name="table_name" value="student">
                         <div class="file-field input-field">
                             <div class="btn">
-                                <span>Fichier CSV</span>
-                                <input type="file" name="student" id="student"
-                                   accept=".csv" multiple>
+                                <label for="student" style="cursor: pointer;">
+                                    <span>Fichier CSV</span>
+                                </label>
+                                <input type="file" name="student" id="student" accept=".csv" multiple style="display: none;">
                             </div>
+
                             <div class="file-path-wrapper">
                                 <label>
                                     <input class="file-path validate" type="text"
-                                       placeholder="Choisissez un fichier CSV" required>
+                                           placeholder="Choisir" required>
+                                    <span>Chosissez un fichier CSV</span>
                                 </label>
                             </div>
                             <button class="btn waves-effect waves-light"
@@ -160,14 +168,16 @@ class Dashboard
                         <input type="hidden" name="table_name" value="teacher">
                         <div class="file-field input-field">
                             <div class="btn">
-                                <span>Fichier CSV</span>
-                                <input type="file" name="teacher"
-                                    id="teacher" accept=".csv" multiple>
+                                <label for="teacher" style="cursor: pointer;">
+                                    <span>Fichier CSV</span>
+                                </label>
+                                <input type="file" name="teacher" id="teacher" accept=".csv" multiple style="display: none;">
                             </div>
                             <div class="file-path-wrapper">
                                 <label>
                                     <input class="file-path validate" type="text"
-                                        placeholder="Choisissez un fichier CSV" required>
+                                        placeholder="Choisir" required>
+                                    <span>Choisissez un fichier CSV</span>
                                 </label>
                             </div>
                             <button class="btn waves-effect waves-light"
@@ -186,14 +196,16 @@ class Dashboard
                         <input type="hidden" name="table_name" value="internship">
                         <div class="file-field input-field">
                             <div class="btn">
-                                <span>Fichier CSV</span>
-                                <input type="file" name="internship"
-                                    id="internship" accept=".csv" multiple>
+                                <label for="internship" style="cursor: pointer;">
+                                    <span>Fichier CSV</span>
+                                </label>
+                                <input type="file" name="internship" id="internship" accept=".csv" multiple style="display: none;">
                             </div>
                             <div class="file-path-wrapper">
                                 <label>
                                     <input class="file-path validate" type="text"
                                         placeholder="Choisissez un fichier CSV" required>
+                                    <span>Choisissez un fichier CSV</span>
                                 </label>
                             </div>
                             <button class="btn waves-effect waves-light"

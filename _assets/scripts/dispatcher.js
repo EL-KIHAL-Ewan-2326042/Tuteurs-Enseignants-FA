@@ -488,12 +488,12 @@ document.addEventListener(
                                                           <td></td>
                                                           <td></td>
                                                           <td></td>
-                                                          <td><strong>Tout cocher</strong></td>
+                                                          <td></td>
                                                           <td>
                                                               <p>
                                                                   <label class="center">
                                                                        <input type="checkbox" id="select-all-checkbox" class="center-align filled-in" />
-                                                                       <span data-type="checkbox"></span>
+                                                                       <span data-type="checkbox">Tout cocher</span>
                                                                    </label>
                                                               </p>
                                                            </td>`;
@@ -795,7 +795,7 @@ document.addEventListener(
                     <label class="center">
                         <input type="checkbox" class="dispatch-checkbox center-align filled-in" name="listTupleAssociate[]" 
                             value="${row.id_teacher}$${row.internship_identifier}$${row.score}" />
-                        <span data-type="checkbox"></span>
+                        <span data-type="checkbox">Cocher</span>
                     </label>
                 </p>
                 </td>`;
