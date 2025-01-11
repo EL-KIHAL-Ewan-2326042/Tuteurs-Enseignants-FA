@@ -202,8 +202,10 @@ class User extends Model
     public function loadCoefficients(string $user_id, int $id_backup): array|false
     {
         try {
-            $query = "SELECT name_criteria, coef, is_checked "
-                    . "FROM backup "
+            $query = "SELECT backup.name_criteria, backup.coef,"
+                    . " backup.is_checked, distribution_criteria.description "
+                    . "FROM backup JOIN distribution_criteria "
+                    . "ON backup.name_criteria = distribution_criteria.name_criteria "
                     . "WHERE user_id = :user_id "
                     . "AND id_backup = :id_backup "
                     . "ORDER BY name_criteria ASC";
@@ -267,7 +269,7 @@ class User extends Model
      **/
     public function getDefaultCoef(): array
     {
-        $query = "SELECT name_criteria "
+        $query = "SELECT name_criteria, description "
                 . "FROM distribution_criteria "
                 . "ORDER BY name_criteria ASC";
         $stmt = $this->_db->getConn()->prepare($query);
