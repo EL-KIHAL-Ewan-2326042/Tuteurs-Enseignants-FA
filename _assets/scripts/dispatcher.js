@@ -608,9 +608,14 @@ document.addEventListener(
                     }
                 )
                 .then(
-                    data =>
-                    {
+                    async data => {
                         createNewTable(data).then();
+                        // const internshipLoc = await geocodeAddress(
+                        //  data[0].address
+                        // )
+                        // placeMarker(
+                        //     internshipLoc, "Etudiant", false
+                        // );
                         createTeacherMarkers(data).then();
                     }
                 )
@@ -1100,7 +1105,6 @@ async function updateMap(InternshipAddress, Id_teacher)
         placeMarker(internshipLocation, "Entreprise", true);
 
         centerMap(internshipLocation, closestTeacherAddress);
-        displayRoute(internshipLocation, closestTeacherAddress);
     } catch (error) {
         console.error("Erreur lors de la mise à jour de la carte :", error);
     }

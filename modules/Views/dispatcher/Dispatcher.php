@@ -154,6 +154,7 @@ class Dispatcher
                             <?php foreach ($listCriteria as $criteria):
                                 $value = $criteria['coef'];
                                 $name = $criteria['name_criteria'];
+                                $description = $criteria['description'];
                                 ?>
                                 <div class="row">
                                     <div class="col s6">
@@ -174,7 +175,10 @@ class Dispatcher
                                                    checked="checked"
                                                         <?php
                                                     endif; ?> />
-                                                <span>
+                                                <span class="tooltipped"
+                                                data-position="top"
+                                                data-tooltip=
+                                                  "<?php echo $description ?>">
                                                     <?php echo $name; ?>
                                                 </span>
                                             </label>
@@ -200,17 +204,19 @@ class Dispatcher
                                 echo $this->errorMessageAfterSort; ?></p>
                             <p class="green-text"><?php
                                 echo $this->checkMessageAfterSort; ?></p>
-                            <button class=
-                                    "btn waves-effect waves-light button-margin"
-                                type="submit" name="action-save"
-                                value="<?php echo $id_backup ?>" id="save-btn">
+                            <button class="btn waves-effect waves-light button-margin tooltipped"
+                                    type="submit" name="action-save"
+                                    value="<?php echo $id_backup ?>" id="save-btn"
+                                    data-position="top"
+                                    data-tooltip="Enregistrer la sauvegarde">
                                 Enregister
                                 <i class="material-icons right">arrow_downward</i>
                             </button>
-                            <button class=
-                                    "btn waves-effect waves-light button-margin"
-                                type="submit" name="action"
-                                value="generate" id="generate-btn">
+                            <button class="btn waves-effect waves-light button-margin tooltipped"
+                                    type="submit" name="action"
+                                    value="generate" id="generate-btn"
+                                    data-position="top"
+                                    data-tooltip="Commencer la répartition">
                                 Générer
                                 <i class="material-icons right">send</i>
                             </button>
@@ -242,13 +248,13 @@ class Dispatcher
                                 <?php echo $this->checkMessageDirectAssoc; ?>
                             </p>
                             <div class="col s12">
-                                <button class
-                                        ="btn waves-effect waves-light button-margin"
-                                    type="submit" name="action">
+                                <button class=
+                                        "btn waves-effect
+                                        waves-light button-margin tooltipped"
+                                        type="submit" name="action"
+                                        data-position="top" data-tooltip="Valider l'association">
                                     Associer
-                                    <i class="material-icons right">
-                                        arrow_downward
-                                    </i>
+                                    <i class="material-icons right">arrow_downward</i>
                                 </button>
                             </div>
                         </div>
@@ -339,15 +345,22 @@ class Dispatcher
                                         ' ' . $resultDispatch['student_name'] . ' ('
                                         . $resultDispatch['student_number'] . ')'; ?>
                                     <br>
-                                    <i class="material-icons clickable">face</i>
+                                    <i class="material-icons clickable tooltipped"
+                                       data-position="top"
+                                       data-tooltip=
+                                       "Afficher la vue étudiante ">face</i>
                                 </td>
                                 <td>
                                     <?php echo $resultDispatch['company_name'] . ' ('
                                         . $resultDispatch['internship_identifier']
                                         . ')'; ?>
                                     <br>
-                                    <i class="material-icons clickable">map</i>
+                                    <i class="material-icons clickable tooltipped"
+                                       data-position="top"
+                                       data-tooltip=
+                                       "Voir la position de l'entreprise">map</i>
                                 </td>
+
                                 <td>
                                     <?php echo $resultDispatch['formation']; ?>
                                 </td>
@@ -434,15 +447,24 @@ class Dispatcher
 
                             <div class="row s12 center">
                                 <input type="hidden" id="selectStudentSubmitted"
-                                   name="selectStudentSubmitted" value="1">
-                                <button class="waves-effect waves-light btn"
-                                    type="submit">Valider</button>
+                                       name="selectStudentSubmitted" value="1">
+                                <button class="waves-effect waves-light
+                                btn tooltipped"
+                                        type="submit"
+                                        data-position="top"
+                                        data-tooltip="Confirmer votre choix">
+                                    Valider
+                                </button>
                                 <input type="hidden" name="restartDispatcherButton"
-                                   value="1">
-                                <button class="waves-effect waves-light btn"
-                                    type="submit">Recommencer</button>
+                                       value="1">
+                                <button class="waves-effect waves-light
+                                btn tooltipped"
+                                        type="submit"
+                                        data-position="top"
+                                        data-tooltip="Recommencer la sélection">
+                                    Recommencer
+                                </button>
                             </div>
-
                             <br>
                             <br>
 
@@ -451,6 +473,13 @@ class Dispatcher
                 <?php endif; ?>
 
             </div>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var tooltips = document.querySelectorAll('.tooltipped');
+                    M.Tooltip.init(tooltips);
+                })
+            </script>
         </main>
         <?php
     }
