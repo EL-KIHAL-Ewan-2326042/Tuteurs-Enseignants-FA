@@ -1,0 +1,7 @@
+User-agent: Googlebot
+Disallow: /dashboard/
+
+User-agent: *
+Allow: /
+
+Sitemap: https://tutormap.alwaysdata.net/

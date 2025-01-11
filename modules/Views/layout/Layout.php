@@ -53,6 +53,9 @@ class Layout
             <head>
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1">
+                <meta name="description"
+                      content="Auteurs: Alvares Titouan, Avias Daphné,
+Kerbadou Islem, Pellet Casimir">
                 <title><?php echo $title; ?></title>
                 <link rel="icon" type="image/x-icon" href="/favicon.ico">
                 <link href="https://cdnjs.cloudflare.com/ajax/libs/

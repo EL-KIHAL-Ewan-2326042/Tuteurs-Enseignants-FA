@@ -21,7 +21,12 @@ function updateSelectOptions()
         {
             let selectInstance = M.FormSelect.getInstance(select);
             if (selectInstance) {
-                selectInstance.update();
+                try {
+                    selectInstance.update();
+                }
+                catch (error) {
+
+                }
             }
         }
     );
