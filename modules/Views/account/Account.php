@@ -191,17 +191,20 @@ class Account
                 <div class="row"></div>
                 <div id="table">
                     <table class="highlight centered" id="account-table">
-                        <thead>
+                        <thead <?php
+                        if (count($interns) > 1) {
+                            echo 'id="clickable"';
+                        } ?>>
                         <tr>
-                            <th class="clickable">ETUDIANT</th>
-                            <th class="clickable">FORMATION</th>
-                            <th class="clickable">GROUPE</th>
-                            <th class="clickable">HISTORIQUE</th>
-                            <th class="clickable">TYPE</th>
-                            <th class="clickable">ENTREPRISE</th>
-                            <th class="clickable">SUJET</th>
-                            <th class="clickable">ADRESSE</th>
-                            <th class="clickable">
+                            <th>ETUDIANT</th>
+                            <th>FORMATION</th>
+                            <th>GROUPE</th>
+                            <th>HISTORIQUE</th>
+                            <th>TYPE</th>
+                            <th>ENTREPRISE</th>
+                            <th>SUJET</th>
+                            <th>ADRESSE</th>
+                            <th>
                                 <div class="tooltip-container tooltip"
                                      data-tooltip=
                                      "Durée moyenne vous séparant du lieu du stage"

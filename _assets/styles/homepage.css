@@ -58,7 +58,7 @@ main a:hover {
 
 /* Tableau Homepage */
 
-.clickable {
+#clickable {
     cursor: pointer;
 }
 

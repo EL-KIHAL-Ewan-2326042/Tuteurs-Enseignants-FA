@@ -82,7 +82,7 @@ main a:hover {
 
 /* Tableau Account */
 
-.clickable {
+#clickable {
     cursor: pointer;
 }
 

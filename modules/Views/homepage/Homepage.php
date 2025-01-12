@@ -400,23 +400,26 @@ readonly class Homepage
                             else: ?>
                         <form method="post" class="center-align table">
                             <table class="highlight centered" id="homepage-table">
-                                <thead>
+                                <thead <?php
+                                if (count($table) > 1) {
+                                    echo 'id="clickable"';
+                                } ?>>
                                 <tr>
-                                    <th class="clickable">ETUDIANT</th>
-                                    <th class="clickable">FORMATION</th>
-                                    <th class="clickable">GROUPE</th>
-                                    <th class="clickable">HISTORIQUE</th>
-                                    <th class="clickable">ENTREPRISE</th>
-                                    <th class="clickable">SUJET</th>
-                                    <th class="clickable">ADRESSE</th>
-                                    <th class="clickable">
+                                    <th>ETUDIANT</th>
+                                    <th>FORMATION</th>
+                                    <th>GROUPE</th>
+                                    <th>HISTORIQUE</th>
+                                    <th>ENTREPRISE</th>
+                                    <th>SUJET</th>
+                                    <th>ADRESSE</th>
+                                    <th>
                                         <div class="tooltip-container tooltip"
                                             data-tooltip="Durée moyenne vous
                                             séparant du lieu du stage"
                                             data-position="top">(?)</div>
                                         POSITION
                                     </th>
-                                    <th class="clickable">
+                                    <th>
                                         <div class="tooltip-container tooltip"
                                             data-tooltip="Voeux formulés"
                                             data-position="top">(?)</div>
