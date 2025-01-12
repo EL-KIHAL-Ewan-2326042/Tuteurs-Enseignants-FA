@@ -98,7 +98,7 @@ class Account
 
             <div class="row"></div>
 
-            <div id="countInternships">
+            <div id="count-internships">
                 <div>
                     <?php
                     echo '<h5>';
@@ -137,19 +137,24 @@ class Account
                 <div class="card-panel white">
                     <div class="inline">
                         <?php if (!$max) : ?>
-                            <p class="countTrainees cell">
+                            <p class="cell">
                                 Valeur maximale introuvable,
                                 veuillez en entrer une nouvelle
                             </p>
                         <?php else: ?>
-                            <p class="countTrainees cell">
+                            <p class="cell">
                                 Valeur maximale actuelle: <?php echo $max ?>
                             </p>
                         <?php endif; ?>
-                        <p class="countTrainees cell">
-                            Nombre total de tutorats en cours:
-                            <?php echo $internship + $alternance ?>
-                        </p>
+                        <div class="cell united">
+                            <p class="tooltip-container tooltip"
+                                data-tooltip=
+                                "Chaque stage compte pour 1 <br>
+                                 Chaque alternance compte pour 2"
+                                data-position="top">(?)</p>
+                            Nombre total actuel: <?php
+                            echo $internship + (2 * $alternance) ?>
+                        </div>
                     </div>
                     <form method="post" class="inline">
                         <div class="input-field cell">
@@ -208,9 +213,8 @@ class Account
                                 <div class="tooltip-container tooltip"
                                      data-tooltip=
                                      "Durée moyenne vous séparant du lieu du stage"
-                                     data-position="top">(?)</div>
-                                POSITION
-                            </th>
+                                     data-position="top">(?)
+                                </div>POSITION</th>
                         </tr>
                         </thead>
                         <tbody>
