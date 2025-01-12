@@ -45,6 +45,9 @@ h4 {
     padding-bottom: 20px;
     color: #E8CE7E;
     font-weight: bold;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 .tooltip-container:hover::after {

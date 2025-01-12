@@ -146,8 +146,12 @@ tbody {
 .tooltip-container {
     position: relative;
     display: inline-block;
+    cursor: pointer;
     color: #E8CE7E;
     font-weight: bold;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 
 /** Pagination **/
