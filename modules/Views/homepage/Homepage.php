@@ -71,25 +71,33 @@ readonly class Homepage
             <h3 class="center-align">Répartiteur de tuteurs enseignants</h3>
 
             <div class="card-panel white">
-                <form class="col table" id="searchForm" onsubmit="return false;" method="POST">
-                    <label for="searchType">Type de recherche:</label>
-                    <div class="input-field">
-                        <select id="searchType" name="searchType"
-                                aria-label="Type de recherche">
-                            <option value="studentNumber" selected>Numéro Etudiant</option>
-                            <option value="name">Nom et Prénom</option>
-                            <option value="company">Entreprise</option>
-                        </select>
+                <form class="col" id="searchForm" onsubmit="return false;" method="POST">
+                    <div class="inline">
+                        <div class="searchCell">
+                            <label for="searchType">Type de recherche:</label>
+                            <div class="input-field">
+                                <select id="searchType" name="searchType"
+                                        aria-label="Type de recherche">
+                                    <option value="studentNumber" selected>Numéro Etudiant</option>
+                                    <option value="name">Nom et Prénom</option>
+                                    <option value="company">Entreprise</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="searchCell">
+                            <label for="search">Rechercher:</label>
+                            <input type="text" id="search" name="search"
+                                   autocomplete="off" maxlength="50" required
+                                   aria-label="Rechercher"/>
+                        </div>
                     </div>
 
-                    <label for="search">Rechercher:</label>
-                    <input type="text" id="search" name="search"
-                           autocomplete="off" maxlength="50" required
-                           aria-label="Rechercher"/>
-
-                    <p>Etudiant(s):</p>
-                    <div id="searchResults" role="region" aria-live="polite"
-                         aria-label="Résultats de recherche"></div>
+                    <div class="searchCell">
+                        <p>Stage(s) et alternance(s):</p>
+                        <div id="searchResults" role="region" aria-live="polite"
+                             aria-label="Résultats de recherche"></div>
+                    </div>
                 </form>
             </div>
 
@@ -527,7 +535,7 @@ readonly class Homepage
 
                             <div class="row"></div>
 
-                            <div class="selection"> <div class="formCell">
+                            <div class="inline">
                                 <button class="waves-effect waves-light btn tooltip"
                                     name="selecInternshipSubmitted" value="1"
                                     type="submit" data-tooltip="Envoyer vos choix"

@@ -31,14 +31,32 @@ main a:hover {
     color: var(--main-color);
 }
 
-.selection {
+main .card-panel {
+    padding: 12px 3px;
+}
+
+.inline {
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: space-evenly;
+}
+
+.searchCell {
+    padding: 0 12px;
+}
+
+.searchCell .input-field {
+    margin-top: 0;
+    margin-bottom: 8px;
 }
 
 .formCell {
     padding: 0 3rem;
+}
+
+#searchResults ul,
+#searchResults p {
+    margin: 0;
 }
 
 .btn {
