@@ -74,6 +74,22 @@ main .card-panel {
     color: #00558B;
 }
 
+input[type="checkbox"].filled-in:checked + span:after {
+    background-color: #00558B !important;
+    border-color: #00558B !important;
+}
+
+/* label focus color */
+input[type=text]:focus + label {
+    color: #00558B !important;
+}
+
+/* label underline focus color */
+input[type=text]:focus {
+    border-bottom: 1px solid #00558B !important;
+    box-shadow: 0 1px 0 0 #00558B !important;
+}
+
 /* Tableau Homepage */
 
 #clickable {
