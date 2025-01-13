@@ -71,14 +71,16 @@ readonly class Homepage
             <h3 class="center-align">Répartiteur de tuteurs enseignants</h3>
 
             <div class="card-panel white">
-                <form class="col" id="searchForm" onsubmit="return false;" method="POST">
+                <form class="col" id="searchForm"
+                      onsubmit="return false;" method="POST">
                     <div class="inline">
                         <div class="searchCell">
                             <label for="searchType">Type de recherche:</label>
                             <div class="input-field">
                                 <select id="searchType" name="searchType"
                                         aria-label="Type de recherche">
-                                    <option value="studentNumber" selected>Numéro Etudiant</option>
+                                    <option value="studentNumber"
+                                            selected>Numéro Etudiant</option>
                                     <option value="name">Nom et Prénom</option>
                                     <option value="company">Entreprise</option>
                                 </select>
@@ -505,7 +507,9 @@ readonly class Homepage
                                             Tout
                                         </option>
                                     </select>
-                                    <label for="rows-per-page">Nombre de lignes par page</label>
+                                    <label
+                                    for="rows-per-page"
+                                    >Nombre de lignes par page</label>
                                 </div>
                             </div>
 

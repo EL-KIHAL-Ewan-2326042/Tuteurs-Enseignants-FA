@@ -142,14 +142,16 @@ class Dashboard
                                 <label for="student" style="cursor: pointer;">
                                     <span>Fichier CSV</span>
                                 </label>
-                                <input type="file" name="student" id="student" accept=".csv" multiple style="display: none;">
+                                <input type="file" name="student"
+                                       id="student" accept=".csv"
+                                       multiple style="display: none;">
                             </div>
 
                             <div class="file-path-wrapper">
                                 <label>
                                     <input class="file-path validate" type="text"
-                                           placeholder="Choisir" required>
-                                    <span>Chosissez un fichier CSV</span>
+                                           placeholder="Choisir un fichier" required>
+                                    <span>Format CSV</span>
                                 </label>
                             </div>
                             <button class="btn waves-effect waves-light"
@@ -171,13 +173,17 @@ class Dashboard
                                 <label for="teacher" style="cursor: pointer;">
                                     <span>Fichier CSV</span>
                                 </label>
-                                <input type="file" name="teacher" id="teacher" accept=".csv" multiple style="display: none;">
+                                <input type="file"
+                                       name="teacher"
+                                       id="teacher"
+                                       accept=".csv"
+                                       multiple style="display: none;">
                             </div>
                             <div class="file-path-wrapper">
                                 <label>
                                     <input class="file-path validate" type="text"
-                                        placeholder="Choisir" required>
-                                    <span>Choisissez un fichier CSV</span>
+                                        placeholder="Choisir un fichier" required>
+                                    <span>Format CSV</span>
                                 </label>
                             </div>
                             <button class="btn waves-effect waves-light"
@@ -199,13 +205,18 @@ class Dashboard
                                 <label for="internship" style="cursor: pointer;">
                                     <span>Fichier CSV</span>
                                 </label>
-                                <input type="file" name="internship" id="internship" accept=".csv" multiple style="display: none;">
+                                <input type="file"
+                                       name="internship"
+                                       id="internship"
+                                       accept=".csv"
+                                       multiple style="display: none;">
                             </div>
                             <div class="file-path-wrapper">
                                 <label>
                                     <input class="file-path validate" type="text"
-                                        placeholder="Choisissez un fichier CSV" required>
-                                    <span>Choisissez un fichier CSV</span>
+                                        placeholder="Choisir un fichier"
+                                           required>
+                                    <span>Format CSV</span>
                                 </label>
                             </div>
                             <button class="btn waves-effect waves-light"

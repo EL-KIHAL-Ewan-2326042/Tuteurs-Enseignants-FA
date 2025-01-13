@@ -608,15 +608,10 @@ document.addEventListener(
                     }
                 )
                 .then(
-                    async data => {
-                        createNewTable(data).then();
-                        // const internshipLoc = await geocodeAddress(
-                        //  data[0].address
-                        // )
-                        // placeMarker(
-                        //     internshipLoc, "Etudiant", false
-                        // );
-                        createTeacherMarkers(data).then();
+                    async data =>
+                    {
+                        createNewTable(data);
+                        createTeacherMarkers(data);
                     }
                 )
                 .catch(

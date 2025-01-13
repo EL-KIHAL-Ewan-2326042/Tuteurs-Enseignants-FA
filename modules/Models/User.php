@@ -203,12 +203,12 @@ class User extends Model
     {
         try {
             $query = "SELECT backup.name_criteria, backup.coef,"
-                    . " backup.is_checked, distribution_criteria.description "
-                    . "FROM backup JOIN distribution_criteria "
-                    . "ON backup.name_criteria = distribution_criteria.name_criteria "
-                    . "WHERE user_id = :user_id "
-                    . "AND id_backup = :id_backup "
-                    . "ORDER BY name_criteria ASC";
+                . " backup.is_checked, distribution_criteria.description "
+                . "FROM backup JOIN distribution_criteria "
+                . "ON backup.name_criteria = distribution_criteria.name_criteria "
+                . "WHERE user_id = :user_id "
+                . "AND id_backup = :id_backup "
+                . "ORDER BY name_criteria ASC";
             $stmt = $this->_db->getConn()->prepare($query);
             $stmt->bindParam(':user_id', $user_id);
             $stmt->bindParam(':id_backup', $id_backup);

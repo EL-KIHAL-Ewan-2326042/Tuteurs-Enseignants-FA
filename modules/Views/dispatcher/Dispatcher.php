@@ -100,7 +100,8 @@ class Dispatcher
                             if ($saves) : ?>
                                 <div class="input-field">
                                     <label
-                                    for="save-selector">Sélectionnez une sauvegarde</label>
+                                    for="save-selector"
+                                    >Sélectionnez une sauvegarde</label>
                                     <br><br>
                                     <select id="save-selector" name="save-selector">
                                 <?php
@@ -206,7 +207,10 @@ class Dispatcher
                                 echo $this->errorMessageAfterSort; ?></p>
                             <p class="green-text"><?php
                                 echo $this->checkMessageAfterSort; ?></p>
-                            <button class="btn waves-effect waves-light button-margin tooltipped"
+                            <button
+                                    class
+                                    ="btn waves-effect
+                                    waves-light button-margin tooltipped"
                                     type="submit" name="action-save"
                                     value="<?php echo $id_backup ?>" id="save-btn"
                                     data-position="top"
@@ -214,7 +218,10 @@ class Dispatcher
                                 Enregister
                                 <i class="material-icons right">arrow_downward</i>
                             </button>
-                            <button class="btn waves-effect waves-light button-margin tooltipped"
+                            <button
+                                    class
+                                    ="btn waves-effect
+                                    waves-light button-margin tooltipped"
                                     type="submit" name="action"
                                     value="generate" id="generate-btn"
                                     data-position="top"
@@ -254,9 +261,11 @@ class Dispatcher
                                         "btn waves-effect
                                         waves-light button-margin tooltipped"
                                         type="submit" name="action"
-                                        data-position="top" data-tooltip="Valider l'association">
+                                        data-position="top"
+                                        data-tooltip="Valider l'association">
                                     Associer
-                                    <i class="material-icons right">arrow_downward</i>
+                                    <i
+                                    class="material-icons right">arrow_downward</i>
                                 </button>
                             </div>
                         </div>
@@ -418,7 +427,9 @@ class Dispatcher
                                         <?php echo count($resultDispatchList); ?>
                                         ">Tout</option>
                                     </select>
-                                    <label for="rows-per-page">Nombre de lignes par page</label>
+                                    <label
+                                    for="rows-per-page"
+                                    >Nombre de lignes par page</label>
                                 </div>
                             </div>
 
