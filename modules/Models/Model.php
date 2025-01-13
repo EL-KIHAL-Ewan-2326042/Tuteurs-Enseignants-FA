@@ -457,7 +457,7 @@ class Model
         $studentColumns = $this->getTableColumn('student');
         $studentData = array_combine($studentColumns, $data);
 
-        // Insertion dans la table teacher
+        // Insertion dans la table student
         $this->insertGenericData($data, 'student');
 
         // Insertion dans la table study_at
@@ -499,11 +499,11 @@ class Model
     {
         $userModel = new User($this->_db);
         $teacher = [$data[0], $data[1], $data[2], $data[3]];
-        $discipline = ['discipline_name' => $data[4]];
-        $explodedData = explode('$', $data[5]);
+        $discipline = [1 => $data[5]];
+        $explodedData = explode('$', $data[4]);
         $address = [
-            'address' => $explodedData[0],
-            'type' => isset($explodedData[1]) ? $explodedData[1] : null
+            1 => $explodedData[0],
+            2 => isset($explodedData[1]) ? $explodedData[1] : null
         ];
         // Colonnes pour la table teacher
         $teacherColumns = $this->getTableColumn('teacher');
@@ -512,15 +512,17 @@ class Model
         // Insertion dans la table teacher
         $this->insertGenericData($teacher, 'teacher');
 
+
         // Insertion dans la table has_address, is_taught et user_connect
         $this->insertGenericData(
-            [['id_teacher' => $teacherData['id_teacher']] + $address],
+            [0 => $teacherData['id_teacher']] + $address,
             'has_address'
         );
         $this->insertGenericData(
-            [['id_teacher' => $teacherData['id_teacher']] + $discipline],
+            [0 => $teacherData['id_teacher']] + $discipline,
             'is_taught'
         );
+
         $userModel->insertUserConnect(
             $teacherData['id_teacher'],
             'default_password'
@@ -588,7 +590,7 @@ class Model
             return;
         }
 
-        // Réquee SQL d'insertion
+        // Réquete SQL d'insertion
         $query = "INSERT INTO $tableName (" . implode(',', $tableColumns)
                 . ") VALUES (" . implode(
                     ',', array_map(
@@ -597,6 +599,7 @@ class Model
                         )
                     )
                 ) . ")";
+
         $stmt = $this->_db->getConn()->prepare($query);
 
         // Lier les valeurs des données aux paramètres nommés dans le requête
