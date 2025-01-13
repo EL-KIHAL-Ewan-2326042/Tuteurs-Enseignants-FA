@@ -70,10 +70,24 @@ h4 {
     color: red;
 }
 
+/* Style des boutons de la page */
+.btn{
+    background-color : #00558B;
+}
+
+.btn:hover {
+    background-color: #E8CE7E;
+}
+
 /* Style des options dans le menu déroulant du select */
 .dropdown-content li>a, .dropdown-content li>span{
     padding: 15px;
     color: #00558B;
+}
+
+input[type="checkbox"].filled-in:checked + span:after {
+    background-color: #00558B !important;
+    border-color: #00558B !important;
 }
 
 /* Style des select */
