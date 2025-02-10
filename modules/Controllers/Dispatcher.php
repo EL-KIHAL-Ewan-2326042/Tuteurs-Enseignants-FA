@@ -262,9 +262,7 @@ class Dispatcher
                 exit();
             }
 
-            if (isset($_POST['action-save'])
-                && $_POST['action-save'] !== 'default'
-            ) {
+            if (isset($_POST['action-save'])) {
                 $coefficients = [];
                 foreach ($_POST['coef'] as $criteria => $coef) {
                     $coefficients[$criteria] = [
@@ -274,11 +272,18 @@ class Dispatcher
                     ];
                 }
 
-                $userModel->saveCoefficients(
-                    $coefficients,
-                    $_SESSION['identifier'],
-                    (int)$_POST['action-save']
-                );
+                if ($_POST['action-save'] === 'new') {
+                    $userModel->createCoefficients(
+                        $coefficients,
+                        $_SESSION['identifier']
+                    );
+                } else {
+                    $userModel->saveCoefficients(
+                        $coefficients,
+                        $_SESSION['identifier'],
+                        (int)$_POST['action-save']
+                    );
+                }
             }
 
             if (isset($_POST['searchInternship'])
