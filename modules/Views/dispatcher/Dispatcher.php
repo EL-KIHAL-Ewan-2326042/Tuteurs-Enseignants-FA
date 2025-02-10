@@ -104,30 +104,25 @@ class Dispatcher
                                     >Sélectionnez une sauvegarde</label>
                                     <br><br>
                                     <select id="save-selector" name="save-selector">
-                                <?php
-                                if (isset($_POST['save-selector'])
-                                    && $_POST['save-selector'] !== 'i'
-                                ) :
-                                    $selected = $_POST['save-selector'];
-                                    ?>
-                                <option value="i">Sauvegarde #<?php echo $selected;?>
-                                </option>
-                                <?php else: ?>
-                                <option value="default">Choisir
-                                </option>
-                                <?php endif; ?>
-                                <?php foreach ($saves as $save): ?>
-                                    <?php
-                                    $id_backup = $save['id_backup'];
-                                    if (isset($_POST['save-selector'])
-                                        && $id_backup == $_POST['save-selector']
-                                    ) {
-                                        continue;
-                                    } ?>
-                                    <option value="<?php echo $id_backup; ?>">
-                                        Sauvegarde #<?php echo $id_backup; ?>
-                                    </option>
-                                <?php endforeach; ?>
+                                        <option
+                                        value="new">Nouvelle Sauvegarde
+                                        </option>
+                                        <?php foreach ($saves as $save): ?>
+                                            <?php $id_backup = $save['id_backup']; ?>
+                                        <option value="<?php echo $id_backup; ?>"
+                                            <?php
+                                            if (isset($_POST['save-selector'])) {
+                                                $saveSelected
+                                                    = $_POST['save-selector'];
+                                            }
+                                            if (isset($_POST['save-selector'])
+                                                && $saveSelected == $id_backup
+                                            ) : ?>
+                                        selected
+                                            <?php endif; ?>
+                                        >Sauvegarde #<?php echo $id_backup; ?>
+                                            </option>
+                                        <?php endforeach; ?>
                                     </select>
                                 </div>
                             <?php endif; ?>
@@ -135,22 +130,23 @@ class Dispatcher
 
                             <?php
                             unset($id_backup);
-                            $id_backup = $_POST['save-selector'] ?? 'default';
+                            $id_backup = $_POST['save-selector'] ?? 'new';
 
-                            if ($id_backup === 'default' || $id_backup === 'i') {
-                                $defaultCriteria = $this
-                                    ->userModel->getDefaultCoef();
+                            if ($id_backup === 'new'
+                                || $id_backup === 'default'
+                                || $id_backup === 'i'
+                            ) {
+                                $defaultCriteria = $this->
+                                userModel->getDefaultCoef();
                                 $listCriteria = [];
-
                                 foreach ($defaultCriteria as $key => $value) {
                                     $listCriteria[$key] = $value;
                                 }
                             } else {
-                                $listCriteria = $this->userModel
-                                    ->loadCoefficients(
-                                        $_SESSION['identifier'],
-                                        $id_backup
-                                    );
+                                $listCriteria = $this->userModel->loadCoefficients(
+                                    $_SESSION['identifier'],
+                                    $id_backup
+                                );
                             }
                             ?>
 
