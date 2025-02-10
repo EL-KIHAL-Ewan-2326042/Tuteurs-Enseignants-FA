@@ -112,7 +112,7 @@ class Student extends Model
                 . "FROM student "
                 . "WHERE student_number ILIKE :searchTerm "
                 . "ORDER BY student_number "
-                . "LIMIT 5";
+                . "LIMIT 10";
             $searchTerm = "$searchTerm%";
         } elseif ($searchType === 'name') {
             $query
@@ -124,7 +124,7 @@ class Student extends Model
                 . "WHERE student_name ILIKE :searchTerm "
                 . "OR student_firstname ILIKE :searchTerm "
                 . "ORDER BY rank DESC "
-                . "LIMIT 5";
+                . "LIMIT 10";
             $searchTerm = "%$searchTerm%";
         } elseif ($searchType === 'company') {
             $query
@@ -137,7 +137,7 @@ class Student extends Model
                 . "ON student.student_number = internship.student_number "
                 . "WHERE company_name ILIKE :searchTerm "
                 . "ORDER BY rank DESC "
-                . "LIMIT 5";
+                . "LIMIT 10";
             $searchTerm = "$searchTerm%";
         }
 
