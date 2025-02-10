@@ -43,7 +43,7 @@ h4 {
     display: inline-block;
     cursor: pointer;
     padding-bottom: 20px;
-    color: #E8CE7E;
+    color: #E8CE7E !important;
     font-weight: bold;
     -webkit-user-select: none;
     -ms-user-select: none;
