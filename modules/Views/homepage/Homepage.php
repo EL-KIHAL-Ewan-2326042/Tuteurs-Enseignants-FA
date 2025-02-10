@@ -457,7 +457,7 @@ readonly class Homepage
                                         </td>
                                         <td>
                                             <?php echo $row['internshipTeacher'] > 0
-                                                ? $row['year'] : 'Non'; ?>
+                                                ? $row['year'] : '❌'; ?>
                                         </td>
                                         <td>
                                             <?php echo str_replace(
