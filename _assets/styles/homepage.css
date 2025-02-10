@@ -163,7 +163,7 @@ tbody {
 .tooltip-container {
     position: relative;
     display: inline-block;
-    color: #E8CE7E;
+    color: #E8CE7E !important;
     font-weight: bold;
 }
 
@@ -185,6 +185,7 @@ tbody {
     align-items: center;
     font-size: 16px;
     padding: 0 10px;
+    margin: 0;
 }
 
 #pagination-controls span {
