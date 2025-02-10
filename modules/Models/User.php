@@ -278,7 +278,7 @@ class User extends Model
 
         foreach ($defaultCriteria as &$criteria) {
             $criteria['coef'] = 1;
-            $criteria['is_checked'] = true;
+            $criteria['is_checked'] = false;
         }
 
         return $defaultCriteria;
@@ -319,5 +319,47 @@ class User extends Model
         $stmt->bindValue(':department', $department);
         $stmt->execute();
     }
+    public function createCoefficients(array $coef, $user_id): void
+    {
+        $conn = $this->_db->getConn();
 
+        try {
+            // 1. Get new backup ID from id_backup table
+            $conn->beginTransaction();
+
+            // Get current max ID from id_backup table
+            $stmt = $conn->prepare("SELECT MAX(Id_backup) FROM Id_backup");
+            $stmt->execute();
+            $maxId = $stmt->fetchColumn();
+            $newId = $maxId ? $maxId + 1 : 1;
+
+            // 2. Insert into Id_backup table
+            $stmt = $conn->prepare("INSERT INTO Id_backup (Id_backup) VALUES (?)");
+            $stmt->execute([$newId]);
+
+            // 3. Insert into backup table with generated name
+            $insertBackup = $conn->prepare("
+            INSERT INTO backup 
+            (User_id, Name_criteria, Id_backup, Coef, Is_checked, Name_save) 
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
+
+            foreach ($coef as $criteria => $data) {
+                $insertBackup->execute([
+                    $user_id,
+                    $criteria,
+                    $newId,
+                    $data['coef'],
+                    $data['is_checked'] ? 1 : 0,
+                    "Sauvegarde #" . $newId
+                ]);
+            }
+
+            $conn->commit();
+
+        } catch (PDOException $e) {
+            $conn->rollBack();
+            throw new Exception("Error creating backup: " . $e->getMessage());
+        }
+    }
 }
