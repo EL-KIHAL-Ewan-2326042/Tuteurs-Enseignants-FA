@@ -440,44 +440,44 @@ readonly class Homepage
                                 <tbody>
                                 <?php foreach ($table as $row): ?>
                                     <tr class="homepage-row">
-                                        <td>
-                                            <?php echo $row["student_name"] . " " .
-                                                $row["student_firstname"] ?>
-                                        </td>
-                                        <td>
-                                            <?php echo str_replace(
+                                        <td><?php
+                                            echo $row["student_name"] . " " .
+                                                $row["student_firstname"]
+                                        ?></td>
+                                        <td><?php
+                                            echo str_replace(
                                                 '_', ' ',
                                                 $row["formation"]
-                                            ) ?>
-                                        </td>
-                                        <td>
-                                            <?php echo str_replace(
+                                            )
+                                        ?></td>
+                                        <td><?php
+                                            echo str_replace(
                                                 '_', ' ', $row["class_group"]
-                                            ) ?>
-                                        </td>
-                                        <td>
-                                            <?php echo $row['internshipTeacher'] > 0
-                                                ? $row['year'] : '❌'; ?>
-                                        </td>
-                                        <td>
-                                            <?php echo str_replace(
+                                            )
+                                        ?></td>
+                                        <td><?php
+                                            echo $row['internshipTeacher'] > 0
+                                                ? $row['year'] : '❌';
+                                        ?></td>
+                                        <td><?php
+                                            echo str_replace(
                                                 '_', ' ',
                                                 $row["company_name"]
-                                            ) ?>
-                                        </td>
-                                        <td>
-                                            <?php echo str_replace(
+                                            )
+                                        ?></td>
+                                        <td><?php
+                                            echo str_replace(
                                                 '_', ' ', $row["internship_subject"]
-                                            ) ?>
-                                        </td>
-                                        <td>
-                                            <?php echo str_replace(
+                                            )
+                                        ?></td>
+                                        <td><?php
+                                            echo str_replace(
                                                 '_', "'", $row['address']
-                                            ) ?>
-                                        </td>
-                                        <td>
-                                            ~<?php echo $row['duration'] ?> minutes
-                                        </td>
+                                            )
+                                        ?></td>
+                                        <td>~<?php echo
+                                            $row['duration'] . " minutes"
+                                        ?></td>
                                         <td>
                                             <label class="center">
                                                 <input type="checkbox"
