@@ -176,8 +176,8 @@ class Model
             );
         }
 
-        if (isset($dictCoef['Cohérence'])) {
-            $dictValues["Cohérence"] = round(
+        if (isset($dictCoef['Discipline'])) {
+            $dictValues["Discipline"] = round(
                 $internshipModel->scoreDiscipSubject(
                     $internship['internship_identifier'],
                     $identifier
@@ -231,7 +231,7 @@ class Model
                     break;
 
                 case 'Est demandé':
-                case 'Cohérence':
+                case 'Discipline':
                     $ScoreRelevance = $value * $coef;
                     $totalScore += $ScoreRelevance;
                     break;
