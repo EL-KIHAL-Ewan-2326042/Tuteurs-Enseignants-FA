@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Fichier contenant le singleton de l'instance de la base de donnée
  *
@@ -37,10 +38,6 @@ use PDOException;
  */
 class Database
 {
-    private string $_host = "postgresql-tutormap.alwaysdata.net";
-    private string $_user = "tutormap";
-    private string $_pass = "8exs7JcEpGVfsI";
-    private string $_dbname = "tutormap_v4";
     private ?PDO $_conn = null;
 
     /**
@@ -48,7 +45,28 @@ class Database
      */
     public function __construct()
     {
+        $config = json_decode(file_get_contents('config.json'), true);
+
+        $host = $config['database']['host'];
+        $dbname = $config['database']['dbname'];
+        $user = $config['database']['user'];
+        $pass = $config['database']['password'];
+
+        try {
+            $this->_conn = new PDO(
+                "pgsql:host=$host;dbname=$dbname",
+                $user,
+                $pass,
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+                ]
+            );
+        } catch (PDOException $e) {
+            die("Erreur de connexion: " . $e->getMessage());
+        }
     }
+
 
     /**
      * Méthode statique pour obtenir l'instance unique
