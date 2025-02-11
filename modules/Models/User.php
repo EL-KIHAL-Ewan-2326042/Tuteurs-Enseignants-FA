@@ -20,6 +20,7 @@ namespace Blog\Models;
 use Includes\Database;
 use mysql_xdevapi\Exception;
 use PDO;
+use PDOException;
 
 /**
  * Classe gérant toutes les fonctionnalités du site associées
@@ -175,12 +176,14 @@ class User extends Model
      * @return array|null Renvoie un tableau associatif contenant les identifiants
      * des sauvegardes disponibles, ou `null` en cas d'échec
      */
-    public function showCoefficients(): ?array
+    public function showCoefficients($user_id): ?array
     {
         try {
             $query = "SELECT DISTINCT id_backup "
-                    . "FROM id_backup ORDER BY id_backup ASC";
+                    . "FROM backup "
+                    . "WHERE user_id = :user_id ORDER BY id_backup ASC";
             $stmt = $this->_db->getConn()->prepare($query);
+            $stmt->bindParam(':user_id', $user_id);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (\Exception) {
@@ -324,20 +327,16 @@ class User extends Model
         $conn = $this->_db->getConn();
 
         try {
-            // 1. Get new backup ID from id_backup table
             $conn->beginTransaction();
 
-            // Get current max ID from id_backup table
             $stmt = $conn->prepare("SELECT MAX(Id_backup) FROM Id_backup");
             $stmt->execute();
             $maxId = $stmt->fetchColumn();
             $newId = $maxId ? $maxId + 1 : 1;
 
-            // 2. Insert into Id_backup table
             $stmt = $conn->prepare("INSERT INTO Id_backup (Id_backup) VALUES (?)");
             $stmt->execute([$newId]);
 
-            // 3. Insert into backup table with generated name
             $insertBackup = $conn->prepare("
             INSERT INTO backup 
             (User_id, Name_criteria, Id_backup, Coef, Is_checked, Name_save) 
@@ -361,5 +360,16 @@ class User extends Model
             $conn->rollBack();
             throw new Exception("Error creating backup: " . $e->getMessage());
         }
+    }
+
+    public function deleteCoefficient($user_id, $id_backup):void {
+        $conn = $this->_db->getConn();
+
+        $query = "DELETE FROM backup "
+               . "WHERE Id_backup = :id_backup AND user_id = :user_id";
+        $stmt = $this->_db->getConn()->prepare($query);
+        $stmt->bindParam(':id_backup', $id_backup);
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->execute();
     }
 }
