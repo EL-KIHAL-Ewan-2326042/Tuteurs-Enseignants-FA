@@ -286,6 +286,13 @@ class Dispatcher
                 }
             }
 
+            if (isset($_POST['action-delete'])) {
+                $userModel->
+                deleteCoefficient($_SESSION['identifier'], $_POST['action-delete']);
+                header('Location: /dispatcher');
+                exit();
+            }
+
             if (isset($_POST['searchInternship'])
                 && isset($_POST['searchTeacher'])
             ) {
