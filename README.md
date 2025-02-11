@@ -5,6 +5,7 @@ ALVARES Titouan, AVIAS Daphné, KERBADOU Islem et PELLET Casimir.
 
 ### Projet :
 Ce projet rentre dans le cadre de la SAE S3.01. L'objectif global de cette SAE est de proposer un outil polyvalent permettant de faciliter la répartition des tuteurs pour les étudiants en stage et en alternance dans différentes filières d’étude. 
+Ce projet rentre également dans le cadre de la SAE S4.01. Son objectif est d'améliorer une application déjà existante en partant ainsi de notre projet pour la SAE S3.01. Cela comprend donc la qualité du code, les failles de sécurité, les performances et l'impact environnemental.
 
 ### Fichiers présents : 
 Vous trouverez à la racine de ce Github :
