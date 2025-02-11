@@ -355,6 +355,8 @@ readonly class Homepage
 
             <?php
             if (isset($_POST['selecDepSubmitted'])) {
+                echo "<script> sessionStorage.clear() </script>";
+
                 if (isset($_POST['selecDep'])) {
                     $_SESSION['selecDep'] = $_POST['selecDep'];
 
