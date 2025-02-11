@@ -564,6 +564,7 @@ readonly class Homepage
                         "<?php echo $_SESSION['selected_student']['address']; ?>";
                 <?php endif; ?>
             </script>
+            <?php unset($_SESSION['selected_student']); ?>
         </main>
         <?php
     }
