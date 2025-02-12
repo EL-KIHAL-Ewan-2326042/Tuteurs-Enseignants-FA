@@ -109,7 +109,8 @@ class Dispatcher
                                         value="new">Nouvelle Sauvegarde
                                         </option>
                                         <?php foreach ($saves as $save): ?>
-                                            <?php $id_backup = $save['id_backup']; ?>
+                                            <?php $id_backup = $save['id_backup'];
+                                                  $name_save = $save['name_save'];?>
                                         <option value="<?php echo $id_backup; ?>"
                                             <?php
                                             if (isset($_POST['save-selector'])) {
@@ -121,7 +122,7 @@ class Dispatcher
                                             ) : ?>
                                         selected
                                             <?php endif; ?>
-                                        >Sauvegarde #<?php echo $id_backup; ?>
+                                        ><?php echo $name_save; ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
@@ -132,6 +133,7 @@ class Dispatcher
                             <?php
                             unset($id_backup);
                             $id_backup = $_POST['save-selector'] ?? 'new';
+                            $name_save = '';
 
                             if ($id_backup === 'new'
                                 || $id_backup === 'default'
@@ -143,11 +145,13 @@ class Dispatcher
                                 foreach ($defaultCriteria as $key => $value) {
                                     $listCriteria[$key] = $value;
                                 }
+                                $name_save = 'Nouvelle sauvegarde';
                             } else {
                                 $listCriteria = $this->userModel->loadCoefficients(
                                     $_SESSION['identifier'],
                                     $id_backup
                                 );
+                                $name_save = $listCriteria[0]['name_save'];
                             }
                             ?>
 
@@ -198,7 +202,12 @@ class Dispatcher
                                     </div>
                                 </div>
                             <?php endforeach; ?>
-
+                            <div class="input-field">
+                                <input type="text" id="save-name"
+                                       name="save-name"
+                                       value="<?php echo $name_save ?>">
+                                <label for="save-name">Nom de la sauvegarde</label>
+                            </div>
 
                             <p class="red-text" id="checkboxError"><?php
                                 echo $this->errorMessageAfterSort; ?></p>
