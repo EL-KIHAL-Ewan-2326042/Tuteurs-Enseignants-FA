@@ -5,10 +5,15 @@
  */
 document.addEventListener(
     'DOMContentLoaded', function () {
-        const maxNumberInput = document.getElementById("newMaxNumber");
-        maxNumberInput.addEventListener("keyup", inputBoundaries);
-        maxNumberInput.addEventListener("keypress", inputBoundaries);
-        function inputBoundaries()
+        const maxInternInput = document.getElementById("newMaxIntern");
+        maxInternInput.addEventListener("keyup", () => inputBoundaries(maxInternInput));
+        maxInternInput.addEventListener("keypress", () => inputBoundaries(maxInternInput));
+
+        const maxApprenticeInput = document.getElementById("newMaxApprentice");
+        maxApprenticeInput.addEventListener("keyup", () => inputBoundaries(maxApprenticeInput));
+        maxApprenticeInput.addEventListener("keypress", () => inputBoundaries(maxApprenticeInput));
+
+        function inputBoundaries(maxNumberInput)
         {
             if (Number(maxNumberInput.value) < Number(maxNumberInput.min)) {
                 maxNumberInput.value = maxNumberInput.min;
