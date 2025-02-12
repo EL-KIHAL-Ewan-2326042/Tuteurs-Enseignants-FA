@@ -140,8 +140,7 @@ class Teacher extends Model
             = "SELECT id_teacher, teacher_name, teacher_firstname "
             . "FROM teacher "
             . "WHERE id_teacher ILIKE :searchTerm "
-            . "ORDER BY id_teacher ASC "
-            . "LIMIT 5";
+            . "ORDER BY id_teacher ASC";
 
         $searchTerm = "$searchTerm%";
 

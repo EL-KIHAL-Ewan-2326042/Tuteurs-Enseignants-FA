@@ -65,9 +65,7 @@ class Intramu
     public function show(): void
     {
         if (isset($_SESSION['identifier'])) {
-            unset($_SESSION['identifier']);
-            unset($_SESSION['role_name']);
-            unset($_SESSION['role_department']);
+            session_destroy();
             header('Location: /homepage');
             exit();
         }
@@ -98,6 +96,8 @@ class Intramu
             } else {
                 $errorMessage = 'Identifiant ou mot de passe incorrect';
             }
+        } else {
+            echo "<script> sessionStorage.clear() </script>";
         }
 
         $title = "Connexion";

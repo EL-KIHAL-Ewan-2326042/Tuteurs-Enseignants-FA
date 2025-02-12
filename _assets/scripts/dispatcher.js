@@ -35,7 +35,7 @@ document.addEventListener(
                 if (searchTerm.length > 0) {
                     fetchResults(searchTerm, 'searchInternship');
                 } else {
-                    searchResults.innerHTML = '<p>Barre de recherche vide</p>';
+                    searchResults.innerHTML = '<p></p>';
                 }
             }
         );
