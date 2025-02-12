@@ -451,12 +451,12 @@ readonly class Homepage
                                                 '_', ' ',
                                                 $row["formation"]
                                             )
-                                        ?></td>
+                                            ?></td>
                                         <td><?php
                                             echo str_replace(
                                                 '_', ' ', $row["class_group"]
                                             )
-                                        ?></td>
+                                            ?></td>
                                         <td><?php
                                             echo $row['internshipTeacher'] > 0
                                                 ? $row['year'] : '❌';
@@ -466,17 +466,17 @@ readonly class Homepage
                                                 '_', ' ',
                                                 $row["company_name"]
                                             )
-                                        ?></td>
+                                            ?></td>
                                         <td><?php
                                             echo str_replace(
                                                 '_', ' ', $row["internship_subject"]
                                             )
-                                        ?></td>
+                                            ?></td>
                                         <td><?php
                                             echo str_replace(
                                                 '_', "'", $row['address']
                                             )
-                                        ?></td>
+                                            ?></td>
                                         <td>~<?php echo
                                             $row['duration'] . " minutes"
                                         ?></td>
