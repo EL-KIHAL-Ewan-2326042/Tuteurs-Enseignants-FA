@@ -254,26 +254,26 @@ class Internship extends Model
     /**
      * Permet de mettre à jour le nombre de stage ou alternance selon le type
      *
-     * @param array $interns    la liste de stage/alternance
+     * @param array $trainees   la liste de stage/alternance
      * @param int   $internship le nombre de stage
      * @param int   $alternance le nombre d'alternance
      *
      * @return void
      */
-    public function getCountInternsPerType(array $interns,
+    public function getCountInternsPerType(array $trainees,
         int   &$internship, int &$alternance
     ): void {
         $internship = 0;
         $alternance = 0;
-        if (empty($interns)) {
+        if (empty($trainees)) {
             return;
         }
 
-        foreach ($interns as $intern) {
-            if (strtolower($intern['type']) == 'internship') {
+        foreach ($trainees as $trainee) {
+            if (strtolower($trainee['type']) == 'internship') {
                 ++$internship;
             }
-            if (strtolower($intern['type']) == 'alternance') {
+            if (strtolower($trainee['type']) == 'alternance') {
                 ++$alternance;
             }
         }
