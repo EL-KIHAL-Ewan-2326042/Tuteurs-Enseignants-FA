@@ -745,6 +745,7 @@ document.addEventListener(
             newTable.id = 'student-dispatch-table';
 
             const thead = document.createElement('thead');
+            thead.classList.add("clickable");
             thead.innerHTML = `
             <tr>
             <th>Enseignant</th>
@@ -802,6 +803,14 @@ document.addEventListener(
             newTable.appendChild(tbody);
             container.appendChild(newTable);
 
+            M.Tooltip.init(
+                document.querySelectorAll('.star-rating'), {
+                    exitDelay: 100,
+                }
+            );
+
+            setSortingListeners();
+
             loadingContainer.remove();
         }
 
@@ -829,6 +838,78 @@ document.addEventListener(
             return stars;
         }
 
+        /**
+         * Trie la table prenant pour id "student-dispatch-table"
+         *
+         * @param n numéro désignant la colonne par laquelle on trie le tableau
+         */
+        function sortTable(n)
+        {
+            let dir, rows, switching, i, x, y, shouldSwitch, column;
+            const table = document.getElementById("student-dispatch-table");
+            switching = true;
+
+            if (table.rows[0].getElementsByTagName("TH")[n].innerHTML.substring(table.rows[0].getElementsByTagName("TH")[n].innerHTML.length - 1) === "▲") { dir = "desc";
+            } else { dir = "asc";
+            }
+
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); ++i) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                    if (dir === "asc") {
+                        if (n === 2 && Number(x.innerHTML.substring(0, x.innerHTML.indexOf(' '))) > Number(y.innerHTML.substring(0, y.innerHTML.indexOf(' ')))
+                            || (n === 5 && Number(x.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')) < Number(y.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')))
+                            || (n === 6 && x.getElementsByTagName("INPUT")[0].checked < y.getElementsByTagName("INPUT")[0].checked)
+                            || (n >= 0 && n < 5 && n !== 2 && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase())
+                        ) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir === "desc") {
+                        if (n === 2 && Number(x.innerHTML.substring(0, x.innerHTML.indexOf(' '))) < Number(y.innerHTML.substring(0, y.innerHTML.indexOf(' ')))
+                            || (n === 5 && Number(x.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')) > Number(y.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')))
+                            || (n === 6 && x.getElementsByTagName("INPUT")[0].checked > y.getElementsByTagName("INPUT")[0].checked)
+                            || (n >= 0 && n < 5 && n !== 2 && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())
+                        ) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                }
+            }
+            for (i = 0; i < rows[0].cells.length; ++i) {
+                column = rows[0].getElementsByTagName("TH")[i].innerHTML;
+                if (column.substring(column.length-1) === "▲" || column.substring(column.length-1) === "▼") { table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-2);
+                }
+                if (i === n) {
+                    if (dir === "asc") { table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▲";
+                    } else { table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▼";
+                    }
+                }
+            }
+        }
+
+        function setSortingListeners()
+        {
+            const table = document.getElementById("student-dispatch-table").rows[0];
+            for (let i = 0; i < table.cells.length; ++i) {
+                table.getElementsByTagName("TH")[i].addEventListener(
+                    'click', () =>
+                    {
+                        sortTable(i);
+                    }
+                );
+            }
+            sortTable(5);
+        }
     }
 );
 
