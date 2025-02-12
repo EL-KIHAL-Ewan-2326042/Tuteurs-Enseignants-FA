@@ -91,6 +91,12 @@ input[type="checkbox"].filled-in:checked + span:after {
     cursor: pointer;
 }
 
+thead {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
 #student-dispatch-table th, #student-dispatch-table td {
     padding: 6px 10px;
     text-align: center;
