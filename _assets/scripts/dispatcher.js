@@ -205,34 +205,38 @@ document.addEventListener(
                 );
             }
         );
-
         const criteriaCheckboxes = document.querySelectorAll('.criteria-checkbox');
         const errorMessageElement = document.getElementById('checkboxError');
         const button = document.getElementById('generate-btn');
+
+        let hasInteracted = false;
 
         function validateCheckboxes()
         {
             const anyChecked = Array.from(criteriaCheckboxes).some(checkbox => checkbox.checked);
 
-            if (!anyChecked) {
+            if (!anyChecked && hasInteracted) {
                 errorMessageElement.textContent = 'Veuillez sélectionner au moins un critère.';
                 button.disabled = true;
             } else {
                 errorMessageElement.textContent = '';
-                if (button.disabled) {
-                    button.disabled = false;
-                }
+                button.disabled = !anyChecked;
             }
         }
 
         criteriaCheckboxes.forEach(
-            checkbox =>
-            {
+            function (checkbox) {
                 checkbox.addEventListener(
-                    'change', validateCheckboxes
+                    'change', function () {
+                        hasInteracted = true;
+                        validateCheckboxes();
+                    }
                 );
             }
         );
+
+
+        validateCheckboxes();
 
         const select = document.getElementById('save-selector');
         const saveButton = document.getElementById('save-btn');
@@ -242,14 +246,11 @@ document.addEventListener(
             saveButton.disabled = select.value === 'default';
         }
 
-        if (!select) {
-            return;
+        if (select) {
+            select.addEventListener('change', updateButtonState);
+            updateButtonState();
         }
 
-        select.addEventListener('change', updateButtonState);
-
-        updateButtonState();
-        validateCheckboxes();
     }
 );
 
