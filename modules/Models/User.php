@@ -179,7 +179,7 @@ class User extends Model
     public function showCoefficients($user_id): ?array
     {
         try {
-            $query = "SELECT DISTINCT id_backup "
+            $query = "SELECT DISTINCT id_backup, name_save "
                     . "FROM backup "
                     . "WHERE user_id = :user_id ORDER BY id_backup ASC";
             $stmt = $this->_db->getConn()->prepare($query);
@@ -205,7 +205,7 @@ class User extends Model
     public function loadCoefficients(string $user_id, int $id_backup): array|false
     {
         try {
-            $query = "SELECT backup.name_criteria, backup.coef,"
+            $query = "SELECT backup.name_save, backup.name_criteria, backup.coef,"
                 . " backup.is_checked, distribution_criteria.description "
                 . "FROM backup JOIN distribution_criteria "
                 . "ON backup.name_criteria = distribution_criteria.name_criteria "
@@ -238,7 +238,8 @@ class User extends Model
      * @return bool Renvoie 'true' si la mise à jour a réussi, 'false' sinon
      */
     public function saveCoefficients(
-        array $data, string $user_id, int $id_backup = 0
+        array $data, string $user_id, string $name_save,
+        int $id_backup = 0,
     ): bool {
         try {
             $query = "UPDATE backup "
@@ -256,6 +257,17 @@ class User extends Model
                 $stmt->bindParam(':is_checked', $singleData['is_checked']);
                 $stmt->execute();
             }
+
+            $query = "UPDATE backup "
+                   . "SET name_save = :name_save "
+                   . "WHERE user_id = :user_id "
+                   . "AND id_backup = :id_backup";
+            $stmt = $this->_db->getConn()->prepare($query);
+            $stmt->bindParam(':name_save', $name_save);
+            $stmt->bindParam(':user_id', $user_id);
+            $stmt->bindParam(':id_backup', $id_backup);
+
+            $stmt->execute();
 
             return true;
         } catch (Exception) {
@@ -322,7 +334,9 @@ class User extends Model
         $stmt->bindValue(':department', $department);
         $stmt->execute();
     }
-    public function createCoefficients(array $coef, $user_id): void
+    public function createCoefficients(
+        array $coef, string $name_save, $user_id
+    ): void
     {
         $conn = $this->_db->getConn();
 
@@ -350,7 +364,7 @@ class User extends Model
                     $newId,
                     $data['coef'],
                     $data['is_checked'] ? 1 : 0,
-                    "Sauvegarde #" . $newId
+                    $name_save
                 ]);
             }
 
