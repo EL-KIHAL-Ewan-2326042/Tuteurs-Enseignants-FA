@@ -561,6 +561,8 @@ document.addEventListener(
 /**
  * Partie 4: Vue Etudiante
  */
+let placedMarkers = new Set();
+
 document.addEventListener(
     'DOMContentLoaded', function () {
 
@@ -669,32 +671,46 @@ document.addEventListener(
 
         async function createTeacherMarkers(data)
         {
-            let minDistance;
-            let closestTeacherAddress;
-            for (const row of data) {
-                const teacherAddresses = await getTeacherAddresses(row.id_teacher);
-                const internshipLocation = await geocodeAddress(row.address);
-                minDistance = Infinity;
+            let addressCache = new Map();
+            let teacherAddressCache = new Map();
 
-                if (Array.isArray(teacherAddresses)) {
-                    for (const item of teacherAddresses) {
-                        const location = await geocodeAddress(item.address);
-                        const distance = await calculateDistanceOnly(internshipLocation, location);
-
-                        if (distance < minDistance) {
-                            minDistance = distance;
-                            closestTeacherAddress = location;
-                        }
-                    }
-                } else {
-                    closestTeacherAddress = await geocodeAddress(teacherAddresses.address);
+            async function getGeocode(address)
+            {
+                if (!addressCache.has(address)) {
+                    addressCache.set(address, geocodeAddress(address));
                 }
-                const marker = new ol.Overlay(
-                    {
-                        position: ol.proj.fromLonLat([closestTeacherAddress.lon, closestTeacherAddress.lat]),
-                        element: createMarkerElement(row.teacher_name),
-                    }
+                return await addressCache.get(address);
+            }
+
+            for (const row of data) {
+                if (placedMarkers.has(row.teacher_name)) {
+                    continue;
+                }
+
+                const internshipLocation = await getGeocode(row.address);
+
+                let teacherAddresses = await getTeacherAddresses(row.id_teacher);
+                teacherAddresses = Array.isArray(teacherAddresses) ? teacherAddresses : [teacherAddresses];
+
+                const teacherLocations = await Promise.all(
+                    teacherAddresses.map(
+                        async(item) => {
+                        if (!teacherAddressCache.has(item.address)
+                    ) {
+                        teacherAddressCache.set(item.address, getGeocode(item.address));
+                        }
+                            return await teacherAddressCache.get(item.address);
+                        }
+                    )
                 );
+
+                const distances = await Promise.all(
+                    teacherLocations.map(location => calculateDistanceOnly(internshipLocation, location))
+                );
+
+                const minIndex = distances.indexOf(Math.min(...distances));
+                const closestTeacherAddress = teacherLocations[minIndex];
+
                 const markerFeature = new ol.Feature(
                     {
                         geometry: new ol.geom.Point(
@@ -705,8 +721,11 @@ document.addEventListener(
                 );
 
                 markerSource.addFeature(markerFeature);
+
+                placedMarkers.add(row.teacher_name);
             }
         }
+
         async function createNewTable(data)
         {
             const container = document.querySelector('.dispatch-table-wrapper');
