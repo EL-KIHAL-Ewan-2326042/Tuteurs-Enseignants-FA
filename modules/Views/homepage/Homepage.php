@@ -355,6 +355,8 @@ readonly class Homepage
 
             <?php
             if (isset($_POST['selecDepSubmitted'])) {
+                echo "<script> sessionStorage.clear() </script>";
+
                 if (isset($_POST['selecDep'])) {
                     $_SESSION['selecDep'] = $_POST['selecDep'];
 
@@ -564,6 +566,7 @@ readonly class Homepage
                         "<?php echo $_SESSION['selected_student']['address']; ?>";
                 <?php endif; ?>
             </script>
+            <?php unset($_SESSION['selected_student']); ?>
         </main>
         <?php
     }

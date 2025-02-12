@@ -275,15 +275,24 @@ class Dispatcher
                 if ($_POST['action-save'] === 'new') {
                     $userModel->createCoefficients(
                         $coefficients,
+                        $_POST['save-name'],
                         $_SESSION['identifier']
                     );
                 } else {
                     $userModel->saveCoefficients(
                         $coefficients,
                         $_SESSION['identifier'],
+                        $_POST['save-name'],
                         (int)$_POST['action-save']
                     );
                 }
+            }
+
+            if (isset($_POST['action-delete'])) {
+                $userModel->
+                deleteCoefficient($_SESSION['identifier'], $_POST['action-delete']);
+                header('Location: /dispatcher');
+                exit();
             }
 
             if (isset($_POST['searchInternship'])

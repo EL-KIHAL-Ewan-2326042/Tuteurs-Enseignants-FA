@@ -96,7 +96,8 @@ class Dispatcher
                         <form class="col s12" action="./dispatcher"
                               method="post" onsubmit="showLoading();">
                             <?php
-                            $saves = $this->userModel->showCoefficients();
+                            $saves = $this->userModel
+                                ->showCoefficients($_SESSION['identifier']);
                             if ($saves) : ?>
                                 <div class="input-field">
                                     <label
@@ -108,7 +109,8 @@ class Dispatcher
                                         value="new">Nouvelle Sauvegarde
                                         </option>
                                         <?php foreach ($saves as $save): ?>
-                                            <?php $id_backup = $save['id_backup']; ?>
+                                            <?php $id_backup = $save['id_backup'];
+                                                  $name_save = $save['name_save'];?>
                                         <option value="<?php echo $id_backup; ?>"
                                             <?php
                                             if (isset($_POST['save-selector'])) {
@@ -120,7 +122,7 @@ class Dispatcher
                                             ) : ?>
                                         selected
                                             <?php endif; ?>
-                                        >Sauvegarde #<?php echo $id_backup; ?>
+                                        ><?php echo $name_save; ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
@@ -131,6 +133,7 @@ class Dispatcher
                             <?php
                             unset($id_backup);
                             $id_backup = $_POST['save-selector'] ?? 'new';
+                            $name_save = '';
 
                             if ($id_backup === 'new'
                                 || $id_backup === 'default'
@@ -142,11 +145,13 @@ class Dispatcher
                                 foreach ($defaultCriteria as $key => $value) {
                                     $listCriteria[$key] = $value;
                                 }
+                                $name_save = 'Nouvelle sauvegarde';
                             } else {
                                 $listCriteria = $this->userModel->loadCoefficients(
                                     $_SESSION['identifier'],
                                     $id_backup
                                 );
+                                $name_save = $listCriteria[0]['name_save'];
                             }
                             ?>
 
@@ -197,34 +202,55 @@ class Dispatcher
                                     </div>
                                 </div>
                             <?php endforeach; ?>
-
+                            <div class="input-field">
+                                <input type="text" id="save-name"
+                                       name="save-name"
+                                       value="<?php echo $name_save ?>">
+                                <label for="save-name">Nom de la sauvegarde</label>
+                            </div>
 
                             <p class="red-text" id="checkboxError"><?php
                                 echo $this->errorMessageAfterSort; ?></p>
                             <p class="green-text"><?php
                                 echo $this->checkMessageAfterSort; ?></p>
-                            <button
-                                    class
-                                    ="btn waves-effect
+
+                            <div style="display: flex;
+                            justify-content: space-between;
+                            align-items: center;">
+                                <div>
+                                    <button class="btn waves-effect
+                                    waves-light button-margin tooltipped red"
+                                            type="submit" name="action-delete"
+                                            value="<?php echo $id_backup ?>"
+                                            id="delete-btn"
+                                            data-position="top"
+                                            data-tooltip="Supprimer la sauvegarde">
+                                        Supprimer
+                                        <i class="material-icons right">delete</i>
+                                    </button>
+                                    <button class="btn waves-effect
                                     waves-light button-margin tooltipped"
-                                    type="submit" name="action-save"
-                                    value="<?php echo $id_backup ?>" id="save-btn"
-                                    data-position="top"
-                                    data-tooltip="Enregistrer la sauvegarde">
-                                Enregister
-                                <i class="material-icons right">arrow_downward</i>
-                            </button>
-                            <button
-                                    class
-                                    ="btn waves-effect
-                                    waves-light button-margin tooltipped"
-                                    type="submit" name="action"
-                                    value="generate" id="generate-btn"
-                                    data-position="top"
-                                    data-tooltip="Commencer la répartition">
-                                Générer
-                                <i class="material-icons right">send</i>
-                            </button>
+                                            type="submit" name="action-save"
+                                            value="<?php echo $id_backup ?>"
+                                            id="save-btn"
+                                            data-position="top"
+                                            data-tooltip="Enregistrer la sauvegarde">
+                                        Enregistrer
+                                        <i class="material-icons right"
+                                        >arrow_downward</i>
+                                    </button>
+                                </div>
+
+                                <button class="btn waves-effect
+                                waves-light button-margin tooltipped"
+                                        type="submit" name="action"
+                                        value="generate" id="generate-btn"
+                                        data-position="top"
+                                        data-tooltip="Commencer la répartition">
+                                    Générer
+                                    <i class="material-icons right">send</i>
+                                </button>
+                            </div>
                         </form>
                     </div>
 
@@ -453,24 +479,27 @@ class Dispatcher
                                 </button>
                             </div>
 
-                            <div class="row s12 center">
-                                <input type="hidden" id="selectStudentSubmitted"
-                                       name="selectStudentSubmitted" value="1">
-                                <button class="waves-effect waves-light
-                                btn tooltipped"
-                                        type="submit"
+
+                            <div>
+                                <button class="btn waves-effect
+                                waves-light button-margin tooltipped"
+                                        type="submit" name="action-save"
+                                        value="<?php echo $id_backup ?>"
+                                        id="save-btn"
                                         data-position="top"
-                                        data-tooltip="Confirmer votre choix">
-                                    Valider
+                                        data-tooltip="Enregistrer la sauvegarde">
+                                    Enregister
+                                    <i class="material-icons
+                                    right">arrow_downward</i>
                                 </button>
-                                <input type="hidden" name="restartDispatcherButton"
-                                       value="1">
-                                <button class="waves-effect waves-light
-                                btn tooltipped"
-                                        type="submit"
+                                <button class="btn waves-effect
+                                waves-light button-margin tooltipped"
+                                        type="submit" name="action"
+                                        value="generate" id="generate-btn"
                                         data-position="top"
-                                        data-tooltip="Recommencer la sélection">
-                                    Recommencer
+                                        data-tooltip="Commencer la répartition">
+                                    Générer
+                                    <i class="material-icons right">send</i>
                                 </button>
                             </div>
                             <br>
