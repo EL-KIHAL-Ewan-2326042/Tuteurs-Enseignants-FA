@@ -18,157 +18,158 @@ DROP TABLE IF EXISTS Student;
 DROP TABLE IF EXISTS Teacher;
 
 CREATE TABLE Teacher(
-    Id_teacher VARCHAR(10),
-    Teacher_name VARCHAR(50),
-    Teacher_firstname VARCHAR(50),
-    Maxi_number_trainees INT,
-    PRIMARY KEY(Id_teacher)
+                        Id_teacher VARCHAR(10),
+                        Teacher_name VARCHAR(50),
+                        Teacher_firstname VARCHAR(50),
+                        Maxi_number_intern INT,
+                        Maxi_number_apprentice INT,
+                        PRIMARY KEY(Id_teacher)
 );
 
 CREATE TABLE Student(
-    Student_number VARCHAR(10),
-    Student_name VARCHAR(50) NOT NULL,
-    Student_firstname VARCHAR(50) NOT NULL,
-    Formation VARCHAR(50),
-    Class_group VARCHAR(50),
-    PRIMARY KEY(Student_number)
+                        Student_number VARCHAR(10),
+                        Student_name VARCHAR(50) NOT NULL,
+                        Student_firstname VARCHAR(50) NOT NULL,
+                        Formation VARCHAR(50),
+                        Class_group VARCHAR(50),
+                        PRIMARY KEY(Student_number)
 );
 
 CREATE TABLE Discipline(
-    Discipline_name VARCHAR(50),
-    PRIMARY KEY(Discipline_name)
+                           Discipline_name VARCHAR(50),
+                           PRIMARY KEY(Discipline_name)
 );
 
 CREATE TABLE User_connect(
-    User_id VARCHAR(10),
-    User_pass VARCHAR(100),
-    PRIMARY KEY(User_id)
+                             User_id VARCHAR(10),
+                             User_pass VARCHAR(100),
+                             PRIMARY KEY(User_id)
 );
 
 CREATE TABLE Role(
-    Role_name VARCHAR(50),
-    PRIMARY KEY(Role_name)
+                     Role_name VARCHAR(50),
+                     PRIMARY KEY(Role_name)
 );
 
 CREATE TABLE Distribution_criteria(
-    Name_criteria VARCHAR(50),
-    Description VARCHAR(500) NOT NULL,
-    PRIMARY KEY(Name_criteria)
+                                      Name_criteria VARCHAR(50),
+                                      Description VARCHAR(500) NOT NULL,
+                                      PRIMARY KEY(Name_criteria)
 );
 
 CREATE TABLE Addr_name(
-    Address VARCHAR(100),
-    PRIMARY KEY(Address)
+                          Address VARCHAR(100),
+                          PRIMARY KEY(Address)
 );
 
 CREATE TABLE Address_type(
-    Type VARCHAR(50),
-    PRIMARY KEY(Type)
+                             Type VARCHAR(50),
+                             PRIMARY KEY(Type)
 );
 
 CREATE TABLE Id_backup(
-    Id_backup INT,
-    PRIMARY KEY(Id_backup)
+                          Id_backup INT,
+                          PRIMARY KEY(Id_backup)
 );
 
 CREATE TABLE Internship(
-    Internship_identifier VARCHAR(20),
-    Company_name VARCHAR(50) NOT NULL,
-    Keywords VARCHAR(200),
-    Start_date_internship DATE NOT NULL,
-    Type VARCHAR(50),
-    End_date_internship DATE NOT NULL,
-    Internship_subject VARCHAR(150) NOT NULL,
-    Address VARCHAR(100) NOT NULL,
-    Student_number VARCHAR(10) NOT NULL,
-    Relevance_score FLOAT,
-    Id_teacher VARCHAR(10),
-    PRIMARY KEY(Internship_identifier),
-    FOREIGN KEY(Id_teacher) REFERENCES Teacher(Id_teacher),
-    FOREIGN KEY(Address) REFERENCES Addr_name(Address),
-    FOREIGN KEY(Student_number) REFERENCES Student(Student_number)
+                           Internship_identifier VARCHAR(20),
+                           Company_name VARCHAR(50) NOT NULL,
+                           Keywords VARCHAR(200),
+                           Start_date_internship DATE NOT NULL,
+                           Type VARCHAR(50),
+                           End_date_internship DATE NOT NULL,
+                           Internship_subject VARCHAR(150) NOT NULL,
+                           Address VARCHAR(100) NOT NULL,
+                           Student_number VARCHAR(10) NOT NULL,
+                           Relevance_score FLOAT,
+                           Id_teacher VARCHAR(10),
+                           PRIMARY KEY(Internship_identifier),
+                           FOREIGN KEY(Id_teacher) REFERENCES Teacher(Id_teacher),
+                           FOREIGN KEY(Address) REFERENCES Addr_name(Address),
+                           FOREIGN KEY(Student_number) REFERENCES Student(Student_number)
 );
 
 CREATE TABLE Department(
-    Department_name VARCHAR(50),
-    Address VARCHAR(100) NOT NULL,
-    PRIMARY KEY(Department_name),
-    FOREIGN KEY(Address) REFERENCES Addr_name(Address)
+                           Department_name VARCHAR(50),
+                           Address VARCHAR(100) NOT NULL,
+                           PRIMARY KEY(Department_name),
+                           FOREIGN KEY(Address) REFERENCES Addr_name(Address)
 );
 
 CREATE TABLE Is_requested(
-    Id_teacher VARCHAR(10),
-    Internship_identifier VARCHAR(50),
-    PRIMARY KEY(Id_teacher, Internship_identifier),
-    FOREIGN KEY(Id_teacher) REFERENCES Teacher(Id_teacher),
-    FOREIGN KEY(Internship_identifier) REFERENCES Internship(Internship_identifier)
+                             Id_teacher VARCHAR(10),
+                             Internship_identifier VARCHAR(50),
+                             PRIMARY KEY(Id_teacher, Internship_identifier),
+                             FOREIGN KEY(Id_teacher) REFERENCES Teacher(Id_teacher),
+                             FOREIGN KEY(Internship_identifier) REFERENCES Internship(Internship_identifier)
 );
 
 CREATE TABLE Is_taught(
-    Id_teacher VARCHAR(10),
-    Discipline_name VARCHAR(50),
-    PRIMARY KEY(Id_teacher, Discipline_name),
-    FOREIGN KEY(Id_teacher) REFERENCES Teacher(Id_teacher),
-    FOREIGN KEY(Discipline_name) REFERENCES Discipline(Discipline_name)
+                          Id_teacher VARCHAR(10),
+                          Discipline_name VARCHAR(50),
+                          PRIMARY KEY(Id_teacher, Discipline_name),
+                          FOREIGN KEY(Id_teacher) REFERENCES Teacher(Id_teacher),
+                          FOREIGN KEY(Discipline_name) REFERENCES Discipline(Discipline_name)
 );
 
 CREATE TABLE Has_role(
-    User_id VARCHAR(10),
-    Role_name VARCHAR(50) NOT NULL,
-    Department_name VARCHAR(50) NOT NULL,
-    PRIMARY KEY(User_id, Role_name),
-    FOREIGN KEY(User_id) REFERENCES User_connect(User_id),
-    FOREIGN KEY(Role_name) REFERENCES Role(Role_name)
+                         User_id VARCHAR(10),
+                         Role_name VARCHAR(50) NOT NULL,
+                         Department_name VARCHAR(50) NOT NULL,
+                         PRIMARY KEY(User_id, Role_name),
+                         FOREIGN KEY(User_id) REFERENCES User_connect(User_id),
+                         FOREIGN KEY(Role_name) REFERENCES Role(Role_name)
 );
 
 CREATE TABLE Study_at(
-    Student_number VARCHAR(10),
-    Department_name VARCHAR(50),
-    PRIMARY KEY(Student_number, Department_name),
-    FOREIGN KEY(Student_number) REFERENCES Student(Student_number),
-    FOREIGN KEY(Department_name) REFERENCES Department(Department_name)
+                         Student_number VARCHAR(10),
+                         Department_name VARCHAR(50),
+                         PRIMARY KEY(Student_number, Department_name),
+                         FOREIGN KEY(Student_number) REFERENCES Student(Student_number),
+                         FOREIGN KEY(Department_name) REFERENCES Department(Department_name)
 );
 
 CREATE TABLE Has_address(
-    Id_teacher VARCHAR(10),
-    Address VARCHAR(100),
-    Type VARCHAR(50),
-    PRIMARY KEY(Id_teacher, Address, Type),
-    FOREIGN KEY(Id_teacher) REFERENCES Teacher(Id_teacher),
-    FOREIGN KEY(Address) REFERENCES Addr_name(Address),
-    FOREIGN KEY(Type) REFERENCES Address_type(Type)
+                            Id_teacher VARCHAR(10),
+                            Address VARCHAR(100),
+                            Type VARCHAR(50),
+                            PRIMARY KEY(Id_teacher, Address, Type),
+                            FOREIGN KEY(Id_teacher) REFERENCES Teacher(Id_teacher),
+                            FOREIGN KEY(Address) REFERENCES Addr_name(Address),
+                            FOREIGN KEY(Type) REFERENCES Address_type(Type)
 );
 
 CREATE TABLE Distance(
-    Id_teacher VARCHAR(10),
-    Internship_identifier VARCHAR(20),
-    Distance INT,
-    PRIMARY KEY(Id_teacher, Internship_identifier),
-    FOREIGN KEY(Id_teacher) REFERENCES Teacher(Id_teacher),
-    FOREIGN KEY(Internship_identifier) REFERENCES Internship(Internship_identifier)
+                         Id_teacher VARCHAR(10),
+                         Internship_identifier VARCHAR(20),
+                         Distance INT,
+                         PRIMARY KEY(Id_teacher, Internship_identifier),
+                         FOREIGN KEY(Id_teacher) REFERENCES Teacher(Id_teacher),
+                         FOREIGN KEY(Internship_identifier) REFERENCES Internship(Internship_identifier)
 );
 
 CREATE TABLE backup (
-    User_id VARCHAR(10),
-    Name_criteria VARCHAR(50),
-    Id_backup INT,
-    Coef INT,
-    Name_save VARCHAR(100),
-    Is_checked BOOLEAN DEFAULT TRUE,
-    PRIMARY KEY(User_id, Name_criteria, Id_backup),
-    FOREIGN KEY(User_id) REFERENCES User_connect(User_id),
-    FOREIGN KEY(Name_criteria) REFERENCES Distribution_criteria(Name_criteria),
-    FOREIGN KEY(Id_backup) REFERENCES Id_backup(Id_backup)
+                        User_id VARCHAR(10),
+                        Name_criteria VARCHAR(50),
+                        Id_backup INT,
+                        Coef INT,
+                        Name_save VARCHAR(100),
+                        Is_checked BOOLEAN DEFAULT TRUE,
+                        PRIMARY KEY(User_id, Name_criteria, Id_backup),
+                        FOREIGN KEY(User_id) REFERENCES User_connect(User_id),
+                        FOREIGN KEY(Name_criteria) REFERENCES Distribution_criteria(Name_criteria),
+                        FOREIGN KEY(Id_backup) REFERENCES Id_backup(Id_backup)
 );
 
 CREATE OR REPLACE FUNCTION check_is_requested_assignment()
 RETURNS TRIGGER AS $$
-    BEGIN
+BEGIN
         IF EXISTS (SELECT 1 FROM Internship WHERE Internship_identifier = NEW.Internship_identifier AND Id_teacher IS NOT NULL) THEN
             RAISE EXCEPTION 'Un professeur est déjà assigné à ce stage';
-        END IF;
-        RETURN NEW;
-    END;
+END IF;
+RETURN NEW;
+END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER check_Is_requested_assignment
@@ -179,28 +180,28 @@ CREATE TRIGGER check_Is_requested_assignment
 
 CREATE OR REPLACE FUNCTION check_internship_assignment()
 RETURNS TRIGGER AS $$
-    BEGIN
+BEGIN
         IF NEW.Id_teacher IS NOT NULL THEN
-            DELETE FROM Is_requested WHERE Internship_identifier = NEW.Internship_identifier;
-            DELETE FROM Distance WHERE Internship_identifier = NEW.Internship_identifier;
-        END IF;
-        RETURN NEW;
-    END;
+DELETE FROM Is_requested WHERE Internship_identifier = NEW.Internship_identifier;
+DELETE FROM Distance WHERE Internship_identifier = NEW.Internship_identifier;
+END IF;
+RETURN NEW;
+END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER check_internship_assignment
     BEFORE UPDATE OR INSERT ON Internship
     FOR EACH ROW
-    EXECUTE FUNCTION check_internship_assignment();
+EXECUTE FUNCTION check_internship_assignment();
 
 CREATE OR REPLACE FUNCTION check_distance_assignment()
 RETURNS TRIGGER AS $$
 BEGIN
     IF (SELECT Id_teacher FROM Internship WHERE Internship_identifier = NEW.Internship_identifier) IS NULL THEN
         RETURN NEW;
-    ELSE
+ELSE
         RAISE EXCEPTION 'Un professeur est déjà assigné à ce stage';
-    END IF;
+END IF;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -211,12 +212,12 @@ CREATE TRIGGER check_distance_assignment
 
 CREATE OR REPLACE FUNCTION create_addr_for_insert()
 RETURNS TRIGGER AS $$
-    BEGIN
+BEGIN
         IF (SELECT Address FROM Addr_name WHERE Address = NEW.Address) IS NULL THEN
             INSERT INTO Addr_name (Address) VALUES (NEW.address);
-        END IF;
-        RETURN NEW;
-    END;
+END IF;
+RETURN NEW;
+END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER create_addr_for_insert_internship
@@ -228,18 +229,18 @@ CREATE TRIGGER create_addr_for_insert_internship
 CREATE OR REPLACE FUNCTION update_backup_new_criteria()
 RETURNS TRIGGER AS $$
     DECLARE
-        user_id TEXT;
+user_id TEXT;
         id_backup integer;
-    BEGIN
-        FOR user_id IN SELECT User_connect.user_id FROM User_connect
-            LOOP
-            FOR id_backup IN SELECT Id_backup.id_backup FROM Id_backup
-                LOOP
-                INSERT INTO backup (user_id, name_Criteria, id_backup, coef, Is_checked) VALUES (user_id, NEW.name_criteria, id_backup, 1, False);
-                END LOOP;
-            END LOOP;
-        RETURN NEW;
-    END;
+BEGIN
+FOR user_id IN SELECT User_connect.user_id FROM User_connect
+                                                    LOOP
+    FOR id_backup IN SELECT Id_backup.id_backup FROM Id_backup
+                   LOOP
+               INSERT INTO backup (user_id, name_Criteria, id_backup, coef, Is_checked) VALUES (user_id, NEW.name_criteria, id_backup, 1, False);
+END LOOP;
+END LOOP;
+RETURN NEW;
+END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER update_backup_new_criteria
@@ -253,15 +254,20 @@ CREATE TRIGGER create_addr_for_insert_has_address
     FOR EACH ROW
     EXECUTE FUNCTION create_addr_for_insert();
 
+CREATE TRIGGER create_addr_for_insert_department
+    BEFORE INSERT ON department
+    FOR EACH ROW
+    EXECUTE FUNCTION create_addr_for_insert();
+
 
 CREATE OR REPLACE FUNCTION create_discipline_for_insert()
 RETURNS TRIGGER AS $$
-    BEGIN
+BEGIN
         IF (SELECT discipline_name FROM Discipline WHERE discipline_name = NEW.discipline_name) IS NULL THEN
             INSERT INTO Discipline (discipline_name) VALUES (NEW.discipline_name);
-        END IF;
-        RETURN NEW;
-    END;
+END IF;
+RETURN NEW;
+END;
 $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER create_discipline_for_insert_is_taught
@@ -272,11 +278,11 @@ CREATE TRIGGER create_discipline_for_insert_is_taught
 
 CREATE OR REPLACE FUNCTION create_id_backup_for_insert()
 RETURNS TRIGGER AS $$
-    BEGIN
+BEGIN
         IF (SELECT id_backup FROM id_backup WHERE id_backup.id_backup = NEW.id_backup) IS NULL THEN
             INSERT INTO id_backup (id_backup) VALUES (NEW.id_backup);
-        END IF;
-    RETURN NEW;
+END IF;
+RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -288,17 +294,17 @@ CREATE TRIGGER create_discipline_for_insert_is_taught
 CREATE OR REPLACE FUNCTION update_backup_new_id_backup()
 RETURNS TRIGGER AS $$
     DECLARE
-        user_id TEXT;
+user_id TEXT;
         name_criteria TEXT;
-    BEGIN
-        FOR user_id IN SELECT user_connect.user_id FROM User_connect
-            LOOP
-            FOR name_criteria IN SELECT Distribution_criteria.name_criteria FROM Distribution_criteria
-                LOOP
-                INSERT INTO backup (user_id, name_Criteria, id_backup, coef) VALUES (user_id, name_criteria, NEW.id_backup, 1);
-            END LOOP;
-        END LOOP;
-    RETURN NEW;
+BEGIN
+FOR user_id IN SELECT user_connect.user_id FROM User_connect
+                                                    LOOP
+    FOR name_criteria IN SELECT Distribution_criteria.name_criteria FROM Distribution_criteria
+                   LOOP
+               INSERT INTO backup (user_id, name_Criteria, id_backup, coef) VALUES (user_id, name_criteria, NEW.id_backup, 1);
+END LOOP;
+END LOOP;
+RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -311,17 +317,17 @@ CREATE TRIGGER update_backup_new_id_backup
 CREATE OR REPLACE FUNCTION insert_backup()
 RETURNS TRIGGER AS $$
     DECLARE
-        name_criteria TEXT;
+name_criteria TEXT;
         id_backup integer;
-    BEGIN
-        FOR name_criteria IN SELECT Distribution_criteria.name_criteria FROM Distribution_criteria
-            LOOP
-            FOR id_backup IN SELECT Id_backup.id_backup FROM Id_backup
-                LOOP
-                INSERT INTO backup (user_id, name_Criteria, id_backup, coef) VALUES (NEW.user_id, name_criteria, id_backup, 1);
-            END LOOP;
-        END LOOP;
-    RETURN NEW;
+BEGIN
+FOR name_criteria IN SELECT Distribution_criteria.name_criteria FROM Distribution_criteria
+                                                                         LOOP
+    FOR id_backup IN SELECT Id_backup.id_backup FROM Id_backup
+                         LOOP
+                     INSERT INTO backup (user_id, name_Criteria, id_backup, coef) VALUES (NEW.user_id, name_criteria, id_backup, 1);
+END LOOP;
+END LOOP;
+RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -342,43 +348,43 @@ INSERT INTO Distribution_criteria (Name_criteria, Description) VALUES ('Distance
 INSERT INTO Distribution_criteria (Name_criteria, Description) VALUES ('Discipline', 'Prendre en compte la corrélation entre la matière enseigner par le responsable et le sujet du stage');
 INSERT INTO Distribution_criteria (Name_criteria, Description) VALUES ('Est demandé', 'Prendre en compte le fait que le responsable demande le stage');
 
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('B22662146', 'CASES', 'Murphy', 3);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('R14328249', 'ALVARADOS', 'Christen', 2);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('G42185815', 'KOCHS', 'Barry', 4);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('R32281327', 'DUDLEYS', 'Wylie', 5);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('O75041198', 'SLATERS', 'Colleen', 1);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('V73654623', 'MONROES', 'Linus', 2);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('Z17235374', 'FISCHERS', 'Isabella', 4);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('R84623671', 'MCCARTYS', 'Claudia', 3);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('D78106598', 'CASTANEDAS', 'Beau', 5);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('S85694088', 'DORSEYS', 'Colby', 2);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('Y68664772', 'COTES', 'Juliet', 4);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('Q66676064', 'MCPHERSONS', 'Perry', 3);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('B10648624', 'HANEYS', 'Nolan', 5);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('N26332417', 'MEYERSS', 'Mufutau', 1);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('F42358144', 'AGUIRRES', 'Halee', 2);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('I57332640', 'EMERSONS', 'Jenette', 4);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('B51423637', 'CRUZS', 'Hayden', 3);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('C45328794', 'LAWRENCES', 'Brittany', 5);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('H48344613', 'IRWINS', 'Alisa', 2);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('R41814241', 'MILESS', 'Aidan', 4);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('A23456789', 'PARKER', 'Megan', 3);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('B34567890', 'TURNER', 'John', 4);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('C45678901', 'MARTIN', 'Sophia', 2);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('D56789012', 'THOMPSON', 'Ethan', 5);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('E67890123', 'ANDERSON', 'Olivia', 3);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('B22662146', 'CASES', 'Murphy', 3, 2);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('R14328249', 'ALVARADOS', 'Christen', 2, 3);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('G42185815', 'KOCHS', 'Barry', 4,4);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('R32281327', 'DUDLEYS', 'Wylie', 5,2);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('O75041198', 'SLATERS', 'Colleen', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('V73654623', 'MONROES', 'Linus', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('Z17235374', 'FISCHERS', 'Isabella', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('R84623671', 'MCCARTYS', 'Claudia', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('D78106598', 'CASTANEDAS', 'Beau', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('S85694088', 'DORSEYS', 'Colby', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('Y68664772', 'COTES', 'Juliet', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('Q66676064', 'MCPHERSONS', 'Perry', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('B10648624', 'HANEYS', 'Nolan', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('N26332417', 'MEYERSS', 'Mufutau', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('F42358144', 'AGUIRRES', 'Halee', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('I57332640', 'EMERSONS', 'Jenette', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('B51423637', 'CRUZS', 'Hayden', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('C45328794', 'LAWRENCES', 'Brittany', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('H48344613', 'IRWINS', 'Alisa', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('R41814241', 'MILESS', 'Aidan', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('A23456789', 'PARKER', 'Megan', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('B34567890', 'TURNER', 'John', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('C45678901', 'MARTIN', 'Sophia', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('D56789012', 'THOMPSON', 'Ethan', 0,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('E67890123', 'ANDERSON', 'Olivia', 0,0);
 -- insert de prof de TC
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('A12345678', 'BENNETTS', 'Olivia', 3);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('B23456789', 'DAVISS', 'Michael', 4);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('C34567890', 'THOMPSONS', 'Emma', 2);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('D45678901', 'WALKERS', 'Ethan', 5);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('E56789012', 'MILLERS', 'Sophia', 3);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('A12345678', 'BENNETTS', 'Olivia', 3,0);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('B23456789', 'DAVISS', 'Michael', 4,2);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('C34567890', 'THOMPSONS', 'Emma', 2,3);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('D45678901', 'WALKERS', 'Ethan', 5,2);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('E56789012', 'MILLERS', 'Sophia', 3,1);
 -- insert de prof de GEA
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('F67890123', 'ROBERTSS', 'Lucas', 2);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('G78901234', 'HALLS', 'Mia', 4);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('H89012345', 'ALLENS', 'Aiden', 3);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('I90123456', 'YOUNGS', 'Zoe', 1);
-INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_trainees) VALUES ('J01234567', 'WRIGHTS', 'Liam', 5);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('F67890123', 'ROBERTSS', 'Lucas', 2,4);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('G78901234', 'HALLS', 'Mia', 4,2);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('H89012345', 'ALLENS', 'Aiden', 3,1);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('I90123456', 'YOUNGS', 'Zoe', 1,3);
+INSERT INTO Teacher (Id_teacher, Teacher_name, Teacher_firstname, Maxi_number_intern, Maxi_number_apprentice) VALUES ('J01234567', 'WRIGHTS', 'Liam', 5,0);
 
 -- etudiant en INFO à l'IUT d'aix en provence
 INSERT INTO Student (Student_number,Student_name,Student_firstname,formation,Class_group) VALUES ('B82656814','Kerrs','Reese','BUT_INFO','B-1_An2');
@@ -606,106 +612,6 @@ INSERT INTO Address_type (Type) VALUES ('Travail_1');
 INSERT INTO Address_type (Type) VALUES ('Travail_2');
 INSERT INTO Address_type (Type) VALUES ('Batiment');
 
-INSERT INTO Addr_name (Address) VALUES ('Lunel');
-INSERT INTO Addr_name (Address) VALUES ('Boulogne-sur-Mer');
-INSERT INTO Addr_name (Address) VALUES ('Brive-la-Gaillarde');
-INSERT INTO Addr_name (Address) VALUES ('Orléans');
-INSERT INTO Addr_name (Address) VALUES ('Cambrai');
-INSERT INTO Addr_name (Address) VALUES ('La Rochelle');
-INSERT INTO Addr_name (Address) VALUES ('Vandoeuvre-lès-Nancy');
-INSERT INTO Addr_name (Address) VALUES ('Auxerre');
-INSERT INTO Addr_name (Address) VALUES ('Le Puy-en-Velay');
-INSERT INTO Addr_name (Address) VALUES ('Saint-Lô');
-INSERT INTO Addr_name (Address) VALUES ('Beauvais');
-INSERT INTO Addr_name (Address) VALUES ('Montpellier');
-INSERT INTO Addr_name (Address) VALUES ('Lille');
-INSERT INTO Addr_name (Address) VALUES ('Ajaccio');
-INSERT INTO Addr_name (Address) VALUES ('Sarreguemines');
-INSERT INTO Addr_name (Address) VALUES ('Chalon-sur-Saône');
-INSERT INTO Addr_name (Address) VALUES ('Fréjus');
-INSERT INTO Addr_name (Address) VALUES ('413 Av. Gaston Berger, 13100 Aix-en-Provence');
-INSERT INTO Addr_name (Address) VALUES ('Albi');
-INSERT INTO Addr_name (Address) VALUES ('Saint-Étienne-du-Rouvray');
-INSERT INTO Addr_name (Address) VALUES ('Agen');
-INSERT INTO Addr_name (Address) VALUES ('Perpignan');
-INSERT INTO Addr_name (Address) VALUES ('Dreux');
-INSERT INTO Addr_name (Address) VALUES ('Évreux');
-INSERT INTO Addr_name (Address) VALUES ('Angoulême');
-INSERT INTO Addr_name (Address) VALUES ('Paris');
-INSERT INTO Addr_name (Address) VALUES ('Aulnay-sous-Bois');
-INSERT INTO Addr_name (Address) VALUES ('Périgueux');
-INSERT INTO Addr_name (Address) VALUES ('Villenave-d_Ornon');
-INSERT INTO Addr_name (Address) VALUES ('Dijon');
-INSERT INTO Addr_name (Address) VALUES ('Marcq-en-Baroeul');
-INSERT INTO Addr_name (Address) VALUES ('Colmar');
-INSERT INTO Addr_name (Address) VALUES ('Aix-en-Provence');
-INSERT INTO Addr_name (Address) VALUES ('Marseille');
-INSERT INTO Addr_name (Address) VALUES ('Nice');
-INSERT INTO Addr_name (Address) VALUES ('Toulon');
-INSERT INTO Addr_name (Address) VALUES ('Antibes');
-INSERT INTO Addr_name (Address) VALUES ('Avignon');
-INSERT INTO Addr_name (Address) VALUES ('Cannes');
-INSERT INTO Addr_name (Address) VALUES ('Gap');
-INSERT INTO Addr_name (Address) VALUES ('La Ciotat');
-INSERT INTO Addr_name (Address) VALUES ('Martigues');
-INSERT INTO Addr_name (Address) VALUES ('Digne-les-Bains');
-INSERT INTO Addr_name (Address) VALUES ('Saint-Tropez');
-INSERT INTO Addr_name (Address) VALUES ('Lyon');
-INSERT INTO Addr_name (Address) VALUES ('Toulouse');
-INSERT INTO Addr_name (Address) VALUES ('Grenoble');
-INSERT INTO Addr_name (Address) VALUES ('Bordeaux');
-INSERT INTO Addr_name (Address) VALUES ('Le Havre');
-INSERT INTO Addr_name (Address) VALUES ('Vélizy-Villacoublay');
-INSERT INTO Addr_name (Address) VALUES ('Clichy');
-INSERT INTO Addr_name (Address) VALUES ('Boulogne-Billancourt');
-INSERT INTO Addr_name (Address) VALUES ('Strasbourg');
-INSERT INTO Addr_name (Address) VALUES ('Nantes');
-INSERT INTO Addr_name (Address) VALUES ('Amiens');
-INSERT INTO Addr_name (Address) VALUES ('Coudoux');
-INSERT INTO Addr_name (Address) VALUES ('Auriol');
-INSERT INTO Addr_name (Address) VALUES ('Sausset-les-Pins');
-INSERT INTO Addr_name (Address) VALUES ('Carnoux-en-Provence');
-INSERT INTO Addr_name (Address) VALUES ('Gréasque');
-INSERT INTO Addr_name (Address) VALUES ('Le Rove');
-INSERT INTO Addr_name (Address) VALUES ('Calas');
-INSERT INTO Addr_name (Address) VALUES ('Saint-Victoret');
-INSERT INTO Addr_name (Address) VALUES ('Marseille 13e');
-INSERT INTO Addr_name (Address) VALUES ('Marseille 14e');
-INSERT INTO Addr_name (Address) VALUES ('Marseille 15e');
-INSERT INTO Addr_name (Address) VALUES ('Marseille 16e');
-INSERT INTO Addr_name (Address) VALUES ('La Roque-d_Anthéron');
-INSERT INTO Addr_name (Address) VALUES ('Lambesc');
-INSERT INTO Addr_name (Address) VALUES ('La Destrousse');
-INSERT INTO Addr_name (Address) VALUES ('Les Pennes-Mirabeau');
-INSERT INTO Addr_name (Address) VALUES ('Roquefort-la-Bédoule');
-INSERT INTO Addr_name (Address) VALUES ('Le Tholonet');
-INSERT INTO Addr_name (Address) VALUES ('Saint-Estève-Janson');
-INSERT INTO Addr_name (Address) VALUES ('Salon-de-Provence');
-INSERT INTO Addr_name (Address) VALUES ('Cassis');
-INSERT INTO Addr_name (Address) VALUES ('Aubagne');
-INSERT INTO Addr_name (Address) VALUES ('Pertuis');
-INSERT INTO Addr_name (Address) VALUES ('Puyricard');
-INSERT INTO Addr_name (Address) VALUES ('Venelles');
-INSERT INTO Addr_name (Address) VALUES ('Rognac');
-INSERT INTO Addr_name (Address) VALUES ('Mimet');
-INSERT INTO Addr_name (Address) VALUES ('Trets');
-INSERT INTO Addr_name (Address) VALUES ('Gardanne');
-INSERT INTO Addr_name (Address) VALUES ('Rousset');
-INSERT INTO Addr_name (Address) VALUES ('Berre-l_Étang');
-INSERT INTO Addr_name (Address) VALUES ('Allauch');
-INSERT INTO Addr_name (Address) VALUES ('Le Puy-Sainte-Réparade');
-INSERT INTO Addr_name (Address) VALUES ('Saint-Maximin-la-Sainte-Baume');
-INSERT INTO Addr_name (Address) VALUES ('L_Estaque');
-INSERT INTO Addr_name (Address) VALUES ('Fuveau');
-INSERT INTO Addr_name (Address) VALUES ('Bouc-Bel-Air');
-INSERT INTO Addr_name (Address) VALUES ('Plan-de-Cuques');
-INSERT INTO Addr_name (Address) VALUES ('Gémenos');
-INSERT INTO Addr_name (Address) VALUES ('Châteauneuf-le-Rouge');
-INSERT INTO Addr_name (Address) VALUES ('Ceyreste');
-INSERT INTO Addr_name (Address) VALUES ('Simiane-Collongue');
-INSERT INTO Addr_name (Address) VALUES ('Peynier');
-INSERT INTO Addr_name (Address) VALUES ('La Barben');
-INSERT INTO Addr_name (Address) VALUES ('Cassie');
 
 INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('NV22432349XN','Qwant','Aix-en-Provence','Architecture_des_ordinateurs Gestion_de_projet','2025-05-11','alternance','2026-11-22','Developpement_de_jeux_video','B82656814');
 INSERT INTO Internship (Internship_identifier, Company_name, Address, keywords, Start_date_internship, type, End_date_internship, Internship_subject, Student_number) VALUES ('FO60456314IK','Unowhy','Marseille','Architecture_des_ordinateurs Gestion_de_projet','2026-11-21','Internship','2026-12-21','Systemes_informatiques_embarques','Y26472238');
