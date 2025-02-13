@@ -355,6 +355,8 @@ readonly class Homepage
 
             <?php
             if (isset($_POST['selecDepSubmitted'])) {
+                echo "<script> sessionStorage.clear() </script>";
+
                 if (isset($_POST['selecDep'])) {
                     $_SESSION['selecDep'] = $_POST['selecDep'];
 
@@ -449,12 +451,12 @@ readonly class Homepage
                                                 '_', ' ',
                                                 $row["formation"]
                                             )
-                                        ?></td>
+                                            ?></td>
                                         <td><?php
                                             echo str_replace(
                                                 '_', ' ', $row["class_group"]
                                             )
-                                        ?></td>
+                                            ?></td>
                                         <td><?php
                                             echo $row['internshipTeacher'] > 0
                                                 ? $row['year'] : '❌';
@@ -464,17 +466,17 @@ readonly class Homepage
                                                 '_', ' ',
                                                 $row["company_name"]
                                             )
-                                        ?></td>
+                                            ?></td>
                                         <td><?php
                                             echo str_replace(
                                                 '_', ' ', $row["internship_subject"]
                                             )
-                                        ?></td>
+                                            ?></td>
                                         <td><?php
                                             echo str_replace(
                                                 '_', "'", $row['address']
                                             )
-                                        ?></td>
+                                            ?></td>
                                         <td>~<?php echo
                                             $row['duration'] . " minutes"
                                         ?></td>
@@ -564,6 +566,7 @@ readonly class Homepage
                         "<?php echo $_SESSION['selected_student']['address']; ?>";
                 <?php endif; ?>
             </script>
+            <?php unset($_SESSION['selected_student']); ?>
         </main>
         <?php
     }
