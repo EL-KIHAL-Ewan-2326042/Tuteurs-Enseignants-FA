@@ -337,7 +337,7 @@ readonly class Homepage
                     }
                     ?>
                     <form method="post" class="center-align">
-                        <button class="waves-effect waves-light btn tooltip"
+                        <button class="waves-effect waves-light btn tooltip red"
                             name="cancelSearch" value="1" type="submit"
                             formmethod="post" data-tooltip="Annuler la recherche"
                             data-position="top">Annuler</button>
@@ -542,8 +542,9 @@ readonly class Homepage
                             <div class="row"></div>
 
                             <div class="inline">
-                                <button class="waves-effect waves-light btn tooltip"
-                                        type="reset" data-tooltip=
+                                <button class=
+                                        "waves-effect waves-light btn tooltip red"
+                                        type="reset" id="resetForm" data-tooltip=
                                         "Annuler les modifications"
                                         data-position="top">Annuler</button>
                                 <button class="waves-effect waves-light btn tooltip"
