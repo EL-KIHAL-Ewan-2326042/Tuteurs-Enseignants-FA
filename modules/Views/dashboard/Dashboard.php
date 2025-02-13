@@ -59,7 +59,7 @@ class Dashboard
     {
         ?>
         <main>
-            <h3> Gestion des données </h3>
+            <h3 class="center-align flow-text"> Gestion des données </h3>
 
             <!--Exportation-->
             <div class="export">

@@ -68,7 +68,7 @@ readonly class Homepage
     {
         ?>
         <main>
-            <h3 class="center-align">Répartiteur de tuteurs enseignants</h3>
+            <h3 class="center-align flow-text">Répartiteur de tuteurs enseignants</h3>
 
             <div class="card-panel white">
                 <form class="col" id="searchForm"
@@ -349,7 +349,7 @@ readonly class Homepage
                 ?>
             </div>
 
-            <h4 class="center">Sélectionnez le(s) département(s) :</h4>
+            <h4 class="center flow-text">Sélectionnez le(s) département(s) :</h4>
 
             <div class="row"></div>
 

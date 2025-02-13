@@ -214,42 +214,59 @@ class Dispatcher
                             <p class="green-text"><?php
                                 echo $this->checkMessageAfterSort; ?></p>
 
-                            <div style="display: flex;
-                            justify-content: space-between;
-                            align-items: center;">
-                                <div>
-                                    <button class="btn waves-effect
-                                    waves-light button-margin tooltipped red"
-                                            type="submit" name="action-delete"
-                                            value="<?php echo $id_backup ?>"
-                                            id="delete-btn"
-                                            data-position="top"
-                                            data-tooltip="Supprimer la sauvegarde">
-                                        Supprimer
-                                        <i class="material-icons right">delete</i>
-                                    </button>
-                                    <button class="btn waves-effect
-                                    waves-light button-margin tooltipped"
-                                            type="submit" name="action-save"
-                                            value="<?php echo $id_backup ?>"
-                                            id="save-btn"
-                                            data-position="top"
-                                            data-tooltip="Enregistrer la sauvegarde">
-                                        Enregistrer
-                                        <i class="material-icons right"
-                                        >arrow_downward</i>
-                                    </button>
+                            <?php
+                            if ($id_backup == 'new') {
+                                $tooltip = "Créer la sauvegarde";
+                                $btnValue = "Créer";
+                            } else {
+                                $tooltip = "Enregistrer la sauvegarde";
+                                $btnValue = "Enregistrer";
+                            }
+                            ?>
+                            <div class="row">
+                                <div class="col s12 m8 l8">
+                                    <div class="flex-container">
+                                        <button class="btn waves-effect
+                                        waves-light button-margin tooltipped red"
+                                                type="submit" name="action-delete"
+                                                value="<?php echo $id_backup ?>"
+                                                id="delete-btn"
+                                                data-position="top"
+                                                data-tooltip="
+                                                Supprimer la sauvegarde">
+                                            Supprimer
+                                            <i class="material-icons right"
+                                            >delete</i>
+                                        </button>
+                                        <button class="btn waves-effect
+                                        waves-light button-margin tooltipped"
+                                                type="submit" name="action-save"
+                                                value="<?php echo $id_backup ?>"
+                                                id="save-btn"
+                                                data-position="top"
+                                                data-tooltip=
+                                                <?php echo $tooltip ?>>
+                                            <?php echo $btnValue ?>
+                                            <i class=
+                                            "material-icons right">arrow_downward</i>
+                                        </button>
+                                    </div>
                                 </div>
 
-                                <button class="btn waves-effect
-                                waves-light button-margin tooltipped"
-                                        type="submit" name="action"
-                                        value="generate" id="generate-btn"
-                                        data-position="top"
-                                        data-tooltip="Commencer la répartition">
-                                    Générer
-                                    <i class="material-icons right">send</i>
-                                </button>
+                                <div class="col s12">
+                                    <div>
+                                        <button class="btn waves-effect
+                                        waves-light button-margin tooltipped"
+                                                type="submit" name="action"
+                                                value="generate" id="generate-btn"
+                                                data-position="top"
+                                                data-tooltip=
+                                                "Commencer la répartition">
+                                            Générer
+                                            <i class="material-icons right">send</i>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -296,7 +313,7 @@ class Dispatcher
 
                 <div id="loading-section" class="center-align"
                      style="display: none;">
-                    <p style="font-size: 24px;">
+                    <p>
                         Chargement en cours, veuillez patienter...
                     </p>
                     <div class="progress">
@@ -315,7 +332,7 @@ class Dispatcher
                         <div class=
                              "dispatch-table-wrapper selection table-container">
                             <table class
-                                   ="highlight centered responsive-table"
+                                   ="highlight centered"
                                 id="dispatch-table">
                                 <thead class="clickable">
                                 <tr>
