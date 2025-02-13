@@ -150,109 +150,118 @@ function displayResults(data, action)
 /**
  * Partie 2: Coefficients
  */
-document.addEventListener(
-    'DOMContentLoaded', function () {
-        const selects = document.querySelectorAll('select');
-        M.FormSelect.init(selects);
+    document.addEventListener(
+        'DOMContentLoaded', function () {
+            const selects = document.querySelectorAll('select');
+            M.FormSelect.init(selects);
 
-        const saveSelector = document.getElementById('save-selector');
-        if (saveSelector) {
-            saveSelector.addEventListener(
-                'change', function () {
-                    const form = this.closest('form');
-                    form.submit();
+            const saveSelector = document.getElementById('save-selector');
+            const deleteBtn = document.getElementById('delete-btn');
+
+            function toggleDeleteButton() {
+                deleteBtn.disabled = saveSelector.value === 'new';
+            }
+
+            toggleDeleteButton();
+
+            saveSelector.addEventListener('change', toggleDeleteButton);
+
+            if (saveSelector) {
+                saveSelector.addEventListener(
+                    'change', function () {
+                        const form = this.closest('form');
+                        form.submit();
+                    }
+                );
+            }
+
+            const checkboxes = document.querySelectorAll('.criteria-checkbox');
+
+            checkboxes.forEach(
+                checkbox =>
+                {
+                    const hiddenInput = document.querySelector(`input[name="is_checked[${checkbox.dataset.coefInputId}]"]`);
+                    if (checkbox.checked) {
+                        hiddenInput.value = '1';
+                    } else {
+                            hiddenInput.value = '0';
+                    }
+
+                        checkbox.addEventListener(
+                            'change', function () {
+                                if (this.checked) {
+                                    hiddenInput.value = '1';
+                                } else {
+                                    hiddenInput.value = '0';
+                                }
+                            }
+                        );
                 }
             );
-        }
 
-        const checkboxes = document.querySelectorAll('.criteria-checkbox');
-
-        checkboxes.forEach(
-            checkbox =>
-            {
-                const hiddenInput = document.querySelector(`input[name="is_checked[${checkbox.dataset.coefInputId}]"]`);
-                if (checkbox.checked) {
-                    hiddenInput.value = '1';
-                } else {
-                        hiddenInput.value = '0';
-                }
-
-                    checkbox.addEventListener(
+            document.querySelectorAll('.coef-input').forEach(
+                input =>
+                {
+                    input.addEventListener(
                         'change', function () {
-                            if (this.checked) {
-                                hiddenInput.value = '1';
-                            } else {
-                                hiddenInput.value = '0';
+                                let value = parseInt(this.value);
+
+                            if (isNaN(value) || value < 1) {
+                                this.value = 1;
+                            } else if (value > 100) {
+                                this.value = 100;
                             }
                         }
                     );
-            }
-        );
+                }
+            );
+            const criteriaCheckboxes = document.querySelectorAll('.criteria-checkbox');
+            const errorMessageElement = document.getElementById('checkboxError');
+            const generateBtn = document.getElementById('generate-btn');
 
-        document.querySelectorAll('.coef-input').forEach(
-            input =>
+            let hasInteracted = false;
+
+            function validateCheckboxes()
             {
-                input.addEventListener(
-                    'change', function () {
-                            let value = parseInt(this.value);
+                const anyChecked = Array.from(criteriaCheckboxes).some(checkbox => checkbox.checked);
 
-                        if (isNaN(value) || value < 1) {
-                            this.value = 1;
-                        } else if (value > 100) {
-                            this.value = 100;
+                if (!anyChecked && hasInteracted) {
+                    errorMessageElement.textContent = 'Veuillez sélectionner au moins un critère.';
+                    generateBtn.disabled = true;
+                } else {
+                    errorMessageElement.textContent = '';
+                    generateBtn.disabled = !anyChecked;
+                }
+            }
+
+            criteriaCheckboxes.forEach(
+                function (checkbox) {
+                    checkbox.addEventListener(
+                        'change', function () {
+                            hasInteracted = true;
+                            validateCheckboxes();
                         }
-                    }
-                );
+                    );
+                }
+            );
+
+
+            validateCheckboxes();
+
+            const select = document.getElementById('save-selector');
+            const saveButton = document.getElementById('save-btn');
+
+            function updateButtonState()
+            {
+                saveButton.disabled = select.value === 'default';
             }
-        );
-        const criteriaCheckboxes = document.querySelectorAll('.criteria-checkbox');
-        const errorMessageElement = document.getElementById('checkboxError');
-        const button = document.getElementById('generate-btn');
 
-        let hasInteracted = false;
-
-        function validateCheckboxes()
-        {
-            const anyChecked = Array.from(criteriaCheckboxes).some(checkbox => checkbox.checked);
-
-            if (!anyChecked && hasInteracted) {
-                errorMessageElement.textContent = 'Veuillez sélectionner au moins un critère.';
-                button.disabled = true;
-            } else {
-                errorMessageElement.textContent = '';
-                button.disabled = !anyChecked;
+            if (select) {
+                select.addEventListener('change', updateButtonState);
+                updateButtonState();
             }
         }
-
-        criteriaCheckboxes.forEach(
-            function (checkbox) {
-                checkbox.addEventListener(
-                    'change', function () {
-                        hasInteracted = true;
-                        validateCheckboxes();
-                    }
-                );
-            }
-        );
-
-
-        validateCheckboxes();
-
-        const select = document.getElementById('save-selector');
-        const saveButton = document.getElementById('save-btn');
-
-        function updateButtonState()
-        {
-            saveButton.disabled = select.value === 'default';
-        }
-
-        if (select) {
-            select.addEventListener('change', updateButtonState);
-            updateButtonState();
-        }
-
-    }
-);
+    );
 
 document.querySelectorAll('.criteria-checkbox').forEach(
     checkbox =>
@@ -752,8 +761,8 @@ document.addEventListener(
             loadingContainer.className = 'center-align row';
 
             loadingContainer.innerHTML = `
-            <div class="col s6 m4 l3">
-                <p class="flow-text" style="font-size: 24px;">
+            <div class="center-align">
+                <p>
                     Chargement en cours, veuillez patienter...
                 </p>
                 <div class="progress">
@@ -765,7 +774,7 @@ document.addEventListener(
             loadingContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
             const newTable = document.createElement('table');
-            newTable.className = 'highlight centered responsive-table';
+            newTable.className = 'highlight centered';
             newTable.id = 'student-dispatch-table';
 
             const thead = document.createElement('thead');
