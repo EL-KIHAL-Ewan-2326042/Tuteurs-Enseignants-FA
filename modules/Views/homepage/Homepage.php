@@ -543,14 +543,13 @@ readonly class Homepage
 
                             <div class="inline">
                                 <button class="waves-effect waves-light btn tooltip"
+                                        type="reset" data-tooltip=
+                                        "Annuler les modifications"
+                                        data-position="top">Annuler</button>
+                                <button class="waves-effect waves-light btn tooltip"
                                     name="selecInternshipSubmitted" value="1"
                                     type="submit" data-tooltip="Envoyer vos choix"
                                     data-position="top">Valider</button>
-                                <button class="waves-effect waves-light btn tooltip"
-                                    type="reset" data-tooltip=
-                                    "Annuler les modifications" data-position="top">
-                                    Annuler
-                                </button>
                             </div>
                         </form>
                             <?php endif;
