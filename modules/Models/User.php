@@ -343,7 +343,8 @@ class User extends Model
         try {
             $conn->beginTransaction();
 
-            $stmt = $conn->prepare("SELECT MAX(Id_backup) FROM Id_backup");
+            $stmt = $conn->prepare("SELECT MAX(Id_backup) FROM backup WHERE user_id = :user_id");
+            $stmt->bindParam(':user_id', $user_id);
             $stmt->execute();
             $maxId = $stmt->fetchColumn();
             $newId = $maxId ? $maxId + 1 : 1;
