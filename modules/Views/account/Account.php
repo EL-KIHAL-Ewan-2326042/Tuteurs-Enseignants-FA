@@ -227,8 +227,8 @@ class Account
 
                         <div class="inline">
                             <div class="cell">
-                                <button type="reset"
-                                        class="waves-effect waves-light btn tooltip"
+                                <button type="reset" class=
+                                        "waves-effect waves-light btn tooltip red"
                                         data-tooltip="Réinitialiser le formulaire"
                                         data-position="top">
                                     Annuler
