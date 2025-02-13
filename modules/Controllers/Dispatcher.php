@@ -150,6 +150,8 @@ class Dispatcher
      */
     public function show(): void
     {
+
+
         if (isset($_SESSION['role_name'])
             && ((is_array($_SESSION['role_name'])
             && in_array('Admin_dep', $_SESSION['role_name']))
