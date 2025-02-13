@@ -78,7 +78,7 @@ class Account
             if (!isset($_POST['newMaxIntern'])
                 || (isset($result['intern'])
                 && intval($_POST['newMaxIntern']) === $result['intern'])
-                || intval($_POST['newMaxIntern']) <= 0
+                || intval($_POST['newMaxIntern']) < 0
                 || intval($_POST['newMaxIntern']) > 100
             ) {
                 $newMaxIntern = -1;
@@ -90,7 +90,7 @@ class Account
             if (!isset($_POST['newMaxApprentice'])
                 || (isset($result['apprentice'])
                 && intval($_POST['newMaxApprentice']) === $result['apprentice'])
-                || intval($_POST['newMaxApprentice']) <= 0
+                || intval($_POST['newMaxApprentice']) < 0
                 || intval($_POST['newMaxApprentice']) > 100
             ) {
                 $newMaxApprentice = -1;
@@ -227,8 +227,8 @@ class Account
 
                         <div class="inline">
                             <div class="cell">
-                                <button type="reset"
-                                        class="waves-effect waves-light btn tooltip"
+                                <button type="reset" class=
+                                        "waves-effect waves-light btn tooltip red"
                                         data-tooltip="Réinitialiser le formulaire"
                                         data-position="top">
                                     Annuler
