@@ -91,7 +91,7 @@ class Dispatcher
                 <?php
                 if (!isset($_POST['action']) || $_POST['action'] !== 'generate') : ?>
                 <div class="row" id="forms-section">
-                    <div class="col card-panel white z-depth-3 s12 m6"
+                    <div class="col card-panel white z-depth-3 s10 m5 l5"
                          style="padding: 20px; margin-right: 10px">
                         <form class="col s12" action="./dispatcher"
                               method="post" onsubmit="showLoading();">
@@ -254,7 +254,7 @@ class Dispatcher
                         </form>
                     </div>
 
-                    <form class="col card-panel white z-depth-3 s12 m5"
+                    <form class="col card-panel white z-depth-3 s10 m5 l5"
                           style="padding: 20px;" action="./dispatcher"
                           method="post" id="associate-form">
                         <div class="row">
