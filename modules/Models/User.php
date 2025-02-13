@@ -20,6 +20,7 @@ namespace Blog\Models;
 use Includes\Database;
 use mysql_xdevapi\Exception;
 use PDO;
+use PDOException;
 
 /**
  * Classe gérant toutes les fonctionnalités du site associées
@@ -175,12 +176,14 @@ class User extends Model
      * @return array|null Renvoie un tableau associatif contenant les identifiants
      * des sauvegardes disponibles, ou `null` en cas d'échec
      */
-    public function showCoefficients(): ?array
+    public function showCoefficients($user_id): ?array
     {
         try {
-            $query = "SELECT DISTINCT id_backup "
-                    . "FROM id_backup ORDER BY id_backup ASC";
+            $query = "SELECT DISTINCT id_backup, name_save "
+                    . "FROM backup "
+                    . "WHERE user_id = :user_id ORDER BY id_backup ASC";
             $stmt = $this->_db->getConn()->prepare($query);
+            $stmt->bindParam(':user_id', $user_id);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (\Exception) {
@@ -202,7 +205,7 @@ class User extends Model
     public function loadCoefficients(string $user_id, int $id_backup): array|false
     {
         try {
-            $query = "SELECT backup.name_criteria, backup.coef,"
+            $query = "SELECT backup.name_save, backup.name_criteria, backup.coef,"
                 . " backup.is_checked, distribution_criteria.description "
                 . "FROM backup JOIN distribution_criteria "
                 . "ON backup.name_criteria = distribution_criteria.name_criteria "
@@ -235,7 +238,8 @@ class User extends Model
      * @return bool Renvoie 'true' si la mise à jour a réussi, 'false' sinon
      */
     public function saveCoefficients(
-        array $data, string $user_id, int $id_backup = 0
+        array $data, string $user_id, string $name_save,
+        int $id_backup = 0,
     ): bool {
         try {
             $query = "UPDATE backup "
@@ -253,6 +257,17 @@ class User extends Model
                 $stmt->bindParam(':is_checked', $singleData['is_checked']);
                 $stmt->execute();
             }
+
+            $query = "UPDATE backup "
+                   . "SET name_save = :name_save "
+                   . "WHERE user_id = :user_id "
+                   . "AND id_backup = :id_backup";
+            $stmt = $this->_db->getConn()->prepare($query);
+            $stmt->bindParam(':name_save', $name_save);
+            $stmt->bindParam(':user_id', $user_id);
+            $stmt->bindParam(':id_backup', $id_backup);
+
+            $stmt->execute();
 
             return true;
         } catch (Exception) {
@@ -319,25 +334,23 @@ class User extends Model
         $stmt->bindValue(':department', $department);
         $stmt->execute();
     }
-    public function createCoefficients(array $coef, $user_id): void
+    public function createCoefficients(
+        array $coef, string $name_save, $user_id
+    ): void
     {
         $conn = $this->_db->getConn();
 
         try {
-            // 1. Get new backup ID from id_backup table
             $conn->beginTransaction();
 
-            // Get current max ID from id_backup table
             $stmt = $conn->prepare("SELECT MAX(Id_backup) FROM Id_backup");
             $stmt->execute();
             $maxId = $stmt->fetchColumn();
             $newId = $maxId ? $maxId + 1 : 1;
 
-            // 2. Insert into Id_backup table
             $stmt = $conn->prepare("INSERT INTO Id_backup (Id_backup) VALUES (?)");
             $stmt->execute([$newId]);
 
-            // 3. Insert into backup table with generated name
             $insertBackup = $conn->prepare("
             INSERT INTO backup 
             (User_id, Name_criteria, Id_backup, Coef, Is_checked, Name_save) 
@@ -351,7 +364,7 @@ class User extends Model
                     $newId,
                     $data['coef'],
                     $data['is_checked'] ? 1 : 0,
-                    "Sauvegarde #" . $newId
+                    $name_save
                 ]);
             }
 
@@ -361,5 +374,16 @@ class User extends Model
             $conn->rollBack();
             throw new Exception("Error creating backup: " . $e->getMessage());
         }
+    }
+
+    public function deleteCoefficient($user_id, $id_backup):void {
+        $conn = $this->_db->getConn();
+
+        $query = "DELETE FROM backup "
+               . "WHERE Id_backup = :id_backup AND user_id = :user_id";
+        $stmt = $this->_db->getConn()->prepare($query);
+        $stmt->bindParam(':id_backup', $id_backup);
+        $stmt->bindParam(':user_id', $user_id);
+        $stmt->execute();
     }
 }
