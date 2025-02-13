@@ -581,6 +581,52 @@ document.addEventListener(
             }
         );
 
+        function linkSearchedAndTable()
+        {
+            const searchedButton = document.getElementsByName("searchedStudentSubmitted")[0];
+            if (typeof searchedButton === "undefined" || searchedButton === null) {
+                return;
+            }
+            const internshipId = searchedButton.value;
+            let tableCheckbox;
+
+            for (let row of rows) {
+                if (row.getElementsByTagName("INPUT")[0].value === internshipId) {
+                    tableCheckbox = row.getElementsByTagName("INPUT")[0];
+                    break;
+                }
+            }
+
+            if (typeof tableCheckbox !== "undefined" && tableCheckbox !== null) {
+
+                const searchedCheckbox = document.getElementsByName("searchedStudent")[0];
+                if (typeof searchedCheckbox !== "undefined" && searchedCheckbox !== null) {
+
+                    tableCheckbox.addEventListener(
+                        "change", () =>
+                        searchedCheckbox.checked = tableCheckbox.checked
+                    );
+
+                    searchedCheckbox.addEventListener(
+                        "change", () =>
+                        tableCheckbox.checked = searchedCheckbox.checked
+                    );
+                }
+
+                const resetButton = document.getElementById("resetForm");
+
+                if (typeof resetButton !== "undefined" && resetButton !== null) {
+
+                    const initChecked = tableCheckbox.checked;
+                    resetButton.addEventListener(
+                        "click", () =>
+                        searchedCheckbox.checked = initChecked
+                    );
+                }
+            }
+        }
+
         showPage(currentPage);
+        linkSearchedAndTable();
     }
 );

@@ -821,12 +821,12 @@ class Internship extends Model
      *                           l'enseignant
      * @param string $internship numéro du stage
      *
-     * @return string renvoie true si la requête a fonctionné,
+     * @return true|string renvoie true si la requête a fonctionné,
      * sinon l'erreur dans un string
      */
     public function updateSearchedStudentInternship(
         bool $add, string $teacher, string $internship
-    ): string {
+    ): true|string {
         $current_requests = $this->getRequests($teacher);
         if ($add) {
             if (!in_array($internship, $current_requests)) {
