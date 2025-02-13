@@ -749,11 +749,16 @@ document.addEventListener(
 
 
             const loadingContainer = document.createElement('div');
-            loadingContainer.className = 'center-align loading-indicator';
+            loadingContainer.className = 'center-align row';
+
             loadingContainer.innerHTML = `
-            <p style="font-size: 24px;">Chargement en cours, veuillez patienter...</p>
-            <div class="progress">
-            <div class="indeterminate"></div>
+            <div class="col s6 m4 l3">
+                <p class="flow-text" style="font-size: 24px;">
+                    Chargement en cours, veuillez patienter...
+                </p>
+                <div class="progress">
+                    <div class="indeterminate"></div>
+                </div>
             </div>`;
             container.appendChild(loadingContainer);
 

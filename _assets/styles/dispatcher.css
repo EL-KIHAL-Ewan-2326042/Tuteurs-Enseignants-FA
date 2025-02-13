@@ -68,18 +68,16 @@ input[type="checkbox"].filled-in:checked + span:after {
 /* Map OSM */
 
 #map {
-    height: 400px;
-    width: 70%;
-    margin: auto; /* TODO */
+    height: 600px;
+    width: 100%;
 }
 
 @media screen and (max-width: 640px) {
     #map {
-        height: 150px;
-        width: 40%;
+        height: 250px;
+        width: 80%;
     }
 }
-
 
 /* Tableau Dispatcher */
 
@@ -236,19 +234,4 @@ thead {
 
 .row .col.s10 {
     margin-left: 0;
-}
-
-.card-panel {
-    margin: 10px;
-    padding: 15px;
-    border-radius: 10px;
-    background-color: white;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
-}
-
-@media (max-width: 600px) {
-    .card-panel {
-        margin: 10px;
-        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
-    }
 }
