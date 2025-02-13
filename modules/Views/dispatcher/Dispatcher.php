@@ -91,7 +91,7 @@ class Dispatcher
                 <?php
                 if (!isset($_POST['action']) || $_POST['action'] !== 'generate') : ?>
                 <div class="row" id="forms-section">
-                    <div class="col card-panel white z-depth-3 s12 m6"
+                    <div class="col card-panel white z-depth-3 s10 m5 l5"
                          style="padding: 20px; margin-right: 10px">
                         <form class="col s12" action="./dispatcher"
                               method="post" onsubmit="showLoading();">
@@ -254,7 +254,7 @@ class Dispatcher
                         </form>
                     </div>
 
-                    <form class="col card-panel white z-depth-3 s12 m5"
+                    <form class="col card-panel white z-depth-3 s10 m5 l5"
                           style="padding: 20px;" action="./dispatcher"
                           method="post" id="associate-form">
                         <div class="row">
@@ -317,17 +317,17 @@ class Dispatcher
                             <table class
                                    ="highlight centered responsive-table"
                                 id="dispatch-table">
-                                <thead>
+                                <thead class="clickable">
                                 <tr>
-                                    <th class="clickable">Enseignant</th>
-                                    <th class="clickable">Etudiant</th>
-                                    <th class="clickable">Stage</th>
-                                    <th class="clickable">Formation</th>
-                                    <th class="clickable">Groupe</th>
-                                    <th class="clickable">Sujet</th>
-                                    <th class="clickable">Adresse</th>
-                                    <th class="clickable">Score</th>
-                                    <th class="clickable">Associer</th>
+                                    <th>Enseignant</th>
+                                    <th>Etudiant</th>
+                                    <th>Stage</th>
+                                    <th>Formation</th>
+                                    <th>Groupe</th>
+                                    <th>Sujet</th>
+                                    <th>Adresse</th>
+                                    <th>Score</th>
+                                    <th>Associer</th>
                                 </tr>
                                 </thead>
                                 <tbody>
