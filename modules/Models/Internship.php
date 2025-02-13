@@ -338,38 +338,32 @@ class Internship extends Model
     {
         $_db = $this->_db;
 
-        $query = "SELECT Teacher.Id_teacher, Teacher.teacher_name, "
-                  . "Teacher.teacher_firstname, Teacher.maxi_number_trainees, "
-                    . "SUM(CASE "
-                    . "WHEN internship.type = 'alternance' THEN 2 "
-                    . "WHEN internship.type = 'Internship' THEN 1 "
-                    . "ELSE 0 "
-                    . "END) AS Current_count FROM Teacher "
-                  . "JOIN has_role ON Teacher.Id_teacher = has_role.user_id "
-                  . "JOIN Study_at ON "
-                      . "Study_at.department_name = has_role.department_name "
-                  . "JOIN Student "
-                      . "ON Student.student_number = Study_at.student_number "
-                  . "JOIN INTERNSHIP ON "
-                      . "Internship.student_number = Student.student_number "
-                  . "WHERE has_role.department_name IN (SELECT department_name "
-                    . "FROM Study_at "
-                    . "JOIN Student "
-                     . "ON Study_at.student_number = Student.student_number "
-                    . "JOIN Internship ON "
-                        . "Internship.student_number = Internship.student_number "
-                    . "WHERE Internship.internship_identifier = :internship "
-                    . "GROUP BY department_name) AND "
-                      . "Internship.internship_identifier = :internship "
-                  . "GROUP BY Teacher.Id_teacher, "
-                           . "Teacher.teacher_name, Teacher.teacher_firstname, "
-                           . "Teacher.maxi_number_trainees "
-                    . "HAVING Teacher.maxi_number_trainees > SUM("
-                    . "CASE "
-                        . "WHEN internship.type = 'alternance' THEN 2 "
-                        . "WHEN internship.type = 'Internship' THEN 1 "
-                        . "ELSE 0 "
-                    . "END)";
+        $query= "SELECT Teacher.Id_teacher, Teacher.teacher_name, 
+                Teacher.teacher_firstname,
+                SUM(CASE WHEN internship.type = 'alternance' THEN 1 ELSE 0 END) 
+                    AS current_count_apprentice, 
+                SUM(CASE WHEN internship.type = 'Internship' THEN 1 ELSE 0 END) 
+                    AS current_count_intern FROM Teacher  
+                JOIN has_role ON Teacher.Id_teacher = has_role.user_id 
+                JOIN Study_at 
+                    ON Study_at.department_name = has_role.department_name
+                JOIN Student ON Student.student_number = Study_at.student_number
+                JOIN INTERNSHIP 
+                    ON Internship.student_number = Student.student_number
+                WHERE has_role.department_name IN (
+                    SELECT department_name FROM Study_at 
+                    JOIN Student ON Study_at.student_number = Student.student_number
+                    JOIN Internship 
+                        ON Internship.student_number = Internship.student_number 
+                            WHERE Internship.internship_identifier = :internship
+                    GROUP BY department_name) 
+                AND Internship.internship_identifier = :internship
+                GROUP BY Teacher.Id_teacher, Teacher.teacher_name, 
+                         Teacher.teacher_firstname
+                HAVING Teacher.Maxi_number_intern > SUM(CASE 
+                    WHEN internship.type = 'Internship' THEN 1 ELSE 0 END) 
+                   AND Teacher.Maxi_number_apprentice > SUM(CASE 
+                       WHEN internship.type = 'alternance' THEN 1 ELSE 0 END)";
 
         $stmt = $_db->getConn()->prepare($query);
         $stmt->bindValue(':internship', $internship);
@@ -555,14 +549,15 @@ class Internship extends Model
 
         $query = "SELECT Teacher.Id_teacher, Teacher.teacher_name, "
                   . "Teacher.teacher_firstname,"
-                  . "MAX(Maxi_number_intern) AS max_intern, "
-                  . "MAX(maxi_number_apprentice) AS max_apprentice, "
+                  . "Maxi_number_intern AS max_intern, "
+                  . "Maxi_number_apprentice AS max_apprentice, "
                   . "SUM(CASE WHEN internship.type = 'alternance' THEN 1 ELSE 0 END) "
-                  . "AS current_count_apprentice, "
-                  . "SUM(CASE WHEN internship.type = 'Internship' THEN 1 ELSE 0 END) "
-                  . "AS current_count_intern "
-                  . "FROM Teacher "
-                  . "JOIN has_role ON Teacher.Id_teacher = Has_role.user_id "
+                  . "AS current_count_apprentice, 
+                  SUM(CASE WHEN internship.type = 'Internship' THEN 1 ELSE 0 END) 
+                  AS current_count_intern 
+                  FROM Teacher 
+                  JOIN (SELECT DISTINCT user_id, department_name FROM has_role) 
+                  AS has_role ON Teacher.Id_teacher = has_role.user_id "
                   . "LEFT JOIN internship "
                   . "ON Teacher.Id_teacher = internship.Id_teacher "
                   . "WHERE department_name IN ($placeholders) "
@@ -577,6 +572,7 @@ class Internship extends Model
         $listTeacherMaxApprentice = [];
         $listTeacherIntern = [];
         $listTeacherApprentice = [];
+
         foreach ($teacherData as $teacher) {
             $listTeacherMaxIntern[$teacher['id_teacher']] = $teacher['max_intern'];
             $listTeacherMaxApprentice[$teacher['id_teacher']] = $teacher['max_apprentice'];
