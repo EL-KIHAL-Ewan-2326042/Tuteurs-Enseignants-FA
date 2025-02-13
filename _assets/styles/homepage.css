@@ -57,6 +57,8 @@ main .card-panel {
 #searchResults ul,
 #searchResults p {
     margin: 0;
+    max-height: 7.5rem;
+    overflow-y: scroll;
 }
 
 .btn {

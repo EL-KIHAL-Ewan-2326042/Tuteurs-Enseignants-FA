@@ -75,8 +75,7 @@ class Student extends Model
             . "JOIN internship "
             . "ON student.student_number = internship.student_number "
             . "WHERE internship_identifier ILIKE :searchTerm "
-            . "ORDER BY company_name ASC "
-            . "LIMIT 5";
+            . "ORDER BY company_name ASC";
         $searchTerm = "$searchTerm%";
 
         $stmt = $pdo->getConn()->prepare($query);
@@ -111,8 +110,7 @@ class Student extends Model
                 . "to_tsquery('french', :searchTerm), 32) AS rank "
                 . "FROM student "
                 . "WHERE student_number ILIKE :searchTerm "
-                . "ORDER BY student_number "
-                . "LIMIT 10";
+                . "ORDER BY rank, student_number";
             $searchTerm = "$searchTerm%";
         } elseif ($searchType === 'name') {
             $query
@@ -123,8 +121,7 @@ class Student extends Model
                 . "FROM student "
                 . "WHERE student_name ILIKE :searchTerm "
                 . "OR student_firstname ILIKE :searchTerm "
-                . "ORDER BY rank DESC "
-                . "LIMIT 10";
+                . "ORDER BY rank, student_name, student_firstname DESC";
             $searchTerm = "%$searchTerm%";
         } elseif ($searchType === 'company') {
             $query
@@ -136,8 +133,7 @@ class Student extends Model
                 . "JOIN internship "
                 . "ON student.student_number = internship.student_number "
                 . "WHERE company_name ILIKE :searchTerm "
-                . "ORDER BY rank DESC "
-                . "LIMIT 10";
+                . "ORDER BY rank, company_name DESC";
             $searchTerm = "$searchTerm%";
         }
 
