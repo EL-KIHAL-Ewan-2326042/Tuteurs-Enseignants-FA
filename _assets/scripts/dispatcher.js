@@ -35,7 +35,7 @@ document.addEventListener(
                 if (searchTerm.length > 0) {
                     fetchResults(searchTerm, 'searchInternship');
                 } else {
-                    searchResults.innerHTML = '<p>Barre de recherche vide</p>';
+                    searchResults.innerHTML = '<p></p>';
                 }
             }
         );
@@ -205,34 +205,38 @@ document.addEventListener(
                 );
             }
         );
-
         const criteriaCheckboxes = document.querySelectorAll('.criteria-checkbox');
         const errorMessageElement = document.getElementById('checkboxError');
         const button = document.getElementById('generate-btn');
+
+        let hasInteracted = false;
 
         function validateCheckboxes()
         {
             const anyChecked = Array.from(criteriaCheckboxes).some(checkbox => checkbox.checked);
 
-            if (!anyChecked) {
+            if (!anyChecked && hasInteracted) {
                 errorMessageElement.textContent = 'Veuillez sélectionner au moins un critère.';
                 button.disabled = true;
             } else {
                 errorMessageElement.textContent = '';
-                if (button.disabled) {
-                    button.disabled = false;
-                }
+                button.disabled = !anyChecked;
             }
         }
 
         criteriaCheckboxes.forEach(
-            checkbox =>
-            {
+            function (checkbox) {
                 checkbox.addEventListener(
-                    'change', validateCheckboxes
+                    'change', function () {
+                        hasInteracted = true;
+                        validateCheckboxes();
+                    }
                 );
             }
         );
+
+
+        validateCheckboxes();
 
         const select = document.getElementById('save-selector');
         const saveButton = document.getElementById('save-btn');
@@ -242,14 +246,11 @@ document.addEventListener(
             saveButton.disabled = select.value === 'default';
         }
 
-        if (!select) {
-            return;
+        if (select) {
+            select.addEventListener('change', updateButtonState);
+            updateButtonState();
         }
 
-        select.addEventListener('change', updateButtonState);
-
-        updateButtonState();
-        validateCheckboxes();
     }
 );
 
@@ -561,6 +562,8 @@ document.addEventListener(
 /**
  * Partie 4: Vue Etudiante
  */
+let placedMarkers = new Set();
+
 document.addEventListener(
     'DOMContentLoaded', function () {
 
@@ -669,32 +672,46 @@ document.addEventListener(
 
         async function createTeacherMarkers(data)
         {
-            let minDistance;
-            let closestTeacherAddress;
-            for (const row of data) {
-                const teacherAddresses = await getTeacherAddresses(row.id_teacher);
-                const internshipLocation = await geocodeAddress(row.address);
-                minDistance = Infinity;
+            let addressCache = new Map();
+            let teacherAddressCache = new Map();
 
-                if (Array.isArray(teacherAddresses)) {
-                    for (const item of teacherAddresses) {
-                        const location = await geocodeAddress(item.address);
-                        const distance = await calculateDistanceOnly(internshipLocation, location);
-
-                        if (distance < minDistance) {
-                            minDistance = distance;
-                            closestTeacherAddress = location;
-                        }
-                    }
-                } else {
-                    closestTeacherAddress = await geocodeAddress(teacherAddresses.address);
+            async function getGeocode(address)
+            {
+                if (!addressCache.has(address)) {
+                    addressCache.set(address, geocodeAddress(address));
                 }
-                const marker = new ol.Overlay(
-                    {
-                        position: ol.proj.fromLonLat([closestTeacherAddress.lon, closestTeacherAddress.lat]),
-                        element: createMarkerElement(row.teacher_name),
-                    }
+                return await addressCache.get(address);
+            }
+
+            for (const row of data) {
+                if (placedMarkers.has(row.teacher_name)) {
+                    continue;
+                }
+
+                const internshipLocation = await getGeocode(row.address);
+
+                let teacherAddresses = await getTeacherAddresses(row.id_teacher);
+                teacherAddresses = Array.isArray(teacherAddresses) ? teacherAddresses : [teacherAddresses];
+
+                const teacherLocations = await Promise.all(
+                    teacherAddresses.map(
+                        async(item) => {
+                        if (!teacherAddressCache.has(item.address)
+                    ) {
+                        teacherAddressCache.set(item.address, getGeocode(item.address));
+                        }
+                            return await teacherAddressCache.get(item.address);
+                        }
+                    )
                 );
+
+                const distances = await Promise.all(
+                    teacherLocations.map(location => calculateDistanceOnly(internshipLocation, location))
+                );
+
+                const minIndex = distances.indexOf(Math.min(...distances));
+                const closestTeacherAddress = teacherLocations[minIndex];
+
                 const markerFeature = new ol.Feature(
                     {
                         geometry: new ol.geom.Point(
@@ -705,8 +722,11 @@ document.addEventListener(
                 );
 
                 markerSource.addFeature(markerFeature);
+
+                placedMarkers.add(row.teacher_name);
             }
         }
+
         async function createNewTable(data)
         {
             const container = document.querySelector('.dispatch-table-wrapper');
@@ -744,6 +764,7 @@ document.addEventListener(
             newTable.id = 'student-dispatch-table';
 
             const thead = document.createElement('thead');
+            thead.classList.add("clickable");
             thead.innerHTML = `
             <tr>
             <th>Enseignant</th>
@@ -801,6 +822,14 @@ document.addEventListener(
             newTable.appendChild(tbody);
             container.appendChild(newTable);
 
+            M.Tooltip.init(
+                document.querySelectorAll('.star-rating'), {
+                    exitDelay: 100,
+                }
+            );
+
+            setSortingListeners();
+
             loadingContainer.remove();
         }
 
@@ -828,6 +857,78 @@ document.addEventListener(
             return stars;
         }
 
+        /**
+         * Trie la table prenant pour id "student-dispatch-table"
+         *
+         * @param n numéro désignant la colonne par laquelle on trie le tableau
+         */
+        function sortTable(n)
+        {
+            let dir, rows, switching, i, x, y, shouldSwitch, column;
+            const table = document.getElementById("student-dispatch-table");
+            switching = true;
+
+            if (table.rows[0].getElementsByTagName("TH")[n].innerHTML.substring(table.rows[0].getElementsByTagName("TH")[n].innerHTML.length - 1) === "▲") { dir = "desc";
+            } else { dir = "asc";
+            }
+
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); ++i) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                    if (dir === "asc") {
+                        if (n === 2 && Number(x.innerHTML.substring(0, x.innerHTML.indexOf(' '))) > Number(y.innerHTML.substring(0, y.innerHTML.indexOf(' ')))
+                            || (n === 5 && Number(x.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')) < Number(y.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')))
+                            || (n === 6 && x.getElementsByTagName("INPUT")[0].checked < y.getElementsByTagName("INPUT")[0].checked)
+                            || (n >= 0 && n < 5 && n !== 2 && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase())
+                        ) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir === "desc") {
+                        if (n === 2 && Number(x.innerHTML.substring(0, x.innerHTML.indexOf(' '))) < Number(y.innerHTML.substring(0, y.innerHTML.indexOf(' ')))
+                            || (n === 5 && Number(x.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')) > Number(y.getElementsByTagName("DIV")[0].getAttribute('data-tooltip')))
+                            || (n === 6 && x.getElementsByTagName("INPUT")[0].checked > y.getElementsByTagName("INPUT")[0].checked)
+                            || (n >= 0 && n < 5 && n !== 2 && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())
+                        ) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                }
+            }
+            for (i = 0; i < rows[0].cells.length; ++i) {
+                column = rows[0].getElementsByTagName("TH")[i].innerHTML;
+                if (column.substring(column.length-1) === "▲" || column.substring(column.length-1) === "▼") { table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-2);
+                }
+                if (i === n) {
+                    if (dir === "asc") { table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▲";
+                    } else { table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▼";
+                    }
+                }
+            }
+        }
+
+        function setSortingListeners()
+        {
+            const table = document.getElementById("student-dispatch-table").rows[0];
+            for (let i = 0; i < table.cells.length; ++i) {
+                table.getElementsByTagName("TH")[i].addEventListener(
+                    'click', () =>
+                    {
+                        sortTable(i);
+                    }
+                );
+            }
+            sortTable(5);
+        }
     }
 );
 

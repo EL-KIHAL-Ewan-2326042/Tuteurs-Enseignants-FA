@@ -337,7 +337,7 @@ readonly class Homepage
                     }
                     ?>
                     <form method="post" class="center-align">
-                        <button class="waves-effect waves-light btn tooltip"
+                        <button class="waves-effect waves-light btn tooltip red"
                             name="cancelSearch" value="1" type="submit"
                             formmethod="post" data-tooltip="Annuler la recherche"
                             data-position="top">Annuler</button>
@@ -355,6 +355,8 @@ readonly class Homepage
 
             <?php
             if (isset($_POST['selecDepSubmitted'])) {
+                echo "<script> sessionStorage.clear() </script>";
+
                 if (isset($_POST['selecDep'])) {
                     $_SESSION['selecDep'] = $_POST['selecDep'];
 
@@ -449,12 +451,12 @@ readonly class Homepage
                                                 '_', ' ',
                                                 $row["formation"]
                                             )
-                                        ?></td>
+                                            ?></td>
                                         <td><?php
                                             echo str_replace(
                                                 '_', ' ', $row["class_group"]
                                             )
-                                        ?></td>
+                                            ?></td>
                                         <td><?php
                                             echo $row['internshipTeacher'] > 0
                                                 ? $row['year'] : '❌';
@@ -464,17 +466,17 @@ readonly class Homepage
                                                 '_', ' ',
                                                 $row["company_name"]
                                             )
-                                        ?></td>
+                                            ?></td>
                                         <td><?php
                                             echo str_replace(
                                                 '_', ' ', $row["internship_subject"]
                                             )
-                                        ?></td>
+                                            ?></td>
                                         <td><?php
                                             echo str_replace(
                                                 '_', "'", $row['address']
                                             )
-                                        ?></td>
+                                            ?></td>
                                         <td>~<?php echo
                                             $row['duration'] . " minutes"
                                         ?></td>
@@ -540,15 +542,15 @@ readonly class Homepage
                             <div class="row"></div>
 
                             <div class="inline">
+                                <button class=
+                                        "waves-effect waves-light btn tooltip red"
+                                        type="reset" id="resetForm" data-tooltip=
+                                        "Annuler les modifications"
+                                        data-position="top">Annuler</button>
                                 <button class="waves-effect waves-light btn tooltip"
                                     name="selecInternshipSubmitted" value="1"
                                     type="submit" data-tooltip="Envoyer vos choix"
                                     data-position="top">Valider</button>
-                                <button class="waves-effect waves-light btn tooltip"
-                                    type="reset" data-tooltip=
-                                    "Annuler les modifications" data-position="top">
-                                    Annuler
-                                </button>
                             </div>
                         </form>
                             <?php endif;
@@ -564,6 +566,7 @@ readonly class Homepage
                         "<?php echo $_SESSION['selected_student']['address']; ?>";
                 <?php endif; ?>
             </script>
+            <?php unset($_SESSION['selected_student']); ?>
         </main>
         <?php
     }
