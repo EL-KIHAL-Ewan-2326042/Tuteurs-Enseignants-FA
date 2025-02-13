@@ -1,9 +1,5 @@
 @import "global.css";
 
-main {
-    margin: 0 64px;
-}
-
 .button-margin {
     margin-top: var(--medium-spacing);
 }
@@ -226,4 +222,33 @@ thead {
 
 .star-rating span.half {
     background: linear-gradient(to right, gold 50%, #ddd 50%);
+}
+
+
+/** Style en tout genre **/
+
+#forms-section {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.row .col.s10 {
+    margin-left: 0;
+}
+
+.card-panel {
+    margin: 10px;
+    padding: 15px;
+    border-radius: 10px;
+    background-color: white;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 600px) {
+    .card-panel {
+        margin: 10px;
+        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+    }
 }
