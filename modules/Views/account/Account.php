@@ -210,18 +210,18 @@ class Account
                                     echo "Nouvelle valeur maximale:";
                                 ?></label>
                                 <input type="number" name="newMaxIntern"
-                                       id="newMaxIntern" min="1" max="100"
+                                       id="newMaxIntern" min="0" max="100"
                                        value="<?php
-                                        echo ($result['intern']) ?: 1 ?>" />
+                                        echo ($result['intern']) ?: 0 ?>" />
                             </div>
                             <div class="input-field cell">
                                 <label for="newMaxApprentice"><?php
                                     echo "Nouvelle valeur maximale:";
                                 ?></label>
                                 <input type="number" name="newMaxApprentice"
-                                       id="newMaxApprentice" min="1" max="100"
+                                       id="newMaxApprentice" min="0" max="100"
                                        value="<?php
-                                        echo ($result['apprentice']) ?: 1 ?>" />
+                                        echo ($result['apprentice']) ?: 0 ?>" />
                             </div>
                         </div>
 
