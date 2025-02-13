@@ -547,21 +547,21 @@ class Internship extends Model
         $roleDepartments = $_SESSION['role_department'];
         $placeholders = implode(',', array_fill(0, count($roleDepartments), '?'));
 
-        $query = "SELECT Teacher.Id_teacher, Teacher.teacher_name, 
-                  Teacher.teacher_firstname,
-                  Maxi_number_intern AS max_intern, 
-                  Maxi_number_apprentice AS max_apprentice, 
-                  SUM(CASE WHEN internship.type = 'alternance' THEN 1 ELSE 0 END) 
-                  AS current_count_apprentice, 
+        $query = "SELECT Teacher.Id_teacher, Teacher.teacher_name, "
+                  . "Teacher.teacher_firstname,"
+                  . "Maxi_number_intern AS max_intern, "
+                  . "Maxi_number_apprentice AS max_apprentice, "
+                  . "SUM(CASE WHEN internship.type = 'alternance' THEN 1 ELSE 0 END) "
+                  . "AS current_count_apprentice, 
                   SUM(CASE WHEN internship.type = 'Internship' THEN 1 ELSE 0 END) 
                   AS current_count_intern 
                   FROM Teacher 
                   JOIN (SELECT DISTINCT user_id, department_name FROM has_role) 
-                  AS has_role ON Teacher.Id_teacher = has_role.user_id 
-                  LEFT JOIN internship 
-                  ON Teacher.Id_teacher = internship.Id_teacher 
-                  WHERE department_name IN ($placeholders) 
-                  GROUP BY Teacher.Id_teacher";
+                  AS has_role ON Teacher.Id_teacher = has_role.user_id "
+                  . "LEFT JOIN internship "
+                  . "ON Teacher.Id_teacher = internship.Id_teacher "
+                  . "WHERE department_name IN ($placeholders) "
+                  . "GROUP BY Teacher.Id_teacher";
 
         $stmt = $_db->getConn()->prepare($query);
         $stmt->execute($roleDepartments);
