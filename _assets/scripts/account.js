@@ -5,15 +5,10 @@
  */
 document.addEventListener(
     'DOMContentLoaded', function () {
-        const maxInternInput = document.getElementById("newMaxIntern");
-        maxInternInput.addEventListener("keyup", () => inputBoundaries(maxInternInput));
-        maxInternInput.addEventListener("keypress", () => inputBoundaries(maxInternInput));
-
-        const maxApprenticeInput = document.getElementById("newMaxApprentice");
-        maxApprenticeInput.addEventListener("keyup", () => inputBoundaries(maxApprenticeInput));
-        maxApprenticeInput.addEventListener("keypress", () => inputBoundaries(maxApprenticeInput));
-
-        function inputBoundaries(maxNumberInput)
+        const maxNumberInput = document.getElementById("newMaxNumber");
+        maxNumberInput.addEventListener("keyup", inputBoundaries);
+        maxNumberInput.addEventListener("keypress", inputBoundaries);
+        function inputBoundaries()
         {
             if (Number(maxNumberInput.value) < Number(maxNumberInput.min)) {
                 maxNumberInput.value = maxNumberInput.min;
@@ -44,16 +39,16 @@ document.addEventListener(
         );
 
         const rowsPerPageDropdown = document.getElementById('rows-per-page');
-        let rowsPerPage = sessionStorage.getItem("rowsCountAccount") ? Number(sessionStorage.getItem("rowsCountAccount")) : parseInt(rowsPerPageDropdown.value); // Set default to 10
+        let rowsPerPage = sessionStorage.getItem("rowsCount") ? Number(sessionStorage.getItem("rowsCount")) : parseInt(rowsPerPageDropdown.value); // Set default to 10
         if (rowsPerPage !== 10) {
             rowsPerPageDropdown.options[rowsPerPage === 20 ? 1 : rowsPerPage === 50 ? 2 : rowsPerPage === 100 ? 3 : 4].selected = true;
         }
-        sessionStorage.setItem("rowsCountAccount", String(rowsPerPage));
+        sessionStorage.setItem("rowsCount", String(rowsPerPage));
 
         let rows = document.querySelectorAll('.account-row');
         let totalRows = rows.length;
         let totalPages = Math.ceil(totalRows / rowsPerPage);
-        let currentPage = sessionStorage.getItem('pageAccount') && Number(sessionStorage.getItem('pageAccount')) <= totalPages ? Number(sessionStorage.getItem('pageAccount')) : 1;
+        let currentPage = sessionStorage.getItem('page') && Number(sessionStorage.getItem('page')) <= totalPages ? Number(sessionStorage.getItem('page')) : 1;
 
         const prevButton = document.getElementById('prev-page');
         const nextButton = document.getElementById('next-page');
@@ -62,11 +57,11 @@ document.addEventListener(
         const pageNumbersContainer = document.getElementById('page-numbers');
 
         if (document.getElementById("account-table").rows.length > 2) {
-            if (!(sessionStorage.getItem('columnNumberAccount') && sessionStorage.getItem('directionAccount'))) {
-                sessionStorage.setItem('columnNumberAccount', "0");
-                sessionStorage.setItem('directionAccount', "asc");
+            if (!(sessionStorage.getItem('columnNumber') && sessionStorage.getItem('direction'))) {
+                sessionStorage.setItem('columnNumber', "0");
+                sessionStorage.setItem('direction', "asc");
             }
-            sortTable(Number(sessionStorage.getItem('columnNumberAccount')), true);
+            sortTable(Number(sessionStorage.getItem('columnNumber')), true);
 
             for (let i = 0; i < document.getElementById("account-table").rows[0].cells.length; ++i) {
                 document.getElementById("account-table").rows[0].getElementsByTagName("TH")[i].addEventListener(
@@ -94,7 +89,7 @@ document.addEventListener(
                 if (table.rows[0].getElementsByTagName("TH")[n].innerHTML.substring(table.rows[0].getElementsByTagName("TH")[n].innerHTML.length - 1) === "▲") { dir = "desc";
                 } else { dir = "asc";
                 }
-            } else { dir = sessionStorage.getItem('directionAccount');
+            } else { dir = sessionStorage.getItem('direction');
             }
 
             while (switching) {
@@ -152,9 +147,9 @@ document.addEventListener(
                 );
             }
 
-            sessionStorage.setItem('columnNumberAccount', n);
-            sessionStorage.setItem('directionAccount', dir);
-            showPage(currentPage);
+            sessionStorage.setItem('columnNumber', n);
+            sessionStorage.setItem('direction', dir);
+            showPage(currentPage, sessionStorage.getItem('direction'));
         }
 
         function showPage(page)
@@ -180,7 +175,7 @@ document.addEventListener(
             firstButton.disabled = currentPage === 1;
             lastButton.disabled = currentPage === totalPages;
 
-            sessionStorage.setItem('pageAccount', currentPage);
+            sessionStorage.setItem('page', currentPage);
         }
 
         function updatePageNumbers()
@@ -241,7 +236,7 @@ document.addEventListener(
         rowsPerPageDropdown.addEventListener(
             'change', function () {
                 rowsPerPage = parseInt(rowsPerPageDropdown.value);
-                sessionStorage.setItem("rowsCountAccount", String(rowsPerPage));
+                sessionStorage.setItem("rowsCount", String(rowsPerPage));
                 totalPages = Math.ceil(rows.length / rowsPerPage);
                 currentPage = 1;
                 showPage(currentPage);
