@@ -72,10 +72,15 @@ input[type="checkbox"].filled-in:checked + span:after {
     width: 100%;
 }
 
-@media screen and (max-width: 640px) {
+@media screen and (max-width: 768px) {
     #map {
-        height: 250px;
-        width: 80%;
+        height: 400px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    #map {
+        height: 300px;
     }
 }
 

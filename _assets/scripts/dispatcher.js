@@ -158,13 +158,18 @@ function displayResults(data, action)
             const saveSelector = document.getElementById('save-selector');
             const deleteBtn = document.getElementById('delete-btn');
 
-            function toggleDeleteButton() {
-                deleteBtn.disabled = saveSelector.value === 'new';
+            function toggleDeleteButton()
+            {
+                if (deleteBtn) {
+                    deleteBtn.disabled = saveSelector.value === 'new';
+                }
             }
 
             toggleDeleteButton();
 
-            saveSelector.addEventListener('change', toggleDeleteButton);
+            if (saveSelector) {
+                saveSelector.addEventListener('change', toggleDeleteButton);
+            }
 
             if (saveSelector) {
                 saveSelector.addEventListener(
@@ -229,7 +234,9 @@ function displayResults(data, action)
                     errorMessageElement.textContent = 'Veuillez sélectionner au moins un critère.';
                     generateBtn.disabled = true;
                 } else {
-                    errorMessageElement.textContent = '';
+                    if (errorMessageElement) {
+                        errorMessageElement.textContent = '';
+                    }
                     generateBtn.disabled = !anyChecked;
                 }
             }
@@ -851,26 +858,28 @@ document.addEventListener(
         {
             const fullStars = Math.floor(score);
             const decimalPart = score - fullStars;
-            const halfStars = Math.abs(decimalPart - 0.5) <= 0.1 ? 1 : 0;
-            const emptyStars = 5 - fullStars - halfStars;
+
+            const halfStars = (decimalPart >= 0.25 && decimalPart < 0.75) ? 1 : 0;
+
+            const adjustedFullStars = (decimalPart >= 0.75) ? fullStars + 1 : fullStars;
+
+            const emptyStars = 5 - adjustedFullStars - halfStars;
 
             let stars = '';
 
-            for (let i = 0; i < fullStars; i++) {
+            for (let i = 0; i < adjustedFullStars; i++) {
                 stars += '<span class="filled"></span>';
             }
 
             if (halfStars) {
                 stars += '<span class="half"></span>';
             }
-
             for (let i = 0; i < emptyStars; i++) {
                 stars += '<span class="empty"></span>';
             }
 
             return stars;
         }
-
         /**
          * Trie la table prenant pour id "student-dispatch-table"
          *
@@ -1027,7 +1036,7 @@ async function initMap()
         );
         map.addLayer(clusterLayer);
     } catch (error) {
-        console.error("Error initializing map:", error);
+        return;
     }
 }
 
