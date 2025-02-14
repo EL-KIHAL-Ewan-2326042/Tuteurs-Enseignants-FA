@@ -14,6 +14,10 @@ h3, h4 {
     color: var(--main-color);
 }
 
+h5 {
+    text-align: center;
+}
+
 main a {
     color: black;
 }
@@ -72,9 +76,11 @@ main .card-panel {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    margin: 12px 0;
 }
 
 .inline p {
+    text-align: center;
     margin-top: 0;
 }
 
@@ -84,6 +90,8 @@ main .card-panel {
 
 .card-panel {
     width: 50%;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 .cell {
@@ -91,16 +99,7 @@ main .card-panel {
     flex-direction: row;
     width: 50%;
     justify-content: space-evenly;
-}
-
-.united {
-    justify-content: center;
-}
-
-.cell div {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    margin: 6px 12px;
 }
 
 /* Tableau Account */

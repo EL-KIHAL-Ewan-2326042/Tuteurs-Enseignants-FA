@@ -212,19 +212,23 @@ class TeacherTest extends TestCase
     }
 
     /**
-     * Vérifier que la méthode getMaxNumberInternship
+     * Vérifier que la méthode getMaxNumberTrainees
      * renvoie bien des bonnes données
      *
      * @return void
      */
-    public function testGetMaxNumberInternsReturnsData(): void
+    public function testGetMaxNumberTraineesReturnsData(): void
     {
-        $mockResult = '5';
+        $mockResult = ['intern' => '5', 'apprentice' => '3'];
 
         $this->_mockPdo->expects($this->once())
             ->method('prepare')
-            ->with($this->stringContains('SELECT maxi_number_trainees'))
-            ->willReturn($this->_mockStmt);
+            ->with(
+                $this->stringContains(
+                    'SELECT maxi_number_intern AS intern,
+                    maxi_number_apprentice AS apprentice'
+                )
+            )->willReturn($this->_mockStmt);
 
         $this->_mockStmt->expects($this->once())
             ->method('bindParam')
@@ -238,9 +242,9 @@ class TeacherTest extends TestCase
             ->with(PDO::FETCH_COLUMN)
             ->willReturn($mockResult);
 
-        $result = $this->_teacher->getMaxNumberInterns('1');
+        $result = $this->_teacher->getMaxNumberTrainees('1');
         $this->assertIsString($result);
-        $this->assertEquals('5', $result);
+        $this->assertEquals(['intern' => '5', 'apprentice' => '3'], $result);
     }
 
     /**
