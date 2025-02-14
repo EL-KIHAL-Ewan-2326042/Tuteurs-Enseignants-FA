@@ -1,7 +1,13 @@
 @import "global.css";
 
-h5 {
+h1 {
+    font-size: 1.64rem;
+    margin: 1.1rem 0 0.656rem 0;
     color: var(--main-color);
+}
+
+label{
+    color: #2c2c2c !important;
 }
 
 /* Style des boutons de la page */
