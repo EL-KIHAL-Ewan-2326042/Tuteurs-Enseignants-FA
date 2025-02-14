@@ -550,20 +550,20 @@ class Internship extends Model
         $placeholders = implode(',', array_fill(0, count($roleDepartments), '?'));
 
         $query = "SELECT Teacher.Id_teacher, Teacher.teacher_name, "
-                  . "Teacher.teacher_firstname,"
-                  . "Maxi_number_intern AS max_intern, "
-                  . "Maxi_number_apprentice AS max_apprentice, "
-                  . "SUM(CASE WHEN internship.type = 'alternance' THEN 1 ELSE 0 END) "
-                  . "AS current_count_apprentice, 
-                  SUM(CASE WHEN internship.type = 'Internship' THEN 1 ELSE 0 END) 
-                  AS current_count_intern 
-                  FROM Teacher 
-                  JOIN (SELECT DISTINCT user_id, department_name FROM has_role) 
-                  AS has_role ON Teacher.Id_teacher = has_role.user_id "
-                  . "LEFT JOIN internship "
-                  . "ON Teacher.Id_teacher = internship.Id_teacher "
-                  . "WHERE department_name IN ($placeholders) "
-                  . "GROUP BY Teacher.Id_teacher";
+              . "Teacher.teacher_firstname,"
+              . "Maxi_number_intern AS max_intern, "
+              . "Maxi_number_apprentice AS max_apprentice, "
+              . "SUM(CASE WHEN internship.type = 'alternance' THEN 1 ELSE 0 END) "
+              . "AS current_count_apprentice, 
+              SUM(CASE WHEN internship.type = 'Internship' THEN 1 ELSE 0 END) 
+              AS current_count_intern 
+              FROM Teacher 
+              JOIN (SELECT DISTINCT user_id, department_name FROM has_role) 
+              AS has_role ON Teacher.Id_teacher = has_role.user_id "
+              . "LEFT JOIN internship "
+              . "ON Teacher.Id_teacher = internship.Id_teacher "
+              . "WHERE department_name IN ($placeholders) "
+              . "GROUP BY Teacher.Id_teacher";
 
         $stmt = $_db->getConn()->prepare($query);
         $stmt->execute($roleDepartments);
@@ -577,9 +577,12 @@ class Internship extends Model
 
         foreach ($teacherData as $teacher) {
             $listTeacherMaxIntern[$teacher['id_teacher']] = $teacher['max_intern'];
-            $listTeacherMaxApprentice[$teacher['id_teacher']] = $teacher['max_apprentice'];
-            $listTeacherIntern[$teacher['id_teacher']] = $teacher['current_count_intern'];
-            $listTeacherApprentice[$teacher['id_teacher']] = $teacher['current_count_apprentice'];
+            $listTeacherMaxApprentice[$teacher['id_teacher']]
+                = $teacher['max_apprentice'];
+            $listTeacherIntern[$teacher['id_teacher']]
+                = $teacher['current_count_intern'];
+            $listTeacherApprentice[$teacher['id_teacher']]
+                = $teacher['current_count_apprentice'];
         }
 
         $listFinal = [];
@@ -605,9 +608,11 @@ class Internship extends Model
             usort($listStart, fn($a, $b) => $b['score'] <=> $a['score']);
             $topCandidate = $listStart[0];
             $assignedTopIntern = $assignedCountsIntern[$topCandidate['id_teacher']];
-            $assignedTopApprentice = $assignedCountsApprentice[$topCandidate['id_teacher']];
+            $assignedTopApprentice = $assignedCountsApprentice
+            [$topCandidate['id_teacher']];
             $listTopIntern = $listTeacherMaxIntern[$topCandidate['id_teacher']];
-            $listTopApprentice = $listTeacherMaxApprentice[$topCandidate['id_teacher']];
+            $listTopApprentice = $listTeacherMaxApprentice
+            [$topCandidate['id_teacher']];
             if ($assignedTopIntern < $listTopIntern
                 && !in_array($topCandidate['internship_identifier'], $listEleveFinal)
                 && $topCandidate['type'] === 'Internship'
@@ -615,16 +620,14 @@ class Internship extends Model
                     $listFinal[] = $topCandidate;
                     $listEleveFinal[] = $topCandidate['internship_identifier'];
                     ++ $assignedCountsIntern[$topCandidate['id_teacher']];
-            }
-            elseif ($assignedTopApprentice < $listTopApprentice
+            } elseif ($assignedTopApprentice < $listTopApprentice
                 && !in_array($topCandidate['internship_identifier'], $listEleveFinal)
                 && $topCandidate['type'] === 'alternance'
             ) {
                 $listFinal[] = $topCandidate;
                 $listEleveFinal[] = $topCandidate['internship_identifier'];
                 ++ $assignedCountsApprentice[$topCandidate['id_teacher']];
-            }
-            else {
+            } else {
                 array_shift($listStart);
             }
         }
