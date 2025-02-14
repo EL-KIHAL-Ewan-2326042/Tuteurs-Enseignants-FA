@@ -59,7 +59,7 @@ class Dashboard
     {
         ?>
         <main>
-            <h3> Gestion des données </h3>
+            <h1> Gestion des données </h1>
 
             <!--Exportation-->
             <div class="export">
@@ -68,7 +68,7 @@ class Dashboard
                     <div class="tooltip-container" data-tooltip=
                     "Exportation des données d'une liste
                         choisie dans un fichier .csv">(?)</div>
-                    <h4>Exporter une liste :</h4>
+                    <h2>Exporter une liste :</h2>
                     <form action="/dashboard" method="POST">
                         <div>
                             <label>
@@ -98,7 +98,7 @@ class Dashboard
                     <div class="tooltip-container" data-tooltip=
                     "Exportation d'un modèle d'une liste choisie dans un fichier
                         .csv (Pour avoir seulement le nom des colonnes)">(?)</div>
-                    <h4>Exporter un modèle:</h4>
+                    <h2>Exporter un modèle:</h2>
                     <form action="/dashboard" method="POST">
                         <div>
                             <label>
@@ -129,11 +129,11 @@ class Dashboard
                      2. Inscrivez vos données <br>
                      3. Vérifiez que le séparateur est bien un point-virgule <br>
                      4. Importez le fichier csv ci-dessous">(?)</div>
-                <h4>Importer :</h4>
+                <h2>Importer :</h2>
 
                 <!--Importation de nouveaux étudiants-->
                 <div class="row">
-                    <h5> Rajouter des étudiants : </h5>
+                    <h3> Rajouter des étudiants : </h3>
                     <form action="/dashboard" method="POST"
                           enctype="multipart/form-data">
                         <input type="hidden" name="table_name" value="student">
@@ -164,7 +164,7 @@ class Dashboard
 
                 <!--Importation de nouveaux professeurs-->
                 <div class="row">
-                    <h5> Rajouter des professeurs : </h5>
+                    <h3> Rajouter des professeurs : </h3>
                     <form action="/dashboard" method="POST"
                         enctype="multipart/form-data">
                         <input type="hidden" name="table_name" value="teacher">
@@ -196,7 +196,7 @@ class Dashboard
 
                 <!--Importation de nouveaux stages-->
                 <div class="row">
-                    <h5> Rajouter des stages : </h5>
+                    <h3> Rajouter des stages : </h3>
                     <form action="/dashboard" method="POST"
                         enctype="multipart/form-data">
                         <input type="hidden" name="table_name" value="internship">
