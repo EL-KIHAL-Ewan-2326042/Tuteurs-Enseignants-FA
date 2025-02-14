@@ -9,6 +9,10 @@ main a:hover {
     background-color : #00558B;
 }
 
+label{
+    color: #2c2c2c !important;
+}
+
 .btn:hover {
     background-color: #E8CE7E;
 }

@@ -2,6 +2,10 @@ main {
     padding: 0 25px 25px 25px;
 }
 
+label{
+    color: #2c2c2c !important;
+}
+
 h3, h4{
     color: #00558B;
 }

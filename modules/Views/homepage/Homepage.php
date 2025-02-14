@@ -68,10 +68,11 @@ readonly class Homepage
     {
         ?>
         <main>
-            <h3 class="center-align
-            flow-text">Répartiteur de tuteurs enseignants</h3>
+            <h1 class="center-align
+            flow-text">Répartiteur de tuteurs enseignants</h1>
 
             <div class="card-panel white">
+                <label ="Numéro Etudiant"
                 <form class="col" id="searchForm"
                       onsubmit="return false;" method="POST">
                     <div class="inline">
@@ -143,9 +144,9 @@ readonly class Homepage
                 if (isset($_SESSION['selected_student']['firstName'])
                     && isset($_SESSION['selected_student']['lastName'])
                 ) {
-                    echo '<h4 class="left-align"> Résultat pour: ' .
+                    echo '<h2 class="left-align"> Résultat pour: ' .
                         $_SESSION['selected_student']['firstName'] . ' ' .
-                        $_SESSION['selected_student']['lastName'] . '</h4>';
+                        $_SESSION['selected_student']['lastName'] . '</h2>';
                     if (!isset($_SESSION['selected_student']['address'])
                         || $_SESSION['selected_student']['address'] === ''
                     ) {
@@ -338,7 +339,8 @@ readonly class Homepage
                     }
                     ?>
                     <form method="post" class="center-align">
-                        <button class="waves-effect waves-light btn tooltip red"
+                        <button class="waves-effect waves-light
+                        btn btn-annuler tooltip"
                             name="cancelSearch" value="1" type="submit"
                             formmethod="post" data-tooltip="Annuler la recherche"
                             data-position="top">Annuler</button>
@@ -350,7 +352,7 @@ readonly class Homepage
                 ?>
             </div>
 
-            <h4 class="center flow-text">Sélectionnez le(s) département(s) :</h4>
+            <h2 class="center flow-text">Sélectionnez le(s) département(s) :</h2>
 
             <div class="row"></div>
 
@@ -544,7 +546,7 @@ readonly class Homepage
 
                             <div class="inline">
                                 <button class=
-                                        "waves-effect waves-light btn tooltip red"
+                                        "waves-effect waves-light btn tooltip"
                                         type="reset" id="resetForm" data-tooltip=
                                         "Annuler les modifications"
                                         data-position="top">Annuler</button>

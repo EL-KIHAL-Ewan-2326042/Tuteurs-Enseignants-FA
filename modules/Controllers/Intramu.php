@@ -96,8 +96,6 @@ class Intramu
             } else {
                 $errorMessage = 'Identifiant ou mot de passe incorrect';
             }
-        } else {
-            echo "<script> sessionStorage.clear() </script>";
         }
 
         $title = "Connexion";
@@ -106,6 +104,7 @@ class Intramu
         $view = new \Blog\Views\intramu\Intramu($errorMessage);
 
         $this->_layout->renderTop($title, $cssFilePath);
+        echo "<script> sessionStorage.clear() </script>";
         $view->showView();
         $this->_layout->renderBottom($jsFilePath);
     }
