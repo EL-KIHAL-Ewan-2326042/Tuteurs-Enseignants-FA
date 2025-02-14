@@ -68,7 +68,8 @@ readonly class Homepage
     {
         ?>
         <main>
-            <h3 class="center-align flow-text">Répartiteur de tuteurs enseignants</h3>
+            <h3 class="center-align
+            flow-text">Répartiteur de tuteurs enseignants</h3>
 
             <div class="card-panel white">
                 <form class="col" id="searchForm"

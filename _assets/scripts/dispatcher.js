@@ -150,125 +150,125 @@ function displayResults(data, action)
 /**
  * Partie 2: Coefficients
  */
-    document.addEventListener(
-        'DOMContentLoaded', function () {
-            const selects = document.querySelectorAll('select');
-            M.FormSelect.init(selects);
+document.addEventListener(
+    'DOMContentLoaded', function () {
+        const selects = document.querySelectorAll('select');
+        M.FormSelect.init(selects);
 
-            const saveSelector = document.getElementById('save-selector');
-            const deleteBtn = document.getElementById('delete-btn');
+        const saveSelector = document.getElementById('save-selector');
+        const deleteBtn = document.getElementById('delete-btn');
 
-            function toggleDeleteButton()
-            {
-                if (deleteBtn) {
-                    deleteBtn.disabled = saveSelector.value === 'new';
+        function toggleDeleteButton()
+        {
+            if (deleteBtn) {
+                deleteBtn.disabled = saveSelector.value === 'new';
+            }
+        }
+
+        toggleDeleteButton();
+
+        if (saveSelector) {
+            saveSelector.addEventListener('change', toggleDeleteButton);
+        }
+
+        if (saveSelector) {
+            saveSelector.addEventListener(
+                'change', function () {
+                    const form = this.closest('form');
+                    form.submit();
                 }
+            );
+        }
+
+        const checkboxes = document.querySelectorAll('.criteria-checkbox');
+
+        checkboxes.forEach(
+            checkbox =>
+            {
+                const hiddenInput = document.querySelector(`input[name="is_checked[${checkbox.dataset.coefInputId}]"]`);
+                if (checkbox.checked) {
+                    hiddenInput.value = '1';
+                } else {
+                        hiddenInput.value = '0';
+                }
+
+                    checkbox.addEventListener(
+                        'change', function () {
+                            if (this.checked) {
+                                hiddenInput.value = '1';
+                            } else {
+                                hiddenInput.value = '0';
+                            }
+                        }
+                    );
             }
+        );
 
-            toggleDeleteButton();
-
-            if (saveSelector) {
-                saveSelector.addEventListener('change', toggleDeleteButton);
-            }
-
-            if (saveSelector) {
-                saveSelector.addEventListener(
+        document.querySelectorAll('.coef-input').forEach(
+            input =>
+            {
+                input.addEventListener(
                     'change', function () {
-                        const form = this.closest('form');
-                        form.submit();
+                            let value = parseInt(this.value);
+
+                        if (isNaN(value) || value < 1) {
+                            this.value = 1;
+                        } else if (value > 100) {
+                            this.value = 100;
+                        }
                     }
                 );
             }
+        );
+        const criteriaCheckboxes = document.querySelectorAll('.criteria-checkbox');
+        const errorMessageElement = document.getElementById('checkboxError');
+        const generateBtn = document.getElementById('generate-btn');
 
-            const checkboxes = document.querySelectorAll('.criteria-checkbox');
+        let hasInteracted = false;
 
-            checkboxes.forEach(
-                checkbox =>
-                {
-                    const hiddenInput = document.querySelector(`input[name="is_checked[${checkbox.dataset.coefInputId}]"]`);
-                    if (checkbox.checked) {
-                        hiddenInput.value = '1';
-                    } else {
-                            hiddenInput.value = '0';
-                    }
+        function validateCheckboxes()
+        {
+            const anyChecked = Array.from(criteriaCheckboxes).some(checkbox => checkbox.checked);
 
-                        checkbox.addEventListener(
-                            'change', function () {
-                                if (this.checked) {
-                                    hiddenInput.value = '1';
-                                } else {
-                                    hiddenInput.value = '0';
-                                }
-                            }
-                        );
+            if (!anyChecked && hasInteracted) {
+                errorMessageElement.textContent = 'Veuillez sélectionner au moins un critère.';
+                generateBtn.disabled = true;
+            } else {
+                if (errorMessageElement) {
+                    errorMessageElement.textContent = '';
                 }
-            );
-
-            document.querySelectorAll('.coef-input').forEach(
-                input =>
-                {
-                    input.addEventListener(
-                        'change', function () {
-                                let value = parseInt(this.value);
-
-                            if (isNaN(value) || value < 1) {
-                                this.value = 1;
-                            } else if (value > 100) {
-                                this.value = 100;
-                            }
-                        }
-                    );
-                }
-            );
-            const criteriaCheckboxes = document.querySelectorAll('.criteria-checkbox');
-            const errorMessageElement = document.getElementById('checkboxError');
-            const generateBtn = document.getElementById('generate-btn');
-
-            let hasInteracted = false;
-
-            function validateCheckboxes()
-            {
-                const anyChecked = Array.from(criteriaCheckboxes).some(checkbox => checkbox.checked);
-
-                if (!anyChecked && hasInteracted) {
-                    errorMessageElement.textContent = 'Veuillez sélectionner au moins un critère.';
-                    generateBtn.disabled = true;
-                } else {
-                    if (errorMessageElement) {
-                        errorMessageElement.textContent = '';
-                    }
-                    generateBtn.disabled = !anyChecked;
-                }
-            }
-
-            criteriaCheckboxes.forEach(
-                function (checkbox) {
-                    checkbox.addEventListener(
-                        'change', function () {
-                            hasInteracted = true;
-                            validateCheckboxes();
-                        }
-                    );
-                }
-            );
-
-
-            validateCheckboxes();
-
-            const select = document.getElementById('save-selector');
-            const saveButton = document.getElementById('save-btn');
-
-            function updateButtonState()
-            {
-                saveButton.disabled = select.value === 'default';
-            }
-
-            if (select) {
-                select.addEventListener('change', updateButtonState);
-                updateButtonState();
+                generateBtn.disabled = !anyChecked;
             }
         }
-    );
+
+        criteriaCheckboxes.forEach(
+            function (checkbox) {
+                checkbox.addEventListener(
+                    'change', function () {
+                        hasInteracted = true;
+                        validateCheckboxes();
+                    }
+                );
+            }
+        );
+
+
+        validateCheckboxes();
+
+        const select = document.getElementById('save-selector');
+        const saveButton = document.getElementById('save-btn');
+
+        function updateButtonState()
+        {
+            saveButton.disabled = select.value === 'default';
+        }
+
+        if (select) {
+            select.addEventListener('change', updateButtonState);
+            updateButtonState();
+        }
+    }
+);
 
 document.querySelectorAll('.criteria-checkbox').forEach(
     checkbox =>
@@ -648,7 +648,7 @@ document.addEventListener(
                 function (eventType) {
                     tableBody.addEventListener(
                         eventType, function (event) {
-                            if (event.target.tagName === 'I' 
+                            if (event.target.tagName === 'I'
                                 && event.target.classList.contains('material-icons')
                             ) {
                                 const clickedRow = getClickedRow(event.target);
@@ -712,14 +712,14 @@ document.addEventListener(
                 const teacherLocations = await Promise.all(
                     teacherAddresses.map(
                         async(item) => {
-                        if (!teacherAddressCache.has(item.address)
-                    ) {
-                        teacherAddressCache.set(item.address, getGeocode(item.address));
-                        }
+                            if (!teacherAddressCache.has(item.address)) {
+                                teacherAddressCache.set(item.address, getGeocode(item.address));
+                            }
                             return await teacherAddressCache.get(item.address);
                         }
                     )
                 );
+
 
                 const distances = await Promise.all(
                     teacherLocations.map(location => calculateDistanceOnly(internshipLocation, location))
@@ -957,7 +957,7 @@ document.addEventListener(
 
 
 /**
- * Partie 5: map OSM 
+ * Partie 5: map OSM
 **/
 
 let map, routeLayer, companyMarker, teacherMarker;
@@ -1036,7 +1036,7 @@ async function initMap()
         );
         map.addLayer(clusterLayer);
     } catch (error) {
-        return;
+
     }
 }
 
