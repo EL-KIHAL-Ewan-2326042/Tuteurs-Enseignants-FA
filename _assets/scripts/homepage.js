@@ -173,6 +173,79 @@ function selectStudent(studentId, studentFirstName, studentLastName)
  * Partie2: Map Intéractive
  */
 
+let map;
+
+document.addEventListener(
+    'DOMContentLoaded', function () {
+        const tableBody = document.querySelector('#homepage-table tbody');
+        let clickedRowOverlay, clickedRowAddress;
+
+        if (tableBody) {
+            ['click', 'touchstart'].forEach(
+                function (eventType) {
+                    tableBody.addEventListener(
+                        eventType, function (event) {
+                            if (event.target.tagName === 'I'
+                                && event.target.classList.contains('material-icons')
+                            ) {
+                                const clickedRow = getClickedRow(event.target);
+                                if (!clickedRow) {
+                                    return;
+                                }
+
+                                const clickedRowData =
+                                    clickedRow.getAttribute('data-selected-row');
+                                const [
+                                    clickedRowAddress,
+                                    clickedRowName
+                                ] = clickedRowData.split('$');
+
+                                if (event.target.textContent === 'map') {
+                                    updateMarkers(clickedRowAddress, clickedRowName).then();
+                                    event.preventDefault();
+                                }
+                            }
+                        }
+                    );
+                }
+            );
+        }
+
+        function getClickedRow(element)
+        {
+            while (element && element.tagName !== 'TR') {
+                element = element.parentElement;
+            }
+            return element;
+        }
+
+        async function updateMarkers(address, name)
+        {
+            if (typeof clickedRowOverlay !== "undefined" && typeof clickedRowAddress !== "undefined"
+                && clickedRowOverlay.element.querySelector("div").innerHTML === name
+                && clickedRowAddress === address
+            ) {
+                return;
+            }
+
+            const selectedRowLocation = await geocodeAddress(address);
+            const selectedRowMarker = new ol.Overlay(
+                {
+                    position: ol.proj.fromLonLat([selectedRowLocation.lon, selectedRowLocation.lat]),
+                    element: createMarkerElement(`${name}`),
+                }
+            );
+
+            if (typeof clickedRowOverlay !== "undefined") {
+                map.removeOverlay(clickedRowOverlay);
+            }
+            clickedRowOverlay = selectedRowMarker;
+            clickedRowAddress = address;
+            map.addOverlay(clickedRowOverlay);
+        }
+    }
+);
+
 /**
  * Initialise la carte en fonction des adresses du professeur et de l'entreprise
  *
@@ -186,16 +259,25 @@ async function initMap()
         return;
     }
 
-    if (typeof companyAddress === "undefined" || typeof teacherAddress === "undefined") {
-        console.error("'companyAddress' ou 'teacherAddress' est indéfini.");
+    if (typeof teacherAddress === "undefined") {
+        console.error("'teacherAddress' est indéfini.");
         return;
     }
 
     try {
-        const companyLocation = await geocodeAddress(companyAddress);
         const teacherLocation = await geocodeAddress(teacherAddress);
+        let companyLocation, centerLon, centerLat;
 
-        const map = new ol.Map(
+        if (typeof companyAddress !== "undefined") {
+            companyLocation = await geocodeAddress(companyAddress);
+            centerLon = (companyLocation.lon + teacherLocation.lon) / 2;
+            centerLat = (companyLocation.lat + teacherLocation.lat) / 2;
+        } else {
+            centerLon = teacherLocation.lon;
+            centerLat = teacherLocation.lat;
+        }
+
+        map = new ol.Map(
             {
                 target: mapElement,
                 layers: [
@@ -209,8 +291,8 @@ async function initMap()
                 {
                     center: ol.proj.fromLonLat(
                         [
-                            (companyLocation.lon + teacherLocation.lon) / 2,
-                            (companyLocation.lat + teacherLocation.lat) / 2,
+                            centerLon,
+                            centerLat,
                             ]
                     ),
                 zoom: 6,
@@ -219,23 +301,25 @@ async function initMap()
             }
         );
 
-        const companyMarker = new ol.Overlay(
+        const teacherMarker = new ol.Overlay(
             {
-                position: ol.proj.fromLonLat([companyLocation.lon, companyLocation.lat]),
-                element: createMarkerElement("Entreprise"),
+                position: ol.proj.fromLonLat([teacherLocation.lon, teacherLocation.lat]),
+                element: createMarkerElement("Vous"),
             }
         );
-            const teacherMarker = new ol.Overlay(
-                {
-                    position: ol.proj.fromLonLat([teacherLocation.lon, teacherLocation.lat]),
-                    element: createMarkerElement("Vous"),
-                }
-            );
-
-        map.addOverlay(companyMarker);
         map.addOverlay(teacherMarker);
 
-        await calculateDistance(companyLocation, teacherLocation, map);
+        if (typeof companyAddress !== "undefined") {
+            const companyMarker = new ol.Overlay(
+                {
+                    position: ol.proj.fromLonLat([companyLocation.lon, companyLocation.lat]),
+                    element: createMarkerElement("Entreprise"),
+                }
+            );
+            map.addOverlay(companyMarker);
+
+            await calculateDistance(companyLocation, teacherLocation, map);
+        }
     } catch (error) {
         console.error("Erreur lors de l'initialisation de la carte :", error);
     }
