@@ -11,6 +11,7 @@ label{
 #map {
     height: 600px;
     width: 100%;
+    margin: 20px 0;
 }
 
 .center {
@@ -110,7 +111,7 @@ input[type=text]:focus {
 
 /* Tableau Homepage */
 
-#clickable {
+.clickable {
     cursor: pointer;
 }
 

@@ -140,7 +140,9 @@ readonly class Homepage
                         );
                     }
                 }
-
+                ?>
+                <div id="map"></div>
+                <?php
                 if (isset($_SESSION['selected_student']['firstName'])
                     && isset($_SESSION['selected_student']['lastName'])
                 ) {
@@ -170,10 +172,6 @@ readonly class Homepage
                                 $_SESSION['identifier'],
                                 isset($internshipInfos['id_teacher'])
                             );
-                            ?>
-                            <div id="map"></div>
-                            <div class="row"></div>
-                            <?php
                             $inDep = false;
                             foreach ($this->studentModel->getDepStudent(
                                 $_SESSION['selected_student']['id']
@@ -220,45 +218,41 @@ readonly class Homepage
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>
-                                            <?php echo str_replace(
-                                                '_', ' ',
-                                                $internshipInfos['formation']
-                                            ) ?>
-                                            </td>
-                                            <td>
-                                                <?php echo str_replace(
+                                            <td><?php
+                                                echo str_replace(
+                                                    '_', ' ',
+                                                    $internshipInfos['formation']
+                                                ) ?></td>
+                                            <td><?php
+                                                echo str_replace(
                                                     '_', ' ',
                                                     $internshipInfos['class_group']
-                                                ) ?>
-                                            </td>
+                                                ) ?></td>
                                             <td>
-                                                    <?php echo $nbInternships > 0
+                                                <?php echo $nbInternships > 0
                                                     ? $year : 'Non' ?>
                                             </td>
-                                            <td>
-                                                <?php echo str_replace(
+                                            <td><?php
+                                                echo str_replace(
                                                     '_', ' ',
                                                     $internshipInfos["company_name"]
-                                                ) ?>
-                                            </td>
-                                            <td>
-                                                    <?php echo str_replace(
-                                                        '_', ' ',
-                                                        $internshipInfos[
-                                                        "internship_subject"
-                                                        ]
-                                                    ) ?>
-                                            </td>
-                                            <td>
-                                                    <?php echo str_replace(
-                                                        '_', "'",
-                                                        $internshipInfos['address']
-                                                    ) ?>
-                                            </td>
-                                            <td>
-                                                ~<?php echo $distance ?> minutes
-                                            </td>
+                                                ) ?></td>
+                                            <td><?php
+                                                echo str_replace(
+                                                    '_', ' ',
+                                                    $internshipInfos[
+                                                    "internship_subject"
+                                                    ]
+                                                ) ?></td>
+                                            <td><?php
+                                                echo str_replace(
+                                                    '_', "'",
+                                                    $internshipInfos['address']
+                                                ) ?></td>
+                                            <td>~<?php
+                                                echo $distance . " minute"
+                                                    . ($distance > 1 ? "s" : "")
+                                                ?></td>
                                             <td>
                             <?php
                             if (!$inDep) {
@@ -339,8 +333,8 @@ readonly class Homepage
                     }
                     ?>
                     <form method="post" class="center-align">
-                        <button class="waves-effect waves-light
-                        btn btn-annuler tooltip"
+                        <button class=
+                            "waves-effect waves-light btn btn-annuler tooltip"
                             name="cancelSearch" value="1" type="submit"
                             formmethod="post" data-tooltip="Annuler la recherche"
                             data-position="top">Annuler</button>
@@ -417,7 +411,7 @@ readonly class Homepage
                             <table class="highlight centered" id="homepage-table">
                                 <thead <?php
                                 if (count($table) > 1) {
-                                    echo 'id="clickable"';
+                                    echo 'class="clickable"';
                                 } ?>>
                                 <tr>
                                     <th>ETUDIANT</th>
@@ -444,7 +438,11 @@ readonly class Homepage
                                 </thead>
                                 <tbody>
                                 <?php foreach ($table as $row): ?>
-                                    <tr class="homepage-row">
+                                    <tr class="homepage-row"
+                                        data-selected-row="<?php
+                                        echo str_replace('_', "'", $row['address'])
+                                            . '$' . $row['student_name']
+                                        ?>">
                                         <td><?php
                                             echo $row["student_name"] . " " .
                                                 $row["student_firstname"]
@@ -479,10 +477,18 @@ readonly class Homepage
                                             echo str_replace(
                                                 '_', "'", $row['address']
                                             )
-                                            ?></td>
+                                            ?>
+                                            <br>
+                                            <i class=
+                                               "material-icons clickable tooltip"
+                                               data-position="top"
+                                               data-tooltip=
+                                               "Voir la position de l'entreprise"
+                                            >map</i></td>
                                         <td>~<?php echo
-                                            $row['duration'] . " minutes"
-                                        ?></td>
+                                                $row['duration'] . " minute"
+                                                . ($row['duration'] > 1 ? "s" : "")
+                                            ?></td>
                                         <td>
                                             <label class="center">
                                                 <input type="checkbox"
@@ -545,11 +551,11 @@ readonly class Homepage
                             <div class="row"></div>
 
                             <div class="inline">
-                                <button class=
-                                        "waves-effect waves-light btn tooltip"
-                                        type="reset" id="resetForm" data-tooltip=
-                                        "Annuler les modifications"
-                                        data-position="top">Annuler</button>
+                                <button class="waves-effect waves-light
+                                btn btn-annuler tooltip"
+                                    type="reset" id="resetForm" data-tooltip=
+                                    "Annuler les modifications"
+                                    data-position="top">Annuler</button>
                                 <button class="waves-effect waves-light btn tooltip"
                                     name="selecInternshipSubmitted" value="1"
                                     type="submit" data-tooltip="Envoyer vos choix"
