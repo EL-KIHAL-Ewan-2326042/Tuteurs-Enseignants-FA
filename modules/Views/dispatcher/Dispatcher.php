@@ -554,7 +554,7 @@ class Dispatcher
 
         $decimalPart = $score - $fullStars;
 
-        $halfStars = (abs($decimalPart - 0.5) <= 0.1) ? 1 : 0;
+        $halfStars = ($decimalPart > 0 && $decimalPart < 1) ? 1 : 0;
 
         $emptyStars = 5 - $fullStars - $halfStars;
 
