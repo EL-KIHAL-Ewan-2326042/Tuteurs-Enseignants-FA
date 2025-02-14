@@ -695,11 +695,12 @@ document.addEventListener(
 
                 const teacherLocations = await Promise.all(
                     teacherAddresses.map(
-                        async(item) => {
-                        if (!teacherAddressCache.has(item.address)
-                    ) {
-                        teacherAddressCache.set(item.address, getGeocode(item.address));
-                        }
+                        async(item) =>
+                        {
+                            if (!teacherAddressCache.has(item.address)
+                            ) {
+                            teacherAddressCache.set(item.address, getGeocode(item.address));
+                            }
                             return await teacherAddressCache.get(item.address);
                         }
                     )
