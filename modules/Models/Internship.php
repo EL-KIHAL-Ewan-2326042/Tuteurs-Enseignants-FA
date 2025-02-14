@@ -344,7 +344,9 @@ class Internship extends Model
                     AS current_count_apprentice, 
                 SUM(CASE WHEN internship.type = 'Internship' THEN 1 ELSE 0 END) 
                     AS current_count_intern FROM Teacher  
-                JOIN has_role ON Teacher.Id_teacher = has_role.user_id 
+                JOIN (SELECT DISTINCT user_id, department_name FROM has_role) 
+                    AS has_role
+                    ON Teacher.Id_teacher = has_role.user_id
                 JOIN Study_at 
                     ON Study_at.department_name = has_role.department_name
                 JOIN Student ON Student.student_number = Study_at.student_number
