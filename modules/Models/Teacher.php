@@ -157,7 +157,7 @@ class Teacher extends Model
      *
      * @param string $teacher Identifiant de l'enseignant
      *
-     * @return false|string Renvoie le nombre maximum de stagiaires et alternants,
+     * @return false|array Renvoie le nombre maximum de stagiaires et alternants,
      * false sinon
      */
     public function getMaxNumberTrainees(string $teacher): false|array
