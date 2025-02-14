@@ -58,9 +58,9 @@ class Intramu
                     <form class="col s12" action="./intramu"
                     method="POST" id="formAssociate">
                         <div class="row">
-                            <h5 class="indigo-text center-align">
+                            <h1 class="indigo-text center-align">
                                 Aix-Marseille Université - Service d'authentification
-                            </h5>
+                            </h1>
                         </div>
                         <div class="row center-align">
                             <p class="red-text"><?php echo $this->errorMessage?></p>

@@ -4,6 +4,10 @@ main {
     flex-direction: column;
 }
 
+label{
+    color: #2c2c2c !important;
+}
+
 #map {
     height: 600px;
     width: 100%;
@@ -15,7 +19,17 @@ main {
     align-items: flex-start;
 }
 
-h3, h4 {
+h1 {
+    font-size: 2.92rem;
+    margin: 1.95rem 0 1.168rem 0;
+}
+
+h2 {
+    font-size: 2.28rem;
+    margin: 1.52rem 0 0.912rem 0;
+}
+
+h1, h2 {
     color: var(--main-color);
 }
 
@@ -65,7 +79,9 @@ main .card-panel {
     background-color: #00558B;
     z-index: 0;
 }
-
+.btn-annuler{
+    background-color: #B30C00 !important;
+}
 .btn:hover {
     background-color: #E8CE7E;
 }
@@ -165,7 +181,7 @@ tbody {
 .tooltip-container {
     position: relative;
     display: inline-block;
-    color: #E8CE7E !important;
+    color: #8F0000 !important;
     font-weight: bold;
 }
 

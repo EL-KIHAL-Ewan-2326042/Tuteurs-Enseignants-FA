@@ -10,11 +10,9 @@ main {
     align-items: flex-start;
 }
 
-h3, h4 {
-    color: var(--main-color);
-}
-
-h5 {
+h2 {
+    font-size: 1.64rem;
+    margin: 1.1rem 0 0.656rem 0;
     text-align: center;
 }
 
@@ -35,6 +33,15 @@ main a:hover {
     z-index: 0;
 }
 
+h1 {
+    font-size: 2.92rem;
+    margin: 1.95rem 0 1.168rem 0;
+}
+
+.btn-annuler {
+    background-color: #B30C00 !important;
+}
+
 .btn:hover {
     background-color: #E8CE7E;
 }
@@ -53,6 +60,10 @@ input[type="checkbox"].filled-in:checked + span:after {
 /* label focus color */
 .input-field input:focus + label {
     color: #00558B !important;
+}
+
+label{
+    color: #2c2c2c !important;
 }
 
 /* label underline focus color */
@@ -169,13 +180,14 @@ tbody {
     position: relative;
     display: inline-block;
     cursor: pointer;
-    color: #E8CE7E !important;
+    color: #8F0000 !important;
     font-weight: bold;
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
     margin-right: 0.5em;
 }
+
 
 /** Pagination **/
 
