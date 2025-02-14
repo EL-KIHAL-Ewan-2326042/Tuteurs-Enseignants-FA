@@ -335,10 +335,6 @@ CREATE TRIGGER insert_backup
 
 /* Les lignes suivantes servent de données de test */
 
-INSERT INTO Id_backup (Id_backup) VALUES (1);
-INSERT INTO Id_backup (Id_backup) VALUES (2);
-INSERT INTO Id_backup (Id_backup) VALUES (3);
-
 INSERT INTO Distribution_criteria (Name_criteria, Description) VALUES ('A été responsable', 'Prendre en compte le fait que le prof ait déjà travaillé avec l élève');
 INSERT INTO Distribution_criteria (Name_criteria, Description) VALUES ('Distance', 'Prendre en compte la distance entre le lieu du stage et l adresse renseigné la plus proche pour le responsable');
 INSERT INTO Distribution_criteria (Name_criteria, Description) VALUES ('Discipline', 'Prendre en compte la corrélation entre la matière enseigner par le responsable et le sujet du stage');
