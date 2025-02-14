@@ -157,41 +157,58 @@ class Teacher extends Model
      *
      * @param string $teacher Identifiant de l'enseignant
      *
-     * @return false|string Renvoie le nombre maximum de stagiaires et alternants,
+     * @return false|array Renvoie le nombre maximum de stagiaires et alternants,
      * false sinon
      */
-    public function getMaxNumberInterns(string $teacher): false|string
+    public function getMaxNumberTrainees(string $teacher): false|array
     {
-        $query = 'SELECT maxi_number_trainees '
+        $query = 'SELECT maxi_number_intern AS intern, '
+                . 'maxi_number_apprentice AS apprentice '
                 . 'FROM teacher '
                 . 'WHERE id_teacher = :teacher';
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindParam(':teacher', $teacher);
         $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_COLUMN);
+        return $stmt->fetch();
     }
 
     /**
      * Met à jour le nombre maximum de stagiaires et alternants
      * que l'enseignant passé en paramètre peut avoir
      *
-     * @param string $teacher              numéro de
-     *                                     l'enseignant
-     * @param int    $maxi_number_trainees nouveau nombre maximum
-     *                                     de stagiaires et alternants
+     * @param string $teacher    numéro de l'enseignant
+     * @param int    $intern     nouveau nombre maximum de stagiaires
+     * @param int    $apprentice nouveau nombre maximum d'alternants
      *
-     * @return string renvoie true si l'update a fonctionné,
-     * sinon une chaîne de caractères contenant l'erreur
+     * @return bool|string renvoie true si l'update a fonctionné,
+     * false si les nouvelles valeurs maximales passées en paramètre sont nulles,
+     * sinon une chaîne de caractères contenant le message d'erreur
      */
     public function updateMaxiNumberTrainees(
-        string $teacher, int $maxi_number_trainees
-    ): string {
-        $query = 'UPDATE teacher '
-                . 'SET maxi_number_trainees = :maxi_number_trainees '
-                . 'WHERE id_teacher = :teacher';
+        string $teacher, int $intern, int $apprentice
+    ): bool|string {
+        if (!($intern > 0 || $apprentice > 0)) {
+            return false;
+        }
+
+        $query = 'UPDATE teacher SET ';
+        if ($intern > 0) {
+            $query .= 'maxi_number_intern = :intern';
+            if ($apprentice > 0) {
+                $query .= ', maxi_number_apprentice = :apprentice';
+            }
+        } else {
+            $query .= 'maxi_number_apprentice = :apprentice';
+        }
+        $query .= ' WHERE id_teacher = :teacher';
         $stmt = $this->_db->getConn()->prepare($query);
-        $stmt->bindParam(':maxi_number_trainees', $maxi_number_trainees);
         $stmt->bindParam(':teacher', $teacher);
+        if ($intern > 0) {
+            $stmt->bindParam(':intern', $intern);
+        }
+        if ($apprentice > 0) {
+            $stmt->bindParam(':apprentice', $apprentice);
+        }
 
         try {
             $stmt->execute();
