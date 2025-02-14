@@ -68,7 +68,8 @@ readonly class Homepage
     {
         ?>
         <main>
-            <h1 class="center-align">Répartiteur de tuteurs enseignants</h1>
+            <h1 class="center-align
+            flow-text">Répartiteur de tuteurs enseignants</h1>
 
             <div class="card-panel white">
                 <label ="Numéro Etudiant"
@@ -87,6 +88,7 @@ readonly class Homepage
                                 </select>
                             </div>
                         </div>
+
                         <div class="searchCell">
                             <label for="search">Rechercher:</label>
                             <input type="text" id="search" name="search"
@@ -337,7 +339,8 @@ readonly class Homepage
                     }
                     ?>
                     <form method="post" class="center-align">
-                        <button class="waves-effect waves-light btn btn-annuler tooltip"
+                        <button class="waves-effect waves-light
+                        btn btn-annuler tooltip"
                             name="cancelSearch" value="1" type="submit"
                             formmethod="post" data-tooltip="Annuler la recherche"
                             data-position="top">Annuler</button>
@@ -349,7 +352,7 @@ readonly class Homepage
                 ?>
             </div>
 
-            <h2 class="center">Sélectionnez le(s) département(s) :</h2>
+            <h2 class="center flow-text">Sélectionnez le(s) département(s) :</h2>
 
             <div class="row"></div>
 

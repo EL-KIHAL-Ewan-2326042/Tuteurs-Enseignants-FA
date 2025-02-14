@@ -170,8 +170,11 @@ class User extends Model
         return $roles ?: [];
     }
 
+
     /**
-     * Récupère la liste des sauvegardes disponibles dans la base de données
+     *  Récupère la liste des sauvegardes disponibles dans la base de données
+     *
+     * @param $user_id l'identifiant de l'utilisateur
      *
      * @return array|null Renvoie un tableau associatif contenant les identifiants
      * des sauvegardes disponibles, ou `null` en cas d'échec
@@ -232,6 +235,7 @@ class User extends Model
      *                          'coef' et 'is_checked'` (int))
      * @param string $user_id   Identifiant de l'utilisateur pour lequel
      *                          les coefficients doivent être mis à jour
+     * @param string $name_save Le nom de la sauvegarde
      * @param int    $id_backup Identifiant de la sauvegarde pour laquelle
      *                          les coefficients doivent être mis à jour
      *
@@ -334,16 +338,26 @@ class User extends Model
         $stmt->bindValue(':department', $department);
         $stmt->execute();
     }
+
+    /**
+     * Créer une sauvegarde pour un utilisateur
+     *
+     * @param array  $coef      les differents coefficients et leurs etats
+     * @param string $name_save le nom de la sauvegarde
+     * @param string $user_id   l'identifiant de l'utilisateur
+     *
+     * @return void
+     */
     public function createCoefficients(
         array $coef, string $name_save, $user_id
-    ): void
-    {
+    ): void {
         $conn = $this->_db->getConn();
 
         try {
             $conn->beginTransaction();
 
-            $stmt = $conn->prepare("SELECT MAX(Id_backup) FROM backup WHERE user_id = :user_id");
+            $stmt = $conn->
+            prepare("SELECT MAX(Id_backup) FROM backup WHERE user_id = :user_id");
             $stmt->bindParam(':user_id', $user_id);
             $stmt->execute();
             $maxId = $stmt->fetchColumn();
@@ -352,21 +366,25 @@ class User extends Model
             $stmt = $conn->prepare("INSERT INTO Id_backup (Id_backup) VALUES (?)");
             $stmt->execute([$newId]);
 
-            $insertBackup = $conn->prepare("
+            $insertBackup = $conn->prepare(
+                "
             INSERT INTO backup 
             (User_id, Name_criteria, Id_backup, Coef, Is_checked, Name_save) 
             VALUES (?, ?, ?, ?, ?, ?)
-        ");
+        "
+            );
 
             foreach ($coef as $criteria => $data) {
-                $insertBackup->execute([
+                $insertBackup->execute(
+                    [
                     $user_id,
                     $criteria,
                     $newId,
                     $data['coef'],
                     $data['is_checked'] ? 1 : 0,
                     $name_save
-                ]);
+                    ]
+                );
             }
 
             $conn->commit();
@@ -377,7 +395,16 @@ class User extends Model
         }
     }
 
-    public function deleteCoefficient($user_id, $id_backup):void {
+    /**
+     * Supprimer une sauvegarde pour un utilisateur
+     *
+     * @param $user_id   l'identifiant de l'utilisateur
+     * @param $id_backup l'identifiant de la sauvegarde à supprimer
+     *
+     * @return void
+     */
+    public function deleteCoefficient($user_id, $id_backup):void
+    {
         $conn = $this->_db->getConn();
 
         $query = "DELETE FROM backup "

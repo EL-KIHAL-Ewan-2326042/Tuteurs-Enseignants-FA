@@ -229,8 +229,10 @@ class Account
                             <div class="inline">
                                 <div class="cell">
                                     <button type="reset" class=
-                                            "waves-effect waves-light btn btn-annuler tooltip"
-                                            data-tooltip="Réinitialiser le formulaire"
+                                            "waves-effect waves-light
+                                            btn btn-annuler tooltip"
+                                            data-tooltip=
+                                            "Réinitialiser le formulaire"
                                             data-position="top">
                                         Annuler
                                     </button>
@@ -240,7 +242,7 @@ class Account
                                         value="1" class=
                                             "waves-effect waves-light btn tooltip"
                                         data-tooltip=
-                                            "Soumettre vos nouvelles valeurs maximales"
+                                        "Soumettre vos nouvelles valeurs maximales"
                                         data-position="top">
                                         Valider
                                     </button>

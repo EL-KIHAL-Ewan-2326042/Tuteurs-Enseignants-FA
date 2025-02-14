@@ -156,6 +156,21 @@ document.addEventListener(
         M.FormSelect.init(selects);
 
         const saveSelector = document.getElementById('save-selector');
+        const deleteBtn = document.getElementById('delete-btn');
+
+        function toggleDeleteButton()
+        {
+            if (deleteBtn) {
+                deleteBtn.disabled = saveSelector.value === 'new';
+            }
+        }
+
+        toggleDeleteButton();
+
+        if (saveSelector) {
+            saveSelector.addEventListener('change', toggleDeleteButton);
+        }
+
         if (saveSelector) {
             saveSelector.addEventListener(
                 'change', function () {
@@ -207,7 +222,7 @@ document.addEventListener(
         );
         const criteriaCheckboxes = document.querySelectorAll('.criteria-checkbox');
         const errorMessageElement = document.getElementById('checkboxError');
-        const button = document.getElementById('generate-btn');
+        const generateBtn = document.getElementById('generate-btn');
 
         let hasInteracted = false;
 
@@ -217,10 +232,12 @@ document.addEventListener(
 
             if (!anyChecked && hasInteracted) {
                 errorMessageElement.textContent = 'Veuillez sélectionner au moins un critère.';
-                button.disabled = true;
+                generateBtn.disabled = true;
             } else {
-                errorMessageElement.textContent = '';
-                button.disabled = !anyChecked;
+                if (errorMessageElement) {
+                    errorMessageElement.textContent = '';
+                }
+                generateBtn.disabled = !anyChecked;
             }
         }
 
@@ -250,7 +267,6 @@ document.addEventListener(
             select.addEventListener('change', updateButtonState);
             updateButtonState();
         }
-
     }
 );
 
@@ -632,7 +648,7 @@ document.addEventListener(
                 function (eventType) {
                     tableBody.addEventListener(
                         eventType, function (event) {
-                            if (event.target.tagName === 'I' 
+                            if (event.target.tagName === 'I'
                                 && event.target.classList.contains('material-icons')
                             ) {
                                 const clickedRow = getClickedRow(event.target);
@@ -695,15 +711,17 @@ document.addEventListener(
 
                 const teacherLocations = await Promise.all(
                     teacherAddresses.map(
-                        async(item) => {
-                        if (!teacherAddressCache.has(item.address)
-                    ) {
-                        teacherAddressCache.set(item.address, getGeocode(item.address));
-                        }
+                        async(item) =>
+                        {
+                            if (!teacherAddressCache.has(item.address)
+                            ) {
+                            teacherAddressCache.set(item.address, getGeocode(item.address));
+                            }
                             return await teacherAddressCache.get(item.address);
                         }
                     )
                 );
+
 
                 const distances = await Promise.all(
                     teacherLocations.map(location => calculateDistanceOnly(internshipLocation, location))
@@ -749,18 +767,23 @@ document.addEventListener(
 
 
             const loadingContainer = document.createElement('div');
-            loadingContainer.className = 'center-align loading-indicator';
+            loadingContainer.className = 'center-align row';
+
             loadingContainer.innerHTML = `
-            <p style="font-size: 24px;">Chargement en cours, veuillez patienter...</p>
-            <div class="progress">
-            <div class="indeterminate"></div>
+            <div class="center-align">
+                <p>
+                    Chargement en cours, veuillez patienter...
+                </p>
+                <div class="progress">
+                    <div class="indeterminate"></div>
+                </div>
             </div>`;
             container.appendChild(loadingContainer);
 
             loadingContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
             const newTable = document.createElement('table');
-            newTable.className = 'highlight centered responsive-table';
+            newTable.className = 'highlight centered';
             newTable.id = 'student-dispatch-table';
 
             const thead = document.createElement('thead');
@@ -837,26 +860,28 @@ document.addEventListener(
         {
             const fullStars = Math.floor(score);
             const decimalPart = score - fullStars;
-            const halfStars = Math.abs(decimalPart - 0.5) <= 0.1 ? 1 : 0;
-            const emptyStars = 5 - fullStars - halfStars;
+
+            const halfStars = (decimalPart >= 0.25 && decimalPart < 0.75) ? 1 : 0;
+
+            const adjustedFullStars = (decimalPart >= 0.75) ? fullStars + 1 : fullStars;
+
+            const emptyStars = 5 - adjustedFullStars - halfStars;
 
             let stars = '';
 
-            for (let i = 0; i < fullStars; i++) {
+            for (let i = 0; i < adjustedFullStars; i++) {
                 stars += '<span class="filled"></span>';
             }
 
             if (halfStars) {
                 stars += '<span class="half"></span>';
             }
-
             for (let i = 0; i < emptyStars; i++) {
                 stars += '<span class="empty"></span>';
             }
 
             return stars;
         }
-
         /**
          * Trie la table prenant pour id "student-dispatch-table"
          *
@@ -934,7 +959,7 @@ document.addEventListener(
 
 
 /**
- * Partie 5: map OSM 
+ * Partie 5: map OSM
 **/
 
 let map, routeLayer, companyMarker, teacherMarker;
@@ -1013,7 +1038,7 @@ async function initMap()
         );
         map.addLayer(clusterLayer);
     } catch (error) {
-        console.error("Error initializing map:", error);
+
     }
 }
 
