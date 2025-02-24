@@ -73,10 +73,11 @@ class Dashboard
              . "pour effectuer cette action.",
             'file not found' => "Le fichier demandé est introuvable. "
              . "Veuillez vérifier votre saisie.",
-            'Fatal' => "Erreur de taille mémoire, veuillez contacter "
+            'Fatal error: Allowed memory' => "Erreur de taille mémoire, veuillez verifier que les séparateur sont bien des ';' puis contacter "
              . "l'administrateur du serveur.",
             'guide utilisateur' => "Erreur lors du traitement du fichier CSV "
-            . "(merci de vérifier que vous respectez bien le guide utilisateur)."
+            . "(merci de vérifier que vous respectez bien le guide utilisateur).",
+            'Les colonnes CSV ne correspondent pas à la table student ou aux valeurs demandées pour la table teacher.' => "Les colonnes CSV ne correspondent pas à la table student ou aux valeurs demandées pour la table teacher."
         ];
 
         // Parcours des mots-clés pour personnaliser le message
@@ -88,7 +89,7 @@ class Dashboard
 
         // Message générique si aucun mot-clé ne correspond
         return "Une erreur inattendue est survenue. "
-        . "Veuillez contacter l'administrateur.".$this->handleExceptionMessage($e);
+        . "Veuillez contacter l'administrateur.";
     }
 
     /**
