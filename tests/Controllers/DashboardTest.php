@@ -19,11 +19,9 @@
 namespace Controllers;
 
 use Blog\Controllers\Dashboard;
-use Blog\Models\Model;
 use Blog\Views\layout\Layout;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Includes\Database;
 
 /**
  * Classe gérant les tests PHPUnit du controlleur Dashboard

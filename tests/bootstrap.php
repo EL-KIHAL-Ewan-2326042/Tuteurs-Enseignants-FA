@@ -14,17 +14,28 @@
  *
  * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
  * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
- */require_once __DIR__ . '/../vendor/autoload.php';
+ */
+require_once __DIR__ . '/../vendor/autoload.php';
 
 //initialisation variables d'environnement pour test
 putenv('APP_ENV=test');
 
 //initialisation base de données
+$config = json_decode(file_get_contents('../config.json'), true);
+
+$host = $config['database']['host'];
+$dbname = $config['database']['dbname'];
+$user = $config['database']['user'];
+$pass = $config['database']['password'];
 try {
     $db = new PDO(
-        'pgsql:host=postgresql-tutormap.alwaysdata.net;dbname=tutormap_v1',
-        'tutormap',
-        '8exs7JcEpGVfsI'
+        "pgsql:host=$host;dbname=$dbname",
+        $user,
+        $pass,
+        [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+        ]
     );
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {

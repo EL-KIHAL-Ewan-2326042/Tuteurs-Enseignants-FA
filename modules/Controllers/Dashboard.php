@@ -21,7 +21,7 @@ namespace Blog\Controllers;
 use Blog\Models\Model;
 use Blog\Views\layout\Layout;
 use Exception;
-use Includes\Database;
+use includes\Database;
 
 /**
  * Classe gérant les échanges de données entre

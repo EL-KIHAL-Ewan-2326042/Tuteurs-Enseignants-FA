@@ -16,7 +16,7 @@
  * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
  * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
  */
-namespace Includes;
+namespace includes;
 use PDO;
 use PDOException;
 
@@ -45,7 +45,7 @@ class Database
      */
     public function __construct()
     {
-        $config = json_decode(file_get_contents('config.json'), true);
+        $config = json_decode(file_get_contents('../config.json'), true);
 
         $host = $config['database']['host'];
         $dbname = $config['database']['dbname'];

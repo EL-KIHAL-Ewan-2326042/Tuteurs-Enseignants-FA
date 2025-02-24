@@ -18,7 +18,7 @@
 namespace Models;
 
 use Blog\Models\Student;
-use Includes\Database;
+use includes\Database;
 use PDO;
 use PDOStatement;
 use PHPUnit\Framework\MockObject\Exception;

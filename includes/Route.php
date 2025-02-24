@@ -16,6 +16,8 @@
  * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
  */
 
+namespace includes;
+
 /**
  * Fais le lien entre une url et une classe
  *

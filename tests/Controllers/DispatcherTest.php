@@ -19,14 +19,7 @@
 namespace Controllers;
 
 use Blog\Controllers\Dispatcher;
-use Blog\Models\Department;
-use Blog\Models\Internship;
-use Blog\Models\Student;
-use Blog\Models\Teacher;
-use Blog\Models\User;
-use Blog\Views\dispatcher\Dispatcher as DispatcherView;
 use Blog\Views\layout\Layout;
-use Includes\Database;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 

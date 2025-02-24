@@ -17,12 +17,11 @@
  */
 namespace Models;
 
-use Includes\Database;
 use Blog\Models\Department;
+use includes\Database;
 use PDO;
 use PDOStatement;
 use PHPUnit\Framework\MockObject\Exception;
-use PHPUnit\Framework\MockObject\MockClass;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -18,9 +18,12 @@
  * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
  */
 
-use Includes\Autoloader;
+use Blog\Views;
+use includes\Autoloader;
+use includes\exceptions\RouterException;
+use includes\Route;
 
-require_once '_assets/includes/Autoloader.php';
+require_once '../includes/Autoloader.php';
 Autoloader::register();
 
 /**
@@ -179,7 +182,7 @@ function createAction(string $uri, mixed $layout): Closure
     };
 }
 
-$layout = new \Blog\Views\layout\Layout();
+$layout =  new Views\layout\Layout();
 $action = createAction($uri, $layout);
 $router->get($uri, $action);
 $router->post($uri, $action);
