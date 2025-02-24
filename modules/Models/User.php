@@ -17,8 +17,8 @@
  */
 
 namespace Blog\Models;
+use Exception;
 use Includes\Database;
-use mysql_xdevapi\Exception;
 use PDO;
 use PDOException;
 
@@ -189,7 +189,7 @@ class User extends Model
             $stmt->bindParam(':user_id', $user_id);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (\Exception) {
+        } catch (\PDOException) {
             return null;
         }
     }
@@ -221,7 +221,7 @@ class User extends Model
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
-        catch (\Exception) {
+        catch (\PDOException) {
             return false;
         }
     }
@@ -274,7 +274,7 @@ class User extends Model
             $stmt->execute();
 
             return true;
-        } catch (Exception) {
+        } catch (PDOException) {
             return false;
         }
     }
@@ -349,9 +349,9 @@ class User extends Model
      * @return void
      */
     public function createCoefficients(
-        array $coef, string $name_save, $user_id
+        array $coef, string $name_save, string $user_id
     ): void {
-        $conn = $this->_db->getConn();
+            $conn = $this->_db->getConn();
 
         try {
             $conn->beginTransaction();
@@ -363,15 +363,12 @@ class User extends Model
             $maxId = $stmt->fetchColumn();
             $newId = $maxId ? $maxId + 1 : 1;
 
-            $stmt = $conn->prepare("INSERT INTO Id_backup (Id_backup) VALUES (?)");
-            $stmt->execute([$newId]);
-
             $insertBackup = $conn->prepare(
                 "
             INSERT INTO backup 
             (User_id, Name_criteria, Id_backup, Coef, Is_checked, Name_save) 
             VALUES (?, ?, ?, ?, ?, ?)
-        "
+            "
             );
 
             foreach ($coef as $criteria => $data) {
@@ -391,7 +388,7 @@ class User extends Model
 
         } catch (PDOException $e) {
             $conn->rollBack();
-            throw new Exception("Error creating backup: " . $e->getMessage());
+            throw new PDOException("Error creating backup: " . $e->getMessage());
         }
     }
 
