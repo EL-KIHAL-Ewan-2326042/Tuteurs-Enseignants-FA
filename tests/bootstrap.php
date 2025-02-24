@@ -27,6 +27,7 @@ $host = $config['database']['host'];
 $dbname = $config['database']['dbname'];
 $user = $config['database']['user'];
 $pass = $config['database']['password'];
+
 try {
     $db = new PDO(
         "pgsql:host=$host;dbname=$dbname",
@@ -37,6 +38,7 @@ try {
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
         ]
     );
+
     $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     echo 'Connexion à la base de données de test échouée : ' . $e->getMessage();

@@ -20,6 +20,7 @@ namespace Controllers;
 
 use Blog\Controllers\Dashboard;
 use Blog\Views\layout\Layout;
+use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -48,6 +49,7 @@ class DashboardTest extends TestCase
      * Initialisation des objets nécessaires pour les tests
      *
      * @return void
+     * @throws Exception
      */
     protected function setUp(): void
     {
