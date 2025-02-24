@@ -110,17 +110,12 @@ class Router
      */
     public function run(): void
     {
-        if (!isset($this->_routes[$_SERVER['REQUEST_METHOD']])) {
-            throw new RouterException("REQUEST_METHOD n'existe pas");
-        }
-
         foreach ($this->_routes[$_SERVER['REQUEST_METHOD']] as $route) {
             if ($route->match($this->_url)) {
                 $route->call();
                 return;
             }
         }
-        throw new RouterException("Erreur 404");
     }
 }
 
