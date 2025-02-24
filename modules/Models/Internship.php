@@ -18,7 +18,7 @@
 
 namespace Blog\Models;
 
-use Includes\Database;
+use includes\Database;
 use PDO;
 use PDOException;
 

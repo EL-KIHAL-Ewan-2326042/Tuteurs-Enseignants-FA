@@ -19,9 +19,9 @@ namespace Models;
 
 use Blog\Models\Internship;
 use Blog\Models\Model;
-use Includes\Database;
-use PHPUnit\Framework\TestCase;
+use includes\Database;
 use PHPUnit\Framework\MockObject\Exception;
+use PHPUnit\Framework\TestCase;
 
 /**
  * Classe gérant les tests PHPUnit du modèle Model

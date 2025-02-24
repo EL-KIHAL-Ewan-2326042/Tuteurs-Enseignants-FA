@@ -15,7 +15,8 @@
  * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
  * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
  */
-namespace Includes;
+
+namespace includes;
 
 /**
  * Autoloader qui permet de charger les fichiers nécessaires automatiquement
@@ -40,9 +41,9 @@ class Autoloader
      *
      * @return void
      */
-    static function register(): void
+    public static function register(): void
     {
-        spl_autoload_register(array(__CLASS__, 'autoload'));
+        spl_autoload_register([__CLASS__, 'autoload']);
     }
 
     /**
@@ -52,52 +53,33 @@ class Autoloader
      *
      * @return void
      */
-    static function autoload(string $class): void
+    public static function autoload(string $class): void
     {
+        $class = str_replace('\\', '/', $class);
 
-        if ($class === 'Includes\Database') {
-            include '_assets/includes/Database.php';
+        $baseDir = __DIR__ . '/../modules/';
+
+        if ($class === 'includes\Database') {
+            include __DIR__ . '/Database.php';
             return;
         }
 
         if (str_contains($class, 'Blog')) {
-            $replacements = [
-                '\\' => '/',
-                'Blog/' => '',
-            ];
-
-            $filename = str_replace(
-                array_keys($replacements),
-                array_values($replacements), $class
-            );
-            $path = 'modules/' . $filename . '.php';
+            $class = str_replace('Blog/', '', $class);
+            $file = $baseDir . $class . '.php';
         } elseif (str_contains($class, 'Test')) {
-            $replacements = [
-                '\\' => '/',
-                'Test/' => '',
-            ];
-
-            $filename = str_replace(
-                array_keys($replacements),
-                array_values($replacements), $class
-            );
-            include 'tests/' . $filename . '.php';
+            $file = __DIR__ .
+                '/../tests/' . str_replace('Test/', '', $class) . '.php';
+        } elseif (str_contains($class, 'Exception')) {
+            $file = __DIR__ . '/exceptions/' . basename($class) . '.php';
         } else {
-            $class = strtoupper(substr($class, 0, 1)) . substr($class, 1);
-
-            if (str_contains($class, 'Exception') !== false) {
-                $path = '_assets/includes/exceptions/' . $class . '.php';
-            } else {
-                $path = '_assets/includes/' . $class . '.php';
-            }
-
+            $file = __DIR__ . '/' . basename($class) . '.php';
         }
-        if (file_exists($path)) {
-            include $path;
+
+        if (file_exists($file)) {
+            include $file;
         } else {
-            include 'modules/Controllers/Error404.php';
+            include __DIR__ . '/../modules/Controllers/Error404.php';
         }
     }
-
-
 }

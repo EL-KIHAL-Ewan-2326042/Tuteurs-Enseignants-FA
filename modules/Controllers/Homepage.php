@@ -23,7 +23,7 @@ use Blog\Models\Internship;
 use Blog\Models\Student;
 use Blog\Models\Teacher;
 use Blog\Views\layout\Layout;
-use Includes\Database;
+use includes\Database;
 
 /**
  * Classe gérant les échanges de données entre

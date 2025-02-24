@@ -18,10 +18,10 @@
 namespace Models;
 
 use Blog\Models\User;
-use Includes\Database;
+use Exception;
+use includes\Database;
 use PDO;
 use PDOStatement;
-use Exception;
 use PHPUnit\Framework\TestCase;
 
 /**

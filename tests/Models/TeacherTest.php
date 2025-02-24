@@ -17,12 +17,12 @@
  */
 namespace Models;
 
-use Includes\Database;
+use Blog\Models\Teacher;
+use includes\Database;
 use PDO;
 use PDOStatement;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
-use Blog\Models\Teacher;
 
 /**
  * Classe gérant les tests PHPUnit du modèle Teacher

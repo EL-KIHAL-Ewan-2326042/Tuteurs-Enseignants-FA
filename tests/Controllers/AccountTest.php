@@ -19,7 +19,6 @@ namespace Controllers;
 
 use Blog\Controllers\Account;
 use Blog\Views\layout\Layout;
-use Includes\Database;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
 
