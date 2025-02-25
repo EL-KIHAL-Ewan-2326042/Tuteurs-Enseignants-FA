@@ -13,18 +13,19 @@ h3, h4 {
 }
 
 /* Style des boutons de la page */
-.btn{
+.btn {
     background-color : #00558B;
+}
+
+/* Style au survol de la souris sur pour les boutons de la page */
+.btn:hover {
+    background-color: #E8CE7E !important;
 }
 
 .text{
     color: #00558B;
     font-weight: bold;
     font-size: 18px;
-}
-/* Style au survol de la souris sur pour les boutons de la page */
-.btn:hover{
-    background-color: #E8CE7E;
 }
 
 main a {
