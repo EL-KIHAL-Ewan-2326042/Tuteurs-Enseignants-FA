@@ -791,7 +791,13 @@ document.addEventListener(
             thead.innerHTML = `
             <tr>
             <th>Enseignant</th>
-            <th>Historique</th>
+            <th>
+                <div class="tooltip-container tooltipped"
+                     data-tooltip="Dernier antécédent
+                     d'accompagnement"
+                     data-position="top">(?)</div>
+                HISTORIQUE
+            </th>
             <th>Position</th>
             <th>Discipline</th>
             <th>Entreprise</th>
@@ -931,13 +937,28 @@ document.addEventListener(
             }
             for (i = 0; i < rows[0].cells.length; ++i) {
                 column = rows[0].getElementsByTagName("TH")[i].innerHTML;
-                if (column.substring(column.length-1) === "▲" || column.substring(column.length-1) === "▼") { table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-2);
+                if (column.substring(column.length-1) === "▲" || column.substring(column.length-1) === "▼") {
+                    table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-2);
+                    if (i === 1 && n !== 1) {
+                        M.Tooltip.init(
+                            document.querySelectorAll('.tooltipped'), {
+                                exitDelay: 100,
+                            }
+                        );
+                    }
                 }
                 if (i === n) {
                     if (dir === "asc") { table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▲";
                     } else { table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▼";
                     }
                 }
+            }
+            if (n === 1) {
+                M.Tooltip.init(
+                    document.querySelectorAll('.tooltipped'), {
+                        exitDelay: 100,
+                    }
+                );
             }
         }
 
@@ -953,6 +974,11 @@ document.addEventListener(
                 );
             }
             sortTable(5);
+            M.Tooltip.init(
+                document.querySelectorAll('.tooltipped'), {
+                    exitDelay: 100,
+                }
+            );
         }
     }
 );
