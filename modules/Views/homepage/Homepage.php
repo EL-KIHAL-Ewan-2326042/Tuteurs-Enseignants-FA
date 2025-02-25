@@ -68,6 +68,8 @@ readonly class Homepage
     {
         ?>
         <main>
+            <?php if (in_array("Professeur", $_SESSION['roles'])) : ?>
+
             <h1 class="center-align">Demande de stagiaire/alternant</h1>
 
             <h2 class="center-align">Recherche d'étudiant</h2>
@@ -358,23 +360,23 @@ readonly class Homepage
 
             <div class="row"></div>
 
-            <?php
-            if (isset($_POST['selecDepSubmitted'])) {
-                echo "<script> sessionStorage.clear() </script>";
+                <?php
+                if (isset($_POST['selecDepSubmitted'])) {
+                    echo "<script> sessionStorage.clear() </script>";
 
-                if (isset($_POST['selecDep'])) {
-                    $_SESSION['selecDep'] = $_POST['selecDep'];
+                    if (isset($_POST['selecDep'])) {
+                        $_SESSION['selecDep'] = $_POST['selecDep'];
 
-                } else {
-                    unset($_SESSION['selecDep']);
+                    } else {
+                        unset($_SESSION['selecDep']);
+                    }
                 }
-            }
 
-            $departments = $this->teacherModel
-                ->getDepTeacher($_SESSION['identifier']);
-            if(!$departments) : ?>
+                $departments = $this->teacherModel
+                    ->getDepTeacher($_SESSION['identifier']);
+                if(!$departments) : ?>
                 <h6 class="left-align">Vous ne faîtes partie d'aucun département</h6>
-                    <?php
+                        <?php
                     else: ?>
                 <form method="post" class="center-align table">
                         <?php
@@ -589,7 +591,50 @@ readonly class Homepage
                         "<?php echo $_SESSION['selected_student']['address']; ?>";
                 <?php endif; ?>
             </script>
-            <?php unset($_SESSION['selected_student']); ?>
+                <?php unset($_SESSION['selected_student']);
+            endif;
+
+
+            if (in_array("Admin_dep", $_SESSION['roles'])) : ?>
+
+            <h1 class="center-align">Stages et alternances dans vos départements</h1>
+
+                <?php $table = array(); ?>
+
+            <div class="table">
+                <table class="highlight centered" id="admin-homepage-table">
+                    <thead <?php
+                    if (count($table) > 1) {
+                        echo 'class="clickable"';
+                    } ?>>
+                    <tr>
+                        <th>DEPARTEMENT</th>
+                        <th>ETUDIANT</th>
+                        <th>FORMATION</th>
+                        <th>GROUPE</th>
+                        <th>TUTEUR</th>
+                        <th>TYPE</th>
+                        <th>DATE DE DEBUT</th>
+                        <th>DATE DE FIN</th>
+                        <th>ENTREPRISE</th>
+                        <th>SUJET</th>
+                        <th>ADRESSE</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($table as $row): ?>
+                        <tr class="admin-homepage-row"
+                            data-selected-row="<?php
+                            echo str_replace('_', "'", $row['address'])
+                                . '$' . $row['student_name']
+                            ?>">
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+
+            <?php endif; ?>
         </main>
         <?php
     }

@@ -139,44 +139,51 @@ tbody {
 }
 
 #homepage-table,
-#search-table {
+#search-table,
+#admin-homepage-table {
     min-width: 800px;
     font-size: 14px;
     width: 100%;
 }
 
 #homepage-table th, #homepage-table td,
-#search-table th, #search-table td {
+#search-table th, #search-table td,
+#admin-homepage-table th, #admin-homepage-table td {
     padding: 6px 10px;
     text-align: center;
     border: 1px solid #ddd;
 }
 
 #homepage-table thead th,
-#search-table thead th {
+#search-table thead th,
+#admin-homepage-table thead th {
     background-color: #f4f4f4;
     font-weight: bold;
     font-size: 14px;
 }
 
 #homepage-table tbody tr:nth-child(even),
-#search-table tbody tr:nth-child(even) {
+#search-table tbody tr:nth-child(even),
+#admin-homepage-table tbody tr:nth-child(even) {
     background-color: #fafafa;
 }
 
 #homepage-table tbody tr:hover,
-#search-table tbody tr:hover {
+#search-table tbody tr:hover,
+#admin-homepage-table tbody tr:hover {
     background-color: #f1f1f1;
 }
 
 @media screen and (max-width: 768px) {
     #homepage-table,
-    #search-table  {
+    #search-table,
+    #admin-homepage-table {
         font-size: 12px;
     }
 
     #homepage-table th, #homepage-table td,
-    #search-table th, #search-table td {
+    #search-table th, #search-table td,
+    #admin-homepage-table th, #admin-homepage-table td {
         padding: 4px 8px;
     }
 }
@@ -260,6 +267,7 @@ main table {
         font-size: 0.47rem;
     }
 
+    width: 85%;
     border: solid #e0e0e0 1px;
 }
 
