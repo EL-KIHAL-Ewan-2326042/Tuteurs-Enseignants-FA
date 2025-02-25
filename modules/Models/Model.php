@@ -329,7 +329,7 @@ class Model
     {
         // Ouverture du fichier CSV et lecture de la première ligne (les en-têtes)
         if (($handle = fopen($csvFilePath, "r")) !== false) {
-            $headers = fgetcsv($handle, 1000, ";");
+            $headers = fgetcsv($handle, 1000, ",");
             fclose($handle);
             return $headers ?: [];
         }
@@ -364,7 +364,7 @@ class Model
             // Crée une exception avec les colonnes CSV qui causent l'erreur
             throw new Exception(
                 "Les colonnes CSV ne correspondent pas à la table "
-                . $tableName . " ou aux valeurs demandées pour la table teacher. "
+                . $tableName . " ou aux valeurs demandées pour la table teacher pour une insertion de stage. "
             );
         } else {
             return true;
@@ -388,7 +388,7 @@ class Model
         }
 
         // Lecture le première ligne du fichier
-        $headers = fgetcsv($handle, 1000, ";");
+        $headers = fgetcsv($handle, 1000, ",");
 
         // Vérifie que les en-têtes du fichier
         // correspondent à celles de la base de données
@@ -399,7 +399,7 @@ class Model
 
         try {
             // Insertion des données
-            while (($data = fgetcsv($handle, 1000, ";")) !== false) {
+            while (($data = fgetcsv($handle, 1000, ",")) !== false) {
                 $this->insertIntoDatabase($data, $tableName);
             }
             fclose($handle);
@@ -455,6 +455,9 @@ class Model
     {
         // Colonnes pour la table student
         $studentColumns = $this->getTableColumn('student');
+        if (count($studentColumns) !== count($data)) {
+            throw new Exception();
+        }
         $studentData = array_combine($studentColumns, $data);
 
         // Insertion dans la table student
@@ -507,6 +510,9 @@ class Model
         ];
         // Colonnes pour la table teacher
         $teacherColumns = $this->getTableColumn('teacher');
+        if (count($teacherColumns) !== count($data)) {
+            throw new Exception();
+        }
         $teacherData = array_combine($teacherColumns, $teacher);
 
         // Insertion dans la table teacher
@@ -547,6 +553,9 @@ class Model
     {
         // Colonnes pour la table internship
         $internshipColumns = $this->getTableColumn('internship');
+        if (count($internshipColumns) !== count($data)) {
+            throw new Exception();
+        }
         $internshipData = array_combine($internshipColumns, $data);
 
         $idTeacher = $internshipData['id_teacher'] ?? null;
@@ -644,7 +653,7 @@ class Model
         }
 
         // Ecriture des en-têtes dans le fichier CSV
-        fputcsv($output, $headers, ';');
+        fputcsv($output, $headers, ',');
 
         // Vérification des en-têtes
         if (empty($headers)) {
@@ -677,7 +686,7 @@ class Model
                 default => throw new Exception("Table non reconnue : " . $tableName),
             };
         } else {
-            $query = "SELECT teacher.maxi_number_trainees, teacher.id_teacher, "
+            $query = "SELECT teacher.maxi_number_intern, teacher.maxi_number_apprentice, teacher.id_teacher, "
                         . "teacher.teacher_name, teacher.teacher_firstname, "
                         . "CONCAT(has_address.address, '$', has_address.type) "
                             . "AS address_type, "
@@ -714,7 +723,7 @@ class Model
                     unset($row['discipline_name']);
                 }
             }
-            fputcsv($output, $row, ';');
+            fputcsv($output, $row, ',');
         }
         fclose($output);
         $csvData = ob_get_clean();
@@ -740,7 +749,7 @@ class Model
         header('Content-Type: text/csv');
         header(
             'Content-Disposition: attachment; filename="'
-            . $tableName . '_export.csv"'
+            . $tableName . '_export_modele.csv"'
         );
         header('Pragma: no-cache');
         header('Expires: 0');
@@ -766,7 +775,7 @@ class Model
         }
 
         // Ecriture des en-têtes dans le fichier CSV
-        fputcsv($output, $columns, ';');
+        fputcsv($output, $columns, ',');
 
         fclose($output);
         $csvData = ob_get_clean();
