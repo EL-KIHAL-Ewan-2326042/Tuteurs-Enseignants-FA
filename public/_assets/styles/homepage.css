@@ -80,11 +80,13 @@ main .card-panel {
     background-color: #00558B;
     z-index: 0;
 }
-.btn-annuler{
+
+.btn-annuler {
     background-color: #B30C00 !important;
 }
+
 .btn:hover {
-    background-color: #E8CE7E;
+    background-color: #E8CE7E !important;
 }
 
 /* Style des options dans le menu déroulant du select */
