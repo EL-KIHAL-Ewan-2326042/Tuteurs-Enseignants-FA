@@ -92,8 +92,7 @@ function fetchResults(query, searchType)
  * @param data The data received from the server.
  * @param action The action used to determine how to display the results.
  */
-function displayResults(data, action)
-{
+function displayResults(data, action) {
     if (searchResults) {
         searchResults.innerHTML = '';
     }
@@ -104,48 +103,38 @@ function displayResults(data, action)
     }
 
     const ul = document.createElement('ul');
-    data.forEach(
-        item =>
-        {
-            const li = document.createElement('li');
-            const a = document.createElement('a');
+    data.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = action === 'searchTeacher'
+            ? `${item.teacher_name} ${item.teacher_firstname} (ID: ${item.id_teacher})`
+            : item.company_name
+                ? `${item.company_name}: ${item.internship_identifier} - ${item.student_name} ${item.student_firstname}`
+                : `${item.student_number} - ${item.student_name} ${item.student_firstname}`;
+
+        li.classList.add('left-align', 'clickable-result');
+        li.addEventListener('click', (event) => {
+            event.preventDefault();
+
             if (action === 'searchTeacher') {
-                a.textContent = `${item.teacher_name} ${item.teacher_firstname} (ID: ${item.id_teacher})`;
-                a.href = '#';
-                a.addEventListener(
-                    'click', (event) =>
-                    {
-                        event.preventDefault();
-                        const inputField = document.getElementById('searchTeacher');
-                        if (inputField) {
-                            inputField.value = `${item.id_teacher}`;
-                        }
-                    }
-                );
-            } else if (action === 'searchInternship') {
-                    a.textContent = item.company_name
-                    ? `${item.company_name}: ${item.internship_identifier} - ${item.student_name} ${item.student_firstname}`
-                    : `${item.student_number} - ${item.student_name} ${item.student_firstname}`;
-                    a.href = '#';
-                    a.addEventListener(
-                        'click', (event) =>
-                        {
-                            event.preventDefault();
-                            const inputField = document.getElementById('searchInternship');
-                            if (inputField) {
-                                inputField.value = `${item.internship_identifier}`;
-                            }
-                        }
-                    );
+                const teacherField = document.getElementById('searchTeacher');
+                if (teacherField) {
+                    teacherField.value = `${item.id_teacher}`;
+                }
             }
 
-                a.classList.add('left-align');
-            li.appendChild(a);
-            ul.appendChild(li);
-        }
-    );
+            if (action === 'searchInternship') {
+                const internshipField = document.getElementById('searchInternship');
+                if (internshipField) {
+                    internshipField.value = `${item.internship_identifier}`;
+                }
+            }
+        });
+
+        ul.appendChild(li);
+    });
     searchResults.appendChild(ul);
 }
+
 
 /**
  * Partie 2: Coefficients
@@ -645,37 +634,25 @@ document.addEventListener(
 
         if (tableBody) {
             ['click', 'touchstart'].forEach(
-                function (eventType) {
-                    tableBody.addEventListener(
-                        eventType, function (event) {
-                            if (event.target.tagName === 'I'
-                                && event.target.classList.contains('material-icons')
-                            ) {
-                                const clickedRow = getClickedRow(event.target);
-                                if (!clickedRow) {
-                                    return;
-                                }
-
-                                const clickedRowIdentifier =
-                                clickedRow.getAttribute('data-internship-identifier');
-                                const [
-                                internshipIdentifier,
-                                idTeacher,
-                                internshipAddress
-                                ] = clickedRowIdentifier.split('$');
-
-                                if (event.target.textContent === 'face') {
-                                    getTeachersForInternship(internshipIdentifier);
-                                    event.preventDefault();
-                                } else if (event.target.textContent === 'map') {
-                                    updateMap(internshipAddress, idTeacher).then();
-                                    event.preventDefault();
-                                }
-                            }
-                        }
+                function (eventType
+                ) {
+                tableBody.addEventListener(
+                    eventType, function (event
+                    ) {
+                    const clickedRow = event.target.closest(
+                        'tr.dispatch-row'
                     );
-                }
-            );
+                    if (!clickedRow) {
+                        return;
+                    }
+
+                    const clickedRowIdentifier = clickedRow.getAttribute('data-internship-identifier');
+                    const [internshipIdentifier, idTeacher, internshipAddress] = clickedRowIdentifier.split('$');
+
+                    getTeachersForInternship(internshipIdentifier);
+                    updateMap(internshipAddress, idTeacher).then();
+                });
+            });
         }
 
         function getClickedRow(element)
