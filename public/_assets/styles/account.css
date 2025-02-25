@@ -10,6 +10,12 @@ main {
     align-items: flex-start;
 }
 
+h1 {
+    font-size: 2.92rem;
+    margin: 1.95rem 0 1.168rem 0;
+    color: var(--main-color);
+}
+
 h2 {
     font-size: 1.64rem;
     margin: 1.1rem 0 0.656rem 0;
@@ -33,17 +39,12 @@ main a:hover {
     z-index: 0;
 }
 
-h1 {
-    font-size: 2.92rem;
-    margin: 1.95rem 0 1.168rem 0;
-}
-
 .btn-annuler {
     background-color: #B30C00 !important;
 }
 
 .btn:hover {
-    background-color: #E8CE7E;
+    background-color: #E8CE7E !important;
 }
 
 /* Style des options dans le menu déroulant du select */

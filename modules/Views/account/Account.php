@@ -140,7 +140,7 @@ class Account
                 <div>
                 <?php
 
-                echo '<h2>';
+                echo '<h2 class="center-align">';
                 if ($internship > 0) {
                     echo "Vous tutorez <strong>" . $internship
                     . "</strong> stage" . ($internship !== 1 ? "s" :'');
@@ -151,7 +151,7 @@ class Account
                     echo " sur un maximum de " . $result['intern'];
                 }
 
-                echo '</h2><h2>';
+                echo '</h2><h2 class="center-align">';
 
                 if ($alternance > 0) {
                     echo "Vous tutorez <strong>" . $alternance
@@ -285,7 +285,13 @@ class Account
                         <th>ETUDIANT</th>
                         <th>FORMATION</th>
                         <th>GROUPE</th>
-                        <th>HISTORIQUE</th>
+                        <th>
+                            <div class="tooltip-container tooltip"
+                                 data-tooltip="Dernier antécédent
+                                 d'accompagnement"
+                                 data-position="top">(?)</div>
+                            HISTORIQUE
+                        </th>
                         <th>TYPE</th>
                         <th>ENTREPRISE</th>
                         <th>SUJET</th>
