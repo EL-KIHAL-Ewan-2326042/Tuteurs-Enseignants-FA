@@ -531,7 +531,9 @@ document.addEventListener(
                 column = rows[0].getElementsByTagName("TH")[i].innerHTML;
                 if (column.substring(column.length-1) === "▲" || column.substring(column.length-1) === "▼") {
                     table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-2);
-                    if (i > 6 && n <= 6) {
+                    if ((i > 6 && n <= 6)
+                        || (i === 3 && n !== 3)
+                    ) {
                         M.Tooltip.init(
                             document.querySelectorAll('.tooltip'), {
                                 exitDelay: 100,
@@ -546,7 +548,7 @@ document.addEventListener(
                     }
                 }
             }
-            if (n > 6) {
+            if (n > 6 || n === 3) {
                 M.Tooltip.init(
                     document.querySelectorAll('.tooltip'), {
                         exitDelay: 100,

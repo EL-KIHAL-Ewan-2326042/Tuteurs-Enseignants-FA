@@ -68,8 +68,9 @@ readonly class Homepage
     {
         ?>
         <main>
-            <h1 class="center-align
-            flow-text">Répartiteur de tuteurs enseignants</h1>
+            <h1 class="center-align">Demande de stagiaire/alternant</h1>
+
+            <h2 class="center-align">Recherche d'étudiant</h2>
 
             <div class="card-panel white">
                 <label ="Numéro Etudiant"
@@ -82,8 +83,9 @@ readonly class Homepage
                                 <select id="searchType" name="searchType"
                                         aria-label="Type de recherche">
                                     <option value="studentNumber"
-                                            selected>Numéro Etudiant</option>
-                                    <option value="name">Nom et Prénom</option>
+                                            >Numéro Etudiant</option>
+                                    <option value="name"
+                                            selected>Nom et Prénom</option>
                                     <option value="company">Entreprise</option>
                                 </select>
                             </div>
@@ -197,7 +199,13 @@ readonly class Homepage
                                     <tr>
                                         <th>FORMATION</th>
                                         <th>GROUPE</th>
-                                        <th>HISTORIQUE</th>
+                                        <th>
+                                            <div class="tooltip-container tooltip"
+                                                 data-tooltip="Dernier antécédent
+                                                 d'accompagnement"
+                                                 data-position="top">(?)</div>
+                                            HISTORIQUE
+                                        </th>
                                         <th>ENTREPRISE</th>
                                         <th>SUJET</th>
                                         <th>ADRESSE</th>
@@ -252,7 +260,7 @@ readonly class Homepage
                                             <td>~<?php
                                                 echo $distance . " minute"
                                                     . ($distance > 1 ? "s" : "")
-                                                ?></td>
+                                            ?></td>
                                             <td>
                             <?php
                             if (!$inDep) {
@@ -346,7 +354,7 @@ readonly class Homepage
                 ?>
             </div>
 
-            <h2 class="center flow-text">Sélectionnez le(s) département(s) :</h2>
+            <h2 class="center-align">Sélectionnez le(s) département(s) :</h2>
 
             <div class="row"></div>
 
@@ -417,7 +425,13 @@ readonly class Homepage
                                     <th>ETUDIANT</th>
                                     <th>FORMATION</th>
                                     <th>GROUPE</th>
-                                    <th>HISTORIQUE</th>
+                                    <th>
+                                        <div class="tooltip-container tooltip"
+                                             data-tooltip="Dernier antécédent
+                                             d'accompagnement"
+                                             data-position="top">(?)</div>
+                                        HISTORIQUE
+                                    </th>
                                     <th>ENTREPRISE</th>
                                     <th>SUJET</th>
                                     <th>ADRESSE</th>
@@ -488,7 +502,7 @@ readonly class Homepage
                                         <td>~<?php echo
                                                 $row['duration'] . " minute"
                                                 . ($row['duration'] > 1 ? "s" : "")
-                                            ?></td>
+                                        ?></td>
                                         <td>
                                             <label class="center">
                                                 <input type="checkbox"
