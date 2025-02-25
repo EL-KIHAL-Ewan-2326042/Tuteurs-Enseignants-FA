@@ -22,8 +22,7 @@ use Blog\Models\Model;
 use Blog\Views\layout\Layout;
 use Exception;
 use includes\Database;
-require_once 'includes/Database.php';
-
+    
 /**
  * Classe gérant les échanges de données entre
  * le modèle et la vue de la page 'Gestion des données'
