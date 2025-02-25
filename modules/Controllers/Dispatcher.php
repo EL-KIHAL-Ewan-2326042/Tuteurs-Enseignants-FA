@@ -150,8 +150,6 @@ class Dispatcher
      */
     public function show(): void
     {
-
-
         if (isset($_SESSION['role_name'])
             && ((is_array($_SESSION['role_name'])
             && in_array('Admin_dep', $_SESSION['role_name']))
@@ -304,7 +302,7 @@ class Dispatcher
                 $checkMessageDirectAssoc = $tmpmessage[1];
             }
 
-            if (isset($_POST['selectStudentSubmitted'])
+            if (isset($_POST['selecInternshipSubmitted'])
                 && isset($_POST['listTupleAssociate'])
             ) {
                 $tmpmessage = $this

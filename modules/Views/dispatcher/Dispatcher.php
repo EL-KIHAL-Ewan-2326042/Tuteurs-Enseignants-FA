@@ -223,6 +223,24 @@ class Dispatcher
                                 $btnValue = "Enregistrer";
                             }
                             ?>
+
+                            <div class="row">
+                                <div class="col s12 m8 l8">
+                                    <div>
+                                        <button class="btn waves-effect
+                                        waves-light button-margin tooltipped"
+                                                type="submit" name="action"
+                                                value="generate" id="generate-btn"
+                                                data-position="top"
+                                                data-tooltip=
+                                                "Commencer la répartition">
+                                            Générer
+                                            <i class="material-icons right">send</i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="row">
                                 <div class="col s12 m8 l8">
                                     <div class="flex-container">
@@ -249,21 +267,6 @@ class Dispatcher
                                             <?php echo $btnValue ?>
                                             <i class=
                                             "material-icons right">arrow_downward</i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div class="col s12">
-                                    <div>
-                                        <button class="btn waves-effect
-                                        waves-light button-margin tooltipped"
-                                                type="submit" name="action"
-                                                value="generate" id="generate-btn"
-                                                data-position="top"
-                                                data-tooltip=
-                                                "Commencer la répartition">
-                                            Générer
-                                            <i class="material-icons right">send</i>
                                         </button>
                                     </div>
                                 </div>
@@ -496,29 +499,23 @@ class Dispatcher
                                 </button>
                             </div>
 
+                            <br>
 
-                            <div>
-                                <button class="btn waves-effect
-                                waves-light button-margin tooltipped"
-                                        type="submit" name="action-save"
-                                        value="<?php echo $id_backup ?>"
-                                        id="save-btn"
-                                        data-position="top"
-                                        data-tooltip="Enregistrer la sauvegarde">
-                                    Enregister
-                                    <i class="material-icons
-                                    right">arrow_downward</i>
-                                </button>
-                                <button class="btn waves-effect
-                                waves-light button-margin tooltipped"
-                                        type="submit" name="action"
-                                        value="generate" id="generate-btn"
-                                        data-position="top"
-                                        data-tooltip="Commencer la répartition">
-                                    Générer
-                                    <i class="material-icons right">send</i>
-                                </button>
+                            <div class="inline center">
+                                <button class=
+                                        "waves-effect waves-light btn tooltipped red"
+                                        type="reset" id="resetForm"
+                                        name="resetForm"
+                                        data-position="top" data-tooltip=
+                                        "Annuler les modifications">Annuler</button>
+                                <button class="waves-effect
+                                        waves-light btn tooltipped"
+                                        name="selecInternshipSubmitted" value="1"
+                                        type="submit" data-position="top"
+                                        data-tooltip=
+                                        "Envoyer vos choix">Valider</button>
                             </div>
+
                             <br>
                             <br>
 
