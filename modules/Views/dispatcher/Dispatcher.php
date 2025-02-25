@@ -398,20 +398,12 @@ class Dispatcher
                                         ' ' . $resultDispatch['student_name'] . ' ('
                                         . $resultDispatch['student_number'] . ')'; ?>
                                     <br>
-                                    <i class="material-icons clickable tooltipped"
-                                       data-position="top"
-                                       data-tooltip=
-                                       "Afficher la vue étudiante ">face</i>
                                 </td>
                                 <td>
                                     <?php echo $resultDispatch['company_name'] . ' ('
                                         . $resultDispatch['internship_identifier']
                                         . ')'; ?>
                                     <br>
-                                    <i class="material-icons clickable tooltipped"
-                                       data-position="top"
-                                       data-tooltip=
-                                       "Voir la position de l'entreprise">map</i>
                                 </td>
 
                                 <td>
