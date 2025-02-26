@@ -662,11 +662,23 @@ readonly class Homepage
                                         ) === "internship" ? "Stage" : "Alternance";
                                         ?></td>
                                     <td><?php
-                                        echo $row["start_date_internship"]
-                                    ?></td>
+                                        echo substr(
+                                            $row["start_date_internship"], -2
+                                        ) . '/' . substr(
+                                            $row["start_date_internship"], 5, 2
+                                        ) . '/' . substr(
+                                            $row["start_date_internship"], 0, 4
+                                        )
+                                        ?></td>
                                     <td><?php
-                                        echo $row["end_date_internship"]
-                                    ?></td>
+                                        echo substr(
+                                            $row["end_date_internship"], -2
+                                        ) . '/' . substr(
+                                            $row["end_date_internship"], 5, 2
+                                        ) . '/' . substr(
+                                            $row["end_date_internship"], 0, 4
+                                        )
+                                        ?></td>
                                     <td><?php
                                         echo str_replace(
                                             '_', ' ',
