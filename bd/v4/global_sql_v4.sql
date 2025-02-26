@@ -118,9 +118,10 @@ CREATE TABLE Has_role(
     User_id VARCHAR(10),
     Role_name VARCHAR(50) NOT NULL,
     Department_name VARCHAR(50) NOT NULL,
-    PRIMARY KEY(User_id, Role_name),
+    PRIMARY KEY(User_id, Role_name, Department_name),
     FOREIGN KEY(User_id) REFERENCES User_connect(User_id),
-    FOREIGN KEY(Role_name) REFERENCES Role(Role_name)
+    FOREIGN KEY(Role_name) REFERENCES Role(Role_name),
+    FOREIGN KEY(Department_name) REFERENCES Department(Department_name)
 );
 
 CREATE TABLE Study_at(
@@ -583,12 +584,12 @@ INSERT INTO User_connect (User_id, User_pass) VALUES ('C45328794', '$2y$10$d1t0m
 INSERT INTO User_connect (User_id, User_pass) VALUES ('H48344613', '$2y$10$DqXmxG1udGp82W05ShrQc.FVp81iW4IEIKSwosD6fNXM0zGF0uMGu');
 INSERT INTO User_connect (User_id, User_pass) VALUES ('R41814241', '$2y$10$UogEny9ZpSiEZ7FoFbLxmeW.FSmtTGFZ0rGNdvJkdf8H8zFidGAuC');
 -- insert pour les prof de TC et GEA
-INSERT INTO User_connect (User_id, User_pass) VALUES ('A12345678', '$2y$10$Px3DIuPvY5UCPv8201EAOORdbch5tUUVOS8DyYsFeMYAM6WJIHo4G');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('A12345678', '$2y$10$GFeWUcSCUpZeUwhn5.G31.NsdljqJJy5V4IjbBbhBb1yPUXvPzVbm');
 INSERT INTO User_connect (User_id, User_pass) VALUES ('B23456789', '$2y$10$XMfBq27RP1Mv3B6jOW9LbO/6Y9ngozLp0U6S9W0wBp3aRI7PjJFs2');
 INSERT INTO User_connect (User_id, User_pass) VALUES ('C34567890', '$2y$10$Eb41ZbnjMKqAVnJBDXqFSe0MyDMU0NNX0R0XNoX7IgW57/K.0Bo2G');
 INSERT INTO User_connect (User_id, User_pass) VALUES ('D45678901', '$2y$10$LqX4MIWZcOanXbPAXrG5zu9F/E.pvP9kYV1RVZqq2MewhihV8BRZ2');
 INSERT INTO User_connect (User_id, User_pass) VALUES ('E56789012', '$2y$10$8A9M7wF2DXR9wbpdM1RLpO5FViBtT5By0lqbxNiyUXKLmkroBhYJi');
-INSERT INTO User_connect (User_id, User_pass) VALUES ('F67890123', '$2y$10$4BCm.CNTLl3wMMGkDyaT2OqJ0ur62Lk3b7vvRvF/CkxplJrBLfpxq');
+INSERT INTO User_connect (User_id, User_pass) VALUES ('F67890123', '$2y$10$jo0JrKZeM1BzKgjABrjzbOLWr2g6TwVNy4LtRN16Y4Giq7Uy3QLh.');
 INSERT INTO User_connect (User_id, User_pass) VALUES ('G78901234', '$2y$10$BMAaFUsO/1xgKiM4A7vg6ON9THfb9Hbfg9ZQKni6sC/3vqeBPJdi6');
 INSERT INTO User_connect (User_id, User_pass) VALUES ('H89012345', '$2y$10$vbTkNDWh6Kr2SHcGH4yADONH8NKhM6VHZSkGCR3VoBr/LlbWGLwxi');
 INSERT INTO User_connect (User_id, User_pass) VALUES ('I90123456', '$2y$10$ISrrFWkUhbb2b3y7/9NdHeEDJNOFqsV58CGuTqLp1Fg3clAho.U/q');
@@ -870,6 +871,7 @@ INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('O75041198', 
 INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('V73654623', 'Professeur', 'IUT_INFO_AIX');
 INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('Z17235374', 'Professeur', 'IUT_INFO_AIX');
 INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('R84623671', 'Professeur', 'IUT_INFO_AIX');
+INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('F67890123', 'Professeur', 'IUT_INFO_AIX');
 INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('D78106598', 'Professeur', 'IUT_INFO_AIX');
 INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('S85694088', 'Professeur', 'IUT_INFO_AIX');
 INSERT INTO Has_role (User_id, Role_name, Department_name) VALUES ('Y68664772', 'Professeur', 'IUT_INFO_AIX');
