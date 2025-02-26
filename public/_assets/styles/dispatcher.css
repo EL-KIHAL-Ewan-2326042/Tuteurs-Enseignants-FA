@@ -1,5 +1,15 @@
 @import "global.css";
 
+main {
+    flex-direction: column;
+}
+
+.center {
+    justify-content: center;
+    width: 90%;
+    align-items: flex-start;
+}
+
 .button-margin {
     margin-top: var(--medium-spacing);
 }
@@ -80,6 +90,12 @@ input[type="checkbox"].filled-in:checked + span:after {
 @media screen and (max-width: 768px) {
     #map {
         height: 400px;
+    }
+}
+
+@media screen and (max-width: 640px) {
+    .center {
+        width: 80%;
     }
 }
 
