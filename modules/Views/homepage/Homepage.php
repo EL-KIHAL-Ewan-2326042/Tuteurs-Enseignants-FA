@@ -599,42 +599,97 @@ readonly class Homepage
 
             <h1 class="center-align">Stages et alternances dans vos départements</h1>
 
-                <?php $table = array(); ?>
+                <?php
+                if (!isset($departments)) {
+                    $departments = $this->teacherModel
+                        ->getDepTeacher($_SESSION['identifier']);
+                }
+                $table = $this->internshipModel
+                    ->getInternshipsWithTutor($departments);
 
-            <div class="table">
-                <table class="highlight centered" id="admin-homepage-table">
-                    <thead <?php
-                    if (count($table) > 1) {
-                        echo 'class="clickable"';
-                    } ?>>
-                    <tr>
-                        <th>DEPARTEMENT</th>
-                        <th>ETUDIANT</th>
-                        <th>FORMATION</th>
-                        <th>GROUPE</th>
-                        <th>TUTEUR</th>
-                        <th>TYPE</th>
-                        <th>DATE DE DEBUT</th>
-                        <th>DATE DE FIN</th>
-                        <th>ENTREPRISE</th>
-                        <th>SUJET</th>
-                        <th>ADRESSE</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <?php foreach ($table as $row): ?>
-                        <tr class="admin-homepage-row"
-                            data-selected-row="<?php
-                            echo str_replace('_', "'", $row['address'])
-                                . '$' . $row['student_name']
-                            ?>">
-                        </tr>
-                    <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
+                if ($table && sizeof($table) > 0) : ?>
 
-            <?php endif; ?>
+                    <div class="table">
+                        <table class="highlight centered" id="admin-homepage-table">
+                            <thead <?php
+                            if (count($table) > 1) {
+                                echo 'class="clickable"';
+                            } ?>>
+                                <tr>
+                                    <th>DEPARTEMENT</th>
+                                    <th>ETUDIANT</th>
+                                    <th>FORMATION</th>
+                                    <th>GROUPE</th>
+                                    <th>TUTEUR</th>
+                                    <th>TYPE</th>
+                                    <th>DATE DE DEBUT</th>
+                                    <th>DATE DE FIN</th>
+                                    <th>ENTREPRISE</th>
+                                    <th>SUJET</th>
+                                    <th>ADRESSE</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            <?php foreach ($table as $row) : ?>
+                                <tr class="admin-homepage-row">
+                                    <td><?php
+                                        echo str_replace(
+                                            '_', ' ', $row['department_name']
+                                        )
+                                        ?></td>
+                                    <td><?php
+                                        echo $row["student_name"] . " " .
+                                            $row["student_firstname"]
+                                    ?></td>
+                                    <td><?php
+                                        echo str_replace(
+                                            '_', ' ',
+                                            $row["formation"]
+                                        )
+                                        ?></td>
+                                    <td><?php
+                                        echo str_replace(
+                                            '_', ' ', $row["class_group"]
+                                        )
+                                        ?></td>
+                                    <td><?php
+                                        echo $row["teacher_name"] . " " .
+                                            $row["teacher_firstname"]
+                                    ?></td>
+                                    <td><?php
+                                        echo strtolower(
+                                            $row["type"]
+                                        ) === "internship" ? "Stage" : "Alternance";
+                                        ?></td>
+                                    <td><?php
+                                        echo $row["start_date_internship"]
+                                    ?></td>
+                                    <td><?php
+                                        echo $row["end_date_internship"]
+                                    ?></td>
+                                    <td><?php
+                                        echo str_replace(
+                                            '_', ' ',
+                                            $row["company_name"]
+                                        )
+                                        ?></td>
+                                    <td><?php
+                                        echo str_replace(
+                                            '_', ' ', $row["internship_subject"]
+                                        )
+                                        ?></td>
+                                    <td><?php
+                                        echo str_replace(
+                                            '_', "'", $row['address']
+                                        )
+                                        ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif;
+            endif; ?>
         </main>
         <?php
     }
