@@ -88,239 +88,242 @@ class Dispatcher
             </h3>
             <?php
             if (!isset($_POST['action']) || $_POST['action'] !== 'generate') : ?>
-            <div class="row" id="forms-section">
-                <div class="col card-panel white z-depth-3 s10 m5 l5"
-                     style="padding: 20px; margin-right: 10px">
-                    <form class="col s12" action="./dispatcher"
-                          method="post" onsubmit="showLoading();">
-                        <?php
-                        $saves = $this->userModel
-                            ->showCoefficients($_SESSION['identifier']);
-                        if ($saves) : ?>
-                        <div class="input-field">
-                            <label
-                            for="save-selector"
-                            >Sélectionnez une sauvegarde</label>
-                            <br><br>
-                            <select id="save-selector" name="save-selector">
-                                <option
-                                value="new">Nouvelle Sauvegarde
-                                </option>
-                                <?php foreach ($saves as $save): ?>
-                                    <?php $id_backup = $save['id_backup'];
-                                          $name_save = $save['name_save'];?>
-                                <option value="<?php echo $id_backup; ?>"
-                                    <?php
-                                    if (isset($_POST['save-selector'])) {
-                                        $saveSelected
-                                            = $_POST['save-selector'];
-                                    }
-                                    if (isset($_POST['save-selector'])
-                                        && $saveSelected == $id_backup
-                                    ) : ?>
-                                selected
-                                    <?php endif; ?>
-                                ><?php echo $name_save; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                        <?php endif; ?>
-
-
-                        <?php
-                        unset($id_backup);
-                        $id_backup = $_POST['save-selector'] ?? 'new';
-                        $name_save = '';
-
-                        if ($id_backup === 'new'
-                            || $id_backup === 'default'
-                            || $id_backup === 'i'
-                        ) {
-                            $defaultCriteria = $this->
-                            userModel->getDefaultCoef();
-                            $listCriteria = [];
-                            foreach ($defaultCriteria as $key => $value) {
-                                $listCriteria[$key] = $value;
-                            }
-                            $name_save = 'Nouvelle sauvegarde';
-                        } else {
-                            $listCriteria = $this->userModel->loadCoefficients(
-                                $_SESSION['identifier'],
-                                $id_backup
-                            );
-                            $name_save = $listCriteria[0]['name_save'];
-                        }
-                        ?>
-
-                        <?php foreach ($listCriteria as $criteria):
-                            $value = $criteria['coef'];
-                            $name = $criteria['name_criteria'];
-                            $description = $criteria['description'];
-                            ?>
-                            <div class="row">
-                                <div class="col s6">
-                                    <p>
-                                        <label>
-                                           <input type="hidden"
-                                           name="is_checked[<?php echo $name;?>]"
-                                           value="0">
-                                            <input type="checkbox"
-                                               class=
-                                               "filled-in criteria-checkbox"
-                                               name=
-                                               "criteria_on[<?php echo $name;?>]"
-                                       data-coef-input-id="<?php echo $name; ?>"
-                                               <?php
-                                                if ($criteria['is_checked']
+                <div class="row" id="forms-section">
+                    <div class="col card-panel white z-depth-3 s10 m5 l5"
+                         style="padding: 20px; margin-right: 10px">
+                        <form class="col s12" action="./dispatcher"
+                              method="post" onsubmit="showLoading();">
+                            <?php
+                            $saves = $this->userModel
+                                ->showCoefficients($_SESSION['identifier']);
+                            if ($saves) : ?>
+                                <div class="input-field">
+                                    <label
+                                            for="save-selector"
+                                    >Sélectionnez une sauvegarde</label>
+                                    <br><br>
+                                    <select id="save-selector" name="save-selector">
+                                        <option
+                                                value="new">Nouvelle Sauvegarde
+                                        </option>
+                                        <?php foreach ($saves as $save): ?>
+                                            <?php $id_backup = $save['id_backup'];
+                                            $name_save = $save['name_save'];?>
+                                            <option value="<?php echo $id_backup; ?>"
+                                                <?php
+                                                if (isset($_POST['save-selector'])) {
+                                                    $saveSelected
+                                                        = $_POST['save-selector'];
+                                                }
+                                                if (isset($_POST['save-selector'])
+                                                    && $saveSelected == $id_backup
                                                 ) : ?>
-                                               checked="checked"
+                                                    selected
+                                                <?php endif; ?>
+                                            ><?php echo $name_save; ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            <?php endif; ?>
+
+
+                            <?php
+                            unset($id_backup);
+                            $id_backup = $_POST['save-selector'] ?? 'new';
+                            $name_save = '';
+
+                            if ($id_backup === 'new'
+                                || $id_backup === 'default'
+                                || $id_backup === 'i'
+                            ) {
+                                $defaultCriteria = $this->
+                                userModel->getDefaultCoef();
+                                $listCriteria = [];
+                                foreach ($defaultCriteria as $key => $value) {
+                                    $listCriteria[$key] = $value;
+                                }
+                                $name_save = 'Nouvelle sauvegarde';
+                            } else {
+                                $listCriteria = $this->userModel->loadCoefficients(
+                                    $_SESSION['identifier'],
+                                    $id_backup
+                                );
+                                $name_save = $listCriteria[0]['name_save'];
+                            }
+                            ?>
+
+                            <?php foreach ($listCriteria as $criteria):
+                                $value = $criteria['coef'];
+                                $name = $criteria['name_criteria'];
+                                $description = $criteria['description'];
+                                ?>
+                                <div class="row">
+                                    <div class="col s6">
+                                        <p>
+                                            <label>
+                                                <input type="hidden"
+                                                   name=
+                                                   "is_checked[<?php echo $name;?>]"
+                                                   value="0">
+                                                <input type="checkbox"
+                                                   class=
+                                                   "filled-in criteria-checkbox"
+                                                   name=
+                                                   "criteria_on[<?php echo $name;?>]"
+                                                   data-coef-input-id=
+                                                       "<?php echo $name; ?>"
                                                     <?php
-                                                endif; ?> />
-                                            <span class="tooltipped"
-                                            data-position="top"
-                                            data-tooltip=
-                                              "<?php echo $description ?>">
+                                                    if ($criteria['is_checked']
+                                                    ) : ?>
+                                                        checked="checked"
+                                                        <?php
+                                                    endif; ?> />
+                                                <span class="tooltipped"
+                                                      data-position="top"
+                                                      data-tooltip=
+                                                      "<?php echo $description ?>">
                                                 <?php echo $name; ?>
                                             </span>
-                                        </label>
-                                    </p>
+                                            </label>
+                                        </p>
+                                    </div>
+                                    <div class="col s6">
+                                        <div class="input-field">
+                                            <input type="number" class="coef-input"
+                                                   name="coef[<?php echo $name; ?>]"
+                                                   id="<?php echo $name; ?>"
+                                                   min="1" max="100"
+                                                   value="<?php echo $value ?>"
+                                            />
+                                            <label for="<?php echo $name; ?>">Coeff
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col s6">
-                                    <div class="input-field">
-                                        <input type="number" class="coef-input"
-                                           name="coef[<?php echo $name; ?>]"
-                                           id="<?php echo $name; ?>"
-                                           min="1" max="100"
-                                           value="<?php echo $value ?>"
-                                        />
-                                        <label for="<?php echo $name; ?>">Coeff
-                                        </label>
+                            <?php endforeach; ?>
+                            <div class="input-field">
+                                <input type="text" id="save-name"
+                                       name="save-name"
+                                       value="<?php echo $name_save ?>">
+                                <label for="save-name">Nom de la sauvegarde</label>
+                            </div>
+
+                            <p class="red-text" id="checkboxError"><?php
+                                echo $this->errorMessageAfterSort; ?></p>
+                            <p class="green-text"><?php
+                                echo $this->checkMessageAfterSort; ?></p>
+
+                            <?php
+                            if ($id_backup == 'new') {
+                                $tooltip = "Créer la sauvegarde";
+                                $btnValue = "Créer";
+                            } else {
+                                $tooltip = "Enregistrer la sauvegarde";
+                                $btnValue = "Enregistrer";
+                            }
+                            ?>
+
+                            <div class="row">
+                                <div class="col s12 m8 l8">
+                                    <div>
+                                        <button class="btn waves-effect
+                                    waves-light button-margin tooltipped"
+                                                type="submit" name="action"
+                                                value="generate" id="generate-btn"
+                                                data-position="top"
+                                                data-tooltip=
+                                                "Commencer la répartition">
+                                            Générer
+                                            <i class="material-icons right">send</i>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
-                        <?php endforeach; ?>
-                        <div class="input-field">
-                            <input type="text" id="save-name"
-                                   name="save-name"
-                                   value="<?php echo $name_save ?>">
-                            <label for="save-name">Nom de la sauvegarde</label>
-                        </div>
 
-                        <p class="red-text" id="checkboxError"><?php
-                            echo $this->errorMessageAfterSort; ?></p>
-                        <p class="green-text"><?php
-                            echo $this->checkMessageAfterSort; ?></p>
-
-                        <?php
-                        if ($id_backup == 'new') {
-                            $tooltip = "Créer la sauvegarde";
-                            $btnValue = "Créer";
-                        } else {
-                            $tooltip = "Enregistrer la sauvegarde";
-                            $btnValue = "Enregistrer";
-                        }
-                        ?>
-
-                        <div class="row">
-                            <div class="col s12 m8 l8">
-                                <div>
-                                    <button class="btn waves-effect
+                            <div class="row">
+                                <div class="col s12 m8 l8">
+                                    <div class="flex-container">
+                                        <button class="btn waves-effect
                                     waves-light button-margin tooltipped"
-                                            type="submit" name="action"
-                                            value="generate" id="generate-btn"
-                                            data-position="top"
-                                            data-tooltip=
-                                            "Commencer la répartition">
-                                        Générer
-                                        <i class="material-icons right">send</i>
-                                    </button>
+                                                type="submit" name="action-save"
+                                                value="<?php echo $id_backup ?>"
+                                                id="save-btn"
+                                                data-position="top"
+                                                data-tooltip=
+                                            <?php echo $tooltip ?>>
+                                            <?php echo $btnValue ?>
+                                            <i class=
+                                               "material-icons right"
+                                            >arrow_downward</i>
+                                        </button>
+                                        <button class="btn waves-effect
+                                    waves-light button-margin tooltipped red"
+                                                type="submit" name="action-delete"
+                                                value="<?php echo $id_backup ?>"
+                                                id="delete-btn"
+                                                data-position="top"
+                                                data-tooltip="
+                                            Supprimer la sauvegarde">
+                                            Supprimer
+                                            <i class="material-icons right"
+                                            >delete</i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </form>
+                    </div>
 
+                    <form class="col card-panel white z-depth-3 s10 m5 l5"
+                          style="padding: 20px;" action="./dispatcher"
+                          method="post" id="associate-form">
                         <div class="row">
-                            <div class="col s12 m8 l8">
-                                <div class="flex-container">
-                                    <button class="btn waves-effect
+                            <p class="text">Associe un professeur à un stage
+                                (ne prend pas en compte le nombre maximum d'étudiant,
+                                mais le fait que le stage soit déjà attribué)</p>
+                            <div class="input-field col s6">
+                                <input id="searchTeacher" name="searchTeacher"
+                                       type="text" class="validate">
+                                <label for="searchTeacher">ID professeur</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <input id="searchInternship" name="searchInternship"
+                                       type="text" class="validate">
+                                <label for="searchInternship">ID Stage</label>
+                            </div>
+                            <div id="searchResults"></div>
+                            <p class="red-text">
+                                <?php echo $this->errorMessageDirectAssoc; ?>
+                            </p>
+                            <p class="green-text">
+                                <?php echo $this->checkMessageDirectAssoc; ?>
+                            </p>
+                            <div class="col s12">
+                                <button class=
+                                        "btn waves-effect
                                     waves-light button-margin tooltipped"
-                                            type="submit" name="action-save"
-                                            value="<?php echo $id_backup ?>"
-                                            id="save-btn"
-                                            data-position="top"
-                                            data-tooltip=
-                                            <?php echo $tooltip ?>>
-                                        <?php echo $btnValue ?>
-                                        <i class=
-                                        "material-icons right">arrow_downward</i>
-                                    </button>
-                                    <button class="btn waves-effect
-                                    waves-light button-margin tooltipped red"
-                                            type="submit" name="action-delete"
-                                            value="<?php echo $id_backup ?>"
-                                            id="delete-btn"
-                                            data-position="top"
-                                            data-tooltip="
-                                            Supprimer la sauvegarde">
-                                        Supprimer
-                                        <i class="material-icons right"
-                                        >delete</i>
-                                    </button>
-                                </div>
+                                        type="submit" name="action"
+                                        data-position="top"
+                                        data-tooltip="Valider l'association">
+                                    Associer
+                                    <i class=
+                                       "material-icons right">arrow_downward</i>
+                                </button>
                             </div>
                         </div>
                     </form>
                 </div>
 
-                <form class="col card-panel white z-depth-3 s10 m5 l5"
-                      style="padding: 20px;" action="./dispatcher"
-                      method="post" id="associate-form">
-                    <div class="row">
-                        <p class="text">Associe un professeur à un stage
-                            (ne prend pas en compte le nombre maximum d'étudiant,
-                            mais le fait que le stage soit déjà attribué)</p>
-                        <div class="input-field col s6">
-                            <input id="searchTeacher" name="searchTeacher"
-                               type="text" class="validate">
-                            <label for="searchTeacher">ID professeur</label>
-                        </div>
-                        <div class="input-field col s6">
-                            <input id="searchInternship" name="searchInternship"
-                               type="text" class="validate">
-                            <label for="searchInternship">ID Stage</label>
-                        </div>
-                        <div id="searchResults"></div>
-                        <p class="red-text">
-                            <?php echo $this->errorMessageDirectAssoc; ?>
-                        </p>
-                        <p class="green-text">
-                            <?php echo $this->checkMessageDirectAssoc; ?>
-                        </p>
-                        <div class="col s12">
-                            <button class=
-                                    "btn waves-effect
-                                    waves-light button-margin tooltipped"
-                                    type="submit" name="action"
-                                    data-position="top"
-                                    data-tooltip="Valider l'association">
-                                Associer
-                                <i
-                                class="material-icons right">arrow_downward</i>
-                            </button>
-                        </div>
+                <div id="loading-section" class="center-align"
+                     style="display: none;">
+                    <p>
+                        Chargement en cours, veuillez patienter...
+                    </p>
+                    <div class="progress">
+                        <div class="indeterminate"></div>
                     </div>
-                </form>
-            </div>
-
-            <div id="loading-section" class="center-align"
-                 style="display: none;">
-                <p>
-                    Chargement en cours, veuillez patienter...
-                </p>
-                <div class="progress">
-                    <div class="indeterminate"></div>
                 </div>
-            </div>
             <?php endif;
 
             if (isset($_POST['coef']) && isset($_POST['action'])
@@ -378,7 +381,7 @@ class Dispatcher
                                 )[0];
                             foreach ($resultDispatchList as $resultDispatch):
                                 $internship = $resultDispatch[
-                                        'internship_identifier'
+                                'internship_identifier'
                                 ];
                                 $companyName = $resultDispatch['company_name'];
                                 $id_teacher = $resultDispatch['id_teacher'];
@@ -457,16 +460,16 @@ class Dispatcher
                                                 <input type="checkbox" class=
                                                 "dispatch-checkbox
                                                 center-align filled-in"
-                                                   id="listTupleAssociate[]"
-                                                   name="listTupleAssociate[]"
-                                                   value="<?php
-                                                    echo
-                                                    $id_teacher.
-                                                    "$".
-                                                    $internship.
-                                                    "$".
-                                                    $score;
-                                                    ?>" />
+                                                       id="listTupleAssociate[]"
+                                                       name="listTupleAssociate[]"
+                                                       value="<?php
+                                                        echo
+                                                           $id_teacher.
+                                                           "$".
+                                                           $internship.
+                                                           "$".
+                                                           $score;
+                                                        ?>" />
                                                 <span data-type="
                                                 checkbox">Cocher</span>
                                             </label>
