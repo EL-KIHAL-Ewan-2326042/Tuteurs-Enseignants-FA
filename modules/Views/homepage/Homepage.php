@@ -700,7 +700,11 @@ readonly class Homepage
                             </tbody>
                         </table>
                     </div>
-                <?php endif;
+                    <?php
+                else :
+                    echo "<h6 class='left-align'
+                    >Aucun stage à afficher</h6>";
+                endif;
             endif; ?>
         </main>
         <?php
