@@ -92,7 +92,8 @@ function fetchResults(query, searchType)
  * @param data The data received from the server.
  * @param action The action used to determine how to display the results.
  */
-function displayResults(data, action) {
+function displayResults(data, action)
+{
     if (searchResults) {
         searchResults.innerHTML = '';
     }
@@ -296,7 +297,6 @@ document.addEventListener(
             }
         );
 
-        // Initialize the Materialize select dropdown
         M.FormSelect.init(document.querySelectorAll('select'));
 
         if (document.getElementById("dispatch-table") === null) {
@@ -304,7 +304,7 @@ document.addEventListener(
         }
 
         const rowsPerPageDropdown = document.getElementById('rows-per-page');
-        let rowsPerPage = sessionStorage.getItem("rowsCountDispatcher") ? Number(sessionStorage.getItem("rowsCountDispatcher")) : parseInt(rowsPerPageDropdown.value); // Set default to 10
+        let rowsPerPage = sessionStorage.getItem("rowsCountDispatcher") ? Number(sessionStorage.getItem("rowsCountDispatcher")) : parseInt(rowsPerPageDropdown.value);
         if (rowsPerPage !== 10) {
             rowsPerPageDropdown.options[rowsPerPage === 20 ? 1 : rowsPerPage === 50 ? 2 : rowsPerPage === 100 ? 3 : 4].selected = true;
         }
@@ -530,10 +530,41 @@ document.addEventListener(
             selectAllCheckbox.checked = visibleRows.every(row => row.querySelector('input[type="checkbox"]').checked);
         }
 
+        function findCheckboxInStudentTable(teacherId, internshipIdentifier)
+        {
+            const studentTable = document.getElementById('student-dispatch-table');
+            if (!studentTable) {
+                return null;
+            }
+            const checkboxes = studentTable.querySelectorAll('.dispatch-checkbox');
+            for (const checkbox of checkboxes) {
+                const [cbTeacherId, cbInternshipIdentifier] = checkbox.value.split('$');
+                if (cbTeacherId === teacherId && cbInternshipIdentifier === internshipIdentifier) {
+                    return checkbox;
+                }
+            }
+            return null;
+        }
+
+
+
         document.querySelectorAll('.dispatch-row input[type="checkbox"]:not(#select-all-checkbox)').forEach(
             checkbox =>
             {
-                checkbox.addEventListener('change', toggleSelectAllCheckbox);
+                checkbox.addEventListener(
+                    'change', function () {
+                        toggleSelectAllCheckbox();
+
+                        const checkboxValueParts = this.value.split('$');
+                        const teacherId = checkboxValueParts[0];
+                        const internshipIdentifier = checkboxValueParts[1];
+
+                        const studentTableCheckbox = findCheckboxInStudentTable(teacherId, internshipIdentifier);
+                        if (studentTableCheckbox) {
+                            studentTableCheckbox.checked = this.checked;
+                        }
+                    }
+                );
             }
         );
 
@@ -563,6 +594,7 @@ document.addEventListener(
         );
 
         showPage(currentPage);
+
     }
 );
 
@@ -634,10 +666,9 @@ document.addEventListener(
 
         const tableBody = document.querySelector('#dispatch-table tbody');
 
-
         if (tableBody) {
             let lastClickTime = 0;
-            const debounceTime = 1000;
+            const debounceTime = 5000;
 
             ['click', 'touchstart'].forEach(function (eventType) {
                 tableBody.addEventListener(eventType, function (event) {
@@ -653,6 +684,22 @@ document.addEventListener(
                         return;
                     }
 
+                    const clickedCell = event.target.closest('td, th');
+                    if (!clickedCell) {
+                        return;
+                    }
+
+                    const allCells = Array.from(clickedRow.children);
+
+                    const clickedColIndex = allCells.indexOf(clickedCell);
+
+
+                    const isLastColumn = clickedColIndex === allCells.length - 1;
+
+                    if (isLastColumn) {
+                        return;
+                    }
+
                     const clickedRowIdentifier = clickedRow.getAttribute('data-internship-identifier');
                     const [internshipName, internshipIdentifier, idTeacher, internshipAddress] = clickedRowIdentifier.split('$');
 
@@ -661,10 +708,10 @@ document.addEventListener(
                     getTeachersForInternship(internshipIdentifier, idTeacher);
                     updateCompanyAndTeacherMap(internshipAddress, idTeacher, internshipName).then();
                     hideLoadingMessage();
-                });
+                }
+                );
             });
         }
-
         function getClickedRow(element)
         {
             while (element && element.tagName !== 'TR') {
@@ -677,7 +724,8 @@ document.addEventListener(
             let addressCache = new Map();
             let teacherAddressCache = new Map();
 
-            async function getGeocode(address) {
+            async function getGeocode(address)
+            {
                 if (!addressCache.has(address)) {
                     addressCache.set(address, geocodeAddress(address));
                 }
@@ -692,7 +740,10 @@ document.addEventListener(
                 const internshipLocation = await getGeocode(row.address);
 
                 let teacherAddresses = await getTeacherAddresses(row.id_teacher);
-                teacherAddresses = Array.isArray(teacherAddresses) ? teacherAddresses : [teacherAddresses];
+
+                if (teacherAddresses.length === 0) {
+                    continue;
+                }
 
                 const teacherLocations = await Promise.all(
                     teacherAddresses.map(async (item) => {
@@ -709,6 +760,7 @@ document.addEventListener(
 
                 const minIndex = distances.indexOf(Math.min(...distances));
                 const closestTeacherAddress = teacherLocations[minIndex];
+
 
                 if (row.id_teacher === idTeacher) {
                     placeMarker(closestTeacherAddress, row.teacher_name, false, "red", "white");
@@ -738,9 +790,8 @@ document.addEventListener(
             const header = document.createElement('h3');
             header.id = 'student-dispatch-header';
             header.textContent = `Résultat pour ${data[0].student_firstname} ${data[0].student_name}`;
-            header.className = 'center-align flow-text';
+            header.className = 'center-align flow-text clickable';
             container.appendChild(header);
-
 
             const loadingContainer = document.createElement('div');
             loadingContainer.className = 'center-align row';
@@ -792,13 +843,14 @@ document.addEventListener(
 
                 if (studentHistory) {
                     row.date_experience = studentHistory;
-                }
-                else {
+                } else {
                     row.date_experience = '❌';
                 }
 
-                tr.className = 'dispatch-row';
+                tr.className = 'student-dispatch-row clickable';
                 tr.dataset.internshipIdentifier = `${row.internship_identifier}$${row.id_teacher}`;
+
+                tr.dataset.teacherName = `${row.teacher_name}`;
 
                 tr.innerHTML = `
                 <td>${row.teacher_firstname} ${row.teacher_name} (${row.id_teacher})</td>
@@ -827,6 +879,46 @@ document.addEventListener(
             newTable.appendChild(tbody);
             container.appendChild(newTable);
 
+            const checkboxes = newTable.querySelectorAll('.dispatch-checkbox');
+
+            function findCheckboxInDispatcherTable(teacherId, internshipIdentifier)
+            {
+                const dispatcherTable = document.getElementById('dispatch-table');
+                if (!dispatcherTable) {
+                    return null;
+                }
+                const checkboxes = dispatcherTable.querySelectorAll('.dispatch-checkbox');
+                for (const checkbox of checkboxes) {
+                    const [cbTeacherId, cbInternshipIdentifier] = checkbox.value.split('$');
+                    if (cbTeacherId === teacherId && cbInternshipIdentifier === internshipIdentifier) {
+                        return checkbox;
+                    }
+                }
+                return null;
+            }
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    if (this.checked) {
+                        checkboxes.forEach(cb => {
+                            if (cb !== this) {
+                                cb.checked = false;
+                            }
+                        });
+                    }
+                    const studentTableCheckboxes = newTable.querySelectorAll('.dispatch-checkbox');
+                    studentTableCheckboxes.forEach(studentCheckbox => {
+                        const checkboxValueParts = studentCheckbox.value.split('$');
+                        const teacherId = checkboxValueParts[0];
+                        const internshipIdentifier = checkboxValueParts[1];
+                        const dispatcherTableCheckbox = findCheckboxInDispatcherTable(teacherId, internshipIdentifier);
+                        if (dispatcherTableCheckbox) {
+                            dispatcherTableCheckbox.checked = studentCheckbox.checked;
+                        }
+                    });
+                });
+            });
+
             M.Tooltip.init(
                 document.querySelectorAll('.star-rating'), {
                     exitDelay: 100,
@@ -836,7 +928,57 @@ document.addEventListener(
             setSortingListeners();
 
             loadingContainer.remove();
+
+            const rows = newTable.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td:not(:last-child)');
+
+                cells.forEach(cell => {
+                    cell.addEventListener('click', () => {
+                        const teacherName = row.dataset.teacherName;
+
+                        updateSelectedTeacherMarker(teacherName);
+                    });
+                });
+            });
         }
+
+        let selectedMarker = null;
+
+        function updateSelectedTeacherMarker(teacher_name)
+        {
+            if (selectedMarker) {
+                console.log('Resetting previous marker to blue');
+
+                const previousMarkerElement = selectedMarker.getElement();
+                if (previousMarkerElement) {
+                    const previousLabel = previousMarkerElement.querySelector(".marker-label");
+                    const previousPointer = previousMarkerElement.querySelector(".marker-pointer");
+
+                    if (previousLabel) {
+                        previousLabel.style.backgroundColor = "blue";
+                    }
+                    if (previousPointer) {
+                        previousPointer.style.borderTop = "6px solid blue";
+                    }
+                }
+            }
+
+            const markers = document.querySelectorAll(".enhanced-marker");
+            markers.forEach(marker => {
+                const label = marker.querySelector(".marker-label");
+                if (label && label.textContent === teacher_name) {
+                    console.log('Updating new selected teacher marker to red');
+
+                    label.style.backgroundColor = "red";
+                    const pointer = marker.querySelector(".marker-pointer");
+                    if (pointer) pointer.style.borderTop = "6px solid red";
+
+                    selectedMarker = map.getOverlays().getArray().find(overlay => overlay.getElement() === marker);
+                }
+            });
+        }
+
 
         function renderStarsJS(score)
         {
@@ -965,6 +1107,7 @@ document.addEventListener(
 **/
 
 let map, routeLayer, companyMarker;
+let selectedMarker = null;
 const teacherMarkerCache = new Map();
 
 /**
@@ -1004,41 +1147,6 @@ async function initMap()
 
         markerSource = new ol.source.Vector();
 
-        clusterSource = new ol.source.Cluster(
-            {
-                distance: 25,
-                source: markerSource,
-            }
-        );
-
-        clusterLayer = new ol.layer.Vector(
-            {
-                source: clusterSource,
-                style: function (feature) {
-                    const size = feature.get("features").length;
-                    const color = size > 1 ? "red" : "blue";
-                    return new ol.style.Style(
-                        {
-                            image: new ol.style.Circle(
-                                {
-                                    radius: size > 1 ? 30 : 20,
-                                    fill: new ol.style.Fill({ color }),
-                                    stroke: new ol.style.Stroke({ color: "white", width: 2 }),
-                                }
-                            ),
-                        text: new ol.style.Text(
-                            {
-                                text: size > 1 ? size.toString() : feature.get("features")[0].get("name"),
-                                fill: new ol.style.Fill({ color: "white" }),
-                                stroke: new ol.style.Stroke({ color: "black", width: 2 }),
-                                font: "12px Arial",
-                            }
-                        ),
-                        }
-                    );
-                },
-            }
-        );
         map.addLayer(clusterLayer);
     } catch (error) {
 
@@ -1344,19 +1452,24 @@ async function displayRoute(origin, destination)
     }
 }
 
-function placeMarker(location, label, isCompany, bgColor, labelColor) {
+function placeMarker(location, label, isCompany, bgColor, labelColor)
+{
     if (teacherMarkerCache.has(label)) {
         return;
     }
 
     const markerElement = createMarkerElement(label, bgColor, labelColor);
 
-        const marker = new ol.Overlay({
+    const marker = new ol.Overlay(
+        {
             position: ol.proj.fromLonLat([location.lon, location.lat]),
             element: markerElement,
-        });
+        }
+    );
 
-        map.addOverlay(marker);
+    selectedMarker = marker;
+
+    map.addOverlay(marker);
 
     teacherMarkerCache.set(label, marker);
 
@@ -1371,7 +1484,8 @@ function placeMarker(location, label, isCompany, bgColor, labelColor) {
  * Crée un élément de marqueur amélioré
  *
  * @param {string} label Étiquette du marqueur
- * @param {string} color La couleur du marqeur
+ * @param bgColor
+ * @param labelColor
  *
  * @returns {HTMLElement} Élément du marqueur
  */
@@ -1418,7 +1532,8 @@ function createMarkerElement(label, bgColor, labelColor)
     return marker;
 }
 
-function clearMarkers() {
+function clearMarkers()
+{
     if (!map || typeof map.getOverlays !== "function") {
         console.error("Map is not initialized or getOverlays() is not available.");
         return;
@@ -1431,7 +1546,8 @@ function clearMarkers() {
     companyMarker = null;
 }
 
-function showLoadingMessage(message) {
+function showLoadingMessage(message)
+{
     let loadingDiv = document.getElementById("map-loading-message");
 
     if (!loadingDiv) {
@@ -1453,12 +1569,12 @@ function showLoadingMessage(message) {
     loadingDiv.style.display = "block";
 }
 
-function hideLoadingMessage() {
+function hideLoadingMessage()
+{
     const loadingDiv = document.getElementById("map-loading-message");
     if (loadingDiv) {
         loadingDiv.style.display = "none";
     }
 }
-
 
 initMap();
