@@ -163,21 +163,21 @@ class Dispatcher
                                         <p>
                                             <label>
                                                 <input type="hidden"
-                                                   name=
-                                                   "is_checked[<?php echo $name;?>]"
-                                                   value="0">
+                                                       name=
+                                                       "is_checked[<?php echo $name;?>]"
+                                                       value="0">
                                                 <input type="checkbox"
-                                                   class=
-                                                   "filled-in criteria-checkbox"
-                                                   name=
-                                                   "criteria_on[<?php echo $name;?>]"
-                                                   data-coef-input-id=
+                                                       class=
+                                                       "filled-in criteria-checkbox"
+                                                       name=
+                                                       "criteria_on[<?php echo $name;?>]"
+                                                       data-coef-input-id=
                                                        "<?php echo $name; ?>"
                                                     <?php
                                                     if ($criteria['is_checked']
                                                     ) : ?>
                                                         checked="checked"
-                                                        <?php
+                                                    <?php
                                                     endif; ?> />
                                                 <span class="tooltipped"
                                                       data-position="top"
@@ -327,10 +327,16 @@ class Dispatcher
             <?php endif;
 
             if (isset($_POST['coef']) && isset($_POST['action'])
-                && $_POST['action'] === 'generate'
+            && $_POST['action'] === 'generate'
             ) : ?>
             <div class="center">
-                <div id="map"></div>
+                <div id="map-loading-overlay" style="display: none;">
+                    <div class="loading-message">Mise à jour de la map...</div>
+                    <div class="progress">
+                        <div class="indeterminate"></div>
+                    </div>
+                </div>
+                <div id="map" class="map-container"></div>
                 <div class="row"></div>
 
                 <form action="./dispatcher" method="post">
@@ -357,8 +363,8 @@ class Dispatcher
                             <?php
                             $dictCoef = array_filter(
                                 $_POST['coef'], function ($coef, $key) {
-                                    return isset($_POST['criteria_on'][$key]);
-                                }, ARRAY_FILTER_USE_BOTH
+                                return isset($_POST['criteria_on'][$key]);
+                            }, ARRAY_FILTER_USE_BOTH
                             );
 
                             if (!empty($dictCoef)) {
@@ -463,13 +469,13 @@ class Dispatcher
                                                        id="listTupleAssociate[]"
                                                        name="listTupleAssociate[]"
                                                        value="<?php
-                                                        echo
+                                                       echo
                                                            $id_teacher.
                                                            "$".
                                                            $internship.
                                                            "$".
                                                            $score;
-                                                        ?>" />
+                                                       ?>" />
                                                 <span data-type="
                                                 checkbox">Cocher</span>
                                             </label>
@@ -541,8 +547,33 @@ class Dispatcher
                         <br>
                     </div>
                 </form>
-            <?php endif; ?>
+                <?php endif; ?>
             </div>
+
+            <style>
+                #map-loading-overlay {
+                    position: absolute; /* Position over the map */
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white background */
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 2; /* Ensure it's above the map */
+                }
+
+                #map-loading-overlay .loading-message {
+                    font-size: 1.5em;
+                    margin-bottom: 20px;
+                }
+
+                #map.loading {
+                    filter: blur(5px); /* Apply blur effect to the map */
+                }
+            </style>
 
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
