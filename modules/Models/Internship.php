@@ -172,7 +172,7 @@ class Internship extends Model
      * Calcule la distance entre un stage et un enseignant
      *
      * @param string $internship_identifier L'identifiant du stage
-     * @param string $id_teacher            L'identifiant du professeur
+     * @param string $id_teacher            L'identifiant du enseignant
      * @param bool   $bound                 True si un enseignant est déjà associé
      *                                      au stage, false sinon
      *
@@ -280,13 +280,13 @@ class Internship extends Model
     }
 
     /**
-     * Calcule la pertinence des stages pour un professeur
+     * Calcule la pertinence des stages pour un enseignant
      * et des stages en fonction de plusieurs critères de pondération.
      *
      * @param Department $departmentModel le modèmle de la table departement
      * @param Teacher    $teacherModel    le modèle de la table
-     *                                    professeur
-     * @param array      $teacher         la liste des professeur
+     *                                    enseignant
+     * @param array      $teacher         la liste des enseignant
      * @param array      $dictCoef        Tableau associatif des critères de calcul
      *                                    et leurs coefficients
      * 
@@ -326,7 +326,7 @@ class Internship extends Model
 
     /**
      * Permet de calculer pour un stage/alternance
-     * le score avec tous les professeur de son departement
+     * le score avec tous les enseignant de son departement
      *
      * @param string $internship l'identifiant du stage/alternance
      * @param array  $dictCoef   Tableau associatif des critères
@@ -407,14 +407,14 @@ class Internship extends Model
     /**
      * Renvoie un score associé à la pertinence entre
      * le sujet du stage et les disciplines enseignées
-     * par le professeur, tous deux passés en paramètre
+     * par le enseignant, tous deux passés en paramètre
      *
      * @param string $internshipId numéro du stage
      * @param string $identifier   identifiant de l'enseignant
      *
      * @return float score associé à la pertinence
      * entre le sujet de stage et les disciplines
-     * enseignées par le professeur connecté
+     * enseignées par le enseignant connecté
      */
     public function scoreDiscipSubject(
         string $internshipId, string $identifier
@@ -504,10 +504,10 @@ class Internship extends Model
     }
 
     /**
-     * Permet de savoir si un professeur a tutorer un etudiant
+     * Permet de savoir si un enseignant a tutorer un etudiant
      *
      * @param string $internship_identifier l'identifiant du stage/alternance
-     * @param string $id_teacher            l'identifiant du professeur
+     * @param string $id_teacher            l'identifiant du enseignant
      *
      * @return bool
      */
@@ -658,7 +658,7 @@ class Internship extends Model
     }
 
     /**
-     * Récupère une liste des élèves et professeurs associés
+     * Récupère une liste des élèves et enseignants associés
      * inscrits dans les départements dont l'admin est responsable.
      *
      * @return array|false Un tableau contenant

@@ -331,7 +331,7 @@ class User extends Model
     public function insertHasRole(string $userId, string $department): void
     {
         $query = "INSERT INTO has_role (user_id, role_name, department_name) "
-                . "VALUES (:user_id, 'Professeur' ,:department)";
+                . "VALUES (:user_id, 'Enseignant' ,:department)";
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindValue(':user_id', $userId);
         $stmt->bindValue(':department', $department);
