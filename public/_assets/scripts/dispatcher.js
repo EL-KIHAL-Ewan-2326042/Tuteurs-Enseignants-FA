@@ -621,6 +621,13 @@ document.addEventListener(
 
         function getTeachersForInternship(Internship_identifier, idTeacher)
         {
+            const mapElement = document.getElementById("map");
+            const mapLoadingOverlay = document.getElementById('map-loading-overlay');
+
+            if (mapElement && mapLoadingOverlay) {
+                mapLoadingOverlay.style.display = 'flex';
+                mapElement.classList.add('loading');
+            }
             fetch(
                 window.location.href, {
                     method: 'POST',
@@ -654,14 +661,23 @@ document.addEventListener(
                 .then(
                     async data =>
                     {
-                        createNewTable(data);
-                        createTeacherMarkers(data, idTeacher);
+                        await createNewTable(data);
+                        await createTeacherMarkers(data, idTeacher);
+                        if (mapElement && mapLoadingOverlay) {
+                            mapLoadingOverlay.style.display = 'none';
+                            mapElement.classList.remove('loading');
+
+                        }
                     }
                 )
                 .catch(
                     error =>
                     {
                         console.error('Fetch error:', error);
+                        if (mapElement && mapLoadingOverlay) {
+                            mapLoadingOverlay.style.display = 'none';
+                            mapElement.classList.remove('loading');
+                        }
                     }
                 );
         }
@@ -705,11 +721,9 @@ document.addEventListener(
                         const clickedRowIdentifier = clickedRow.getAttribute('data-internship-identifier');
                         const [internshipName, internshipIdentifier, idTeacher, internshipAddress] = clickedRowIdentifier.split('$');
 
-                        showLoadingMessage("Mise à jour de la map...");
                         clearMarkers();
                         getTeachersForInternship(internshipIdentifier, idTeacher);
                         updateCompanyAndTeacherMap(internshipAddress, idTeacher, internshipName).then();
-                        hideLoadingMessage();
                     }
                 );
             });
@@ -868,7 +882,7 @@ document.addEventListener(
                 <td>
                 <p>
                     <label class="center">
-                        <input type="checkbox" class="dispatch-checkbox center-align filled-in" name="listTupleAssociate[]" 
+                        <input type="checkbox" class="dispatch-checkbox center-align filled-in" name="listTupleAssociate[]"
                             value="${row.id_teacher}$${row.internship_identifier}$${row.score}" />
                         <span data-type="checkbox">Cocher</span>
                     </label>
@@ -1549,7 +1563,6 @@ function createMarkerElement(label, bgColor, labelColor)
 function clearMarkers()
 {
     if (!map || typeof map.getOverlays !== "function") {
-        console.error("Map is not initialized or getOverlays() is not available.");
         return;
     }
 
@@ -1560,37 +1573,6 @@ function clearMarkers()
     companyMarker = null;
     internshipLocCache = null;
     teacherLocCache = null;
-}
-
-function showLoadingMessage(message)
-{
-    let loadingDiv = document.getElementById("map-loading-message");
-
-    if (!loadingDiv) {
-        loadingDiv = document.createElement("div");
-        loadingDiv.id = "map-loading-message";
-        loadingDiv.style.position = "absolute";
-        loadingDiv.style.top = "10px";
-        loadingDiv.style.left = "50%";
-        loadingDiv.style.transform = "translateX(-50%)";
-        loadingDiv.style.padding = "10px 20px";
-        loadingDiv.style.background = "rgba(0, 0, 0, 0.7)";
-        loadingDiv.style.color = "#fff";
-        loadingDiv.style.borderRadius = "5px";
-        loadingDiv.style.zIndex = "1000";
-        document.body.appendChild(loadingDiv);
-    }
-
-    loadingDiv.innerText = message;
-    loadingDiv.style.display = "block";
-}
-
-function hideLoadingMessage()
-{
-    const loadingDiv = document.getElementById("map-loading-message");
-    if (loadingDiv) {
-        loadingDiv.style.display = "none";
-    }
 }
 
 initMap();
