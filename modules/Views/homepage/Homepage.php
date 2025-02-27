@@ -126,22 +126,9 @@ readonly class Homepage
 
                     if (!$update || gettype($update) !== 'boolean') {
                         echo '<h6 class="red-text">Une erreur est survenue</h6>';
-                    }
-                }
-
-                if (isset($_POST['selecInternshipSubmitted'])) {
-                    $update = $this->internshipModel->updateRequests(
-                        $_POST['selecInternship'] ?? array(),
-                        $_SESSION['identifier']
-                    );
-
-                    if (!$update || gettype($update) !== 'boolean') {
-                        echo '<h6 class="red-text">Une erreur est survenue</h6>';
                     } else {
-                        unset(
-                            $_SESSION['unconfirmed'],
-                            $_SESSION['lastPage'], $_POST['page']
-                        );
+                        echo '<h6 class="green-text">'
+                            . 'Vos choix ont bien été pris en compte</h6>';
                     }
                 }
                 ?>
@@ -408,6 +395,21 @@ readonly class Homepage
                 <div class="row"></div>
 
                         <?php
+                        if (isset($_POST['selecInternshipSubmitted'])) {
+                            $update = $this->internshipModel->updateRequests(
+                                $_POST['selecInternship'] ?? array(),
+                                $_SESSION['identifier']
+                            );
+
+                            if (!$update || gettype($update) !== 'boolean') {
+                                echo '<h6 class="red-text">'
+                                    . 'Une erreur est survenue</h6>';
+                            } else {
+                                echo '<h6 class="green-text">'
+                                    . 'Vos choix ont bien été pris en compte</h6>';
+                            }
+                        }
+
                         if(!empty($_SESSION['selecDep'])) :
                             $table = $this->teacherModel->getStudentsList(
                                 $_SESSION['selecDep'], $_SESSION['identifier'],
