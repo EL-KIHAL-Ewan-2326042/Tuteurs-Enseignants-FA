@@ -194,7 +194,8 @@ readonly class Homepage
                                 echo '<div class="center-align">';
                             }
                             ?>
-                                <table class="highlight centered" id="search-table">
+                                <table class="highlight centered
+                                responsive-table" id="search-table">
                                     <thead>
                                     <tr>
                                         <th>FORMATION</th>
@@ -416,7 +417,8 @@ readonly class Homepage
                                     Aucun stage disponible</h6>";
                             else: ?>
                         <form method="post" class="center-align table">
-                            <table class="highlight centered" id="homepage-table">
+                            <table class="highlight centered
+                                          responsive-table" id="homepage-table">
                                 <thead <?php
                                 if (count($table) > 1) {
                                     echo 'class="clickable"';
@@ -564,17 +566,15 @@ readonly class Homepage
 
                             <div class="row"></div>
 
-                            <div class="inline">
-                                <button class="waves-effect waves-light
-                                btn btn-annuler tooltip"
-                                    type="reset" id="resetForm" data-tooltip=
-                                    "Annuler les modifications"
-                                    data-position="top">Annuler</button>
-                                <button class="waves-effect waves-light btn tooltip"
-                                    name="selecInternshipSubmitted" value="1"
-                                    type="submit" data-tooltip="Envoyer vos choix"
-                                    data-position="top">Valider</button>
-                            </div>
+                            <button class="waves-effect waves-light
+                            btn btn-annuler tooltip"
+                                type="reset" id="resetForm" data-tooltip=
+                                "Annuler les modifications"
+                                data-position="top">Annuler</button>
+                            <button class="waves-effect waves-light btn tooltip"
+                                name="selecInternshipSubmitted" value="1"
+                                type="submit" data-tooltip="Envoyer vos choix"
+                                data-position="top">Valider</button>
                         </form>
                             <?php endif;
                         endif;

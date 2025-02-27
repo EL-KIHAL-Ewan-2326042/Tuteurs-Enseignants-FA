@@ -127,8 +127,11 @@ class Dashboard
                 <div class="tooltip-container" data-tooltip=
                     "1. Exporter le modèle correspondant <br>
                      2. Inscrivez vos données <br>
-                     3. Vérifiez que le séparateur est bien une virgule (avec un éditeur de texte) <br>
-                     4. Vérifiez qu'un texte comportant une virgule soit encadrer par des guillemets (avec un éditeur de texte) <br>
+                     3. Vérifiez que le séparateur est
+                     bien une virgule (avec un éditeur de texte) <br>
+                     4. Vérifiez qu'un texte comportant une
+                     virgule soit encadrer par
+                     des guillemets (avec un éditeur de texte) <br>
                      5. Importez le fichier csv ci-dessous">(?)</div>
                 <h2>Importer :</h2>
 

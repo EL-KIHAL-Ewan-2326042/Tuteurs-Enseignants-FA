@@ -67,7 +67,7 @@ function fetchResults(query, searchType)
     ).then(
         response =>
         { if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
+            throw new Error('Network response was not ok ' + response.statusText);
         }
             return response.json();
         }
@@ -104,48 +104,38 @@ function displayResults(data, action)
     }
 
     const ul = document.createElement('ul');
-    data.forEach(
-        item =>
-        {
-            const li = document.createElement('li');
-            const a = document.createElement('a');
+    data.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = action === 'searchTeacher'
+            ? `${item.teacher_name} ${item.teacher_firstname} (ID: ${item.id_teacher})`
+            : item.company_name
+                ? `${item.company_name}: ${item.internship_identifier} - ${item.student_name} ${item.student_firstname}`
+                : `${item.student_number} - ${item.student_name} ${item.student_firstname}`;
+
+        li.classList.add('left-align', 'clickable-result');
+        li.addEventListener('click', (event) => {
+            event.preventDefault();
+
             if (action === 'searchTeacher') {
-                a.textContent = `${item.teacher_name} ${item.teacher_firstname} (ID: ${item.id_teacher})`;
-                a.href = '#';
-                a.addEventListener(
-                    'click', (event) =>
-                    {
-                        event.preventDefault();
-                        const inputField = document.getElementById('searchTeacher');
-                        if (inputField) {
-                            inputField.value = `${item.id_teacher}`;
-                        }
-                    }
-                );
-            } else if (action === 'searchInternship') {
-                    a.textContent = item.company_name
-                    ? `${item.company_name}: ${item.internship_identifier} - ${item.student_name} ${item.student_firstname}`
-                    : `${item.student_number} - ${item.student_name} ${item.student_firstname}`;
-                    a.href = '#';
-                    a.addEventListener(
-                        'click', (event) =>
-                        {
-                            event.preventDefault();
-                            const inputField = document.getElementById('searchInternship');
-                            if (inputField) {
-                                inputField.value = `${item.internship_identifier}`;
-                            }
-                        }
-                    );
+                const teacherField = document.getElementById('searchTeacher');
+                if (teacherField) {
+                    teacherField.value = `${item.id_teacher}`;
+                }
             }
 
-                a.classList.add('left-align');
-            li.appendChild(a);
-            ul.appendChild(li);
-        }
-    );
+            if (action === 'searchInternship') {
+                const internshipField = document.getElementById('searchInternship');
+                if (internshipField) {
+                    internshipField.value = `${item.internship_identifier}`;
+                }
+            }
+        });
+
+        ul.appendChild(li);
+    });
     searchResults.appendChild(ul);
 }
+
 
 /**
  * Partie 2: Coefficients
@@ -189,18 +179,18 @@ document.addEventListener(
                 if (checkbox.checked) {
                     hiddenInput.value = '1';
                 } else {
-                        hiddenInput.value = '0';
+                    hiddenInput.value = '0';
                 }
 
-                    checkbox.addEventListener(
-                        'change', function () {
-                            if (this.checked) {
-                                hiddenInput.value = '1';
-                            } else {
-                                hiddenInput.value = '0';
-                            }
+                checkbox.addEventListener(
+                    'change', function () {
+                        if (this.checked) {
+                            hiddenInput.value = '1';
+                        } else {
+                            hiddenInput.value = '0';
                         }
-                    );
+                    }
+                );
             }
         );
 
@@ -209,7 +199,7 @@ document.addEventListener(
             {
                 input.addEventListener(
                     'change', function () {
-                            let value = parseInt(this.value);
+                        let value = parseInt(this.value);
 
                         if (isNaN(value) || value < 1) {
                             this.value = 1;
@@ -237,7 +227,9 @@ document.addEventListener(
                 if (errorMessageElement) {
                     errorMessageElement.textContent = '';
                 }
-                generateBtn.disabled = !anyChecked;
+                if (generateBtn) {
+                    generateBtn.disabled = !anyChecked;
+                }
             }
         }
 
@@ -305,7 +297,6 @@ document.addEventListener(
             }
         );
 
-        // Initialize the Materialize select dropdown
         M.FormSelect.init(document.querySelectorAll('select'));
 
         if (document.getElementById("dispatch-table") === null) {
@@ -313,7 +304,7 @@ document.addEventListener(
         }
 
         const rowsPerPageDropdown = document.getElementById('rows-per-page');
-        let rowsPerPage = sessionStorage.getItem("rowsCountDispatcher") ? Number(sessionStorage.getItem("rowsCountDispatcher")) : parseInt(rowsPerPageDropdown.value); // Set default to 10
+        let rowsPerPage = sessionStorage.getItem("rowsCountDispatcher") ? Number(sessionStorage.getItem("rowsCountDispatcher")) : parseInt(rowsPerPageDropdown.value);
         if (rowsPerPage !== 10) {
             rowsPerPageDropdown.options[rowsPerPage === 20 ? 1 : rowsPerPage === 50 ? 2 : rowsPerPage === 100 ? 3 : 4].selected = true;
         }
@@ -539,10 +530,41 @@ document.addEventListener(
             selectAllCheckbox.checked = visibleRows.every(row => row.querySelector('input[type="checkbox"]').checked);
         }
 
+        function findCheckboxInStudentTable(teacherId, internshipIdentifier)
+        {
+            const studentTable = document.getElementById('student-dispatch-table');
+            if (!studentTable) {
+                return null;
+            }
+            const checkboxes = studentTable.querySelectorAll('.dispatch-checkbox');
+            for (const checkbox of checkboxes) {
+                const [cbTeacherId, cbInternshipIdentifier] = checkbox.value.split('$');
+                if (cbTeacherId === teacherId && cbInternshipIdentifier === internshipIdentifier) {
+                    return checkbox;
+                }
+            }
+            return null;
+        }
+
+
+
         document.querySelectorAll('.dispatch-row input[type="checkbox"]:not(#select-all-checkbox)').forEach(
             checkbox =>
             {
-                checkbox.addEventListener('change', toggleSelectAllCheckbox);
+                checkbox.addEventListener(
+                    'change', function () {
+                        toggleSelectAllCheckbox();
+
+                        const checkboxValueParts = this.value.split('$');
+                        const teacherId = checkboxValueParts[0];
+                        const internshipIdentifier = checkboxValueParts[1];
+
+                        const studentTableCheckbox = findCheckboxInStudentTable(teacherId, internshipIdentifier);
+                        if (studentTableCheckbox) {
+                            studentTableCheckbox.checked = this.checked;
+                        }
+                    }
+                );
             }
         );
 
@@ -572,6 +594,7 @@ document.addEventListener(
         );
 
         showPage(currentPage);
+
     }
 );
 
@@ -579,6 +602,8 @@ document.addEventListener(
  * Partie 4: Vue Etudiante
  */
 let placedMarkers = new Set();
+let selectedMarker = null;
+let internshipLocCache, teacherLocCache = null;
 
 document.addEventListener(
     'DOMContentLoaded', function () {
@@ -594,8 +619,15 @@ document.addEventListener(
             }
         }
 
-        function getTeachersForInternship(Internship_identifier)
+        function getTeachersForInternship(Internship_identifier, idTeacher)
         {
+            const mapElement = document.getElementById("map");
+            const mapLoadingOverlay = document.getElementById('map-loading-overlay');
+
+            if (mapElement && mapLoadingOverlay) {
+                mapLoadingOverlay.style.display = 'flex';
+                mapElement.classList.add('loading');
+            }
             fetch(
                 window.location.href, {
                     method: 'POST',
@@ -629,14 +661,23 @@ document.addEventListener(
                 .then(
                     async data =>
                     {
-                        createNewTable(data);
-                        createTeacherMarkers(data);
+                        await createNewTable(data);
+                        await createTeacherMarkers(data, idTeacher);
+                        if (mapElement && mapLoadingOverlay) {
+                            mapLoadingOverlay.style.display = 'none';
+                            mapElement.classList.remove('loading');
+
+                        }
                     }
                 )
                 .catch(
                     error =>
                     {
                         console.error('Fetch error:', error);
+                        if (mapElement && mapLoadingOverlay) {
+                            mapLoadingOverlay.style.display = 'none';
+                            mapElement.classList.remove('loading');
+                        }
                     }
                 );
         }
@@ -644,40 +685,49 @@ document.addEventListener(
         const tableBody = document.querySelector('#dispatch-table tbody');
 
         if (tableBody) {
-            ['click', 'touchstart'].forEach(
-                function (eventType) {
-                    tableBody.addEventListener(
-                        eventType, function (event) {
-                            if (event.target.tagName === 'I'
-                                && event.target.classList.contains('material-icons')
-                            ) {
-                                const clickedRow = getClickedRow(event.target);
-                                if (!clickedRow) {
-                                    return;
-                                }
+            let lastClickTime = 0;
+            const debounceTime = 5000;
 
-                                const clickedRowIdentifier =
-                                clickedRow.getAttribute('data-internship-identifier');
-                                const [
-                                internshipIdentifier,
-                                idTeacher,
-                                internshipAddress
-                                ] = clickedRowIdentifier.split('$');
+            ['click', 'touchstart'].forEach(function (eventType) {
+                tableBody.addEventListener(eventType, function (event) {
+                        const currentTime = new Date().getTime();
 
-                                if (event.target.textContent === 'face') {
-                                    getTeachersForInternship(internshipIdentifier);
-                                    event.preventDefault();
-                                } else if (event.target.textContent === 'map') {
-                                    updateMap(internshipAddress, idTeacher).then();
-                                    event.preventDefault();
-                                }
-                            }
+                        if (currentTime - lastClickTime < debounceTime) {
+                            return;
                         }
-                    );
-                }
-            );
-        }
+                        lastClickTime = currentTime;
 
+                        const clickedRow = event.target.closest('tr.dispatch-row');
+                        if (!clickedRow) {
+                            return;
+                        }
+
+                        const clickedCell = event.target.closest('td, th');
+                        if (!clickedCell) {
+                            return;
+                        }
+
+                        const allCells = Array.from(clickedRow.children);
+
+                        const clickedColIndex = allCells.indexOf(clickedCell);
+
+
+                        const isLastColumn = clickedColIndex === allCells.length - 1;
+
+                        if (isLastColumn) {
+                            return;
+                        }
+
+                        const clickedRowIdentifier = clickedRow.getAttribute('data-internship-identifier');
+                        const [internshipName, internshipIdentifier, idTeacher, internshipAddress] = clickedRowIdentifier.split('$');
+
+                        clearMarkers();
+                        getTeachersForInternship(internshipIdentifier, idTeacher);
+                        updateCompanyAndTeacherMap(internshipAddress, idTeacher, internshipName).then();
+                    }
+                );
+            });
+        }
         function getClickedRow(element)
         {
             while (element && element.tagName !== 'TR') {
@@ -686,8 +736,7 @@ document.addEventListener(
             return element;
         }
 
-        async function createTeacherMarkers(data)
-        {
+        async function createTeacherMarkers(data, idTeacher) {
             let addressCache = new Map();
             let teacherAddressCache = new Map();
 
@@ -707,21 +756,19 @@ document.addEventListener(
                 const internshipLocation = await getGeocode(row.address);
 
                 let teacherAddresses = await getTeacherAddresses(row.id_teacher);
-                teacherAddresses = Array.isArray(teacherAddresses) ? teacherAddresses : [teacherAddresses];
+
+                if (teacherAddresses.length === 0) {
+                    continue;
+                }
 
                 const teacherLocations = await Promise.all(
-                    teacherAddresses.map(
-                        async(item) =>
-                        {
-                            if (!teacherAddressCache.has(item.address)
-                            ) {
+                    teacherAddresses.map(async (item) => {
+                        if (!teacherAddressCache.has(item.address)) {
                             teacherAddressCache.set(item.address, getGeocode(item.address));
-                            }
-                            return await teacherAddressCache.get(item.address);
                         }
-                    )
+                        return await teacherAddressCache.get(item.address);
+                    })
                 );
-
 
                 const distances = await Promise.all(
                     teacherLocations.map(location => calculateDistanceOnly(internshipLocation, location))
@@ -730,16 +777,13 @@ document.addEventListener(
                 const minIndex = distances.indexOf(Math.min(...distances));
                 const closestTeacherAddress = teacherLocations[minIndex];
 
-                const markerFeature = new ol.Feature(
-                    {
-                        geometry: new ol.geom.Point(
-                            ol.proj.fromLonLat([closestTeacherAddress.lon, closestTeacherAddress.lat])
-                        ),
-                    name: row.teacher_name,
-                    }
-                );
 
-                markerSource.addFeature(markerFeature);
+                if (row.id_teacher === idTeacher) {
+                    selectedMarker = placeMarker(closestTeacherAddress, row.teacher_name, false, "red", "white");
+                }
+                else {
+                    placeMarker(closestTeacherAddress, row.teacher_name, false, "blue", "white");
+                }
 
                 placedMarkers.add(row.teacher_name);
             }
@@ -762,9 +806,8 @@ document.addEventListener(
             const header = document.createElement('h3');
             header.id = 'student-dispatch-header';
             header.textContent = `Résultat pour ${data[0].student_firstname} ${data[0].student_name}`;
-            header.className = 'center-align flow-text';
+            header.className = 'center-align flow-text clickable';
             container.appendChild(header);
-
 
             const loadingContainer = document.createElement('div');
             loadingContainer.className = 'center-align row';
@@ -783,7 +826,7 @@ document.addEventListener(
             loadingContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
             const newTable = document.createElement('table');
-            newTable.className = 'highlight centered';
+            newTable.className = 'highlight centered responsive-table';
             newTable.id = 'student-dispatch-table';
 
             const thead = document.createElement('thead');
@@ -816,13 +859,14 @@ document.addEventListener(
 
                 if (studentHistory) {
                     row.date_experience = studentHistory;
-                }
-                else {
+                } else {
                     row.date_experience = '❌';
                 }
 
-                tr.className = 'dispatch-row';
+                tr.className = 'student-dispatch-row clickable';
                 tr.dataset.internshipIdentifier = `${row.internship_identifier}$${row.id_teacher}`;
+
+                tr.dataset.teacherName = `${row.teacher_name}`;
 
                 tr.innerHTML = `
                 <td>${row.teacher_firstname} ${row.teacher_name} (${row.id_teacher})</td>
@@ -838,7 +882,7 @@ document.addEventListener(
                 <td>
                 <p>
                     <label class="center">
-                        <input type="checkbox" class="dispatch-checkbox center-align filled-in" name="listTupleAssociate[]" 
+                        <input type="checkbox" class="dispatch-checkbox center-align filled-in" name="listTupleAssociate[]"
                             value="${row.id_teacher}$${row.internship_identifier}$${row.score}" />
                         <span data-type="checkbox">Cocher</span>
                     </label>
@@ -851,6 +895,46 @@ document.addEventListener(
             newTable.appendChild(tbody);
             container.appendChild(newTable);
 
+            const checkboxes = newTable.querySelectorAll('.dispatch-checkbox');
+
+            function findCheckboxInDispatcherTable(teacherId, internshipIdentifier)
+            {
+                const dispatcherTable = document.getElementById('dispatch-table');
+                if (!dispatcherTable) {
+                    return null;
+                }
+                const checkboxes = dispatcherTable.querySelectorAll('.dispatch-checkbox');
+                for (const checkbox of checkboxes) {
+                    const [cbTeacherId, cbInternshipIdentifier] = checkbox.value.split('$');
+                    if (cbTeacherId === teacherId && cbInternshipIdentifier === internshipIdentifier) {
+                        return checkbox;
+                    }
+                }
+                return null;
+            }
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    if (this.checked) {
+                        checkboxes.forEach(cb => {
+                            if (cb !== this) {
+                                cb.checked = false;
+                            }
+                        });
+                    }
+                    const studentTableCheckboxes = newTable.querySelectorAll('.dispatch-checkbox');
+                    studentTableCheckboxes.forEach(studentCheckbox => {
+                        const checkboxValueParts = studentCheckbox.value.split('$');
+                        const teacherId = checkboxValueParts[0];
+                        const internshipIdentifier = checkboxValueParts[1];
+                        const dispatcherTableCheckbox = findCheckboxInDispatcherTable(teacherId, internshipIdentifier);
+                        if (dispatcherTableCheckbox) {
+                            dispatcherTableCheckbox.checked = studentCheckbox.checked;
+                        }
+                    });
+                });
+            });
+
             M.Tooltip.init(
                 document.querySelectorAll('.star-rating'), {
                     exitDelay: 100,
@@ -860,7 +944,66 @@ document.addEventListener(
             setSortingListeners();
 
             loadingContainer.remove();
+
+            const rows = newTable.querySelectorAll('tbody tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td:not(:last-child)');
+
+                cells.forEach(cell => {
+                    cell.addEventListener('click', () => {
+                        const teacherName = row.dataset.teacherName;
+
+                        updateSelectedTeacherMarker(teacherName);
+                    });
+                });
+            });
         }
+
+        function updateSelectedTeacherMarker(teacher_name)
+        {
+            if (selectedMarker) {
+                const previousMarkerElement = selectedMarker.getElement();
+                if (previousMarkerElement) {
+                    const previousLabel = previousMarkerElement.querySelector(".marker-label");
+                    const previousPointer = previousMarkerElement.querySelector(".marker-pointer");
+
+                    if (previousLabel) {
+                        previousLabel.style.backgroundColor = "blue";
+                    }
+                    if (previousPointer) {
+                        previousPointer.style.borderTop = "6px solid blue";
+                    }
+                }
+            }
+
+            let selectedTeacherLocation = null;
+
+            const markers = document.querySelectorAll(".enhanced-marker");
+            markers.forEach(marker => {
+                const label = marker.querySelector(".marker-label");
+                if (label && label.textContent === teacher_name) {
+
+                    label.style.backgroundColor = "red";
+                    const pointer = marker.querySelector(".marker-pointer");
+                    if (pointer) pointer.style.borderTop = "6px solid red";
+
+                    selectedMarker = map.getOverlays().getArray().find(overlay => overlay.getElement() === marker);
+
+                    if (selectedMarker) {
+                        const position = selectedMarker.getPosition();
+                        if (position) {
+                            const lonLat = ol.proj.toLonLat(position);
+                            selectedTeacherLocation = { lon: lonLat[0], lat: lonLat[1] };
+                        }
+                    }
+                }
+            });
+
+            if (internshipLocCache && selectedTeacherLocation) {
+                displayRoute(internshipLocCache, selectedTeacherLocation);
+            }
+        }
+
 
         function renderStarsJS(score)
         {
@@ -986,9 +1129,10 @@ document.addEventListener(
 
 /**
  * Partie 5: map OSM
-**/
+ **/
 
-let map, routeLayer, companyMarker, teacherMarker;
+let map, routeLayer, companyMarker;
+const teacherMarkerCache = new Map();
 
 /**
  * Initialise la carte, centree sur la France
@@ -1010,58 +1154,24 @@ async function initMap()
             {
                 target: mapElement,
                 layers: [
-                new ol.layer.Tile(
+                    new ol.layer.Tile(
+                        {
+                            source: new ol.source.OSM(),
+                        }
+                    ),
+                ],
+                view: new ol.View(
                     {
-                        source: new ol.source.OSM(),
+                        center: franceCenter,
+                        zoom: 5,
+                        projection: 'EPSG:3857'
                     }
                 ),
-            ],
-            view: new ol.View(
-                {
-                    center: franceCenter,
-                    zoom: 5,
-                }
-            ),
             }
         );
 
         markerSource = new ol.source.Vector();
 
-        clusterSource = new ol.source.Cluster(
-            {
-                distance: 25,
-                source: markerSource,
-            }
-        );
-
-        clusterLayer = new ol.layer.Vector(
-            {
-                source: clusterSource,
-                style: function (feature) {
-                    const size = feature.get("features").length;
-                    const color = size > 1 ? "red" : "blue";
-                    return new ol.style.Style(
-                        {
-                            image: new ol.style.Circle(
-                                {
-                                    radius: size > 1 ? 30 : 20,
-                                    fill: new ol.style.Fill({ color }),
-                                    stroke: new ol.style.Stroke({ color: "white", width: 2 }),
-                                }
-                            ),
-                        text: new ol.style.Text(
-                            {
-                                text: size > 1 ? size.toString() : feature.get("features")[0].get("name"),
-                                fill: new ol.style.Fill({ color: "white" }),
-                                stroke: new ol.style.Stroke({ color: "black", width: 2 }),
-                                font: "12px Arial",
-                            }
-                        ),
-                        }
-                    );
-                },
-            }
-        );
         map.addLayer(clusterLayer);
     } catch (error) {
 
@@ -1217,10 +1327,11 @@ async function getStudentHistory(Student_number)
 /**
  * Mise à jour de la carte avec deux nouvelles adresses
  *
- * @param {string} InternshipAddress Première adresse
- * @param {string} Id_teacher Deuxième adresse
+ * @param {string} internshipAddress Première adresse
+ * @param {string} Id_teacher Id du prof
+ * @param internshipName adresse de entreprise
  */
-async function updateMap(InternshipAddress, Id_teacher)
+async function updateCompanyAndTeacherMap(internshipAddress, Id_teacher, internshipName)
 {
     if (!map) {
         console.error("La carte n'est pas initialisée. Appelez initMap d'abord.");
@@ -1229,7 +1340,7 @@ async function updateMap(InternshipAddress, Id_teacher)
 
     try {
         const teacherAddresses = await getTeacherAddresses(Id_teacher);
-        const internshipLocation = await geocodeAddress(InternshipAddress);
+        const internshipLocation = await geocodeAddress(internshipAddress);
 
         let closestTeacherAddress = null;
         let minDistance = Infinity;
@@ -1249,7 +1360,11 @@ async function updateMap(InternshipAddress, Id_teacher)
         }
 
 
-        placeMarker(internshipLocation, "Entreprise", true);
+        internshipName = "Entreprise " + internshipName;
+        placeMarker(internshipLocation, internshipName, true, "yellow", "black");
+        internshipLocCache = internshipLocation;
+        teacherLocCache = closestTeacherAddress;
+        await displayRoute(internshipLocation, teacherLocCache);
 
         centerMap(internshipLocation, closestTeacherAddress);
     } catch (error) {
@@ -1259,12 +1374,15 @@ async function updateMap(InternshipAddress, Id_teacher)
 
 function centerMap(location1, location2)
 {
+    if (!location1 || !location2) {
+        return;
+    }
     const view = map.getView();
     view.setCenter(
         ol.proj.fromLonLat(
             [
-            (location1.lon + location2.lon) / 2,
-            (location1.lat + location2.lat) / 2,
+                (location1.lon + location2.lon) / 2,
+                (location1.lat + location2.lat) / 2,
             ]
         )
     );
@@ -1322,7 +1440,7 @@ async function displayRoute(origin, destination)
             const route = data.routes[0];
             const routeCoords = route.geometry.coordinates.map(
                 (coord) =>
-                ol.proj.fromLonLat(coord)
+                    ol.proj.fromLonLat(coord)
             );
 
             if (!routeLayer) {
@@ -1365,20 +1483,25 @@ async function displayRoute(origin, destination)
     }
 }
 
-function placeMarker(location, label, isCompany)
+function placeMarker(location, label, isCompany, bgColor, labelColor)
 {
-    if (isCompany && companyMarker) {
-        map.removeOverlay(companyMarker);
-    } else if (!isCompany && teacherMarker) {
-        map.removeOverlay(teacherMarker);
+    if (teacherMarkerCache.has(label)) {
+        return;
     }
+
+    const markerElement = createMarkerElement(label, bgColor, labelColor);
 
     const marker = new ol.Overlay(
         {
             position: ol.proj.fromLonLat([location.lon, location.lat]),
-            element: createMarkerElement(label),
+            element: markerElement,
         }
     );
+
+
+    map.addOverlay(marker);
+
+    teacherMarkerCache.set(label, marker);
 
     if (isCompany) {
         companyMarker = marker;
@@ -1386,17 +1509,19 @@ function placeMarker(location, label, isCompany)
         teacherMarker = marker;
     }
 
-    map.addOverlay(marker);
+    return marker;
 }
 
 /**
  * Crée un élément de marqueur amélioré
  *
  * @param {string} label Étiquette du marqueur
+ * @param bgColor
+ * @param labelColor
  *
  * @returns {HTMLElement} Élément du marqueur
  */
-function createMarkerElement(label)
+function createMarkerElement(label, bgColor, labelColor)
 {
     const marker = document.createElement("div");
     marker.className = "enhanced-marker";
@@ -1417,12 +1542,8 @@ function createMarkerElement(label)
     marker.style.alignItems = "center";
     marker.style.zIndex = "1"
 
-    const offsetX = Math.random() * 10 - 5;
-    const offsetY = Math.random() * 10 - 5;
-    marker.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
-
-    markerLabel.style.backgroundColor = "blue";
-    markerLabel.style.color = "white";
+    markerLabel.style.backgroundColor = bgColor;
+    markerLabel.style.color = labelColor;
     markerLabel.style.padding = "2px 5px";
     markerLabel.style.borderRadius = "3px";
     markerLabel.style.fontSize = "10px";
@@ -1433,10 +1554,25 @@ function createMarkerElement(label)
     pointer.style.height = "0";
     pointer.style.borderLeft = "4px solid transparent";
     pointer.style.borderRight = "4px solid transparent";
-    pointer.style.borderTop = "6px solid blue";
+    pointer.style.borderTop = "6px solid " + bgColor;
     pointer.style.marginTop = "-1px";
 
     return marker;
+}
+
+function clearMarkers()
+{
+    if (!map || typeof map.getOverlays !== "function") {
+        return;
+    }
+
+    map.getOverlays().clear();
+
+    teacherMarkerCache.clear();
+    placedMarkers.clear();
+    companyMarker = null;
+    internshipLocCache = null;
+    teacherLocCache = null;
 }
 
 initMap();
