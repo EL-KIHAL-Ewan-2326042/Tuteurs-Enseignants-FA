@@ -114,7 +114,7 @@ class TeacherTest extends TestCase
 
     /**
      * Vérifier que la méthode getAddress renvoie bien
-     * l'addresse du professeur
+     * l'addresse du enseignant
      *
      * @return void
      */

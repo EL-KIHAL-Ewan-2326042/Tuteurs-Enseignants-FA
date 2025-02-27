@@ -64,7 +64,7 @@ class Dashboard
             <!--Exportation-->
             <div class="export">
                 <div class="card-panel white">
-                    <!--Exportation des listes : Etudiants/Professeurs/Stages-->
+                    <!--Exportation des listes : Etudiants/enseignants/Stages-->
                     <div class="tooltip-container" data-tooltip=
                     "Exportation des données d'une liste
                         choisie dans un fichier .csv">(?)</div>
@@ -79,7 +79,7 @@ class Dashboard
                                             selected>Choisir
                                     </option>
                                     <option value="student">Etudiants</option>
-                                    <option value="teacher">Professeurs</option>
+                                    <option value="teacher">Enseignants</option>
                                     <option value="internship">Stages</option>
                                 </select>
                             </label>
@@ -108,7 +108,7 @@ class Dashboard
                                         disabled selected>Choisir
                                     </option>
                                     <option value="student">Etudiants</option>
-                                    <option value="teacher">Professeurs</option>
+                                    <option value="teacher">Enseignants</option>
                                     <option value="internship">Stages</option>
                                 </select>
                             </label>
@@ -166,9 +166,9 @@ class Dashboard
                     </form>
                 </div>
 
-                <!--Importation de nouveaux professeurs-->
+                <!--Importation de nouveaux enseignants-->
                 <div class="row">
-                    <h3> Rajouter des professeurs : </h3>
+                    <h3> Rajouter des enseignants : </h3>
                     <form action="/dashboard" method="POST"
                         enctype="multipart/form-data">
                         <input type="hidden" name="table_name" value="teacher">

@@ -279,13 +279,13 @@ class Dispatcher
                           style="padding: 20px;" action="./dispatcher"
                           method="post" id="associate-form">
                         <div class="row">
-                            <p class="text">Associe un professeur à un stage
+                            <p class="text">Associe un enseignant à un stage
                                 (ne prend pas en compte le nombre maximum d'étudiant,
                                 mais le fait que le stage soit déjà attribué)</p>
                             <div class="input-field col s6">
                                 <input id="searchTeacher" name="searchTeacher"
-                                       type="text" class="validate">
-                                <label for="searchTeacher">ID professeur</label>
+                                   type="text" class="validate">
+                                <label for="searchTeacher">ID enseignant</label>
                             </div>
                             <div class="input-field col s6">
                                 <input id="searchInternship" name="searchInternship"
@@ -548,6 +548,7 @@ class Dispatcher
                     </div>
                 </form>
                 <?php endif; ?>
+
             </div>
 
             <style>

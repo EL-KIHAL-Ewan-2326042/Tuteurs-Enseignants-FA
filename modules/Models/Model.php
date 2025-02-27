@@ -98,7 +98,7 @@ class Model
     }
 
     /**
-     * Calcule la durée entre un stage et un professeur avec OSRM
+     * Calcule la durée entre un stage et un enseignant avec OSRM
      *
      * @param array $latLngInternship Latitude et longitude de l'origine
      * @param array $latLngTeacher    Latitude et longitude de la destination
