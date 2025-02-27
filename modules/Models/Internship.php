@@ -342,7 +342,7 @@ class Internship extends Model
                 Teacher.teacher_firstname,
                 SUM(CASE WHEN internship.type = 'alternance' THEN 1 ELSE 0 END) 
                     AS current_count_apprentice, 
-                SUM(CASE WHEN internship.type = 'Internship' THEN 1 ELSE 0 END) 
+                SUM(CASE WHEN internship.type = 'internship' THEN 1 ELSE 0 END) 
                     AS current_count_intern FROM Teacher  
                 JOIN (SELECT DISTINCT user_id, department_name FROM has_role) 
                     AS has_role
@@ -363,7 +363,7 @@ class Internship extends Model
                 GROUP BY Teacher.Id_teacher, Teacher.teacher_name, 
                          Teacher.teacher_firstname
                 HAVING Teacher.Maxi_number_intern > SUM(CASE 
-                    WHEN internship.type = 'Internship' THEN 1 ELSE 0 END) 
+                    WHEN internship.type = 'internship' THEN 1 ELSE 0 END) 
                    AND Teacher.Maxi_number_apprentice > SUM(CASE 
                        WHEN internship.type = 'alternance' THEN 1 ELSE 0 END)";
 
@@ -389,7 +389,9 @@ class Internship extends Model
 
 
         $result = array();
-
+        print_r('coucou');
+        print_r($internship);
+        print_r($teacherList);
         foreach ($teacherList as $teacher) {
             $result[] = $this
                 ->calculateRelevanceTeacherStudentsAssociate(
@@ -615,7 +617,7 @@ class Internship extends Model
             [$topCandidate['id_teacher']];
             if ($assignedTopIntern < $listTopIntern
                 && !in_array($topCandidate['internship_identifier'], $listEleveFinal)
-                && $topCandidate['type'] === 'Internship'
+                && $topCandidate['type'] === 'internship'
             ) {
                     $listFinal[] = $topCandidate;
                     $listEleveFinal[] = $topCandidate['internship_identifier'];
