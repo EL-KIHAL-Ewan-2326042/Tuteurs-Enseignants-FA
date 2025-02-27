@@ -602,6 +602,7 @@ document.addEventListener(
  * Partie 4: Vue Etudiante
  */
 let placedMarkers = new Set();
+let selectedMarker = null;
 
 document.addEventListener(
     'DOMContentLoaded', function () {
@@ -763,7 +764,7 @@ document.addEventListener(
 
 
                 if (row.id_teacher === idTeacher) {
-                    placeMarker(closestTeacherAddress, row.teacher_name, false, "red", "white");
+                    selectedMarker = placeMarker(closestTeacherAddress, row.teacher_name, false, "red", "white");
                 }
                 else {
                     placeMarker(closestTeacherAddress, row.teacher_name, false, "blue", "white");
@@ -943,12 +944,9 @@ document.addEventListener(
             });
         }
 
-        let selectedMarker = null;
-
         function updateSelectedTeacherMarker(teacher_name)
         {
             if (selectedMarker) {
-                console.log('Resetting previous marker to blue');
 
                 const previousMarkerElement = selectedMarker.getElement();
                 if (previousMarkerElement) {
@@ -968,7 +966,6 @@ document.addEventListener(
             markers.forEach(marker => {
                 const label = marker.querySelector(".marker-label");
                 if (label && label.textContent === teacher_name) {
-                    console.log('Updating new selected teacher marker to red');
 
                     label.style.backgroundColor = "red";
                     const pointer = marker.querySelector(".marker-pointer");
@@ -1107,7 +1104,6 @@ document.addEventListener(
 **/
 
 let map, routeLayer, companyMarker;
-let selectedMarker = null;
 const teacherMarkerCache = new Map();
 
 /**
@@ -1346,6 +1342,9 @@ async function updateCompanyAndTeacherMap(internshipAddress, Id_teacher, interns
 
 function centerMap(location1, location2)
 {
+    if (!location1 || !location2) {
+        return;
+    }
     const view = map.getView();
     view.setCenter(
         ol.proj.fromLonLat(
@@ -1467,7 +1466,6 @@ function placeMarker(location, label, isCompany, bgColor, labelColor)
         }
     );
 
-    selectedMarker = marker;
 
     map.addOverlay(marker);
 
@@ -1478,6 +1476,8 @@ function placeMarker(location, label, isCompany, bgColor, labelColor)
     } else {
         teacherMarker = marker;
     }
+
+    return marker;
 }
 
 /**
