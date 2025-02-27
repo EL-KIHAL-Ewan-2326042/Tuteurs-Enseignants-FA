@@ -67,7 +67,7 @@ function fetchResults(query, searchType)
     ).then(
         response =>
         { if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
+            throw new Error('Network response was not ok ' + response.statusText);
         }
             return response.json();
         }
@@ -179,18 +179,18 @@ document.addEventListener(
                 if (checkbox.checked) {
                     hiddenInput.value = '1';
                 } else {
-                        hiddenInput.value = '0';
+                    hiddenInput.value = '0';
                 }
 
-                    checkbox.addEventListener(
-                        'change', function () {
-                            if (this.checked) {
-                                hiddenInput.value = '1';
-                            } else {
-                                hiddenInput.value = '0';
-                            }
+                checkbox.addEventListener(
+                    'change', function () {
+                        if (this.checked) {
+                            hiddenInput.value = '1';
+                        } else {
+                            hiddenInput.value = '0';
                         }
-                    );
+                    }
+                );
             }
         );
 
@@ -199,7 +199,7 @@ document.addEventListener(
             {
                 input.addEventListener(
                     'change', function () {
-                            let value = parseInt(this.value);
+                        let value = parseInt(this.value);
 
                         if (isNaN(value) || value < 1) {
                             this.value = 1;
@@ -603,6 +603,7 @@ document.addEventListener(
  */
 let placedMarkers = new Set();
 let selectedMarker = null;
+let internshipAddressCache, teacherAddressCache = null;
 
 document.addEventListener(
     'DOMContentLoaded', function () {
@@ -673,43 +674,43 @@ document.addEventListener(
 
             ['click', 'touchstart'].forEach(function (eventType) {
                 tableBody.addEventListener(eventType, function (event) {
-                    const currentTime = new Date().getTime();
+                        const currentTime = new Date().getTime();
 
-                    if (currentTime - lastClickTime < debounceTime) {
-                        return;
+                        if (currentTime - lastClickTime < debounceTime) {
+                            return;
+                        }
+                        lastClickTime = currentTime;
+
+                        const clickedRow = event.target.closest('tr.dispatch-row');
+                        if (!clickedRow) {
+                            return;
+                        }
+
+                        const clickedCell = event.target.closest('td, th');
+                        if (!clickedCell) {
+                            return;
+                        }
+
+                        const allCells = Array.from(clickedRow.children);
+
+                        const clickedColIndex = allCells.indexOf(clickedCell);
+
+
+                        const isLastColumn = clickedColIndex === allCells.length - 1;
+
+                        if (isLastColumn) {
+                            return;
+                        }
+
+                        const clickedRowIdentifier = clickedRow.getAttribute('data-internship-identifier');
+                        const [internshipName, internshipIdentifier, idTeacher, internshipAddress] = clickedRowIdentifier.split('$');
+
+                        showLoadingMessage("Mise à jour de la map...");
+                        clearMarkers();
+                        getTeachersForInternship(internshipIdentifier, idTeacher);
+                        updateCompanyAndTeacherMap(internshipAddress, idTeacher, internshipName).then();
+                        hideLoadingMessage();
                     }
-                    lastClickTime = currentTime;
-
-                    const clickedRow = event.target.closest('tr.dispatch-row');
-                    if (!clickedRow) {
-                        return;
-                    }
-
-                    const clickedCell = event.target.closest('td, th');
-                    if (!clickedCell) {
-                        return;
-                    }
-
-                    const allCells = Array.from(clickedRow.children);
-
-                    const clickedColIndex = allCells.indexOf(clickedCell);
-
-
-                    const isLastColumn = clickedColIndex === allCells.length - 1;
-
-                    if (isLastColumn) {
-                        return;
-                    }
-
-                    const clickedRowIdentifier = clickedRow.getAttribute('data-internship-identifier');
-                    const [internshipName, internshipIdentifier, idTeacher, internshipAddress] = clickedRowIdentifier.split('$');
-
-                    showLoadingMessage("Mise à jour de la map...");
-                    clearMarkers();
-                    getTeachersForInternship(internshipIdentifier, idTeacher);
-                    updateCompanyAndTeacherMap(internshipAddress, idTeacher, internshipName).then();
-                    hideLoadingMessage();
-                }
                 );
             });
         }
@@ -1101,7 +1102,7 @@ document.addEventListener(
 
 /**
  * Partie 5: map OSM
-**/
+ **/
 
 let map, routeLayer, companyMarker;
 const teacherMarkerCache = new Map();
@@ -1126,18 +1127,18 @@ async function initMap()
             {
                 target: mapElement,
                 layers: [
-                new ol.layer.Tile(
+                    new ol.layer.Tile(
+                        {
+                            source: new ol.source.OSM(),
+                        }
+                    ),
+                ],
+                view: new ol.View(
                     {
-                        source: new ol.source.OSM(),
+                        center: franceCenter,
+                        zoom: 5,
                     }
                 ),
-            ],
-            view: new ol.View(
-                {
-                    center: franceCenter,
-                    zoom: 5,
-                }
-            ),
             }
         );
 
@@ -1333,6 +1334,9 @@ async function updateCompanyAndTeacherMap(internshipAddress, Id_teacher, interns
 
         internshipName = "Entreprise " + internshipName;
         placeMarker(internshipLocation, internshipName, true, "yellow", "black");
+        internshipAddressCache = internshipLocation;
+        teacherAddressCache = closestTeacherAddress;
+        await displayRoute(internshipLocation, teacherAddressCache);
 
         centerMap(internshipLocation, closestTeacherAddress);
     } catch (error) {
@@ -1349,8 +1353,8 @@ function centerMap(location1, location2)
     view.setCenter(
         ol.proj.fromLonLat(
             [
-            (location1.lon + location2.lon) / 2,
-            (location1.lat + location2.lat) / 2,
+                (location1.lon + location2.lon) / 2,
+                (location1.lat + location2.lat) / 2,
             ]
         )
     );
@@ -1408,7 +1412,7 @@ async function displayRoute(origin, destination)
             const route = data.routes[0];
             const routeCoords = route.geometry.coordinates.map(
                 (coord) =>
-                ol.proj.fromLonLat(coord)
+                    ol.proj.fromLonLat(coord)
             );
 
             if (!routeLayer) {
