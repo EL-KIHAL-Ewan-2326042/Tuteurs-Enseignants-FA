@@ -582,18 +582,7 @@ readonly class Homepage
                         </form>
                             <?php endif;
                         endif;
-                    endif; ?>
-            <script>
-                <?php if(isset($_SESSION['address'])) : ?>
-                    const teacherAddress =
-                        "<?php echo $_SESSION['address'][0]['address']; ?>";
-                <?php endif;
-                if(isset($_SESSION['selected_student']['address'])) : ?>
-                    const companyAddress =
-                        "<?php echo $_SESSION['selected_student']['address']; ?>";
-                <?php endif; ?>
-            </script>
-                <?php unset($_SESSION['selected_student']);
+                    endif;
             endif;
 
 
@@ -708,6 +697,18 @@ readonly class Homepage
                     >Aucun stage à afficher</h6>";
                 endif;
             endif; ?>
+
+            <script>
+                <?php if (!empty($_SESSION['address'])) : ?>
+                    const teacherAddress =
+                        "<?php echo $_SESSION['address'][0]['address']; ?>";
+                <?php endif;
+                if(isset($_SESSION['selected_student']['address'])) : ?>
+                    const companyAddress =
+                        "<?php echo $_SESSION['selected_student']['address']; ?>";
+                <?php endif; ?>
+            </script>
+            <?php unset($_SESSION['selected_student']); ?>
         </main>
         <?php
     }

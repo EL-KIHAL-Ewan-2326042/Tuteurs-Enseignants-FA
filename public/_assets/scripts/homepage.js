@@ -259,22 +259,27 @@ async function initMap()
         return;
     }
 
-    if (typeof teacherAddress === "undefined") {
-        console.error("'teacherAddress' est indéfini.");
-        return;
-    }
-
     try {
-        const teacherLocation = await geocodeAddress(teacherAddress);
-        let companyLocation, centerLon, centerLat;
+        let teacherLocation, companyLocation, centerLon, centerLat;
 
-        if (typeof companyAddress !== "undefined") {
+        if (typeof teacherAddress !== "undefined") {
+            teacherLocation = await geocodeAddress(teacherAddress);
+            if (typeof companyAddress !== "undefined") {
+                companyLocation = await geocodeAddress(companyAddress);
+                centerLon = (companyLocation.lon + teacherLocation.lon) / 2;
+                centerLat = (companyLocation.lat + teacherLocation.lat) / 2;
+            } else {
+                centerLon = teacherLocation.lon;
+                centerLat = teacherLocation.lat;
+            }
+        } else if (typeof companyAddress !== "undefined") {
             companyLocation = await geocodeAddress(companyAddress);
-            centerLon = (companyLocation.lon + teacherLocation.lon) / 2;
-            centerLat = (companyLocation.lat + teacherLocation.lat) / 2;
+            centerLon = companyLocation.lon;
+            centerLat = companyLocation.lat;
         } else {
-            centerLon = teacherLocation.lon;
-            centerLat = teacherLocation.lat;
+            const france = await geocodeAddress("France");
+            centerLon = france.lon;
+            centerLat = france.lat;
         }
 
         map = new ol.Map(
@@ -301,13 +306,15 @@ async function initMap()
             }
         );
 
-        const teacherMarker = new ol.Overlay(
-            {
-                position: ol.proj.fromLonLat([teacherLocation.lon, teacherLocation.lat]),
-                element: createMarkerElement("Vous"),
-            }
-        );
-        map.addOverlay(teacherMarker);
+        if (typeof teacherAddress !== "undefined") {
+            const teacherMarker = new ol.Overlay(
+                {
+                    position: ol.proj.fromLonLat([teacherLocation.lon, teacherLocation.lat]),
+                    element: createMarkerElement("Vous"),
+                }
+            );
+            map.addOverlay(teacherMarker);
+        }
 
         if (typeof companyAddress !== "undefined") {
             const companyMarker = new ol.Overlay(
@@ -317,8 +324,10 @@ async function initMap()
                 }
             );
             map.addOverlay(companyMarker);
+        }
 
-            await calculateDistance(companyLocation, teacherLocation, map);
+        if (typeof companyAddress !== "undefined" && typeof teacherAddress !== "undefined") {
+            await calculateDistance(companyLocation, teacherLocation, map)
         }
     } catch (error) {
         console.error("Erreur lors de l'initialisation de la carte :", error);
