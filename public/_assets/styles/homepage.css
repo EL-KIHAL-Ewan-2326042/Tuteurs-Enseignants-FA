@@ -113,12 +113,10 @@ input[type=text]:focus {
 
 /* Tableau Homepage */
 
+/* Tableau Homepage */
+
 .clickable {
     cursor: pointer;
-}
-
-.table {
-    width: 85%;
 }
 
 thead {
@@ -127,22 +125,14 @@ thead {
     user-select: none;
 }
 
-thead, tbody tr {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-}
-
-tbody {
-    width: 100%;
-    display: block;
+.table {
+    width: 85%;
 }
 
 #homepage-table,
 #search-table {
-    min-width: 800px;
-    font-size: 14px;
     width: 100%;
+    font-size: 14px;
 }
 
 #homepage-table th, #homepage-table td,
@@ -156,7 +146,6 @@ tbody {
 #search-table thead th {
     background-color: #f4f4f4;
     font-weight: bold;
-    font-size: 14px;
 }
 
 #homepage-table tbody tr:nth-child(even),
@@ -166,12 +155,12 @@ tbody {
 
 #homepage-table tbody tr:hover,
 #search-table tbody tr:hover {
-    background-color: #f1f1f1;
+    background-color: #ffffcc;
 }
 
 @media screen and (max-width: 768px) {
     #homepage-table,
-    #search-table  {
+    #search-table {
         font-size: 12px;
     }
 
@@ -179,6 +168,13 @@ tbody {
     #search-table th, #search-table td {
         padding: 4px 8px;
     }
+}
+
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+    color: #8F0000 !important;
+    font-weight: bold;
 }
 
 .tooltip-container {

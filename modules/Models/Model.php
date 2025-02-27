@@ -364,7 +364,8 @@ class Model
             // Crée une exception avec les colonnes CSV qui causent l'erreur
             throw new Exception(
                 "Les colonnes CSV ne correspondent pas à la table "
-                . $tableName . " ou aux valeurs demandées pour la table teacher pour une insertion de stage. "
+                . $tableName . " ou aux valeurs demandées " .
+                "pour la table teacher pour une insertion de stage. "
             );
         } else {
             return true;
