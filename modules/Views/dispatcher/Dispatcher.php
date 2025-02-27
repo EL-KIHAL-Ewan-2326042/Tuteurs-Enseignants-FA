@@ -377,6 +377,7 @@ class Dispatcher
                                     . $escapedJson . "'>";
                             } else {
                                 header('location: ./dispatcher');
+                                exit();
                             }
 
                             $resultDispatchList = $this->internshipModel
