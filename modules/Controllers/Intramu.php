@@ -91,7 +91,17 @@ class Intramu
                 $_SESSION['role_department'] = $userModel
                     ->getRoleDepartment($identifierLogs);
                 $_SESSION['address'] = $teacherModel->getAddress($identifierLogs);
-                header('Location: /homepage');
+                if (is_array($_SESSION['roles'])) {
+                    if (in_array('Enseignant', $_SESSION['roles'])) {
+                        header('Location: /homepage');
+                    } else if (in_array('Admin_dep', $_SESSION['roles'])) {
+                        header('Location: /tutoring');
+                    } else {
+                        header('Location: /intramu');
+                    }
+                } else {
+                    header('Location: /intramu');
+                }
                 exit();
             } else {
                 $errorMessage = 'Identifiant ou mot de passe incorrect';

@@ -410,4 +410,32 @@ class User extends Model
         $stmt->bindParam(':user_id', $user_id);
         $stmt->execute();
     }
+
+    /**
+     * Récupère les départements dont l'utilisateur
+     * passé en paramètre est administrateur
+     *
+     * @param string $identifier Identifiant de l'utilisateur
+     *
+     * @return array|false Renvoie false si l'identifiant ne correspond pas à celui
+     * de l'utilisateur connecté, sinon renvoie une liste contenant les départements
+     * de l'utilisateur où il est administrateur s'il en a, false sinon
+     */
+    public function getAdminDepartments(string $identifier): false|array
+    {
+        if ($_SESSION['identifier'] !== $identifier) {
+            return false;
+        }
+
+        $db = $this->_db;
+        $query = 'SELECT department_name FROM has_role '
+            . 'WHERE has_role.user_id = :user_id '
+            . "AND has_role.role_name = 'Admin_dep'";
+
+        $stmt = $db->getConn()->prepare($query);
+        $stmt->bindParam(':user_id', $identifier);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+    }
 }

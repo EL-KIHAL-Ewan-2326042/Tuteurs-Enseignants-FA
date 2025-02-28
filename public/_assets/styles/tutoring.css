@@ -4,22 +4,6 @@ main {
     flex-direction: column;
 }
 
-label{
-    color: #2c2c2c !important;
-}
-
-#map {
-    height: 600px;
-    width: 100%;
-    margin: 20px 0;
-}
-
-.center {
-    justify-content: center;
-    width: 70%;
-    align-items: flex-start;
-}
-
 h1 {
     font-size: 2.92rem;
     margin: 1.95rem 0 1.168rem 0;
@@ -46,43 +30,15 @@ main a:hover {
     color: var(--main-color);
 }
 
-main .card-panel {
-    padding: 12px 3px;
-}
-
 .inline {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
 }
 
-.searchCell {
-    padding: 0 12px;
-}
-
-.searchCell .input-field {
-    margin-top: 0;
-    margin-bottom: 8px;
-}
-
-.formCell {
-    padding: 0 3rem;
-}
-
-#searchResults ul,
-#searchResults p {
-    margin: 0;
-    max-height: 7.5rem;
-    overflow-y: scroll;
-}
-
 .btn {
     background-color: #00558B;
     z-index: 0;
-}
-
-.btn-annuler {
-    background-color: #B30C00 !important;
 }
 
 .btn:hover {
@@ -100,21 +56,14 @@ input[type="checkbox"].filled-in:checked + span:after {
     border-color: #00558B !important;
 }
 
-/* label focus color */
-input[type=text]:focus + label {
-    color: #00558B !important;
-}
-
-/* label underline focus color */
-input[type=text]:focus {
-    border-bottom: 1px solid #00558B !important;
-    box-shadow: 0 1px 0 0 #00558B !important;
-}
-
-/* Tableau Homepage */
+/* Tableau Tutoring */
 
 .clickable {
     cursor: pointer;
+}
+
+.table {
+    width: 85%;
 }
 
 thead {
@@ -123,48 +72,63 @@ thead {
     user-select: none;
 }
 
-.table {
-    width: 85%;
-}
-
-#homepage-table,
-#search-table {
+thead, tbody tr {
+    display: table;
     width: 100%;
-    font-size: 14px;
+    table-layout: fixed;
 }
 
-#homepage-table th, #homepage-table td,
-#search-table th, #search-table td {
+tbody {
+    width: 100%;
+    display: block;
+}
+
+#tutoring-table,
+#search-table,
+#tutoring-table {
+    min-width: 800px;
+    font-size: 14px;
+    width: 100%;
+}
+
+#tutoring-table th, #tutoring-table td,
+#search-table th, #search-table td,
+#tutoring-table th, #tutoring-table td {
     padding: 6px 10px;
     text-align: center;
     border: 1px solid #ddd;
 }
 
-#homepage-table thead th,
-#search-table thead th {
+#tutoring-table thead th,
+#search-table thead th,
+#tutoring-table thead th {
     background-color: #f4f4f4;
     font-weight: bold;
     font-size: 14px;
 }
 
-#homepage-table tbody tr:nth-child(even),
-#search-table tbody tr:nth-child(even) {
+#tutoring-table tbody tr:nth-child(even),
+#search-table tbody tr:nth-child(even),
+#tutoring-table tbody tr:nth-child(even) {
     background-color: #fafafa;
 }
 
-#homepage-table tbody tr:hover,
-#search-table tbody tr:hover {
-    background-color: #ffffcc;
+#tutoring-table tbody tr:hover,
+#search-table tbody tr:hover,
+#tutoring-table tbody tr:hover {
+    background-color: #f1f1f1;
 }
 
 @media screen and (max-width: 768px) {
-    #homepage-table,
-    #search-table {
+    #tutoring-table,
+    #search-table,
+    #tutoring-table {
         font-size: 12px;
     }
 
-    #homepage-table th, #homepage-table td,
-    #search-table th, #search-table td {
+    #tutoring-table th, #tutoring-table td,
+    #search-table th, #search-table td,
+    #tutoring-table th, #tutoring-table td {
         padding: 4px 8px;
     }
 }
@@ -248,21 +212,6 @@ main table {
         font-size: 0.47rem;
     }
 
+    width: 85%;
     border: solid #e0e0e0 1px;
-}
-
-
-@media screen and (max-width: 640px) {
-    #map {
-        height: 250px;
-        width: 100%;
-    }
-
-    .center {
-        width: 80%;
-    }
-
-    .card-panel {
-        width: 80%;
-    }
 }

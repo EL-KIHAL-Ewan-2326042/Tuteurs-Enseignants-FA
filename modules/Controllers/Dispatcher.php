@@ -153,6 +153,7 @@ class Dispatcher
 
         return [$returnErrorMessage, $returnCheckMessage];
     }
+
     /**
      * Méthode `show` utilisée pour gérer l'affichage et la gestion des actions
      * du tableau de bord lors de l'administration des départements, association
