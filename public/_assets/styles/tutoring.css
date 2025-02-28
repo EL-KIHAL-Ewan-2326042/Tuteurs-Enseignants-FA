@@ -147,6 +147,8 @@ thead {
     font-size: 16px;
     padding: 0 10px;
     margin: 0;
+    min-width: 48px;
+    min-height: 48px;
 }
 
 #pagination-controls span {

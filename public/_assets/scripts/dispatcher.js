@@ -806,7 +806,7 @@ document.addEventListener(
 
 
                 if (row.id_teacher === idTeacher) {
-                    selectedMarker = placeMarker(closestTeacherAddress, row.teacher_name, false, "red", "white");
+                    selectedMarker = placeMarker(closestTeacherAddress, row.teacher_name, false, "#B22222", "white");
                 }
                 else {
                     placeMarker(closestTeacherAddress, row.teacher_name, false, "blue", "white");
@@ -1030,7 +1030,7 @@ document.addEventListener(
                     const label = marker.querySelector(".marker-label");
                     if (label && label.textContent === teacher_name) {
 
-                        label.style.backgroundColor = "red";
+                        label.style.backgroundColor = "#B22222";
                         const pointer = marker.querySelector(".marker-pointer");
                         if (pointer) { pointer.style.borderTop = "6px solid red";
                         }
@@ -1500,7 +1500,7 @@ async function displayRoute(origin, destination)
                             {
                                 stroke: new ol.style.Stroke(
                                     {
-                                        color: "red",
+                                        color: "#B22222",
                                         width: 3,
                                     }
                                 ),

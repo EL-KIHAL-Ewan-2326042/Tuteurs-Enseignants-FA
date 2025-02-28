@@ -519,23 +519,6 @@ readonly class Homepage
                                 </tbody>
                             </table>
 
-                            <div class="row">
-                                <div class="input-field col s2">
-                                    <select id="rows-per-page">
-                                        <option value="10" selected>10</option>
-                                        <option value="20">20</option>
-                                        <option value="50">50</option>
-                                        <option value="100">100</option>
-                                        <option value="<?php echo count($table)?>">
-                                            Tout
-                                        </option>
-                                    </select>
-                                    <label
-                                    for="rows-per-page"
-                                    >Nombre de lignes par page</label>
-                                </div>
-                            </div>
-
                             <div id="pagination-controls" class="center-align">
                                 <button type="button" class=
                                     "waves-effect waves-light btn" id="first-page">
@@ -560,7 +543,21 @@ readonly class Homepage
                                 </i></button>
                             </div>
 
-                            <div class="row"></div>
+                            <div class="row">
+                                <label class="input-field col s6 m2"
+                                       for="rows-per-page"
+                                >Nombre de lignes par page
+                                    <select id="rows-per-page">
+                                        <option value="10" selected>10</option>
+                                        <option value="20">20</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                        <option value="<?php echo count($table)?>">
+                                            Tout
+                                        </option>
+                                    </select>
+                                </label>
+                            </div>
 
                             <button class="waves-effect waves-light
                             btn btn-annuler tooltip"
@@ -577,6 +574,10 @@ readonly class Homepage
                     endif; ?>
 
             <script>
+                document.addEventListener('DOMContentLoaded', function() {
+                    var elems = document.querySelectorAll('select');
+                    M.FormSelect.init(elems);
+                });
                 <?php if (!empty($_SESSION['address'])) : ?>
                     const teacherAddress =
                         "<?php echo $_SESSION['address'][0]['address']; ?>";

@@ -85,7 +85,7 @@ a.brand-logo {
     height: 60px;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 800px) {
     .hide-on-med-and-down {
         display: none !important;
     }
@@ -137,4 +137,11 @@ footer {
         margin: 10px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
+}
+
+/** Boutons de la map OSM **/
+
+button.ol-zoom-in, button.ol-zoom-out {
+    min-width: 48px;
+    min-height: 48px;
 }
