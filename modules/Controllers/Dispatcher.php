@@ -119,23 +119,38 @@ class Dispatcher
         $returnErrorMessage = '';
         $returnCheckMessage = '';
 
+        // Temporary storage to track associated internships
+        $associatedInternships = [];
+
         foreach ($_POST['listTupleAssociate'] as $tupleAssociate) {
             $tmp = explode("$", $tupleAssociate);
-            if (in_array($tmp[0], $listTeacher)
-                && in_array($tmp[1], $listInternship)
+            $teacher = $tmp[0];
+            $internship = $tmp[1];
+            $score = floatval($tmp[2]);
+
+            if (in_array($teacher, $listTeacher) 
+                && in_array(
+                    $internship, $listInternship
+                )
             ) {
-                if (!(in_array([$tmp[0], $tmp[1]], $listAssociate))) {
-                    $returnCheckMessage .= $internshipModel
-                        ->insertIsResponsible($tmp[0], $tmp[1], floatval($tmp[2]));
+                if (in_array([$teacher, $internship], $listAssociate)) {
+                    $returnErrorMessage .=
+                        "$teacher et $internship, cette association existe déjà<br>";
+                } elseif (in_array($internship, $associatedInternships)) {
+                    continue;
                 } else {
-                    $returnErrorMessage .= $tmp[0] . " et "
-                        . $tmp[1] . ", cette association existe déjà<br>";
+                    $returnCheckMessage .=
+                        $internshipModel->insertIsResponsible(
+                            $teacher, $internship, $score
+                        );
+                    $associatedInternships[] = $internship;
                 }
             } else {
-                $returnErrorMessage .=  $tmp[0] . " ou "
-                    . $tmp[1] . ", inexistant dans ce departement<br>";
+                $returnErrorMessage .=
+                    "$teacher ou $internship, inexistant dans ce département<br>";
             }
         }
+
         return [$returnErrorMessage, $returnCheckMessage];
     }
 
@@ -150,8 +165,6 @@ class Dispatcher
      */
     public function show(): void
     {
-
-
         if (isset($_SESSION['role_name'])
             && ((is_array($_SESSION['role_name'])
             && in_array('Admin_dep', $_SESSION['role_name']))
@@ -304,7 +317,7 @@ class Dispatcher
                 $checkMessageDirectAssoc = $tmpmessage[1];
             }
 
-            if (isset($_POST['selectStudentSubmitted'])
+            if (isset($_POST['selecInternshipSubmitted'])
                 && isset($_POST['listTupleAssociate'])
             ) {
                 $tmpmessage = $this

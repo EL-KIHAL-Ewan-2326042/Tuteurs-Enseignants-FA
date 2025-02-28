@@ -172,7 +172,7 @@ class Internship extends Model
      * Calcule la distance entre un stage et un enseignant
      *
      * @param string $internship_identifier L'identifiant du stage
-     * @param string $id_teacher            L'identifiant du professeur
+     * @param string $id_teacher            L'identifiant de l'enseignant
      * @param bool   $bound                 True si un enseignant est déjà associé
      *                                      au stage, false sinon
      *
@@ -280,13 +280,13 @@ class Internship extends Model
     }
 
     /**
-     * Calcule la pertinence des stages pour un professeur
+     * Calcule la pertinence des stages pour un enseignant
      * et des stages en fonction de plusieurs critères de pondération.
      *
-     * @param Department $departmentModel le modèmle de la table departement
+     * @param Department $departmentModel le modèle de la table departement
      * @param Teacher    $teacherModel    le modèle de la table
-     *                                    professeur
-     * @param array      $teacher         la liste des professeur
+     *                                    enseignant
+     * @param array      $teacher         la liste des enseignants
      * @param array      $dictCoef        Tableau associatif des critères de calcul
      *                                    et leurs coefficients
      * 
@@ -310,6 +310,7 @@ class Internship extends Model
             }
         }
 
+
         $result = array();
 
         foreach ($internshipList as $internship) {
@@ -321,12 +322,12 @@ class Internship extends Model
         if (!empty($result)) {
             return $result;
         }
-        return [[]];
+        return [];
     }
 
     /**
      * Permet de calculer pour un stage/alternance
-     * le score avec tous les professeur de son departement
+     * le score avec tous les enseignants de son departement
      *
      * @param string $internship l'identifiant du stage/alternance
      * @param array  $dictCoef   Tableau associatif des critères
@@ -342,7 +343,7 @@ class Internship extends Model
                 Teacher.teacher_firstname,
                 SUM(CASE WHEN internship.type = 'alternance' THEN 1 ELSE 0 END) 
                     AS current_count_apprentice, 
-                SUM(CASE WHEN internship.type = 'Internship' THEN 1 ELSE 0 END) 
+                SUM(CASE WHEN internship.type = 'internship' THEN 1 ELSE 0 END) 
                     AS current_count_intern FROM Teacher  
                 JOIN (SELECT DISTINCT user_id, department_name FROM has_role) 
                     AS has_role
@@ -363,7 +364,7 @@ class Internship extends Model
                 GROUP BY Teacher.Id_teacher, Teacher.teacher_name, 
                          Teacher.teacher_firstname
                 HAVING Teacher.Maxi_number_intern > SUM(CASE 
-                    WHEN internship.type = 'Internship' THEN 1 ELSE 0 END) 
+                    WHEN internship.type = 'internship' THEN 1 ELSE 0 END) 
                    AND Teacher.Maxi_number_apprentice > SUM(CASE 
                        WHEN internship.type = 'alternance' THEN 1 ELSE 0 END)";
 
@@ -389,7 +390,6 @@ class Internship extends Model
 
 
         $result = array();
-
         foreach ($teacherList as $teacher) {
             $result[] = $this
                 ->calculateRelevanceTeacherStudentsAssociate(
@@ -404,17 +404,18 @@ class Internship extends Model
         return [[]];
     }
 
+
     /**
      * Renvoie un score associé à la pertinence entre
      * le sujet du stage et les disciplines enseignées
-     * par le professeur, tous deux passés en paramètre
+     * par l'enseignant, tous deux passés en paramètre
      *
      * @param string $internshipId numéro du stage
      * @param string $identifier   identifiant de l'enseignant
      *
      * @return float score associé à la pertinence
      * entre le sujet de stage et les disciplines
-     * enseignées par le professeur connecté
+     * enseignées par l'enseignant connecté
      */
     public function scoreDiscipSubject(
         string $internshipId, string $identifier
@@ -504,10 +505,10 @@ class Internship extends Model
     }
 
     /**
-     * Permet de savoir si un professeur a tutorer un etudiant
+     * Permet de savoir si un enseignant a demandé à tutorer un étudiant
      *
      * @param string $internship_identifier l'identifiant du stage/alternance
-     * @param string $id_teacher            l'identifiant du professeur
+     * @param string $id_teacher            l'identifiant de l'enseignant
      *
      * @return bool
      */
@@ -555,11 +556,11 @@ class Internship extends Model
               . "Maxi_number_apprentice AS max_apprentice, "
               . "SUM(CASE WHEN internship.type = 'alternance' THEN 1 ELSE 0 END) "
               . "AS current_count_apprentice, 
-              SUM(CASE WHEN internship.type = 'Internship' THEN 1 ELSE 0 END) 
-              AS current_count_intern 
-              FROM Teacher 
-              JOIN (SELECT DISTINCT user_id, department_name FROM has_role) 
-              AS has_role ON Teacher.Id_teacher = has_role.user_id "
+                  SUM(CASE WHEN internship.type = 'internship' THEN 1 ELSE 0 END) 
+                  AS current_count_intern 
+                  FROM Teacher 
+                  JOIN (SELECT DISTINCT user_id, department_name FROM has_role) 
+                  AS has_role ON Teacher.Id_teacher = has_role.user_id "
               . "LEFT JOIN internship "
               . "ON Teacher.Id_teacher = internship.Id_teacher "
               . "WHERE department_name IN ($placeholders) "
@@ -575,8 +576,10 @@ class Internship extends Model
         $listTeacherIntern = [];
         $listTeacherApprentice = [];
 
+
         foreach ($teacherData as $teacher) {
-            $listTeacherMaxIntern[$teacher['id_teacher']] = $teacher['max_intern'];
+            $listTeacherMaxIntern[$teacher['id_teacher']]
+                = $teacher['max_intern'];
             $listTeacherMaxApprentice[$teacher['id_teacher']]
                 = $teacher['max_apprentice'];
             $listTeacherIntern[$teacher['id_teacher']]
@@ -588,6 +591,7 @@ class Internship extends Model
         $listFinal = [];
         $listStart = [];
         $listEleveFinal = [];
+
 
         foreach ($teacherData as $teacher) {
             foreach ($this->relevanceTeacher(
@@ -615,15 +619,17 @@ class Internship extends Model
             [$topCandidate['id_teacher']];
             if ($assignedTopIntern < $listTopIntern
                 && !in_array($topCandidate['internship_identifier'], $listEleveFinal)
-                && $topCandidate['type'] === 'Internship'
+                && $topCandidate['type'] === 'internship'
             ) {
-                    $listFinal[] = $topCandidate;
+
+                $listFinal[] = $topCandidate;
                     $listEleveFinal[] = $topCandidate['internship_identifier'];
                     ++ $assignedCountsIntern[$topCandidate['id_teacher']];
             } elseif ($assignedTopApprentice < $listTopApprentice
                 && !in_array($topCandidate['internship_identifier'], $listEleveFinal)
                 && $topCandidate['type'] === 'alternance'
             ) {
+
                 $listFinal[] = $topCandidate;
                 $listEleveFinal[] = $topCandidate['internship_identifier'];
                 ++ $assignedCountsApprentice[$topCandidate['id_teacher']];
@@ -658,7 +664,7 @@ class Internship extends Model
     }
 
     /**
-     * Récupère une liste des élèves et professeurs associés
+     * Récupère une liste des élèves et enseignants associés
      * inscrits dans les départements dont l'admin est responsable.
      *
      * @return array|false Un tableau contenant
@@ -781,8 +787,8 @@ class Internship extends Model
                   . 'LEFT JOIN teacher '
                       . 'ON internship.id_teacher = teacher.id_teacher '
                   . 'WHERE internship.student_number = :student '
-                  . 'AND start_date_internship > CURRENT_DATE '
-                  . 'ORDER BY start_date_internship ASC '
+                  . 'AND end_date_internship > CURRENT_DATE '
+                  . 'ORDER BY end_date_internship ASC '
                   . 'LIMIT 1';
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindParam(':student', $student);
