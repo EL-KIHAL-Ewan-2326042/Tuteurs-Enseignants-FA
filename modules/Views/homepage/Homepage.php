@@ -459,7 +459,8 @@ readonly class Homepage
                                     <tr class="homepage-row clickable"
                                         data-selected-row="<?php
                                         echo str_replace('_', "'", $row['address'])
-                                            . '$' . $row['student_name']
+                                        . '$'
+                                        . str_replace('_', ' ', $row["company_name"])
                                         ?>">
                                         <td><?php
                                             echo $row["student_name"] . " " .

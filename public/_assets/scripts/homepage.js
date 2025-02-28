@@ -194,10 +194,10 @@ document.addEventListener(
                                 clickedRow.getAttribute('data-selected-row');
                             const [
                                 clickedRowAddress,
-                                clickedRowName
+                                clickedRowLabel
                             ] = clickedRowData.split('$');
 
-                            updateMarkers(clickedRowAddress, clickedRowName).then();
+                            updateMarkers(clickedRowAddress, clickedRowLabel).then();
                             event.preventDefault();
                         }
                     );
@@ -205,10 +205,10 @@ document.addEventListener(
             );
         }
 
-        async function updateMarkers(address, name)
+        async function updateMarkers(address, label)
         {
             if (typeof clickedRowOverlay !== "undefined" && typeof clickedRowAddress !== "undefined"
-                && clickedRowOverlay.element.querySelector("div").innerHTML === name
+                && clickedRowOverlay.element.querySelector("div").innerHTML === label
                 && clickedRowAddress === address
             ) {
                 return;
@@ -218,7 +218,7 @@ document.addEventListener(
             const selectedRowMarker = new ol.Overlay(
                 {
                     position: ol.proj.fromLonLat([selectedRowLocation.lon, selectedRowLocation.lat]),
-                    element: createMarkerElement(`${name}`),
+                    element: createMarkerElement(label, "yellow", "black"),
                 }
             );
 
@@ -296,7 +296,7 @@ async function initMap()
             const teacherMarker = new ol.Overlay(
                 {
                     position: ol.proj.fromLonLat([teacherLocation.lon, teacherLocation.lat]),
-                    element: createMarkerElement("Vous"),
+                    element: createMarkerElement("Vous", "blue", "white"),
                 }
             );
             map.addOverlay(teacherMarker);
@@ -306,7 +306,7 @@ async function initMap()
             const companyMarker = new ol.Overlay(
                 {
                     position: ol.proj.fromLonLat([companyLocation.lon, companyLocation.lat]),
-                    element: createMarkerElement("Entreprise"),
+                    element: createMarkerElement("Entreprise", "red", "white"),
                 }
             );
             map.addOverlay(companyMarker);
@@ -407,22 +407,50 @@ async function calculateDistance(origin, destination, map)
 }
 
 /**
- * Crée un élément de marqueur
+ * Crée un élément de marqueur amélioré
  *
  * @param {string} label Étiquette du marqueur
+ * @param bgColor
+ * @param labelColor
  *
  * @returns {HTMLElement} Élément du marqueur
  */
-function createMarkerElement(label)
+function createMarkerElement(label, bgColor, labelColor)
 {
     const marker = document.createElement("div");
-    marker.className = "marker";
-    marker.textContent = label;
-    marker.style.backgroundColor = "blue";
-    marker.style.color = "white";
-    marker.style.padding = "5px";
-    marker.style.borderRadius = "50%";
-    marker.style.textAlign = "center";
+    marker.className = "enhanced-marker";
+
+    const markerLabel = document.createElement("div");
+    markerLabel.className = "marker-label";
+    markerLabel.textContent = label;
+
+    const pointer = document.createElement("div");
+    pointer.className = "marker-pointer";
+
+    marker.appendChild(markerLabel);
+    marker.appendChild(pointer);
+
+    marker.style.position = "absolute";
+    marker.style.display = "flex";
+    marker.style.flexDirection = "column";
+    marker.style.alignItems = "center";
+    marker.style.zIndex = "1"
+
+    markerLabel.style.backgroundColor = bgColor;
+    markerLabel.style.color = labelColor;
+    markerLabel.style.padding = "2px 5px";
+    markerLabel.style.borderRadius = "3px";
+    markerLabel.style.fontSize = "10px";
+    markerLabel.style.textAlign = "center";
+    markerLabel.style.boxShadow = "0 1px 3px rgba(0, 0, 0, 0.2)";
+
+    pointer.style.width = "0";
+    pointer.style.height = "0";
+    pointer.style.borderLeft = "4px solid transparent";
+    pointer.style.borderRight = "4px solid transparent";
+    pointer.style.borderTop = "6px solid " + bgColor;
+    pointer.style.marginTop = "-1px";
+
     return marker;
 }
 
