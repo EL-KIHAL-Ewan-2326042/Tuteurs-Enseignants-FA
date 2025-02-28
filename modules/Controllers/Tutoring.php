@@ -18,7 +18,7 @@
 
 namespace Blog\Controllers;
 
-use Blog\Models\Internship;
+use Blog\Models\Department;
 use Blog\Models\User;
 use Blog\Views\tutoring\Tutoring as TutoringView;
 use Blog\Views\layout\Layout;
@@ -57,7 +57,7 @@ class Tutoring
     }
 
     /**
-     * Contrôleur de la page 'Compte'
+     * Contrôleur de la page 'Stages'
      *
      * @return void
      */
@@ -72,9 +72,9 @@ class Tutoring
 
             $db = Database::getInstance();
             $userModel = new User($db);
-            $internshipModel = new Internship($db);
+            $departmentModel = new Department($db);
 
-            $view = new TutoringView($userModel, $internshipModel);
+            $view = new TutoringView($userModel, $departmentModel);
 
             $title = "Stages";
             $cssFilePath = '_assets/styles/tutoring.css';
