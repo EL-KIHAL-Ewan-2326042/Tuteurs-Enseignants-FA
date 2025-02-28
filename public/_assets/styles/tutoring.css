@@ -1,0 +1,217 @@
+@import "global.css";
+
+main {
+    flex-direction: column;
+}
+
+h1 {
+    font-size: 2.92rem;
+    margin: 1.95rem 0 1.168rem 0;
+}
+
+h2 {
+    font-size: 2.28rem;
+    margin: 1.52rem 0 0.912rem 0;
+}
+
+h1, h2 {
+    color: var(--main-color);
+}
+
+main a {
+    color: black;
+}
+
+main a:visited {
+    color: black;
+}
+
+main a:hover {
+    color: var(--main-color);
+}
+
+.inline {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+.btn {
+    background-color: #00558B;
+    z-index: 0;
+}
+
+.btn:hover {
+    background-color: #E8CE7E !important;
+}
+
+/* Style des options dans le menu déroulant du select */
+.dropdown-content li>a, .dropdown-content li>span{
+    padding: 15px;
+    color: #00558B;
+}
+
+input[type="checkbox"].filled-in:checked + span:after {
+    background-color: #00558B !important;
+    border-color: #00558B !important;
+}
+
+/* Tableau Tutoring */
+
+.clickable {
+    cursor: pointer;
+}
+
+.table {
+    width: 85%;
+}
+
+thead {
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+thead, tbody tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+}
+
+tbody {
+    width: 100%;
+    display: block;
+}
+
+#tutoring-table,
+#search-table,
+#tutoring-table {
+    min-width: 800px;
+    font-size: 14px;
+    width: 100%;
+}
+
+#tutoring-table th, #tutoring-table td,
+#search-table th, #search-table td,
+#tutoring-table th, #tutoring-table td {
+    padding: 6px 10px;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+#tutoring-table thead th,
+#search-table thead th,
+#tutoring-table thead th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+#tutoring-table tbody tr:nth-child(even),
+#search-table tbody tr:nth-child(even),
+#tutoring-table tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+#tutoring-table tbody tr:hover,
+#search-table tbody tr:hover,
+#tutoring-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
+
+@media screen and (max-width: 768px) {
+    #tutoring-table,
+    #search-table,
+    #tutoring-table {
+        font-size: 12px;
+    }
+
+    #tutoring-table th, #tutoring-table td,
+    #search-table th, #search-table td,
+    #tutoring-table th, #tutoring-table td {
+        padding: 4px 8px;
+    }
+}
+
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+    color: #8F0000 !important;
+    font-weight: bold;
+}
+
+/** Pagination et Checkbox **/
+
+#pagination-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 10px 0;
+    margin-top: 20px;
+}
+
+#pagination-controls button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    padding: 0 10px;
+    margin: 0;
+}
+
+#pagination-controls span {
+    margin: 0 10px;
+    font-size: 16px;
+}
+
+#pagination-controls #page-numbers {
+    display: flex;
+    gap: 5px;
+}
+
+#pagination-controls button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media screen and (max-width: 600px) {
+    #pagination-controls button {
+        font-size: 14px;
+        padding: 0 5px;
+    }
+
+    #pagination-controls span {
+        font-size: 14px;
+    }
+}
+
+main table {
+    @media (max-width: 830px) {
+        font-size: 0.8rem;
+    }
+
+    @media (max-width: 650px) {
+        font-size: 0.7rem;
+    }
+
+    @media (max-width: 600px) {
+        font-size: 0.65rem;
+    }
+
+    @media (max-width: 550px) {
+        font-size: 0.6rem;
+    }
+
+    @media (max-width: 500px) {
+        font-size: 0.52rem;
+    }
+
+    @media (max-width: 450px) {
+        font-size: 0.47rem;
+    }
+
+    width: 85%;
+    border: solid #e0e0e0 1px;
+}
