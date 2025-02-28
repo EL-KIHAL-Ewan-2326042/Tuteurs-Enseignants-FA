@@ -1,7 +1,7 @@
 ### Documentation des tables de la base de données ###  
 ### Schéma MLD
 
-![Image Schéma MLD](https://i.imgur.com/N4K7Xnu.png)
+![Image Schéma MLD](https://i.imgur.com/1Yhr68G.png)
 
 ---
 
@@ -14,7 +14,8 @@
   - `Id_teacher` (`VARCHAR(10)`) : Identifiant unique de l'enseignant (clé primaire)(ce numéro est nécessairement un `user_id` permettant à l'enseignant d'accéder au site).
   - `Teacher_name` (`VARCHAR(50)`) : Nom de l'enseignant.
   - `Teacher_firstname` (`VARCHAR(50)`) : Prénom de l'enseignant.
-  - `Maxi_number_trainees` (`INT`) : Nombre maximum de stagiaires qu'un enseignant peut superviser.
+  - `Maxi_number_intern` (`INT`) : Nombre maximum d'alternant qu'un enseignant peut superviser.
+  - - `Maxi_number_apprentice` (`INT`) : Nombre maximum de stagiaires qu'un enseignant peut superviser.
 
 #### 1.2 **Student**
 - **Table** : `Student`
