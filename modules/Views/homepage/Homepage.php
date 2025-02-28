@@ -68,8 +68,6 @@ readonly class Homepage
     {
         ?>
         <main>
-            <?php if (in_array("Professeur", $_SESSION['roles'])) : ?>
-
             <h1 class="center-align">Demande de stagiaire/alternant</h1>
 
             <h2 class="center-align">Recherche d'étudiant</h2>
@@ -582,121 +580,7 @@ readonly class Homepage
                         </form>
                             <?php endif;
                         endif;
-                    endif;
-            endif;
-
-
-            if (in_array("Admin_dep", $_SESSION['roles'])) : ?>
-
-            <h1 class="center-align">Stages et alternances dans vos départements</h1>
-
-                <?php
-                if (!isset($departments)) {
-                    $departments = $this->teacherModel
-                        ->getDepTeacher($_SESSION['identifier']);
-                }
-                $table = $this->internshipModel
-                    ->getInternshipsWithTutor($departments);
-
-                if ($table && sizeof($table) > 0) : ?>
-
-                    <div class="table">
-                        <table class="highlight centered" id="admin-homepage-table">
-                            <thead <?php
-                            if (count($table) > 1) {
-                                echo 'class="clickable"';
-                            } ?>>
-                                <tr>
-                                    <th>DEPARTEMENT</th>
-                                    <th>ETUDIANT</th>
-                                    <th>FORMATION</th>
-                                    <th>GROUPE</th>
-                                    <th>TUTEUR</th>
-                                    <th>TYPE</th>
-                                    <th>DATE DE DEBUT</th>
-                                    <th>DATE DE FIN</th>
-                                    <th>ENTREPRISE</th>
-                                    <th>SUJET</th>
-                                    <th>ADRESSE</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            <?php foreach ($table as $row) : ?>
-                                <tr class="admin-homepage-row">
-                                    <td><?php
-                                        echo str_replace(
-                                            '_', ' ', $row['department_name']
-                                        )
-                                        ?></td>
-                                    <td><?php
-                                        echo $row["student_name"] . " " .
-                                            $row["student_firstname"]
-                                    ?></td>
-                                    <td><?php
-                                        echo str_replace(
-                                            '_', ' ',
-                                            $row["formation"]
-                                        )
-                                        ?></td>
-                                    <td><?php
-                                        echo str_replace(
-                                            '_', ' ', $row["class_group"]
-                                        )
-                                        ?></td>
-                                    <td><?php
-                                        echo $row["teacher_name"] . " " .
-                                            $row["teacher_firstname"]
-                                    ?></td>
-                                    <td><?php
-                                        echo strtolower(
-                                            $row["type"]
-                                        ) === "internship" ? "Stage" : "Alternance";
-                                        ?></td>
-                                    <td><?php
-                                        echo substr(
-                                            $row["start_date_internship"], -2
-                                        ) . '/' . substr(
-                                            $row["start_date_internship"], 5, 2
-                                        ) . '/' . substr(
-                                            $row["start_date_internship"], 0, 4
-                                        )
-                                        ?></td>
-                                    <td><?php
-                                        echo substr(
-                                            $row["end_date_internship"], -2
-                                        ) . '/' . substr(
-                                            $row["end_date_internship"], 5, 2
-                                        ) . '/' . substr(
-                                            $row["end_date_internship"], 0, 4
-                                        )
-                                        ?></td>
-                                    <td><?php
-                                        echo str_replace(
-                                            '_', ' ',
-                                            $row["company_name"]
-                                        )
-                                        ?></td>
-                                    <td><?php
-                                        echo str_replace(
-                                            '_', ' ', $row["internship_subject"]
-                                        )
-                                        ?></td>
-                                    <td><?php
-                                        echo str_replace(
-                                            '_', "'", $row['address']
-                                        )
-                                        ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                    <?php
-                else :
-                    echo "<h6 class='left-align'
-                    >Aucun stage à afficher</h6>";
-                endif;
-            endif; ?>
+                    endif; ?>
 
             <script>
                 <?php if (!empty($_SESSION['address'])) : ?>
