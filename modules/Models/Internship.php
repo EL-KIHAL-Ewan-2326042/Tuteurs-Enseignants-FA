@@ -969,7 +969,7 @@ class Internship extends Model
      * @param array $departments Tableau contenant les départements dont on veut
      *                           récupérer les stages et alternances
      *
-     * @return false|array Retourne un tableau contenant toutes les données relatives
+     * @return false|array Renvoie un tableau contenant toutes les données relatives
      * aux stages et alternances, si la liste de départements passée en paramètre est
      * vide ou qu'aucun résultat n'est trouvé alors le tableau est vide, false sinon
      */
@@ -981,12 +981,12 @@ class Internship extends Model
 
         $departmentList = "";
         foreach ($departments as $department) {
-            $departmentList .= "'" . $department['department_name'] . "', ";
+            $departmentList .= "'" . $department . "', ";
         }
         $departmentList = substr($departmentList, 0, -2);
 
-        $query = "SELECT department_name, student_firstname, student_name, formation,
-                  class_group, teacher_firstname, teacher_name, type,
+        $query = "SELECT DISTINCT department_name, student_firstname, student_name,
+                  formation, class_group, teacher_firstname, teacher_name, type,
                   start_date_internship, end_date_internship, company_name,
                   internship_subject, address
                   FROM internship
