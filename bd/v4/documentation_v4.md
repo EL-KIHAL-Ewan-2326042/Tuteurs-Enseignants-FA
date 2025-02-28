@@ -15,7 +15,7 @@
   - `Teacher_name` (`VARCHAR(50)`) : Nom de l'enseignant.
   - `Teacher_firstname` (`VARCHAR(50)`) : Prénom de l'enseignant.
   - `Maxi_number_intern` (`INT`) : Nombre maximum d'alternant qu'un enseignant peut superviser.
-  - - `Maxi_number_apprentice` (`INT`) : Nombre maximum de stagiaires qu'un enseignant peut superviser.
+  - `Maxi_number_apprentice` (`INT`) : Nombre maximum de stagiaires qu'un enseignant peut superviser.
 
 #### 1.2 **Student**
 - **Table** : `Student`
