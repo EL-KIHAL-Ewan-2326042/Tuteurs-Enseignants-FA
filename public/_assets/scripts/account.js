@@ -1,5 +1,5 @@
 /**
- * Dès le chargement de la page on associe un listener à l'input 'newMaxNumber'
+ * Dès le chargement de la page on associe un listener à l'input 'newMaxIntern' et 'newMaxApprentice'
  *
  * @type {HTMLElement}
  */
