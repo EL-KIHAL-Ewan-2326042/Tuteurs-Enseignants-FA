@@ -451,17 +451,15 @@ document.addEventListener(
         }
 
         const rowsPerPageDropdown = document.getElementById('rows-per-page');
-        let rowsPerPage = sessionStorage.getItem("rowsCountHP") ? Number(sessionStorage.getItem("rowsCountHP")) : parseInt(rowsPerPageDropdown.value); // Set default to 10
+        let rowsPerPage = parseInt(rowsPerPageDropdown.value); // Set default to 10
         if (rowsPerPage !== 10) {
             rowsPerPageDropdown.options[rowsPerPage === 20 ? 1 : rowsPerPage === 50 ? 2 : rowsPerPage === 100 ? 3 : 4].selected = true;
         }
-        sessionStorage.setItem("rowsCountHP", String(rowsPerPage));
 
         let rows = document.querySelectorAll('.homepage-row');
         let totalRows = rows.length;
         let totalPages = Math.ceil(totalRows / rowsPerPage);
-        let currentPage = sessionStorage.getItem("pageHP") && Number(sessionStorage.getItem("pageHP")) <= totalPages
-        && rowsPerPage === 10 ? Number(sessionStorage.getItem("pageHP")) : 1;
+        let currentPage = 1;
 
         const prevButton = document.getElementById('prev-page');
         const nextButton = document.getElementById('next-page');
@@ -470,11 +468,7 @@ document.addEventListener(
         const pageNumbersContainer = document.getElementById('page-numbers');
 
         if (document.getElementById("homepage-table").rows.length > 2) {
-            if (!(sessionStorage.getItem('columnNumberHP') && sessionStorage.getItem('directionHP'))) {
-                sessionStorage.setItem('columnNumberHP', "0");
-                sessionStorage.setItem('directionHP', "asc");
-            }
-            sortTable(Number(sessionStorage.getItem('columnNumberHP')), true);
+            sortTable(currentPage);
 
             for (let i = 0; i < document.getElementById("homepage-table").rows[0].cells.length; ++i) {
                 document.getElementById("homepage-table").rows[0].getElementsByTagName("TH")[i].addEventListener(
@@ -490,20 +484,17 @@ document.addEventListener(
          * Trie la table prenant pour id "homepage-table"
          *
          * @param n numéro désignant la colonne par laquelle on trie le tableau
-         * @param firstLoad booléen indiquant si cet appel est le premier depuis le chargement de la page
          */
-        function sortTable(n, firstLoad = false)
+        function sortTable(n)
         {
             let dir, rows, switching, i, x, y, shouldSwitch, column;
             const table = document.getElementById("homepage-table");
             switching = true;
 
-            if (!firstLoad) {
-                if (table.rows[0].getElementsByTagName("TH")[n].innerHTML.substring(table.rows[0].getElementsByTagName("TH")[n].innerHTML.length - 1) === "▲") { dir = "desc";
-                } else { dir = "asc";
-                }
+            if (table.rows[0].getElementsByTagName("TH")[n].innerHTML.substring(table.rows[0].getElementsByTagName("TH")[n].innerHTML.length - 1) === "▲") {
+                dir = "desc";
             } else {
-                dir = sessionStorage.getItem('directionHP');
+                dir = "asc";
             }
 
             while (switching) {
@@ -565,8 +556,6 @@ document.addEventListener(
                 );
             }
 
-            sessionStorage.setItem('columnNumberHP', n);
-            sessionStorage.setItem('directionHP', dir);
             showPage(currentPage);
         }
 
@@ -592,8 +581,6 @@ document.addEventListener(
             nextButton.disabled = currentPage === totalPages;
             firstButton.disabled = currentPage === 1;
             lastButton.disabled = currentPage === totalPages;
-
-            sessionStorage.setItem('pageHP', currentPage);
         }
 
         function updatePageNumbers()
@@ -654,7 +641,6 @@ document.addEventListener(
         rowsPerPageDropdown.addEventListener(
             'change', function () {
                 rowsPerPage = parseInt(rowsPerPageDropdown.value);
-                sessionStorage.setItem("rowsCountHP", String(rowsPerPage));
                 totalPages = Math.ceil(rows.length / rowsPerPage);
                 currentPage = 1;
                 showPage(currentPage);
