@@ -73,7 +73,8 @@ class Tutoring
             if ($table && sizeof($table) > 0) : ?>
 
             <div class="table">
-                <table class="highlight centered" id="tutoring-table">
+                <table class="highlight centered
+                              responsive-table" id="tutoring-table">
                     <thead <?php
                     if (count($table) > 1) {
                         echo 'class="clickable"';
@@ -165,22 +166,6 @@ class Tutoring
                     </tbody>
                 </table>
 
-                <div class="row">
-                    <div class="input-field col s2">
-                        <select id="rows-per-page">
-                            <option value="10" selected>10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                            <option value="<?php echo count($table)?>">
-                                Tout
-                            </option>
-                        </select>
-                        <label
-                                for="rows-per-page"
-                        >Nombre de lignes par page</label>
-                    </div>
-                </div>
 
                 <div id="pagination-controls" class="center-align">
                     <button type="button" class=
@@ -205,6 +190,24 @@ class Tutoring
                             last_page
                         </i></button>
                 </div>
+
+                <div class="row">
+                    <div class="input-field col s6 m2">
+                        <select id="rows-per-page">
+                            <option value="10" selected>10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="<?php echo count($table)?>">
+                                Tout
+                            </option>
+                        </select>
+                        <label
+                                for="rows-per-page"
+                        >Nombre de lignes par page</label>
+                    </div>
+                </div>
+
             </div>
                 <?php
             else :
