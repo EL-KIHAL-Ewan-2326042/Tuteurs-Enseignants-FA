@@ -83,13 +83,11 @@ class Dispatcher
     {
         ?>
         <main>
-            <div class="col">
-                <h3 class="center-align flow-text">
-                    Répartiteur de tuteurs enseignants
-                </h3>
-
-                <?php
-                if (!isset($_POST['action']) || $_POST['action'] !== 'generate') : ?>
+            <h3 class="center-align flow-text">
+                Répartiteur de tuteurs enseignants
+            </h3>
+            <?php
+            if (!isset($_POST['action']) || $_POST['action'] !== 'generate') : ?>
                 <div class="row" id="forms-section">
                     <div class="col card-panel white z-depth-3 s10 m5 l5"
                          style="padding: 20px; margin-right: 10px">
@@ -101,28 +99,28 @@ class Dispatcher
                             if ($saves) : ?>
                                 <div class="input-field">
                                     <label
-                                    for="save-selector"
+                                            for="save-selector"
                                     >Sélectionnez une sauvegarde</label>
                                     <br><br>
                                     <select id="save-selector" name="save-selector">
                                         <option
-                                        value="new">Nouvelle Sauvegarde
+                                                value="new">Nouvelle Sauvegarde
                                         </option>
                                         <?php foreach ($saves as $save): ?>
                                             <?php $id_backup = $save['id_backup'];
-                                                  $name_save = $save['name_save'];?>
-                                        <option value="<?php echo $id_backup; ?>"
-                                            <?php
-                                            if (isset($_POST['save-selector'])) {
-                                                $saveSelected
-                                                    = $_POST['save-selector'];
-                                            }
-                                            if (isset($_POST['save-selector'])
-                                                && $saveSelected == $id_backup
-                                            ) : ?>
-                                        selected
-                                            <?php endif; ?>
-                                        ><?php echo $name_save; ?>
+                                            $name_save = $save['name_save'];?>
+                                            <option value="<?php echo $id_backup; ?>"
+                                                <?php
+                                                if (isset($_POST['save-selector'])) {
+                                                    $saveSelected
+                                                        = $_POST['save-selector'];
+                                                }
+                                                if (isset($_POST['save-selector'])
+                                                    && $saveSelected == $id_backup
+                                                ) : ?>
+                                                    selected
+                                                <?php endif; ?>
+                                            ><?php echo $name_save; ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
@@ -164,37 +162,39 @@ class Dispatcher
                                     <div class="col s6">
                                         <p>
                                             <label>
-                                               <input type="hidden"
-                                               name="is_checked[<?php echo $name;?>]"
-                                               value="0">
+                                                <input type="hidden"
+                                                   name=
+                                                   "is_checked[<?php echo $name;?>]"
+                                                   value="0">
                                                 <input type="checkbox"
                                                    class=
                                                    "filled-in criteria-checkbox"
                                                    name=
                                                    "criteria_on[<?php echo $name;?>]"
-                                           data-coef-input-id="<?php echo $name; ?>"
-                                                   <?php
+                                                   data-coef-input-id=
+                                                   "<?php echo $name; ?>"
+                                                    <?php
                                                     if ($criteria['is_checked']
                                                     ) : ?>
-                                                   checked="checked"
+                                                        checked="checked"
                                                         <?php
                                                     endif; ?> />
                                                 <span class="tooltipped"
-                                                data-position="top"
-                                                data-tooltip=
-                                                  "<?php echo $description ?>">
-                                                    <?php echo $name; ?>
-                                                </span>
+                                                      data-position="top"
+                                                      data-tooltip=
+                                                      "<?php echo $description ?>">
+                                                <?php echo $name; ?>
+                                            </span>
                                             </label>
                                         </p>
                                     </div>
                                     <div class="col s6">
                                         <div class="input-field">
                                             <input type="number" class="coef-input"
-                                               name="coef[<?php echo $name; ?>]"
-                                               id="<?php echo $name; ?>"
-                                               min="1" max="100"
-                                               value="<?php echo $value ?>"
+                                                   name="coef[<?php echo $name; ?>]"
+                                                   id="<?php echo $name; ?>"
+                                                   min="1" max="100"
+                                                   value="<?php echo $value ?>"
                                             />
                                             <label for="<?php echo $name; ?>">Coeff
                                             </label>
@@ -223,40 +223,12 @@ class Dispatcher
                                 $btnValue = "Enregistrer";
                             }
                             ?>
+
                             <div class="row">
                                 <div class="col s12 m8 l8">
-                                    <div class="flex-container">
-                                        <button class="btn waves-effect
-                                        waves-light button-margin tooltipped red"
-                                                type="submit" name="action-delete"
-                                                value="<?php echo $id_backup ?>"
-                                                id="delete-btn"
-                                                data-position="top"
-                                                data-tooltip="
-                                                Supprimer la sauvegarde">
-                                            Supprimer
-                                            <i class="material-icons right"
-                                            >delete</i>
-                                        </button>
-                                        <button class="btn waves-effect
-                                        waves-light button-margin tooltipped"
-                                                type="submit" name="action-save"
-                                                value="<?php echo $id_backup ?>"
-                                                id="save-btn"
-                                                data-position="top"
-                                                data-tooltip=
-                                                <?php echo $tooltip ?>>
-                                            <?php echo $btnValue ?>
-                                            <i class=
-                                            "material-icons right">arrow_downward</i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div class="col s12">
                                     <div>
                                         <button class="btn waves-effect
-                                        waves-light button-margin tooltipped"
+                                    waves-light button-margin tooltipped"
                                                 type="submit" name="action"
                                                 value="generate" id="generate-btn"
                                                 data-position="top"
@@ -268,6 +240,38 @@ class Dispatcher
                                     </div>
                                 </div>
                             </div>
+
+                            <div class="row">
+                                <div class="col s12 m8 l8">
+                                    <div class="flex-container">
+                                        <button class="btn waves-effect
+                                    waves-light button-margin tooltipped"
+                                                type="submit" name="action-save"
+                                                value="<?php echo $id_backup ?>"
+                                                id="save-btn"
+                                                data-position="top"
+                                                data-tooltip=
+                                            <?php echo $tooltip ?>>
+                                            <?php echo $btnValue ?>
+                                            <i class=
+                                               "material-icons right"
+                                            >arrow_downward</i>
+                                        </button>
+                                        <button class="btn waves-effect
+                                    waves-light button-margin tooltipped red"
+                                                type="submit" name="action-delete"
+                                                value="<?php echo $id_backup ?>"
+                                                id="delete-btn"
+                                                data-position="top"
+                                                data-tooltip="
+                                            Supprimer la sauvegarde">
+                                            Supprimer
+                                            <i class="material-icons right"
+                                            >delete</i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </form>
                     </div>
 
@@ -275,17 +279,17 @@ class Dispatcher
                           style="padding: 20px;" action="./dispatcher"
                           method="post" id="associate-form">
                         <div class="row">
-                            <p class="text">Associe un professeur à un stage
+                            <p class="text">Associe un enseignant à un stage
                                 (ne prend pas en compte le nombre maximum d'étudiant,
                                 mais le fait que le stage soit déjà attribué)</p>
                             <div class="input-field col s6">
                                 <input id="searchTeacher" name="searchTeacher"
                                    type="text" class="validate">
-                                <label for="searchTeacher">ID professeur</label>
+                                <label for="searchTeacher">ID enseignant</label>
                             </div>
                             <div class="input-field col s6">
                                 <input id="searchInternship" name="searchInternship"
-                                   type="text" class="validate">
+                                       type="text" class="validate">
                                 <label for="searchInternship">ID Stage</label>
                             </div>
                             <div id="searchResults"></div>
@@ -298,13 +302,13 @@ class Dispatcher
                             <div class="col s12">
                                 <button class=
                                         "btn waves-effect
-                                        waves-light button-margin tooltipped"
+                                    waves-light button-margin tooltipped"
                                         type="submit" name="action"
                                         data-position="top"
                                         data-tooltip="Valider l'association">
                                     Associer
-                                    <i
-                                    class="material-icons right">arrow_downward</i>
+                                    <i class=
+                                       "material-icons right">arrow_downward</i>
                                 </button>
                             </div>
                         </div>
@@ -320,214 +324,234 @@ class Dispatcher
                         <div class="indeterminate"></div>
                     </div>
                 </div>
-                <?php endif;
+            <?php endif;
 
-                if (isset($_POST['coef']) && isset($_POST['action'])
-                    && $_POST['action'] === 'generate'
-                ) : ?>
-                    <div id="map"></div>
-                    <div class="row"></div>
+            if (isset($_POST['coef']) && isset($_POST['action'])
+                && $_POST['action'] === 'generate'
+            ) : ?>
+            <div class="center">
+                <div id="map" class="map-container" style="position: relative;">
+                    <div id="map-loading-overlay" style="display: none;">
+                        <div class="loading-message">Mise à jour de la map...</div>
+                        <div class="progress">
+                            <div class="indeterminate"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row"></div>
 
-                    <form action="./dispatcher" method="post">
-                        <div class=
-                             "dispatch-table-wrapper selection table-container">
-                            <table class
-                                   ="highlight centered"
-                                id="dispatch-table">
-                                <thead class="clickable">
-                                <tr>
-                                    <th>Enseignant</th>
-                                    <th>Etudiant</th>
-                                    <th>Stage</th>
-                                    <th>Formation</th>
-                                    <th>Groupe</th>
-                                    <th>Sujet</th>
-                                    <th>Adresse</th>
-                                    <th>Score</th>
-                                    <th>Associer</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                        <?php
-                        $dictCoef = array_filter(
-                            $_POST['coef'], function ($coef, $key) {
-                                return isset($_POST['criteria_on'][$key]);
-                            }, ARRAY_FILTER_USE_BOTH
-                        );
-
-                        if (!empty($dictCoef)) {
-                            $escapedJson = htmlspecialchars(
-                                json_encode($dictCoef),
-                                ENT_QUOTES
+                <form action="./dispatcher" method="post">
+                    <div class=
+                         "dispatch-table-wrapper selection table-container">
+                        <table class
+                               ="highlight centered
+                                 responsive-table"
+                               id="dispatch-table">
+                            <thead class="clickable">
+                            <tr>
+                                <th>Enseignant</th>
+                                <th>Etudiant</th>
+                                <th>Stage</th>
+                                <th>Formation</th>
+                                <th>Groupe</th>
+                                <th>Sujet</th>
+                                <th>Adresse</th>
+                                <th>Score</th>
+                                <th>Associer</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <?php
+                            $dictCoef = array_filter(
+                                $_POST['coef'], function ($coef, $key) {
+                                    return isset($_POST['criteria_on'][$key]);
+                                }, ARRAY_FILTER_USE_BOTH
                             );
 
-                            echo "<input type='hidden' id='dictCoefJson' value='"
-                                . $escapedJson . "'>";
-                        } else {
-                            header('location: ./dispatcher');
-                        }
+                            if (!empty($dictCoef)) {
+                                $escapedJson = htmlspecialchars(
+                                    json_encode($dictCoef),
+                                    ENT_QUOTES
+                                );
 
-                        $resultDispatchList = $this->internshipModel
-                            ->dispatcher(
-                                $this->departmentModel,
-                                $this->teacherModel,
-                                $dictCoef
-                            )[0];
-                        foreach ($resultDispatchList as $resultDispatch):
-                            $internship = $resultDispatch['internship_identifier'];
-                            $id_teacher = $resultDispatch['id_teacher'];
-                            $address = $resultDispatch['address'];
-                            $score = $resultDispatch['score'];
+                                echo "<input type='hidden' id='dictCoefJson' value='"
+                                    . $escapedJson . "'>";
+                            } else {
+                                header('location: ./dispatcher');
+                                exit();
+                            }
 
-                            ?>
-                            <tr class="dispatch-row"
-                                data-internship-identifier=
-                                "<?php
-                                echo $internship . '$'. $id_teacher . '$' . $address;
-                                ?>">
-                                <td>
-                                    <?php echo $resultDispatch['teacher_firstname'] .
-                                    ' ' . $resultDispatch['teacher_name'] . ' (' .
-                                    $resultDispatch['id_teacher'] . ')'; ?>
-                                </td>
-                                <td>
-                                    <?php echo $resultDispatch['student_firstname'] .
-                                        ' ' . $resultDispatch['student_name'] . ' ('
-                                        . $resultDispatch['student_number'] . ')'; ?>
-                                    <br>
-                                    <i class="material-icons clickable tooltipped"
-                                       data-position="top"
-                                       data-tooltip=
-                                       "Afficher la vue étudiante ">face</i>
-                                </td>
-                                <td>
-                                    <?php echo $resultDispatch['company_name'] . ' ('
-                                        . $resultDispatch['internship_identifier']
-                                        . ')'; ?>
-                                    <br>
-                                    <i class="material-icons clickable tooltipped"
-                                       data-position="top"
-                                       data-tooltip=
-                                       "Voir la position de l'entreprise">map</i>
-                                </td>
+                            $resultDispatchList = $this->internshipModel
+                                ->dispatcher(
+                                    $this->departmentModel,
+                                    $this->teacherModel,
+                                    $dictCoef
+                                )[0];
+                            foreach ($resultDispatchList as $resultDispatch):
+                                $internship = $resultDispatch[
+                                'internship_identifier'
+                                ];
+                                $companyName = $resultDispatch['company_name'];
+                                $id_teacher = $resultDispatch['id_teacher'];
+                                $address = $resultDispatch['address'];
+                                $score = $resultDispatch['score'];
 
-                                <td>
-                                    <?php echo $resultDispatch['formation']; ?>
-                                </td>
-                                <td>
-                                    <?php echo $resultDispatch['class_group']; ?>
-                                </td>
-                                <td>
-                                    <?php echo $resultDispatch
-                                    ['internship_subject']; ?>
-                                </td>
-                                <td>
-                                    <?php echo $resultDispatch['address']; ?>
-                                </td>
-                                <td>
-                                    <div class="star-rating" data-tooltip="
-                                    <?php echo $resultDispatch['score']; ?>
-                                    " data-position="top">
-                                        <?php
-                                        echo $this
-                                            ->renderStars($resultDispatch['score']);
-                                        ?>
-                                    </div>
-                                </td>
-                                <td>
-                                    <p>
-                                        <label class="center">
-                                            <input type="checkbox" class=
-                                           "dispatch-checkbox center-align filled-in"
-                                            id="listTupleAssociate[]"
-                                            name="listTupleAssociate[]" value="<?php
-                                            echo
-                                            $id_teacher."$".$internship."$".$score;
-                                            ?>" />
-                                            <span data-type="checkbox">Cocher</span>
-                                        </label>
-                                    </p>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                                </tbody>
-                            </table>
+                                ?>
+                                <tr class="dispatch-row clickable"
+                                    data-internship-identifier=
+                                    "<?php
+                                    echo
+                                        $companyName .
+                                        '$' .
+                                        $internship .
+                                        '$'.
+                                        $id_teacher .
+                                        '$' .
+                                        $address;
+                                    ?>">
+                                    <td>
+                                        <?php echo
+                                            $resultDispatch['teacher_firstname'] .
+                                            ' ' .
+                                            $resultDispatch['teacher_name'] . ' (' .
+                                            $resultDispatch['id_teacher'] . ')'; ?>
+                                    </td>
+                                    <td>
+                                        <?php echo
+                                            $resultDispatch['student_firstname'] .
+                                            ' '
+                                            .
+                                            $resultDispatch['student_name'] . ' ('
+                                            .
+                                            $resultDispatch['student_number'] .
+                                            ')'; ?>
+                                        <br>
+                                    </td>
+                                    <td>
+                                        <?php echo
+                                            $companyName . ' ('
+                                            .
+                                            $resultDispatch['internship_identifier']
+                                            .
+                                            ')'; ?>
+                                        <br>
+                                    </td>
 
-                            <br>
+                                    <td>
+                                        <?php echo $resultDispatch['formation']; ?>
+                                    </td>
+                                    <td>
+                                        <?php echo $resultDispatch['class_group']; ?>
+                                    </td>
+                                    <td>
+                                        <?php echo $resultDispatch
+                                        ['internship_subject']; ?>
+                                    </td>
+                                    <td>
+                                        <?php echo $resultDispatch['address']; ?>
+                                    </td>
+                                    <td>
+                                        <div class="star-rating" data-tooltip="
+                                <?php echo $resultDispatch['score']; ?>
+                            " data-position="top">
+                                            <?php
+                                            echo $this
+                                                ->renderStars(
+                                                    $resultDispatch['score']
+                                                );
+                                            ?>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p>
+                                            <label class="center">
+                                                <input type="checkbox" class=
+                                                "dispatch-checkbox
+                                                center-align filled-in"
+                                                       id="listTupleAssociate[]"
+                                                       name="listTupleAssociate[]"
+                                                       value="<?php
+                                                        echo
+                                                           $id_teacher.
+                                                           "$".
+                                                           $internship.
+                                                           "$".
+                                                           $score;
+                                                        ?>" />
+                                                <span data-type="
+                                                checkbox">Cocher</span>
+                                            </label>
+                                        </p>
+                                    </td>
+                                </tr>
+                            <?php endforeach; ?>
+                            </tbody>
+                        </table>
 
-                            <div class="row">
-                                <div class="input-field col s2">
-                                    <select id="rows-per-page">
-                                        <option value="10" selected>10</option>
-                                        <option value="20">20</option>
-                                        <option value="50">50</option>
-                                        <option value="100">100</option>
-                                        <option value="
-                                        <?php echo count($resultDispatchList); ?>
-                                        ">Tout</option>
-                                    </select>
-                                    <label
-                                    for="rows-per-page"
-                                    >Nombre de lignes par page</label>
-                                </div>
+                        <br>
+
+                        <div class="row">
+                            <div class="input-field col s6 m2">
+                                <select id="rows-per-page">
+                                    <option value="10" selected>10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                    <option value="
+                                <?php echo count($resultDispatchList); ?>
+                                ">Tout</option>
+                                </select>
+                                <label
+                                        for="rows-per-page"
+                                >Nombre de lignes par page</label>
                             </div>
-
-                            <div id="pagination-controls" class="center-align">
-                                <button type="button"
-                                        class="waves-effect waves-light btn"
-                                        id="first-page">
-                                    <i class="material-icons">first_page</i>
-                                </button>
-                                <button type="button"
-                                        class="waves-effect waves-light btn"
-                                        id="prev-page">
-                                    <i class="material-icons">arrow_back</i>
-                                </button>
-                                <div id="page-numbers"></div>
-                                <button type="button"
-                                        class="waves-effect waves-light btn"
-                                        id="next-page">
-                                    <i class="material-icons">arrow_forward</i>
-                                </button>
-                                <button type="button"
-                                        class="waves-effect waves-light btn"
-                                        id="last-page">
-                                    <i class="material-icons">last_page</i>
-                                </button>
-                            </div>
-
-
-                            <div>
-                                <button class="btn waves-effect
-                                waves-light button-margin tooltipped"
-                                        type="submit" name="action-save"
-                                        value="<?php echo $id_backup ?>"
-                                        id="save-btn"
-                                        data-position="top"
-                                        data-tooltip="Enregistrer la sauvegarde">
-                                    Enregister
-                                    <i class="material-icons
-                                    right">arrow_downward</i>
-                                </button>
-                                <button class="btn waves-effect
-                                waves-light button-margin tooltipped"
-                                        type="submit" name="action"
-                                        value="generate" id="generate-btn"
-                                        data-position="top"
-                                        data-tooltip="Commencer la répartition">
-                                    Générer
-                                    <i class="material-icons right">send</i>
-                                </button>
-                            </div>
-                            <br>
-                            <br>
-
                         </div>
-                    </form>
-                <?php endif; ?>
+
+                        <div id="pagination-controls" class="center-align">
+                            <button type="button"
+                                    class="waves-effect waves-light btn"
+                                    id="first-page">
+                                <i class="material-icons">first_page</i>
+                            </button>
+                            <button type="button"
+                                    class="waves-effect waves-light btn"
+                                    id="prev-page">
+                                <i class="material-icons">arrow_back</i>
+                            </button>
+                            <div id="page-numbers"></div>
+                            <button type="button"
+                                    class="waves-effect waves-light btn"
+                                    id="next-page">
+                                <i class="material-icons">arrow_forward</i>
+                            </button>
+                            <button type="button"
+                                    class="waves-effect waves-light btn"
+                                    id="last-page">
+                                <i class="material-icons">last_page</i>
+                            </button>
+                        </div>
+
+                        <br>
+
+                        <button class=
+                                "waves-effect waves-light btn tooltipped red"
+                                type="reset" id="resetForm"
+                                name="resetForm"
+                                data-position="top" data-tooltip=
+                                "Annuler les modifications">Annuler</button>
+                        <button class="waves-effect
+                            waves-light btn tooltipped"
+                                name="selecInternshipSubmitted" value="1"
+                                type="submit" data-position="top"
+                                data-tooltip=
+                                "Envoyer vos choix">Valider</button>
+                        <br>
+                        <br>
+                    </div>
+                </form>
+            <?php endif; ?>
 
             </div>
-
             <script>
                 document.addEventListener('DOMContentLoaded', function() {
                     var tooltips = document.querySelectorAll('.tooltipped');

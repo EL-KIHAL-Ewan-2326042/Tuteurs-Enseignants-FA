@@ -117,73 +117,54 @@ input[type=text]:focus {
     cursor: pointer;
 }
 
-.table {
-    width: 85%;
-}
-
 thead {
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
 }
 
-thead, tbody tr {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-}
-
-tbody {
-    width: 100%;
-    display: block;
+.table {
+    width: 85%;
 }
 
 #homepage-table,
-#search-table,
-#admin-homepage-table {
-    min-width: 800px;
-    font-size: 14px;
+#search-table {
     width: 100%;
+    font-size: 14px;
 }
 
 #homepage-table th, #homepage-table td,
-#search-table th, #search-table td,
-#admin-homepage-table th, #admin-homepage-table td {
+#search-table th, #search-table td {
     padding: 6px 10px;
     text-align: center;
     border: 1px solid #ddd;
 }
 
 #homepage-table thead th,
-#search-table thead th,
-#admin-homepage-table thead th {
+#search-table thead th {
     background-color: #f4f4f4;
     font-weight: bold;
     font-size: 14px;
 }
 
 #homepage-table tbody tr:nth-child(even),
-#search-table tbody tr:nth-child(even),
-#admin-homepage-table tbody tr:nth-child(even) {
+#search-table tbody tr:nth-child(even) {
     background-color: #fafafa;
 }
 
 #homepage-table tbody tr:hover,
-#search-table tbody tr:hover,
-#admin-homepage-table tbody tr:hover {
-    background-color: #f1f1f1;
+#search-table tbody tr:hover {
+    background-color: #ffffcc;
 }
 
 @media screen and (max-width: 768px) {
     #homepage-table,
-    #search-table,
-    #admin-homepage-table {
+    #search-table {
         font-size: 12px;
     }
 
     #homepage-table th, #homepage-table td,
-    #search-table th, #search-table td,
-    #admin-homepage-table th, #admin-homepage-table td {
+    #search-table th, #search-table td {
         padding: 4px 8px;
     }
 }
@@ -267,7 +248,6 @@ main table {
         font-size: 0.47rem;
     }
 
-    width: 85%;
     border: solid #e0e0e0 1px;
 }
 

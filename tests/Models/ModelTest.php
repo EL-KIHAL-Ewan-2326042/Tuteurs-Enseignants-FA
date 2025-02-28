@@ -78,7 +78,7 @@ class ModelTest extends TestCase
      * pour une durée
      *
      * @param array      $latLngInternship latitude et longitude du stage/alternance
-     * @param array      $latLngTeacher    latitude et longitude du professeur
+     * @param array      $latLngTeacher    latitude et longitude du enseignant
      * @param array|null $response         la
      *                                     réponse
      *
