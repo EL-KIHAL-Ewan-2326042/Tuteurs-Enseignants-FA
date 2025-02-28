@@ -88,4 +88,45 @@ class Department extends Model
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    /**
+     * Récupère tous les stages et alternances ayant un tuteur déjà attribué
+     * et n'étant pas encore terminés pour les étudiants des départements
+     * passés en paramètre
+     *
+     * @param array $departments Tableau contenant les départements dont on veut
+     *                           récupérer les stages et alternances
+     *
+     * @return false|array Renvoie un tableau contenant toutes les données relatives
+     * aux stages et alternances, si la liste de départements passée en paramètre est
+     * vide ou qu'aucun résultat n'est trouvé alors le tableau est vide, false sinon
+     */
+    public function getInternshipsWithTutor(array $departments): false|array
+    {
+        if (!$departments || sizeof($departments) === 0) {
+            return array();
+        }
+
+        $departmentList = "";
+        foreach ($departments as $department) {
+            $departmentList .= "'" . $department . "', ";
+        }
+        $departmentList = substr($departmentList, 0, -2);
+
+        $query = "SELECT DISTINCT department_name, student_firstname, student_name,
+                  formation, class_group, teacher_firstname, teacher_name, type,
+                  start_date_internship, end_date_internship, company_name,
+                  internship_subject, address
+                  FROM internship
+                  JOIN has_role ON internship.id_teacher = has_role.user_id
+                  JOIN student ON internship.student_number = student.student_number
+                  JOIN teacher ON internship.id_teacher = teacher.id_teacher
+                  WHERE internship.id_teacher IS NOT NULL
+                  AND end_date_internship > CURRENT_DATE
+                  AND department_name IN (". $departmentList .")
+                  ORDER BY department_name";
+        $stmt = $this->_db->getConn()->prepare($query);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
 }

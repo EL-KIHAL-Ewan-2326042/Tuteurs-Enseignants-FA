@@ -18,7 +18,7 @@
 
 namespace Blog\Views\tutoring;
 
-use Blog\Models\Internship;
+use Blog\Models\Department;
 use Blog\Models\User;
 
 /**
@@ -45,11 +45,11 @@ class Tutoring
      *
      * @param User       $userModel       Instance de la classe Teacher
      *                                    servant de modèle
-     * @param Internship $internshipModel Instance de la classe Internship
+     * @param Department $departmentModel Instance de la classe Internship
      *                                    servant de modèle
      */
     public function __construct(private User $userModel,
-        private Internship $internshipModel
+        private Department $departmentModel
     ) {
     }
 
@@ -67,7 +67,7 @@ class Tutoring
             <?php
             $departments = $this->userModel
                 ->getAdminDepartments($_SESSION['identifier']);
-            $table = $this->internshipModel
+            $table = $this->departmentModel
                 ->getInternshipsWithTutor($departments);
 
             if ($table && sizeof($table) > 0) : ?>
