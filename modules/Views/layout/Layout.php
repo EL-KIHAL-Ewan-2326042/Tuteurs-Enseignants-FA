@@ -80,7 +80,7 @@ openlayers.github.io@master/en/v6.5.0/css/ol.css"
                 </a>
                 <a href="/homepage" class="left brand-logo hide-on-med-and-down"
                 style="margin-left: 10px;">
-                    <img src="https://i.postimg.cc/qMT89vt3/amu-logo.png"
+                    <img src="https://i.imgur.com/CcTBFfX.png"
                     alt="Logo de AMU" height="55" width="130">
                 </a>
                 <ul class="center hide-on-med-and-down">
