@@ -151,7 +151,12 @@ document.addEventListener(
         function toggleDeleteButton()
         {
             if (deleteBtn) {
-                deleteBtn.disabled = saveSelector.value === 'new';
+                if (!saveSelector || saveSelector.value === 'new') {
+                    deleteBtn.disabled = true;
+                }
+                else {
+                    deleteBtn.disabled = false;
+                }
             }
         }
 
@@ -252,7 +257,7 @@ document.addEventListener(
 
         function updateButtonState()
         {
-            saveButton.disabled = select.value === 'default';
+            saveButton.disabled = select.value === 'new';
         }
 
         if (select) {
