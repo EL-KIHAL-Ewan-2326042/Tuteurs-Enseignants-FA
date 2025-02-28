@@ -97,34 +97,35 @@ class Dispatcher
                             $saves = $this->userModel
                                 ->showCoefficients($_SESSION['identifier']);
                             if ($saves) : ?>
-                                <div class="input-field">
-                                    <label
-                                            for="save-selector"
-                                    >Sélectionnez une sauvegarde</label>
-                                    <br><br>
-                                    <select id="save-selector" name="save-selector">
+                                <label
+                                        class="input-field col s12 m12"
+                                        for="save-selector"
+                                >Sélectionnez une sauvegarde
+                                    <select id="save-selector"
+                                            name="save-selector">
                                         <option
                                                 value="new">Nouvelle Sauvegarde
                                         </option>
                                         <?php foreach ($saves as $save): ?>
-                                            <?php $id_backup = $save['id_backup'];
+                                            <?php
+                                            $id_backup = $save['id_backup'];
                                             $name_save = $save['name_save'];?>
-                                            <option value="<?php echo $id_backup; ?>"
-                                                <?php
-                                                if (isset($_POST['save-selector'])) {
-                                                    $saveSelected
-                                                        = $_POST['save-selector'];
-                                                }
-                                                if (isset($_POST['save-selector'])
-                                                    && $saveSelected == $id_backup
-                                                ) : ?>
+                                        <option value="<?php echo $id_backup; ?>"
+                                            <?php
+                                            if (isset($_POST['save-selector'])) {
+                                                $saveSelected
+                                                    = $_POST['save-selector'];
+                                            }
+                                            if (isset($_POST['save-selector'])
+                                                && $saveSelected == $id_backup
+                                            ) : ?>
                                                     selected
-                                                <?php endif; ?>
+                                            <?php endif; ?>
                                             ><?php echo $name_save; ?>
                                             </option>
                                         <?php endforeach; ?>
                                     </select>
-                                </div>
+                                </label>
                             <?php endif; ?>
 
 
@@ -258,7 +259,7 @@ class Dispatcher
                                             >arrow_downward</i>
                                         </button>
                                         <button class="btn waves-effect
-                                    waves-light button-margin tooltipped red"
+                                    waves-light button-margin tooltipped"
                                                 type="submit" name="action-delete"
                                                 value="<?php echo $id_backup ?>"
                                                 id="delete-btn"
@@ -554,20 +555,20 @@ class Dispatcher
                         <br>
 
                         <div class="row">
-                            <div class="input-field col s6 m2">
+                            <label class="input-field col s6 m2"
+                                   for="rows-per-page"
+                            >Nombre de lignes par page
                                 <select id="rows-per-page">
                                     <option value="10" selected>10</option>
                                     <option value="20">20</option>
                                     <option value="50">50</option>
                                     <option value="100">100</option>
-                                    <option value="
-                                <?php echo count($resultDispatchList); ?>
-                                ">Tout</option>
+                                    <option value="<?php echo
+                                    count($resultDispatchList)?>">
+                                        Tout
+                                    </option>
                                 </select>
-                                <label
-                                        for="rows-per-page"
-                                >Nombre de lignes par page</label>
-                            </div>
+                            </label>
                         </div>
 
                         <div id="pagination-controls" class="center-align">
@@ -597,7 +598,7 @@ class Dispatcher
                         <br>
 
                         <button class=
-                                "waves-effect waves-light btn tooltipped red"
+                                "waves-effect waves-light btn tooltipped"
                                 type="reset" id="resetForm"
                                 name="resetForm"
                                 data-position="top" data-tooltip=

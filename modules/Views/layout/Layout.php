@@ -185,7 +185,7 @@ openlayers.github.io@master/en/v6.5.0/css/ol.css"
             </div>
         </footer>
         <script src="/_assets/scripts/layout.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/
+        <script async defer src="https://cdnjs.cloudflare.com/ajax/libs/
 materialize/1.0.0/js/materialize.min.js"></script>
         <?php
         if ($jsFilePath) {
@@ -196,10 +196,9 @@ materialize/1.0.0/js/materialize.min.js"></script>
         if ($currentUri === '/' || $currentUri === '/homepage'
             || $currentUri === '/dispatcher'
         ) {
-            echo '<script 
+            echo '<script async defer
             src="https://cdn.jsdelivr.net/gh/openlayers/
 openlayers.github.io@master/en/v6.5.0/build/ol.js" 
-            async defer 
             onload="initMap()">
           </script>';
         }

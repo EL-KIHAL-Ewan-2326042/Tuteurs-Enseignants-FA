@@ -181,7 +181,7 @@ document.addEventListener(
         let clickedRowOverlay, clickedRowAddress;
 
         if (tableBody) {
-            ['click', 'touchstart'].forEach(
+            ['click'].forEach(
                 function (eventType) {
                     tableBody.addEventListener(
                         eventType, function (event) {

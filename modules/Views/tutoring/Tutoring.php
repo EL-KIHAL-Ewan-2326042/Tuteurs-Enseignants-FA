@@ -192,7 +192,9 @@ class Tutoring
                 </div>
 
                 <div class="row">
-                    <div class="input-field col s6 m2">
+                    <label class="input-field col s6 m2"
+                           for="rows-per-page"
+                    >Nombre de lignes par page
                         <select id="rows-per-page">
                             <option value="10" selected>10</option>
                             <option value="20">20</option>
@@ -202,11 +204,9 @@ class Tutoring
                                 Tout
                             </option>
                         </select>
-                        <label
-                                for="rows-per-page"
-                        >Nombre de lignes par page</label>
-                    </div>
+                    </label>
                 </div>
+
 
             </div>
                 <?php
