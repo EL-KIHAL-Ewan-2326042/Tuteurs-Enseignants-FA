@@ -276,7 +276,8 @@ class Account
                         <?php if ($trainees) : ?>
             <div class="row"></div>
             <div id="table">
-                <table class="highlight centered" id="account-table">
+                <table class="highlight centered
+                              responsive-table" id="account-table">
                     <thead <?php
                     if (count($trainees) > 1) {
                         echo 'id="clickable"';
@@ -351,22 +352,6 @@ class Account
                     </tbody>
                 </table>
 
-                <div class="row">
-                    <div class="input-field col s2">
-                        <label for="rows-per-page">Nombre de lignes par page
-                            <select id="rows-per-page">
-                                <option value="10" selected>10</option>
-                                <option value="20">20</option>
-                                <option value="50">50</option>
-                                <option value="100">100</option>
-                                <option value="<?php echo count($trainees)?>">
-                                    Tout
-                                </option>
-                            </select>
-                        </label>
-                    </div>
-                </div>
-
                 <div id="pagination-controls" class="center-align">
                     <button type="button" class="waves-effect waves-light btn"
                         id="first-page"><i class="material-icons" type="button">
@@ -386,6 +371,20 @@ class Account
                         last_page
                     </i></button>
                 </div>
+                <div class="input-field col s6 m2">
+                    <label for="rows-per-page">Nombre de lignes par page
+                        <select id="rows-per-page">
+                            <option value="10" selected>10</option>
+                            <option value="20">20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="<?php echo count($trainees)?>">
+                                Tout
+                            </option>
+                        </select>
+                    </label>
+                </div>
+
             </div>
                         <?php endif; ?>
         </main>

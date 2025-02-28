@@ -120,29 +120,17 @@ main .card-panel {
     cursor: pointer;
 }
 
-#table {
-    width: 85%;
-}
-
 thead {
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
 }
 
-thead, tbody tr {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-}
-
-tbody {
-    width: 100%;
-    display: block;
+#table {
+    width: 85%;
 }
 
 #account-table {
-    min-width: 800px;
     font-size: 14px;
     width: 100%;
 }
