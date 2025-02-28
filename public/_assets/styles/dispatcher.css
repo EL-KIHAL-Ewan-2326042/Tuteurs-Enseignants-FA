@@ -80,6 +80,109 @@ input[type="checkbox"].filled-in:checked + span:after {
     box-shadow: 0 1px 0 0 #00558B !important;
 }
 
+/* Informations */
+
+.card-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.dispatcher-legend-card {
+    width: 48%;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: white;
+}
+
+.dispatcher-legend-title {
+    text-align: left;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.dispatcher-legend-list {
+    list-style-type: none;
+    padding-left: 0;
+    text-align: left;
+}
+
+.dispatcher-legend-list li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.legend-color-box {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    border: 1px solid #000;
+}
+
+.dispatcher-info-card {
+    width: 48%;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: white;
+}
+
+.dispatcher-info-title {
+    text-align: left;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.dispatcher-info-text {
+    text-align: left;
+}
+
+.legend-line-box {
+    display: inline-block;
+    width: 20px;
+    height: 2px;
+    margin-right: 10px;
+    background-color: red;
+}
+
+ul {
+    text-align: left;
+}
+
+@media (max-width: 768px) {
+    .card-container {
+        flex-direction: column;
+    }
+
+    .dispatcher-legend-card,
+    .dispatcher-info-card {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+}
+
+.legend-color-box.red {
+    background-color: red;
+}
+
+.legend-color-box.blue {
+    background-color: blue;
+}
+
+.legend-color-box.yellow {
+    background-color: yellow;
+}
+
+@media screen and (max-width: 640px) {
+    .dispatcher-info-card, .dispatcher-legend-card {
+        width: 95%;
+    }
+}
+
 /* Map OSM */
 
 #map {
