@@ -456,7 +456,7 @@ readonly class Homepage
                                 </thead>
                                 <tbody>
                                 <?php foreach ($table as $row): ?>
-                                    <tr class="homepage-row"
+                                    <tr class="homepage-row clickable"
                                         data-selected-row="<?php
                                         echo str_replace('_', "'", $row['address'])
                                             . '$' . $row['student_name']
@@ -495,14 +495,7 @@ readonly class Homepage
                                             echo str_replace(
                                                 '_', "'", $row['address']
                                             )
-                                            ?>
-                                            <br>
-                                            <i class=
-                                               "material-icons clickable tooltip"
-                                               data-position="top"
-                                               data-tooltip=
-                                               "Voir la position de l'entreprise"
-                                            >map</i></td>
+                                            ?></td>
                                         <td>~<?php echo
                                                 $row['duration'] . " minute"
                                                 . ($row['duration'] > 1 ? "s" : "")

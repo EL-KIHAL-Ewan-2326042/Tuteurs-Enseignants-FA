@@ -185,38 +185,24 @@ document.addEventListener(
                 function (eventType) {
                     tableBody.addEventListener(
                         eventType, function (event) {
-                            if (event.target.tagName === 'I'
-                                && event.target.classList.contains('material-icons')
-                            ) {
-                                const clickedRow = getClickedRow(event.target);
-                                if (!clickedRow) {
-                                    return;
-                                }
-
-                                const clickedRowData =
-                                    clickedRow.getAttribute('data-selected-row');
-                                const [
-                                    clickedRowAddress,
-                                    clickedRowName
-                                ] = clickedRowData.split('$');
-
-                                if (event.target.textContent === 'map') {
-                                    updateMarkers(clickedRowAddress, clickedRowName).then();
-                                    event.preventDefault();
-                                }
+                            const clickedRow = event.target.closest('tr.homepage-row');
+                            if (!clickedRow) {
+                                return;
                             }
+
+                            const clickedRowData =
+                                clickedRow.getAttribute('data-selected-row');
+                            const [
+                                clickedRowAddress,
+                                clickedRowName
+                            ] = clickedRowData.split('$');
+
+                            updateMarkers(clickedRowAddress, clickedRowName).then();
+                            event.preventDefault();
                         }
                     );
                 }
             );
-        }
-
-        function getClickedRow(element)
-        {
-            while (element && element.tagName !== 'TR') {
-                element = element.parentElement;
-            }
-            return element;
         }
 
         async function updateMarkers(address, name)
