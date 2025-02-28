@@ -124,22 +124,9 @@ readonly class Homepage
 
                     if (!$update || gettype($update) !== 'boolean') {
                         echo '<h6 class="red-text">Une erreur est survenue</h6>';
-                    }
-                }
-
-                if (isset($_POST['selecInternshipSubmitted'])) {
-                    $update = $this->internshipModel->updateRequests(
-                        $_POST['selecInternship'] ?? array(),
-                        $_SESSION['identifier']
-                    );
-
-                    if (!$update || gettype($update) !== 'boolean') {
-                        echo '<h6 class="red-text">Une erreur est survenue</h6>';
                     } else {
-                        unset(
-                            $_SESSION['unconfirmed'],
-                            $_SESSION['lastPage'], $_POST['page']
-                        );
+                        echo '<h6 class="green-text">'
+                            . 'Vos choix ont bien été pris en compte</h6>';
                     }
                 }
                 ?>
@@ -359,23 +346,23 @@ readonly class Homepage
 
             <div class="row"></div>
 
-            <?php
-            if (isset($_POST['selecDepSubmitted'])) {
-                echo "<script> sessionStorage.clear() </script>";
+                <?php
+                if (isset($_POST['selecDepSubmitted'])) {
+                    echo "<script> sessionStorage.clear() </script>";
 
-                if (isset($_POST['selecDep'])) {
-                    $_SESSION['selecDep'] = $_POST['selecDep'];
+                    if (isset($_POST['selecDep'])) {
+                        $_SESSION['selecDep'] = $_POST['selecDep'];
 
-                } else {
-                    unset($_SESSION['selecDep']);
+                    } else {
+                        unset($_SESSION['selecDep']);
+                    }
                 }
-            }
 
-            $departments = $this->teacherModel
-                ->getDepTeacher($_SESSION['identifier']);
-            if(!$departments) : ?>
+                $departments = $this->teacherModel
+                    ->getDepTeacher($_SESSION['identifier']);
+                if(!$departments) : ?>
                 <h6 class="left-align">Vous ne faîtes partie d'aucun département</h6>
-                    <?php
+                        <?php
                     else: ?>
                 <form method="post" class="center-align table">
                         <?php
@@ -407,6 +394,21 @@ readonly class Homepage
                 <div class="row"></div>
 
                         <?php
+                        if (isset($_POST['selecInternshipSubmitted'])) {
+                            $update = $this->internshipModel->updateRequests(
+                                $_POST['selecInternship'] ?? array(),
+                                $_SESSION['identifier']
+                            );
+
+                            if (!$update || gettype($update) !== 'boolean') {
+                                echo '<h6 class="red-text">'
+                                    . 'Une erreur est survenue</h6>';
+                            } else {
+                                echo '<h6 class="green-text">'
+                                    . 'Vos choix ont bien été pris en compte</h6>';
+                            }
+                        }
+
                         if(!empty($_SESSION['selecDep'])) :
                             $table = $this->teacherModel->getStudentsList(
                                 $_SESSION['selecDep'], $_SESSION['identifier'],
@@ -579,8 +581,9 @@ readonly class Homepage
                             <?php endif;
                         endif;
                     endif; ?>
+
             <script>
-                <?php if(isset($_SESSION['address'])) : ?>
+                <?php if (!empty($_SESSION['address'])) : ?>
                     const teacherAddress =
                         "<?php echo $_SESSION['address'][0]['address']; ?>";
                 <?php endif;

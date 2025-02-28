@@ -220,7 +220,7 @@ class Teacher extends Model
 
 
     /**
-     * Renvoie les disiplines qu'enseigne le enseignant passé en paramètre
+     * Renvoie les disiplines qu'enseigne l'enseignant passé en paramètre
      *
      * @param string $id_teacher Identifiant du prof
      *
@@ -311,7 +311,7 @@ class Teacher extends Model
     }
 
     /**
-     * Récupère tous les départements où enseigne le enseignant passé en paramètre
+     * Récupère tous les départements où enseigne l'enseignant passé en paramètre
      *
      * @param string $teacher_id Identifiant de benignant
      *

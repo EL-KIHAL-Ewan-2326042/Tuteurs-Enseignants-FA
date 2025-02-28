@@ -1,59 +1,34 @@
 /**
- * Dès le chargement de la page on associe un listener à l'input 'newMaxIntern' et 'newMaxApprentice'
- *
- * @type {HTMLElement}
- */
-document.addEventListener(
-    'DOMContentLoaded', function () {
-        const maxInternInput = document.getElementById("newMaxIntern");
-        maxInternInput.addEventListener("keyup", () => inputBoundaries(maxInternInput));
-        maxInternInput.addEventListener("keypress", () => inputBoundaries(maxInternInput));
-
-        const maxApprenticeInput = document.getElementById("newMaxApprentice");
-        maxApprenticeInput.addEventListener("keyup", () => inputBoundaries(maxApprenticeInput));
-        maxApprenticeInput.addEventListener("keypress", () => inputBoundaries(maxApprenticeInput));
-
-        function inputBoundaries(maxNumberInput)
-        {
-            if (Number(maxNumberInput.value) < Number(maxNumberInput.min)) {
-                maxNumberInput.value = maxNumberInput.min;
-            }
-            if (Number(maxNumberInput.value) > Number(maxNumberInput.max)) {
-                maxNumberInput.value = maxNumberInput.max;
-            }
-        }
-    }
-);
-
-/**
  * Tri du tableau et pagination
  */
+
 document.addEventListener(
     'DOMContentLoaded', function () {
-        if (document.getElementById("account-table") === null) {
+        if (document.getElementById("tutoring-table") === null) {
             return;
         }
 
-        // Initialize the Materialize select dropdown
-        M.FormSelect.init(document.querySelectorAll('select'));
-
-        M.Tooltip.init(
-            document.querySelectorAll('.tooltip'), {
+        M.FormSelect.init(
+            document.querySelectorAll(
+                'select'
+            ),
+            {
                 exitDelay: 100,
             }
         );
 
         const rowsPerPageDropdown = document.getElementById('rows-per-page');
-        let rowsPerPage = sessionStorage.getItem("rowsCountAccount") ? Number(sessionStorage.getItem("rowsCountAccount")) : parseInt(rowsPerPageDropdown.value); // Set default to 10
+        let rowsPerPage = sessionStorage.getItem("rowsCountTutor") ? Number(sessionStorage.getItem("rowsCountTutor")) : parseInt(rowsPerPageDropdown.value); // Set default to 10
         if (rowsPerPage !== 10) {
             rowsPerPageDropdown.options[rowsPerPage === 20 ? 1 : rowsPerPage === 50 ? 2 : rowsPerPage === 100 ? 3 : 4].selected = true;
         }
-        sessionStorage.setItem("rowsCountAccount", String(rowsPerPage));
+        sessionStorage.setItem("rowsCountTutor", String(rowsPerPage));
 
-        let rows = document.querySelectorAll('.account-row');
+        let rows = document.querySelectorAll('.tutoring-row');
         let totalRows = rows.length;
         let totalPages = Math.ceil(totalRows / rowsPerPage);
-        let currentPage = sessionStorage.getItem('pageAccount') && Number(sessionStorage.getItem('pageAccount')) <= totalPages ? Number(sessionStorage.getItem('pageAccount')) : 1;
+        let currentPage = sessionStorage.getItem("pageTutor") && Number(sessionStorage.getItem("pageTutor")) <= totalPages
+        && rowsPerPage === 10 ? Number(sessionStorage.getItem("pageTutor")) : 1;
 
         const prevButton = document.getElementById('prev-page');
         const nextButton = document.getElementById('next-page');
@@ -61,15 +36,15 @@ document.addEventListener(
         const lastButton = document.getElementById('last-page');
         const pageNumbersContainer = document.getElementById('page-numbers');
 
-        if (document.getElementById("account-table").rows.length > 2) {
-            if (!(sessionStorage.getItem('columnNumberAccount') && sessionStorage.getItem('directionAccount'))) {
-                sessionStorage.setItem('columnNumberAccount', "0");
-                sessionStorage.setItem('directionAccount', "asc");
+        if (document.getElementById("tutoring-table").rows.length > 2) {
+            if (!(sessionStorage.getItem('columnNumberTutor') && sessionStorage.getItem('directionTutor'))) {
+                sessionStorage.setItem('columnNumberTutor', "0");
+                sessionStorage.setItem('directionTutor', "asc");
             }
-            sortTable(Number(sessionStorage.getItem('columnNumberAccount')), true);
+            sortTable(Number(sessionStorage.getItem('columnNumberTutor')), true);
 
-            for (let i = 0; i < document.getElementById("account-table").rows[0].cells.length; ++i) {
-                document.getElementById("account-table").rows[0].getElementsByTagName("TH")[i].addEventListener(
+            for (let i = 0; i < document.getElementById("tutoring-table").rows[0].cells.length; ++i) {
+                document.getElementById("tutoring-table").rows[0].getElementsByTagName("TH")[i].addEventListener(
                     'click', () =>
                     {
                         sortTable(i);
@@ -79,7 +54,7 @@ document.addEventListener(
         }
 
         /**
-         * Trie la table prenant pour id "account-table"
+         * Trie la table prenant pour id "tutoring-table"
          *
          * @param n numéro désignant la colonne par laquelle on trie le tableau
          * @param firstLoad booléen indiquant si cet appel est le premier depuis le chargement de la page
@@ -87,14 +62,17 @@ document.addEventListener(
         function sortTable(n, firstLoad = false)
         {
             let dir, rows, switching, i, x, y, shouldSwitch, column;
-            const table = document.getElementById("account-table");
+            const table = document.getElementById("tutoring-table");
             switching = true;
 
             if (!firstLoad) {
-                if (table.rows[0].getElementsByTagName("TH")[n].innerHTML.substring(table.rows[0].getElementsByTagName("TH")[n].innerHTML.length - 1) === "▲") { dir = "desc";
-                } else { dir = "asc";
+                if (table.rows[0].getElementsByTagName("TH")[n].innerHTML.substring(table.rows[0].getElementsByTagName("TH")[n].innerHTML.length - 1) === "▲") {
+                    dir = "desc";
+                } else {
+                    dir = "asc";
                 }
-            } else { dir = sessionStorage.getItem('directionAccount');
+            } else {
+                dir = sessionStorage.getItem('directionTutor');
             }
 
             while (switching) {
@@ -105,15 +83,19 @@ document.addEventListener(
                     x = rows[i].getElementsByTagName("TD")[n];
                     y = rows[i + 1].getElementsByTagName("TD")[n];
                     if (dir === "asc") {
-                        if ((n < 8 && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase())
-                            || (n === 8 && Number(x.innerHTML.substring(1, x.innerHTML.indexOf(' '))) > Number(y.innerHTML.substring(1, y.innerHTML.indexOf(' '))))
+                        if ((n !== 6 && n !== 7
+                            && x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase())
+                            || ((n === 6 || n === 7)
+                            && x.getAttribute("data-value").toLowerCase() > y.getAttribute("data-value").toLowerCase())
                         ) {
                             shouldSwitch = true;
                             break;
                         }
                     } else if (dir === "desc") {
-                        if ((n < 8 && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())
-                            || (n === 8 && Number(x.innerHTML.substring(1, x.innerHTML.indexOf(' '))) < Number(y.innerHTML.substring(1, y.innerHTML.indexOf(' '))))
+                        if ((n !== 6 && n !== 7
+                            && x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase())
+                            || ((n === 6 || n === 7)
+                            && x.getAttribute("data-value").toLowerCase() < y.getAttribute("data-value").toLowerCase())
                         ) {
                             shouldSwitch = true;
                             break;
@@ -129,15 +111,6 @@ document.addEventListener(
                 column = rows[0].getElementsByTagName("TH")[i].innerHTML;
                 if (column.substring(column.length-1) === "▲" || column.substring(column.length-1) === "▼") {
                     table.rows[0].getElementsByTagName("TH")[i].innerHTML = column.substring(0, column.length-2);
-                    if ((i > 7 && n <= 7)
-                        || (i === 3 && n !== 3)
-                    ) {
-                        M.Tooltip.init(
-                            document.querySelectorAll('.tooltip'), {
-                                exitDelay: 100,
-                            }
-                        );
-                    }
                 }
                 if (i === n) {
                     if (dir === "asc") { table.rows[0].getElementsByTagName("TH")[i].innerHTML += " ▲";
@@ -146,16 +119,9 @@ document.addEventListener(
                     }
                 }
             }
-            if (n > 7 || n === 3) {
-                M.Tooltip.init(
-                    document.querySelectorAll('.tooltip'), {
-                        exitDelay: 100,
-                    }
-                );
-            }
 
-            sessionStorage.setItem('columnNumberAccount', n);
-            sessionStorage.setItem('directionAccount', dir);
+            sessionStorage.setItem('columnNumberTutor', n);
+            sessionStorage.setItem('directionTutor', dir);
             showPage(currentPage);
         }
 
@@ -165,7 +131,7 @@ document.addEventListener(
                 return;
             }
 
-            rows = document.querySelectorAll('.account-row');
+            rows = document.querySelectorAll('.tutoring-row');
 
             currentPage = page;
             updatePageNumbers();
@@ -182,7 +148,7 @@ document.addEventListener(
             firstButton.disabled = currentPage === 1;
             lastButton.disabled = currentPage === totalPages;
 
-            sessionStorage.setItem('pageAccount', currentPage);
+            sessionStorage.setItem('pageTutor', currentPage);
         }
 
         function updatePageNumbers()
@@ -243,7 +209,7 @@ document.addEventListener(
         rowsPerPageDropdown.addEventListener(
             'change', function () {
                 rowsPerPage = parseInt(rowsPerPageDropdown.value);
-                sessionStorage.setItem("rowsCountAccount", String(rowsPerPage));
+                sessionStorage.setItem("rowsCountTutor", String(rowsPerPage));
                 totalPages = Math.ceil(rows.length / rowsPerPage);
                 currentPage = 1;
                 showPage(currentPage);

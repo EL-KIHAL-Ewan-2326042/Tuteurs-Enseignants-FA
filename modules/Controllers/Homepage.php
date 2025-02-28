@@ -73,51 +73,60 @@ class Homepage
             return;
         }
 
-        $db = Database::getInstance();
-        $internshipModel = new Internship($db);
-        $studentModel = new Student($db);
-        $teacherModel = new Teacher($db);
-        $departmentModel = new Department($db);
+        if (isset($_SESSION['roles'])
+            && is_array($_SESSION['roles'])
+            && in_array('Enseignant', $_SESSION['roles'])
+        ) {
 
-        $view = new \Blog\Views\homepage\Homepage(
-            $internshipModel, $studentModel, $teacherModel, $departmentModel
-        );
+            $db = Database::getInstance();
+            $internshipModel = new Internship($db);
+            $studentModel = new Student($db);
+            $teacherModel = new Teacher($db);
+            $departmentModel = new Department($db);
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            if (isset($_POST['action'])) {
-                if ($_POST['action'] === 'search' && isset($_POST['search'])) {
-                    $results = $studentModel->correspondTerms();
-                    header('Content-Type: application/json');
-                    echo json_encode($results);
-                    return;
-                }
+            $view = new \Blog\Views\homepage\Homepage(
+                $internshipModel, $studentModel, $teacherModel, $departmentModel
+            );
 
-                if ($_POST['action'] === 'select_student'
-                    && isset($_POST['student_id'])
-                    && isset($_POST['student_firstName'])
-                    && isset($_POST['student_lastName'])
-                ) {
-                    $studentId = $_POST['student_id'];
-                    $firstName = $_POST['student_firstName'];
-                    $secondName = $_POST['student_lastName'];
-                    $address = $internshipModel->getInternshipAddress($studentId);
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                if (isset($_POST['action'])) {
+                    if ($_POST['action'] === 'search' && isset($_POST['search'])) {
+                        $results = $studentModel->correspondTerms();
+                        header('Content-Type: application/json');
+                        echo json_encode($results);
+                        return;
+                    }
 
-                    $_SESSION['selected_student'] = [
-                        'id' => $studentId,
-                        'firstName' => $firstName,
-                        'lastName' => $secondName,
-                        'address' => $address
-                    ];
+                    if ($_POST['action'] === 'select_student'
+                        && isset($_POST['student_id'])
+                        && isset($_POST['student_firstName'])
+                        && isset($_POST['student_lastName'])
+                    ) {
+                        $studentId = $_POST['student_id'];
+                        $firstName = $_POST['student_firstName'];
+                        $secondName = $_POST['student_lastName'];
+                        $address = $internshipModel
+                            ->getInternshipAddress($studentId);
+
+                        $_SESSION['selected_student'] = [
+                            'id' => $studentId,
+                            'firstName' => $firstName,
+                            'lastName' => $secondName,
+                            'address' => $address
+                        ];
+                    }
                 }
             }
+
+            $title = "Demande";
+            $cssFilePath = '/_assets/styles/homepage.css';
+            $jsFilePath = '/_assets/scripts/homepage.js';
+
+            $this->_layout->renderTop($title, $cssFilePath);
+            $view->showView();
+            $this->_layout->renderBottom($jsFilePath);
+        } else {
+            header('Location: /tutoring');
         }
-
-        $title = "Accueil";
-        $cssFilePath = '/_assets/styles/homepage.css';
-        $jsFilePath = '/_assets/scripts/homepage.js';
-
-        $this->_layout->renderTop($title, $cssFilePath);
-        $view->showView();
-        $this->_layout->renderBottom($jsFilePath);
     }
 }
