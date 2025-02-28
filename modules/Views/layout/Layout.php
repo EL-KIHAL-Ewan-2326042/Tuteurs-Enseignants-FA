@@ -85,12 +85,19 @@ openlayers.github.io@master/en/v6.5.0/css/ol.css"
                 </a>
                 <ul class="center hide-on-med-and-down">
                     <?php
-                    if (isset($_SESSION['identifier'])) {
-                        echo '<li><a href="/homepage">ACCUEIL</a></li>';
+                    if (isset($_SESSION['identifier'])
+                        && isset($_SESSION['roles'])
+                        && is_array($_SESSION['roles'])
+                        && in_array('Enseignant', $_SESSION['roles'])
+                    ) {
+                        echo '<li><a href="/homepage">DEMANDE</a></li>';
                     }
                     if (isset($_SESSION['role_name'])
                         && $_SESSION['role_name'] === 'Admin_dep'
                     ) { ?>
+                        <li><a href="/tutoring">
+                            <?php echo 'STAGES'; ?>
+                            </a></li>
                         <li><a href="/dashboard">
                             <?php echo 'GESTION DES DONNEES'; ?>
                         </a></li>
@@ -109,27 +116,34 @@ openlayers.github.io@master/en/v6.5.0/css/ol.css"
                 <ul class="right">
                     <?php if (isset($_SESSION['identifier'])) { ?>
                         <li class="user-identifier"><a href="/account">
-                                <?php echo $_SESSION['fullName']['teacher_firstname']
-                                . ' ' . $_SESSION['fullName']['teacher_name'] . ' (';
-                                $roles = '';
-                                foreach ($_SESSION['roles'] as $role) {
-                                    $roles .= $role . ', ';
-                                }
-                                $roles = substr($roles, 0, -2);
-                                echo $roles . ')';
-                                ?> </a> </li>
+                            <?php echo $_SESSION['fullName']['teacher_firstname']
+                            . ' ' . $_SESSION['fullName']['teacher_name'] . ' (';
+                            $roles = '';
+                            foreach (array_unique($_SESSION['roles']) as $role) {
+                                $roles .= $role . ', ';
+                            }
+                            $roles = substr($roles, 0, -2);
+                            echo $roles . ')';
+                            ?> </a> </li>
                     <?php } ?>
                 </ul>
             </div>
         </nav>
         <ul class="sidenav" id="mobile-demo">
             <?php
-            if (isset($_SESSION['identifier'])) {
-                echo '<li><a href="/homepage">ACCUEIL</a></li>';
+            if (isset($_SESSION['identifier'])
+                && isset($_SESSION['roles'])
+                && is_array($_SESSION['roles'])
+                && in_array('Enseignant', $_SESSION['roles'])
+            ) {
+                echo '<li><a href="/homepage">DEMANDE</a></li>';
             }
             if (isset($_SESSION['role_name'])
                 && $_SESSION['role_name'] === 'Admin_dep'
             ) { ?>
+                <li><a href="/tutoring">
+                    <?php echo 'STAGES'; ?>
+                </a></li>
                 <li><a href="/dashboard">
                     <?php echo 'GESTION DES DONNEES'; ?>
                 </a></li>
