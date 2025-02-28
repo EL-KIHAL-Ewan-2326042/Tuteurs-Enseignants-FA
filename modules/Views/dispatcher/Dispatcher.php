@@ -330,6 +330,7 @@ class Dispatcher
                 && $_POST['action'] === 'generate'
             ) : ?>
             <div class="center">
+
                 <div id="map" class="map-container" style="position: relative;">
                     <div id="map-loading-overlay" style="display: none;">
                         <div class="loading-message">Mise à jour de la map...</div>
@@ -338,7 +339,69 @@ class Dispatcher
                         </div>
                     </div>
                 </div>
-                <div class="row"></div>
+
+                <div class="card-container">
+                    <div class="card-panel white z-depth-1 dispatcher-legend-card">
+                        <h6 class="flow-text
+                        dispatcher-legend-title">Légende de la carte</h6>
+                        <ul class="browser-default dispatcher-legend-list">
+                            <li><span class="legend-color-box
+                            red"></span> Enseignant sélectionné:
+                            Peut être changé lors d'un clique sur une colonne</li>
+                            <li><span class="legend-color-box
+                            blue"></span> Autres enseignants: comprend seulement
+                            ceux du même département que celui de l'élève</li>
+                            <li><span class="legend-color-box
+                            yellow"></span> Entreprise: l'entreprise de
+                                l'élève selectionné</li>
+                            <li>
+                                <span class="legend-line-box"></span
+                                > Distance entre l'enseignant et l'entreprise
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="card-panel white z-depth-1 dispatcher-info-card">
+                        <h6 class="flow-text
+    dispatcher-info-title">Informations</h6>
+                        <p class="dispatcher-info-text">
+                            <i class="material-icons
+        left tiny">mouse</i
+                            > Cliquez sur une ligne du tableau
+                            pour afficher la vue étudiante et
+                            les informations
+                            de l'étudiant sur la carte.
+                        </p>
+                        <p class="dispatcher-info-text">
+                            <i class="material-icons left
+                            tiny">sort</i> Vous pouvez trier le tableau
+                            en cliquant sur le titre d'une colonne.
+                        </p>
+                        <p class="dispatcher-info-text">
+                            <i class="material-icons
+                            left tiny">settings</i> Critères et coefficients
+                            utilisés pour la répartition :
+                            <?php
+                            $dictCoef = array_filter(
+                                $_POST['coef'], function ($coef, $key) {
+                                    return isset($_POST['criteria_on'][$key]);
+                                }, ARRAY_FILTER_USE_BOTH
+                            );
+                            ?>
+                            <?php if (!empty($dictCoef)) : ?>
+                        <ul>
+                                <?php foreach ($dictCoef as $name => $coef): ?>
+                                <li><strong>
+                                    <?php echo $name; ?>
+                                    </strong> : <?php echo $coef; ?></li>
+                                <?php endforeach; ?>
+                        </ul>
+                        <?php else: ?>
+                            Aucun critère sélectionné.
+                        <?php endif; ?>
+                        </p>
+                    </div>
+                </div>
 
                 <form action="./dispatcher" method="post">
                     <div class=
