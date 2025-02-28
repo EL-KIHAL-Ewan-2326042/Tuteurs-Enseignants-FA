@@ -82,7 +82,7 @@ class Department extends Model
                         . 'internship.student_number = study_at.student_number '
                     . 'WHERE department_name = :department_name '
                     . 'AND id_teacher IS NULL '
-                    . 'AND start_date_internship > CURRENT_DATE';
+                    . 'AND end_date_internship > CURRENT_DATE';
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindParam(':department_name', $department);
         $stmt->execute();
