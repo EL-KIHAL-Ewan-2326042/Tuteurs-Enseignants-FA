@@ -574,10 +574,6 @@ readonly class Homepage
                     endif; ?>
 
             <script>
-                document.addEventListener('DOMContentLoaded', function() {
-                    var elems = document.querySelectorAll('select');
-                    M.FormSelect.init(elems);
-                });
                 <?php if (!empty($_SESSION['address'])) : ?>
                     const teacherAddress =
                         "<?php echo $_SESSION['address'][0]['address']; ?>";
