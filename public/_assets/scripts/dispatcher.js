@@ -519,6 +519,19 @@ document.addEventListener(
                             checkbox.checked = selectAllCheckboxElem.checked;
                         }
                     );
+                    const studentTableCheckboxes = document.querySelectorAll('#student-dispatch-table .dispatch-checkbox');
+                    studentTableCheckboxes.forEach(studentCheckbox => {
+                        const [studentTeacherId, studentInternshipIdentifier] = studentCheckbox.value.split('$');
+                        visibleRows.forEach(dispatchRow => {
+                            const dispatchCheckbox = dispatchRow.querySelector('input[type="checkbox"]');
+                            if (dispatchCheckbox) {
+                                const [dispatchTeacherId, dispatchInternshipIdentifier] = dispatchCheckbox.value.split('$');
+                                if (studentTeacherId === dispatchTeacherId && studentInternshipIdentifier === dispatchInternshipIdentifier) {
+                                    studentCheckbox.checked = selectAllCheckboxElem.checked;
+                                }
+                            }
+                        })
+                    })
                 }
             );
         }

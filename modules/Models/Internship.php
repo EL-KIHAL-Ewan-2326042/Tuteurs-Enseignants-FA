@@ -542,99 +542,103 @@ class Internship extends Model
      *
      * @return array|array[] resultat final sous forme de matrice
      */
-        public function dispatcher(
-            Department $departmentModel, Teacher $teacherModel, array $dicoCoef
-        ): array {
-            $_db = $this->_db;
+    public function dispatcher(
+        Department $departmentModel, Teacher $teacherModel, array $dicoCoef
+    ): array {
+        $_db = $this->_db;
 
-            $roleDepartments = $_SESSION['role_department'];
-            $placeholders = implode(',', array_fill(0, count($roleDepartments), '?'));
+        $roleDepartments = $_SESSION['role_department'];
+        $placeholders = implode(',', array_fill(0, count($roleDepartments), '?'));
 
-            $query = "SELECT Teacher.Id_teacher, Teacher.teacher_name, "
-                  . "Teacher.teacher_firstname,"
-                  . "Maxi_number_intern AS max_intern, "
-                  . "Maxi_number_apprentice AS max_apprentice, "
-                  . "SUM(CASE WHEN internship.type = 'alternance' THEN 1 ELSE 0 END) "
-                  . "AS current_count_apprentice, 
+        $query = "SELECT Teacher.Id_teacher, Teacher.teacher_name, "
+              . "Teacher.teacher_firstname,"
+              . "Maxi_number_intern AS max_intern, "
+              . "Maxi_number_apprentice AS max_apprentice, "
+              . "SUM(CASE WHEN internship.type = 'alternance' THEN 1 ELSE 0 END) "
+              . "AS current_count_apprentice, 
                   SUM(CASE WHEN internship.type = 'internship' THEN 1 ELSE 0 END) 
                   AS current_count_intern 
                   FROM Teacher 
                   JOIN (SELECT DISTINCT user_id, department_name FROM has_role) 
                   AS has_role ON Teacher.Id_teacher = has_role.user_id "
-                  . "LEFT JOIN internship "
-                  . "ON Teacher.Id_teacher = internship.Id_teacher "
-                  . "WHERE department_name IN ($placeholders) "
-                  . "GROUP BY Teacher.Id_teacher";
+              . "LEFT JOIN internship "
+              . "ON Teacher.Id_teacher = internship.Id_teacher "
+              . "WHERE department_name IN ($placeholders) "
+              . "GROUP BY Teacher.Id_teacher";
 
-            $stmt = $_db->getConn()->prepare($query);
-            $stmt->execute($roleDepartments);
+        $stmt = $_db->getConn()->prepare($query);
+        $stmt->execute($roleDepartments);
 
-            $teacherData = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $teacherData = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            $listTeacherMaxIntern = [];
-            $listTeacherMaxApprentice = [];
-            $listTeacherIntern = [];
-            $listTeacherApprentice = [];
-
-
-            foreach ($teacherData as $teacher) {
-                $listTeacherMaxIntern[$teacher['id_teacher']] = $teacher['max_intern'];
-                $listTeacherMaxApprentice[$teacher['id_teacher']] = $teacher['max_apprentice'];
-                $listTeacherIntern[$teacher['id_teacher']] = $teacher['current_count_intern'];
-                $listTeacherApprentice[$teacher['id_teacher']] = $teacher['current_count_apprentice'];
-            }
-
-            $listFinal = [];
-            $listStart = [];
-            $listEleveFinal = [];
+        $listTeacherMaxIntern = [];
+        $listTeacherMaxApprentice = [];
+        $listTeacherIntern = [];
+        $listTeacherApprentice = [];
 
 
-            foreach ($teacherData as $teacher) {
-                foreach ($this->relevanceTeacher(
-                    $departmentModel, $teacherModel, $teacher, $dicoCoef
-                ) as $association) {
-                    $listStart[] = $association;
-                }
-            }
-
-            if (empty($listStart)) {
-                return [[], []];
-            }
-
-            $assignedCountsIntern = $listTeacherIntern;
-            $assignedCountsApprentice = $listTeacherApprentice;
-
-            while (!empty($listStart)) {
-                usort($listStart, fn($a, $b) => $b['score'] <=> $a['score']);
-                $topCandidate = $listStart[0];
-                $assignedTopIntern = $assignedCountsIntern[$topCandidate['id_teacher']];
-                $assignedTopApprentice = $assignedCountsApprentice
-                [$topCandidate['id_teacher']];
-                $listTopIntern = $listTeacherMaxIntern[$topCandidate['id_teacher']];
-                $listTopApprentice = $listTeacherMaxApprentice
-                [$topCandidate['id_teacher']];
-                if ($assignedTopIntern < $listTopIntern
-                    && !in_array($topCandidate['internship_identifier'], $listEleveFinal)
-                    && $topCandidate['type'] === 'internship'
-                ) {
-
-                    $listFinal[] = $topCandidate;
-                        $listEleveFinal[] = $topCandidate['internship_identifier'];
-                        ++ $assignedCountsIntern[$topCandidate['id_teacher']];
-                } elseif ($assignedTopApprentice < $listTopApprentice
-                    && !in_array($topCandidate['internship_identifier'], $listEleveFinal)
-                    && $topCandidate['type'] === 'alternance'
-                ) {
-
-                    $listFinal[] = $topCandidate;
-                    $listEleveFinal[] = $topCandidate['internship_identifier'];
-                    ++ $assignedCountsApprentice[$topCandidate['id_teacher']];
-                } else {
-                    array_shift($listStart);
-                }
-            }
-            return [$listFinal, $assignedCountsIntern, $assignedCountsApprentice];
+        foreach ($teacherData as $teacher) {
+            $listTeacherMaxIntern[$teacher['id_teacher']]
+                = $teacher['max_intern'];
+            $listTeacherMaxApprentice[$teacher['id_teacher']]
+                = $teacher['max_apprentice'];
+            $listTeacherIntern[$teacher['id_teacher']]
+                = $teacher['current_count_intern'];
+            $listTeacherApprentice[$teacher['id_teacher']]
+                = $teacher['current_count_apprentice'];
         }
+
+        $listFinal = [];
+        $listStart = [];
+        $listEleveFinal = [];
+
+
+        foreach ($teacherData as $teacher) {
+            foreach ($this->relevanceTeacher(
+                $departmentModel, $teacherModel, $teacher, $dicoCoef
+            ) as $association) {
+                $listStart[] = $association;
+            }
+        }
+
+        if (empty($listStart)) {
+            return [[], []];
+        }
+
+        $assignedCountsIntern = $listTeacherIntern;
+        $assignedCountsApprentice = $listTeacherApprentice;
+
+        while (!empty($listStart)) {
+            usort($listStart, fn($a, $b) => $b['score'] <=> $a['score']);
+            $topCandidate = $listStart[0];
+            $assignedTopIntern = $assignedCountsIntern[$topCandidate['id_teacher']];
+            $assignedTopApprentice = $assignedCountsApprentice
+            [$topCandidate['id_teacher']];
+            $listTopIntern = $listTeacherMaxIntern[$topCandidate['id_teacher']];
+            $listTopApprentice = $listTeacherMaxApprentice
+            [$topCandidate['id_teacher']];
+            if ($assignedTopIntern < $listTopIntern
+                && !in_array($topCandidate['internship_identifier'], $listEleveFinal)
+                && $topCandidate['type'] === 'internship'
+            ) {
+
+                $listFinal[] = $topCandidate;
+                    $listEleveFinal[] = $topCandidate['internship_identifier'];
+                    ++ $assignedCountsIntern[$topCandidate['id_teacher']];
+            } elseif ($assignedTopApprentice < $listTopApprentice
+                && !in_array($topCandidate['internship_identifier'], $listEleveFinal)
+                && $topCandidate['type'] === 'alternance'
+            ) {
+
+                $listFinal[] = $topCandidate;
+                $listEleveFinal[] = $topCandidate['internship_identifier'];
+                ++ $assignedCountsApprentice[$topCandidate['id_teacher']];
+            } else {
+                array_shift($listStart);
+            }
+        }
+        return [$listFinal, $assignedCountsIntern, $assignedCountsApprentice];
+    }
 
     /**
      * Récupère une liste des identifiants
@@ -783,8 +787,8 @@ class Internship extends Model
                   . 'LEFT JOIN teacher '
                       . 'ON internship.id_teacher = teacher.id_teacher '
                   . 'WHERE internship.student_number = :student '
-                  . 'AND start_date_internship > CURRENT_DATE '
-                  . 'ORDER BY start_date_internship ASC '
+                  . 'AND end_date_internship > CURRENT_DATE '
+                  . 'ORDER BY end_date_internship ASC '
                   . 'LIMIT 1';
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindParam(':student', $student);
