@@ -41,9 +41,10 @@ class RouterException extends Exception
     /**
      * Initialise les attributs passés en paramètre
      *
-     * @param string $message Message à afficher
-     *                                 lorsque l'exception est levée
-     * @param int $code Code correspondant à l'exception
+     * @param string         $message  Message à afficher lorsque l'exception
+     *                                 est levée
+     * @param int            $code     Code correspondant
+     *                                 à l'exception
      * @param Exception|null $previous L'exception précédente qui a été levée
      */
     public function __construct($message, $code = 0, Exception $previous = null)
