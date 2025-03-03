@@ -256,12 +256,6 @@ document.addEventListener(
         validateCheckboxes();
 
         const select = document.getElementById('save-selector');
-        const saveButton = document.getElementById('save-btn');
-
-        function updateButtonState()
-        {
-            saveButton.disabled = select.value === 'new';
-        }
 
         if (select) {
             select.addEventListener('change', updateButtonState);
