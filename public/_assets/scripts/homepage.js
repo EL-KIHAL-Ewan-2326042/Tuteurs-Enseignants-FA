@@ -190,6 +190,22 @@ document.addEventListener(
                                 return;
                             }
 
+                            const clickedCell = event.target.closest('td, th');
+                            if (!clickedCell) {
+                                return;
+                            }
+
+                            const allCells = Array.from(clickedRow.children);
+
+                            const clickedColIndex = allCells.indexOf(clickedCell);
+
+
+                            const isLastColumn = clickedColIndex === allCells.length - 1;
+
+                            if (isLastColumn) {
+                                return;
+                            }
+
                             const clickedRowData =
                                 clickedRow.getAttribute('data-selected-row');
                             const [
