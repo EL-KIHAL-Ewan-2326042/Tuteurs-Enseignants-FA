@@ -82,10 +82,10 @@ readonly class Homepage
                             <div class="input-field">
                                 <select id="searchType" name="searchType"
                                         aria-label="Type de recherche">
-                                    <option value="studentNumber"
-                                            >Numéro Etudiant</option>
                                     <option value="name"
                                             selected>Nom et Prénom</option>
+                                    <option value="studentNumber"
+                                            >Numéro Etudiant</option>
                                     <option value="company">Entreprise</option>
                                 </select>
                             </div>
