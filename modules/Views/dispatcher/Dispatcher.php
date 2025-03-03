@@ -286,12 +286,12 @@ class Dispatcher
                             <div class="input-field col s6">
                                 <input id="searchTeacher" name="searchTeacher"
                                    type="text" class="validate">
-                                <label for="searchTeacher">ID enseignant</label>
+                                <label for="searchTeacher">Enseignant</label>
                             </div>
                             <div class="input-field col s6">
                                 <input id="searchInternship" name="searchInternship"
                                        type="text" class="validate">
-                                <label for="searchInternship">ID Stage</label>
+                                <label for="searchInternship">Stage</label>
                             </div>
                             <div id="searchResults"></div>
                             <p class="red-text">

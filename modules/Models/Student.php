@@ -74,7 +74,7 @@ class Student extends Model
             . "FROM student "
             . "JOIN internship "
             . "ON student.student_number = internship.student_number "
-            . "WHERE internship_identifier ILIKE :searchTerm "
+            . "WHERE company_name ILIKE :searchTerm "
             . "ORDER BY company_name ASC";
         $searchTerm = "$searchTerm%";
 

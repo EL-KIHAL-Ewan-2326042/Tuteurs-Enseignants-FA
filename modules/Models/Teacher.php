@@ -136,11 +136,12 @@ class Teacher extends Model
 
         $searchTerm = trim($searchTerm);
 
-        $query
-            = "SELECT id_teacher, teacher_name, teacher_firstname "
-            . "FROM teacher "
-            . "WHERE id_teacher ILIKE :searchTerm "
-            . "ORDER BY id_teacher ASC";
+            $query
+                = "SELECT id_teacher, teacher_name, teacher_firstname "
+                . "FROM teacher "
+                . "WHERE teacher_name ILIKE :searchTerm "
+                . "OR teacher_firstname ILIKE :searchTerm "
+                . "ORDER BY id_teacher ASC";
 
         $searchTerm = "$searchTerm%";
 
