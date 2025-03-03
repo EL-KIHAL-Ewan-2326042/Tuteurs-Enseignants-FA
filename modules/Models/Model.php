@@ -502,18 +502,20 @@ class Model
     public function insertTeacherData(array $data): void
     {
         $userModel = new User($this->_db);
-        $teacher = [$data[0], $data[1], $data[2], $data[3]];
-        $discipline = [1 => $data[5]];
-        $explodedData = explode('$', $data[4]);
+        $teacher = [$data[0], $data[1], $data[2], $data[3], $data[4]];
+        $discipline = [1 => $data[6]];
+        $explodedData = explode('$', $data[5]);
         $address = [
             1 => $explodedData[0],
             2 => isset($explodedData[1]) ? $explodedData[1] : null
         ];
         // Colonnes pour la table teacher
         $teacherColumns = $this->getTableColumn('teacher');
-        if (count($teacherColumns) !== count($data)) {
+
+        if (count($teacherColumns) +2 !== count($data)) {
             throw new Exception();
         }
+
         $teacherData = array_combine($teacherColumns, $teacher);
 
         // Insertion dans la table teacher
