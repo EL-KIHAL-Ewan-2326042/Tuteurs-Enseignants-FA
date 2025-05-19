@@ -502,42 +502,49 @@ class Model
     public function insertTeacherData(array $data): void
     {
         $userModel = new User($this->_db);
+
+        // Préparation des données teacher, discipline, et adresse
         $teacher = [$data[0], $data[1], $data[2], $data[3], $data[4]];
         $discipline = [1 => $data[6]];
         $explodedData = explode('$', $data[5]);
         $address = [
             1 => $explodedData[0],
-            2 => isset($explodedData[1]) ? $explodedData[1] : null
+            2 => $explodedData[1] ?? null
         ];
-        // Colonnes pour la table teacher
+
+        // Récupération des colonnes de la table teacher
         $teacherColumns = $this->getTableColumn('teacher');
 
-        if (count($teacherColumns) +2 !== count($data)) {
-            throw new Exception();
+        // Vérification de la cohérence du nombre de colonnes
+        if (count($teacherColumns) + 2 !== count($data)) {
+            throw new Exception('Le nombre de données ne correspond pas aux colonnes attendues pour la table teacher.');
         }
 
+        // Construction des données associatives pour l'insertion
         $teacherData = array_combine($teacherColumns, $teacher);
 
         // Insertion dans la table teacher
         $this->insertGenericData($teacher, 'teacher');
 
-
-        // Insertion dans la table has_address, is_taught et user_connect
+        // Insertion dans has_address
         $this->insertGenericData(
             [0 => $teacherData['id_teacher']] + $address,
             'has_address'
         );
+
+        // Insertion dans is_taught
         $this->insertGenericData(
             [0 => $teacherData['id_teacher']] + $discipline,
             'is_taught'
         );
 
+        // Insertion dans user_connect
         $userModel->insertUserConnect(
             $teacherData['id_teacher'],
             'default_password'
         );
 
-        // Insertion dans la table has_role
+        // Insertion dans has_role si un rôle est présent en session
         $department = $_SESSION['role_department'] ?? null;
         if ($department) {
             $userModel->insertHasRole($teacherData['id_teacher'], $department[0]);
