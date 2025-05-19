@@ -2,3 +2,6 @@
 /config.json
 /vendor
 .phpunit*
+.env
+./vendor
+vendor
