@@ -12,6 +12,6 @@
   "require": {
     "ext-pdo": "*",
     "ext-fileinfo": "*",
-    "ext-mysql_xdevapi": "*"
+    "vlucas/phpdotenv": "^5.6"
   }
 }

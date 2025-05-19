@@ -17,6 +17,7 @@
  * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
  */
 namespace includes;
+use Dotenv\Dotenv;
 use PDO;
 use PDOException;
 
@@ -45,12 +46,14 @@ class Database
      */
     public function __construct()
     {
-        $config = json_decode(file_get_contents('../config.json'), true);
+        // Charge les variables d'environnement
+        $dotenv = Dotenv::createImmutable(__DIR__ . '/../');
+        $dotenv->load();
 
-        $host = $config['database']['host'];
-        $dbname = $config['database']['dbname'];
-        $user = $config['database']['user'];
-        $pass = $config['database']['password'];
+        $host = $_ENV['DB_HOST'];
+        $dbname = $_ENV['DB_NAME'];
+        $user = $_ENV['DB_USER'];
+        $pass = $_ENV['DB_PASSWORD'];
 
         try {
             $this->_conn = new PDO(

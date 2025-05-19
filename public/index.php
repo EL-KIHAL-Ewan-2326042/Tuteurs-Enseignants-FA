@@ -22,7 +22,7 @@ use Blog\Views;
 use includes\Autoloader;
 use includes\exceptions\RouterException;
 use includes\Route;
-
+require_once __DIR__ . '/../vendor/autoload.php';
 require_once '../includes/Autoloader.php';
 Autoloader::register();
 
