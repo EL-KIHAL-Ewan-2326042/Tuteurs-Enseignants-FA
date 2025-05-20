@@ -175,11 +175,11 @@ openlayers.github.io@master/en/v6.5.0/css/ol.css"
             <div class="container">
                 <div class="row">
                     <div class="col s6">
-                        &copy; 2024 TutorMap
+                        &copy; <?php echo date("Y"); ?> TutorMap
                     </div>
                     <div class="col s6 right-align">
-                        <a href="/legal-notices">Mentions Légales -</a>
-                        <a href="/aboutus"> A Propos</a>
+                        <a href="/legal-notices">Mentions légales </a>-
+                        <a href="/aboutus"> À propos</a>
                     </div>
                 </div>
             </div>
