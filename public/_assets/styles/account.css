@@ -1,272 +1,122 @@
-@import "global.css";
+@import 'global.css';
 
 main {
-    flex-direction: column;
+    height: 100%;
+    display: flex;
 }
 
-.center {
-    justify-content: center;
-    width: 70%;
-    align-items: flex-start;
-}
-
-h1 {
-    font-size: 2.92rem;
-    margin: 1.95rem 0 1.168rem 0;
-    color: var(--main-color);
-}
-
-h2 {
-    font-size: 1.64rem;
-    margin: 1.1rem 0 0.656rem 0;
-    text-align: center;
-}
-
-main a {
-    color: black;
-}
-
-main a:visited {
-    color: black;
-}
-
-main a:hover {
-    color: var(--main-color);
-}
-
-.btn {
-    background-color: #00558B;
-    z-index: 0;
-}
-
-.btn-annuler {
-    background-color: #B30C00 !important;
-}
-
-.btn:hover {
-    background-color: #E8CE7E !important;
-}
-
-/* Style des options dans le menu déroulant du select */
-.dropdown-content li>a, .dropdown-content li>span{
-    padding: 15px;
-    color: #00558B;
-}
-
-input[type="checkbox"].filled-in:checked + span:after {
-    background-color: #00558B !important;
-    border-color: #00558B !important;
-}
-
-/* label focus color */
-.input-field input:focus + label {
-    color: #00558B !important;
-}
-
-label{
-    color: #2c2c2c !important;
-}
-
-/* label underline focus color */
-.input-field input:focus {
-    border-bottom: 1px solid #00558B !important;
-    box-shadow: 0 1px 0 0 #00558B !important;
-}
-
-main .card-panel {
-    margin-top: 1rem;
-}
-
-#count-internships {
+main >div:first-child {
+    padding: 1rem;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    width: 85%;
-}
-
-.inline {
-    display: flex;
-    flex-direction: row;
     justify-content: space-between;
-    margin: 12px 0;
-}
-
-.inline p {
-    text-align: center;
-    margin-top: 0;
-}
-
-.input-field {
-    margin-bottom: 0;
-}
-
-.card-panel {
-    width: 50%;
-    padding-top: 0;
-    padding-bottom: 0;
-}
-
-.cell {
-    display: flex;
-    flex-direction: row;
-    width: 50%;
-    justify-content: space-evenly;
-    margin: 6px 12px;
-}
-
-/* Tableau Account */
-
-#clickable {
-    cursor: pointer;
-}
-
-thead {
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-#table {
-    width: 85%;
-}
-
-#account-table {
-    font-size: 14px;
-    width: 100%;
-}
-
-#account-table th, #account-table td {
-    padding: 6px 10px;
-    text-align: center;
-    border: 1px solid #ddd;
-}
-
-#account-table thead th {
-    background-color: #f4f4f4;
-    font-weight: bold;
-    font-size: 14px;
-}
-
-#account-table tbody tr:nth-child(even) {
-    background-color: #fafafa;
-}
-
-#account-table tbody tr:hover {
-    background-color: #f1f1f1;
-}
-
-@media screen and (max-width: 768px) {
-    #account-table {
-        font-size: 12px;
-    }
-
-    #account-table th, #account-table td {
-        padding: 4px 8px;
-    }
-}
-
-.tooltip-container {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-    color: #8F0000 !important;
-    font-weight: bold;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-    margin-right: 0.5em;
-}
-
-
-/** Pagination **/
-
-#pagination-controls {
-    display: flex;
-    justify-content: center;
     align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    padding: 10px 0;
-    margin-top: 20px;
+    min-height: 100%;
+    border-right: 1px solid var(--couleur-bleu-roi);
+}
+main >div:first-child li {
+    font-size: .9rem;
+}
+main >div:first-child >div >div{
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+}
+main > div:first-child span {
+    text-transform: uppercase;
+    font-weight: lighter;
 }
 
-#pagination-controls button {
+main >div:first-child >div > div >div {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    gap: .2rem;
+}
+main >div:first-child >div > div > div >div {
+    display: flex;
+    gap: .7rem;
     align-items: center;
-    font-size: 16px;
-    padding: 0 10px;
-    margin: 0;
-    min-width: 48px;
-    min-height: 48px;
+}
+main >div:last-child {
+    padding: 1rem;
+    min-width: 70%;
 }
 
-#pagination-controls span {
-    margin: 0 10px;
-    font-size: 16px;
+h5 {
+    color: var(--couleur-bleu-roi);
+    text-transform: uppercase;
 }
 
-#pagination-controls #page-numbers {
+.card {
+
+    width: fit-content;
+
+    max-width: 100%;
+    gap: .6rem;
     display: flex;
-    gap: 5px;
+    flex-direction: column;
+}
+.card > div {
+    display: flex;
+
+}
+.card > div > div {
+    display: flex;
+    align-items: center;
+    gap: .2rem;
 }
 
-#pagination-controls button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+.card >div >div >input {
+    text-align: center;
+}
+.card input {
+
+    background-color: transparent;
+    border: none;
 }
 
-@media screen and (max-width: 600px) {
-    #pagination-controls button {
-        font-size: 14px;
-        padding: 0 5px;
-    }
-
-    #pagination-controls span {
-        font-size: 14px;
-    }
+.deco {
+    cursor: pointer;
+    background-color: var(--couleur-vin);
+    padding: .3rem 1rem;
+    border-radius: .3rem;
+    color: var(--couleur-blanc);
 }
-
-main table {
-    @media (max-width: 830px) {
-        font-size: 0.8rem;
-    }
-
-    @media (max-width: 650px) {
-        font-size: 0.7rem;
-    }
-
-    @media (max-width: 600px) {
-        font-size: 0.65rem;
-    }
-
-    @media (max-width: 550px) {
-        font-size: 0.6rem;
-    }
-
-    @media (max-width: 500px) {
-        font-size: 0.52rem;
-    }
-
-    @media (max-width: 450px) {
-        font-size: 0.47rem;
-    }
-
-    border: solid #e0e0e0 1px;
+.roles {
+    padding: .1rem;
+    border-radius: .1rem;
+    background-color: var(--couleur-bleu-pale);
+    border: 1px solid var(--couleur-bleu);
+    color: var(--couleur-bleu-roi);
 }
+.dep {
 
-
-@media screen and (max-width: 640px) {
-    #map {
-        height: 250px;
-        width: 100%;
-    }
-
-    .center {
-        width: 80%;
-    }
-
-    .card-panel {
-        width: 80%;
-    }
+    padding: .1rem;
+    border-radius: .1rem;
+    background-color: var(--couleur-corail-pale);
+    border: 1px solid var(--couleur-corail);
+    color: var(--couleur-vin);
+}
+.btn-m{
+    font-size: .3rem;
+    height: fit-content;
+    color: var(--couleur-blanc);
+    border-radius: .2rem;
+    display: flex;
+    align-items: center;
+    border: none;
+}
+.card button[type="submit"] {
+    background-color: transparent;
+    border: 1px solid var(--couleur-bleu-roi);
+    color: var(--couleur-bleu-roi);
+    padding: .3rem;
+}
+.plus {
+    background-color: var(--couleur-emeraude);
+}
+.moin {
+    background-color: var(--couleur-brique);
 }

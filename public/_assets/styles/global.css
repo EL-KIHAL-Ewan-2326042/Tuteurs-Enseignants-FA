@@ -1,63 +1,55 @@
 :root {
-    /* Couleurs */
-    --main-color: #00558B;
-    --secondary-color: #246D9A;
-    --tertiary-color: #E8CE7E;
-    --hover-color: #FFC000;
-    --text-color: white;
+    --couleur-bleu:         #1F63DE;
+    --couleur-jaune:        #FFFF85;
+    --couleur-noir:         #000000;
+    --couleur-blanc:        #FFFFFF;
 
-    /* Polices */
-    --main-family: "Font Awesome 6 Duotone";
+    --couleur-or:           #FED100;
+    --couleur-orange:       #FF7900;
+    --couleur-bleu-clair:   #33CCFF;
+    --couleur-corail:       #FF8B7C;
+    --couleur-vert:         #53DE94;
+    --couleur-mauve:        #9966FF;
 
-    /* Espacements */
-    --small-spacing: 4px;
-    --medium-spacing: 12px;
-    --large-spacing: 18px;
+    --couleur-jaune-pale:   #FFFFBF;
+    --couleur-peche:        #FFDEBF;
+    --couleur-bleu-pale:    #CDEAFC;
+    --couleur-corail-pale:  #FFD4CC;
+    --couleur-vert-pale:    #CAFEE4;
+    --couleur-lavande:      #DDCCFF;
+    --couleur-ocre:         #B2861B;
+    --couleur-brique:       #B25600;
+    --couleur-bleu-roi:     #00008E;
+    --couleur-vin:          #990000;
+    --couleur-emeraude:     #009A74;
+    --couleur-violet:       #660099;
 
-    /* Tailles de police */
-    --font-small: 0.75em;
-    --font-medium: 1em;
-    --font-large: 1.2em;
+    --main-family: "AMUMonumentGrotesk-Regular", sans-serif;
+    --medium-family: "AMUMonumentGrotesk-Medium", sans-serif;
+    --bold-family: "AMUMonumentGrotesk-Bold", sans-serif;
+}
 
-    /* Style des boutons de la page */
-    .btn,
-    [type="checkbox"].filled-in:checked+span:not(.lever):after {
-        border-color: var(--main-color);
-        background-color : var(--main-color);
-    }
 
-    .btn:hover{
-        background-color: var(--tertiary-color);
-    }
+* {
+    font-family: var(--main-family);
+    padding: 0;
+    margin: 0;
+}
 
-    .btn span {
-        color: white;
-    }
+a, li {
+    list-style: none;
+    text-decoration: none;
+}
 
-    button.waves-effect.waves-light.btn.page-number {
-        min-width: 32px;
-        min-height: 32px;
-        padding: 8px 12px;
-        margin: 8px;
-    }
-
-    button.waves-effect.waves-light.btn.page-number:hover,
-    button.waves-effect.waves-light.btn.page-number:focus {
-        background-color: #42a5f5;
-        outline: 2px solid #1e88e5;
-        outline-offset: 2px;
-    }
-
-    label {
-        color: #2c2c2c;
-    }
-
-    div.card-panel.white {
-        background-color: #f5f5f5;
-        color: #333333;
-    }
-
-    .tooltip-container {
-        color: var(--main-color);
-    }
+.df {
+    display: flex;
+}
+.ac {
+    align-items: center;
+}
+.g1 {
+    gap: .5rem;
+}
+.fs8 {
+    font-size: .8rem;
 }
