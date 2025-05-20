@@ -69,38 +69,27 @@ class Layout
                         ) {
                             echo '<li><a href="/homepage">DEMANDE</a></li>';
                         }
-                    if (isset($_SESSION['role_name'])
-                        && $_SESSION['role_name'] === 'Admin_dep'
-                    ) { ?>
-                        <li>
-                            <a href="/tutoring">
-                                tutoring
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/dashboard">
-                                dashboard
-                            </a>
-                        </li>
-                        <li>
-                            <a href="/dispatcher">
-                                dispatcher
-                            </a>
-                        </li>
+
+                        if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep') {
+                            echo '<li><a href="/tutoring">tutoring</a></li>';
+                            echo '<li><a href="/dashboard">dashboard</a></li>';
+                            echo '<li><a href="/dispatcher">dispatcher</a></li>';
+                        }
+                        ?>
                     </ul>
                 </nav>
                 <div>
                     <?php if (isset($_SESSION['identifier'])) { ?>
                         <a href="/account">
-                            <span><?php echo $_SESSION['fullName']['teacher_firstname']
-                                    . ' ' . $_SESSION['fullName']['teacher_name'] ?></span>
+            <span><?php echo $_SESSION['fullName']['teacher_firstname']
+                    . ' ' . $_SESSION['fullName']['teacher_name'] ?></span>
                             <span><?php echo $_SESSION['identifier']?></span>
-                         </a>
+                        </a>
                     <?php } ?>
                 </div>
             </header>
         <?php
-    } }
+    } 
 
     /**
      * Affiche le rendu du pied de page (footer)
