@@ -1,0 +1,50 @@
+@charset "UTF-8";
+/* CSS Document */
+
+
+/* =============================================================================
+FONT
+========================================================================== */
+
+    @font-face {
+    font-family: 'AMUMonumentGrotesk-Regular.';
+    font-style: normal;
+    font-weight: normal;
+    src: local('AMUMonumentGrotesk-Regular'), url('../font/AMUMonumentGrotesk-Regular.woff') format('woff');
+    }
+    
+    @font-face {
+    font-family: 'AMUMonumentGrotesk-RegularItalic';
+    font-style: normal;
+    font-weight: normal;
+    src: local('AMUMonumentGrotesk-RegularItalic'), url('../font/AMUMonumentGrotesk-RegularItalic.woff') format('woff');
+    }
+
+    @font-face {
+    font-family: 'AMUMonumentGrotesk-Medium';
+    font-style: normal;
+    font-weight: normal;
+    src: local('AMUMonumentGrotesk-Medium'), url('../font/AMUMonumentGrotesk-Medium.woff') format('woff');
+    }
+    
+    @font-face {
+    font-family: 'AMUMonumentGrotesk-MediumItalic';
+    font-style: normal;
+    font-weight: normal;
+    src: local('AMUMonumentGrotesk-MediumItalic'), url('../font/AMUMonumentGrotesk-MediumItalicc.woff') format('woff');
+    }
+    
+   @font-face {
+    font-family: 'AMUMonumentGrotesk-Bold';
+    font-style: normal;
+    font-weight: normal;
+    src: local('AMUMonumentGrotesk-Bold'), url('../font/AMUMonumentGrotesk-Bold.woff') format('woff');
+    } 
+
+    @font-face {
+    font-family: 'AMUMonumentGrotesk-BoldItalic';
+    font-style: normal;
+    font-weight: normal;
+    src: local('AMUMonumentGrotesk-BoldItalic'), url('../font/AMUMonumentGrotesk-BoldItalic.woff') format('woff');
+    }
+    
