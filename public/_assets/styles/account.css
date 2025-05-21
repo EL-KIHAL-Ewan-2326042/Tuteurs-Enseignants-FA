@@ -24,7 +24,7 @@ main >div:first-child >div >div{
     margin-bottom: 1rem;
 
 }
-main > div:first-child span {
+main > div:first-child label {
     text-transform: uppercase;
     font-weight: lighter;
 }

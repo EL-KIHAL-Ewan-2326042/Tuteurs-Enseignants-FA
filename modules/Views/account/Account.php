@@ -185,7 +185,7 @@ class Account
                     </h5>
                     <form method="post" name="max_internship" class="card fs8">
                                 <div class="df ac g1">
-                                    <span>Stages max: </span>
+                                    <label for="newMaxIntern">Stages max: </label>
                                     <div >
                                         <button type="button" onclick="adjustValue('newMaxIntern', -1)" class="btn-m moin">
                                             <i class="material-icons tiny">remove</i>
@@ -202,7 +202,7 @@ class Account
                                     </div>
                                 </div>
                                 <div class="df ac g1">
-                                    <span>Alternances max: </span>
+                                    <label for="newMaxApprentice">Alternances max: </label>
                                     <div >
                                         <button type="button" onclick="adjustValue('newMaxApprentice', -1)" class="btn-m moin">
                                             <i class="material-icons tiny">remove</i>
