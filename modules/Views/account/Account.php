@@ -232,7 +232,7 @@ class Account
 
             </div>
             <div>
-                TABLE ICI
+                TUTOR TABLE ICI
             </div>
         </main>
         <script>

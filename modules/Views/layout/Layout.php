@@ -99,11 +99,10 @@ class Layout
                                 && is_array($_SESSION['roles'])
                                 && in_array('Enseignant', $_SESSION['roles'])
                             ) {
-                                echo '<li><a href="/homepage">DEMANDE</a></li>';
+                                echo '<li><a href="/ask">DEMANDE</a></li>';
                             }
 
                             if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep') {
-                                echo '<li><a href="/tutoring">tutoring</a></li>';
                                 echo '<li><a href="/dashboard">dashboard</a></li>';
                                 echo '<li><a href="/dispatcher">dispatcher</a></li>';
                             }

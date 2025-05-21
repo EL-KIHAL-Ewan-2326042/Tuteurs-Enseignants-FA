@@ -1,6 +1,6 @@
 <?php
 /**
- * Fichier contenant les test PHPUnit du controlleur Homepage
+ * Fichier contenant les test PHPUnit du controlleur Ask
  *
  * PHP version 8.3
  *
@@ -17,7 +17,7 @@
  */
 namespace Controllers;
 
-use Blog\Controllers\Homepage;
+use Blog\Controllers\Ask;
 use Blog\Views\layout\Layout;
 use PHPUnit\Framework\MockObject\Exception;
 use PHPUnit\Framework\TestCase;
@@ -52,7 +52,7 @@ class HomepageTest extends TestCase
     protected function setUp(): void
     {
         $this->_layoutMock = $this->createMock(Layout::class);
-        $this->_homepageController = new Homepage($this->_layoutMock);
+        $this->_homepageController = new Ask($this->_layoutMock);
     }
 
     /**
