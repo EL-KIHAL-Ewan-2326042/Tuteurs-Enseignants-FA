@@ -54,7 +54,7 @@ class Intramu
             <section class="form-section">
                 <article>
                     <h1>Service d'authentification</h1>
-                    <p>Accédez au meilleur service pour les étudiants</p>
+                    <p>Trouvez vos stagiaires en un clin d'œil avec la plateforme idéale pour les tuteurs !</p>
                 </article>
                 <form action="./intramu" method="POST" id="formAssociate" class="container">
                     <div class="row">
