@@ -73,12 +73,10 @@ class Layout
                     crossorigin="anonymous"
                     defer></script>
 
-            <!-- Exemple plus léger -->
-            <script src="https://cdn.datatables.net/v/dt/dt-2.3.1/datatables.min.js"
-                    integrity="..."
+            <script src="https://cdn.datatables.net/v/dt/jszip-3.10.1/dt-2.3.1/af-2.7.0/b-3.2.3/b-colvis-3.2.3/b-html5-3.2.3/b-print-3.2.3/cr-2.1.0/fc-5.0.4/fh-4.0.2/kt-2.12.1/r-3.0.4/rr-1.5.0/sp-2.3.3/sl-3.0.0/sr-1.4.1/datatables.min.js"
+                    integrity="sha384-nXnoPxa46dpbP4PvaPQZrVt6mo6Ux86MTtOV+l47cM9/JoPQjZmfYImsAWjlJgeG"
                     crossorigin="anonymous"
                     defer></script>
-
 
             <?php
             echo '<link href="' . $cssFilePath . '" rel="stylesheet">';
@@ -89,25 +87,31 @@ class Layout
                 <a href="/homepage" class="logo">
                     amU
                 </a>
-                <nav>
-                    <ul>
-                        <?php
-                        if (isset($_SESSION['identifier'])
-                            && isset($_SESSION['roles'])
-                            && is_array($_SESSION['roles'])
-                            && in_array('Enseignant', $_SESSION['roles'])
-                        ) {
-                            echo '<li><a href="/homepage">DEMANDE</a></li>';
-                        }
+                <div class="nav">
+                    <button id="toggleMenu">
+                        <i class="material-icons">menu</i>
+                    </button>
+                    <nav id="mainNav">
+                        <ul>
+                            <?php
+                            if (isset($_SESSION['identifier'])
+                                && isset($_SESSION['roles'])
+                                && is_array($_SESSION['roles'])
+                                && in_array('Enseignant', $_SESSION['roles'])
+                            ) {
+                                echo '<li><a href="/homepage">DEMANDE</a></li>';
+                            }
 
-                        if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep') {
-                            echo '<li><a href="/tutoring">tutoring</a></li>';
-                            echo '<li><a href="/dashboard">dashboard</a></li>';
-                            echo '<li><a href="/dispatcher">dispatcher</a></li>';
-                        }
-                        ?>
-                    </ul>
-                </nav>
+                            if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep') {
+                                echo '<li><a href="/tutoring">tutoring</a></li>';
+                                echo '<li><a href="/dashboard">dashboard</a></li>';
+                                echo '<li><a href="/dispatcher">dispatcher</a></li>';
+                            }
+                            ?>
+                        </ul>
+                    </nav>
+                </div>
+
                 <div>
                     <?php if (isset($_SESSION['identifier'])) { ?>
                         <a href="/account">

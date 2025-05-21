@@ -81,3 +81,58 @@ footer a {
 .logo:hover {
     color: var(--couleur-jaune);
 }
+#toggleMenu:hover {
+    color: var(--couleur-jaune);
+}
+#toggleMenu {
+    background-color: transparent;
+    border: none;
+    color: var(--couleur-blanc);
+    display: none;
+}
+#mainNav {
+    width: 100%;
+}
+
+@media screen and (max-width: 920px) {
+
+    header, footer {
+
+        padding: .8rem 1rem;
+    }
+}
+
+@media screen and (max-width: 769px) {
+    #mainNav {
+        display: flex;
+    }
+    #mainNav ul{
+        flex-direction: inherit;
+    }
+
+}
+@media screen and (max-width: 768px) {
+    #toggleMenu {
+        z-index: 100;
+        display: block;
+    }
+    #mainNav {
+        padding: 1rem;
+        height: fit-content;
+        position: absolute;
+    }
+    #mainNav ul{
+        top: 6vh;
+        padding: 1rem;
+        align-items: center;
+        gap: .8rem;
+        background-color: var(--couleur-bleu-roi);
+        position: absolute;
+        flex-direction: column;
+    }
+    .nav {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+}
