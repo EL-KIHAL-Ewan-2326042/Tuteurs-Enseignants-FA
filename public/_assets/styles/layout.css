@@ -1,147 +1,139 @@
-@import "global.css";
+@import 'global.css';
 
-/* Global */
 body {
     display: flex;
-    min-height: 100vh;
     flex-direction: column;
-}
-
-label{
-    color: #2c2c2c !important;
-}
-
-a, a:visited  {
-    color: var(--text-color);
-}
-
-a:hover {
-    color: var(--hover-color);
-    text-decoration: none;
-}
-
-/* Ajustements Header */
-
-.navbar {
-    background-color: var(--main-color);
-}
-
-.nav-wrapper {
-    display: flex;
     justify-content: space-between;
-    align-items: center;
-    position: relative;
-    width: 100%;
-    padding: 0 20px;
-    box-sizing: border-box;
+    min-height: 100vh;
+    background-color: var(--couleur-blanc);
 }
-
-.nav-wrapper .center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+header, footer {
+    z-index: 100;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 14px 28px, rgba(0, 0, 0, 0.22) 0px 10px 10px;
+    max-height: 5vh;
+    min-height: 5vh;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    padding: .8rem 5rem;
+    justify-content: space-between;
+    background-color: var(--couleur-bleu-roi);
 }
-
-.navbar .brand-logo {
-    display: flex;
-    align-items: center;
-    margin-left: 10px;
-}
-
-.navbar .brand-logo img {
-    height: 55px;
-    width: 130px;
-    object-fit: contain;
-}
-
-.nav-wrapper .sidenav-trigger {
-    position: absolute;
-    left: 0;
-}
-
-.nav-wrapper .right {
-    position: absolute;
-    right: 10px;
-}
-
-ul.center {
-    display: flex;
-    justify-content: center;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.sidenav li:first-child {
-    margin-top: var(--large-spacing);
-}
-
-a.brand-logo {
-    display: flex;
-    align-items: center;
-    height: 60px;
-}
-
-@media (max-width: 800px) {
-    .hide-on-med-and-down {
-        display: none !important;
-    }
-}
-
-/* Ajustements Main */
-
-
-main {
-    display: flex;
-    flex: 1 0 auto;
-    justify-content: center;
-    align-items: center;
-    margin-top: 40px;
-    margin-bottom: 40px;
-    overflow-y: auto;
-}
-
-/* Ajustements Footer */
 
 footer {
-    position: sticky;
-    bottom: 0;
+    max-height: 2vh;
+    min-height: 2vh;
+}
+header nav {
+    width: 70%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+header nav ul  {
+    display: flex;
+    gap: 3rem;
+
+}
+header nav ul a {
+    color: var(--couleur-blanc);
+    text-transform: uppercase;
+}
+header div {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+}
+header div a{
+    display: flex;
+    flex-direction: column;
+    color: var(--couleur-blanc);
+}
+header div span {
+    text-transform: uppercase;
+}
+header div span:first-child {
+    font-weight: bold;
+}
+header div span:last-child {
+    font-weight: lighter;
+    font-style: italic;
+    color: var(--couleur-jaune-pale);
+}
+
+header a:hover, footer a:hover {
+    color: var(--couleur-jaune);
+}
+main {
+    min-height: calc(90vh - .8rem * 4);
+}
+footer {
+    text-transform: uppercase;
+    color: var(--couleur-blanc);
+    display: flex;
+    align-items: center;
+}
+footer a {
+    color: var(--couleur-blanc);
+}
+
+.logo {
+    font-size: 2rem;
+    color: var(--couleur-blanc);
+}
+.logo:hover {
+    color: var(--couleur-jaune);
+}
+#toggleMenu:hover {
+    color: var(--couleur-jaune);
+}
+#toggleMenu {
+    background-color: transparent;
+    border: none;
+    color: var(--couleur-blanc);
+    display: none;
+}
+#mainNav {
     width: 100%;
-    background-color: var(--main-color);
-    color: var(--text-color);
-    z-index: 1;
 }
 
-.page-footer {
-    background-color: var(--main-color);
-}
+@media screen and (max-width: 920px) {
 
-.footer-copyright {
-    background-color: var(--main-color);
-    color: var(--text-color);
-}
+    header, footer {
 
-.card-panel {
-    margin: 10px;
-    padding: 15px;
-    border-radius: 10px;
-    background-color: white;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-}
-
-@media (max-width: 600px) {
-    .card-panel {
-        margin: 10px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        padding: .8rem 1rem;
     }
 }
 
-/** Boutons de la map OSM **/
+@media screen and (max-width: 769px) {
+    #mainNav {
+        display: flex;
+    }
+    #mainNav ul{
+        flex-direction: inherit;
+    }
 
-button.ol-zoom-in, button.ol-zoom-out {
-    min-width: 48px;
-    min-height: 48px;
+}
+@media screen and (max-width: 768px) {
+    #toggleMenu {
+        z-index: 100;
+        display: block;
+    }
+    #mainNav {
+        padding: 1rem;
+        height: fit-content;
+        position: absolute;
+    }
+    #mainNav ul{
+        top: 6vh;
+        padding: 1rem;
+        align-items: center;
+        gap: .8rem;
+        background-color: var(--couleur-bleu-roi);
+        position: absolute;
+        flex-direction: column;
+    }
+    .nav {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 }

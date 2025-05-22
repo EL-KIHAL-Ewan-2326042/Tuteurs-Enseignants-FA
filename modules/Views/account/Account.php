@@ -50,6 +50,8 @@ class Account
      */
     public function __construct(private Teacher $teacherModel,
         private Internship $internshipModel
+
+
     ) {
     }
 
@@ -60,11 +62,7 @@ class Account
      */
     public function showView(): void
     {
-        ?>
-        <main>
-            <h1 class="center-align">Stages et alternances assignés</h1>
 
-        <?php
         $trainees = $this->internshipModel->getInterns($_SESSION['identifier']);
         $result = $this->teacherModel
             ->getMaxNumberTrainees($_SESSION['identifier']);
@@ -77,7 +75,7 @@ class Account
         if (isset($_POST['newMaxSubmitted'])) {
             if (!isset($_POST['newMaxIntern'])
                 || (isset($result['intern'])
-                && intval($_POST['newMaxIntern']) === $result['intern'])
+                    && intval($_POST['newMaxIntern']) === $result['intern'])
                 || intval($_POST['newMaxIntern']) < 0
                 || intval($_POST['newMaxIntern']) > 100
             ) {
@@ -89,7 +87,7 @@ class Account
 
             if (!isset($_POST['newMaxApprentice'])
                 || (isset($result['apprentice'])
-                && intval($_POST['newMaxApprentice']) === $result['apprentice'])
+                    && intval($_POST['newMaxApprentice']) === $result['apprentice'])
                 || intval($_POST['newMaxApprentice']) < 0
                 || intval($_POST['newMaxApprentice']) > 100
             ) {
@@ -100,7 +98,7 @@ class Account
             }
 
             if (!(isset($tooLowIntern) && $tooLowIntern
-                && isset($tooLowApprentice) && $tooLowApprentice)
+                    && isset($tooLowApprentice) && $tooLowApprentice)
                 && !(isset($newMaxIntern) && isset($newMaxApprentice))
             ) {
 
@@ -133,262 +131,121 @@ class Account
         }
 
         ?>
-
-            <div class="row"></div>
-
-            <div id="count-internships">
+        <main>
+            <div>
                 <div>
-                <?php
-
-                echo '<h2 class="center-align">';
-                if ($internship > 0) {
-                    echo "Vous tutorez <strong>" . $internship
-                    . "</strong> stage" . ($internship !== 1 ? "s" :'');
-                } else {
-                    echo "Vous ne tutorez <strong>aucun</strong> stage";
-                }
-                if (isset($result['intern'])) {
-                    echo " sur un maximum de " . $result['intern'];
-                }
-
-                echo '</h2><h2 class="center-align">';
-
-                if ($alternance > 0) {
-                    echo "Vous tutorez <strong>" . $alternance
-                    . "</strong> alternance" . ($alternance !== 1 ? "s" : '');
-                } else {
-                    echo "Vous ne tutorez <strong>aucune</strong> alternance";
-                }
-                if (isset($result['apprentice'])) {
-                    echo " sur un maximum de " . $result['apprentice'];
-                }
-                echo '</h2>';
-
-                ?>
-                </div>
-                <div class="card-panel white">
-                    <label for="max_internship">
-                        <form method="post" name="max_internship">
-                            <div class="inline">
-                            <?php if (!$result['intern']) : ?>
-                                <p class="cell"><?php
-                                    echo "Valeur maximale de stages introuvable, "
-                                    . "veuillez en entrer une nouvelle";
-                                ?></p>
-                            <?php else: ?>
-                                <p class="cell"><?php
-                                    echo "Valeur maximale de stages actuelle: "
-                                        . $result['intern']
-                                ?></p>
-                            <?php endif; ?>
-                            <?php if (!$result['apprentice']) : ?>
-                                <p class="cell"><?php
-                                    echo "Valeur maximale d'alternance introuvable, "
-                                        . "veuillez en entrer une nouvelle";
-                                ?></p>
-                            <?php else: ?>
-                                <p class="cell"><?php
-                                    echo "Valeur maximale d'alternances actuelle: "
-                                        . $result['apprentice']
-                                ?></p>
-                            <?php endif; ?>
+                <div>
+                    <h5>
+                        A propos de vous
+                    </h5>
+                    <div class="fs8">
+                        <div>
+                            <div class="df ac g1">
+                                <i class="material-icons left tiny">supervisor_account</i><span>Roles:</span>
                             </div>
 
-                            <div class="inline">
-                                <p class="cell"><?php
-                                    echo "Nombre de stages en cours ou à venir "
-                                        . "que vous tutorez: " . $internship; ?>
-                                </p>
-                                <p class="cell"><?php
-                                    echo "Nombre d'alternances en cours ou à venir "
-                                        . "que vous tutorez: " . $alternance; ?>
-                                </p>
+                            <ul class="df ac g1">
+                                <?php foreach ($_SESSION['roles'] as $role): ?>
+                                    <li class="roles fs8">
+                                        <?= htmlspecialchars($role) ?>
+                                    </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <div class="df ac g1">
+                                <i class="material-icons left tiny">location_on</i><span>Adresse:</span>
                             </div>
 
-                            <div class="inline">
-                                <div class="input-field cell">
-                                    <label for="newMaxIntern"><?php
-                                        echo "Nouvelle valeur maximale:";
-                                    ?></label>
-                                    <input type="number" name="newMaxIntern"
-                                           id="newMaxIntern" min="0" max="100"
-                                           value="<?php
-                                            echo ($result['intern']) ?: 0 ?>" />
-                                </div>
-                                <div class="input-field cell">
-                                    <label for="newMaxApprentice"><?php
-                                        echo "Nouvelle valeur maximale:";
-                                    ?></label>
-                                    <input type="number" name="newMaxApprentice"
-                                           id="newMaxApprentice" min="0" max="100"
-                                           value="<?php
-                                            echo ($result['apprentice']) ?: 0 ?>" />
-                                </div>
+                            <ul>
+                                <?php foreach ($_SESSION['address'] as $addr): ?>
+                                    <li class="fs8"><?= htmlspecialchars($addr['address']) ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <div class="df ac g1">
+                                <i class="material-icons left tiny">apartment</i><span>Département:</span>
                             </div>
 
-                            <div class="inline">
-                                <div class="cell">
-                                    <button type="reset" class=
-                                            "waves-effect waves-light
-                                            btn btn-annuler tooltip"
-                                            data-tooltip=
-                                            "Réinitialiser le formulaire"
-                                            data-position="top">
-                                        Annuler
-                                    </button>
+                            <ul>
+                                <?php foreach ($_SESSION['role_department'] as $dept): ?>
+                                    <li class="dep fs8"><?= htmlspecialchars($dept) ?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+                <div>
+                    <h5>
+                        Stages et alternances assignés
+                    </h5>
+                    <form method="post" name="max_internship" class="card fs8">
+                                <div class="df ac g1">
+                                    <label for="newMaxIntern">Stages max: </label>
+                                    <div >
+                                        <button type="button" onclick="adjustValue('newMaxIntern', -1)" class="btn-m moin">
+                                            <i class="material-icons tiny">remove</i>
+                                        </button>
+                                        <input type="number"
+                                               id="newMaxIntern"
+                                               name="newMaxIntern"
+                                               min="0"
+                                               max="100"
+                                               value="<?php echo $result['intern'] ?: 0; ?>"/>
+                                        <button type="button" onclick="adjustValue('newMaxIntern', 1)" class="btn-m plus">
+                                            <i class="material-icons tiny">add</i>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="cell">
-                                    <button type="submit" name="newMaxSubmitted"
-                                        value="1" class=
-                                            "waves-effect waves-light btn tooltip"
-                                        data-tooltip=
-                                        "Soumettre vos nouvelles valeurs maximales"
-                                        data-position="top">
-                                        Valider
-                                    </button>
+                                <div class="df ac g1">
+                                    <label for="newMaxApprentice">Alternances max: </label>
+                                    <div >
+                                        <button type="button" onclick="adjustValue('newMaxApprentice', -1)" class="btn-m moin">
+                                            <i class="material-icons tiny">remove</i>
+                                        </button>
+                                        <input type="number"
+                                               id="newMaxApprentice"
+                                               name="newMaxApprentice"
+                                               min="0"
+                                               max="100"
+                                               value="<?php echo $result['apprentice'] ?: 0; ?>" />
+                                        <button type="button" onclick="adjustValue('newMaxApprentice', 1)" class="btn-m plus">
+                                            <i class="material-icons tiny">add</i>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        </form>
-                    </label>
-                </div>
+                        <button type="submit"
+                                        name="newMaxSubmitted"
+                                        value="1">
+                                    Enregistrer les modifications
+                        </button>
+                    </form>
 
-                    <?php
-                    if (isset($update)
-                        && (!$update || gettype($update) !== 'boolean')
-                    ) {
-                        echo '<h6 class="red-text">Une erreur est survenue</h6>';
-                    } else {
-                        if (isset($tooLowIntern) && $tooLowIntern) {
-                            echo
-                            '<h6 class="red-text">Vous tutorez déjà plus de <strong>'
-                            . $_POST['newMaxIntern'] . '</strong> stage'
-                            . ($_POST['newMaxIntern'] > 1 ? 's' : '') . '</h6>';
-                        }
-                        if (isset($tooLowApprentice) && $tooLowApprentice) {
-                            echo
-                            '<h6 class="red-text">Vous tutorez déjà plus de <strong>'
-                            . $_POST['newMaxApprentice'] . '</strong> alternance'
-                            . ($_POST['newMaxApprentice'] > 1 ? 's' : '') . '</h6>';
-                        }
-                        ?>
-            </div>
-
-                        <?php if ($trainees) : ?>
-            <div class="row"></div>
-            <div id="table">
-                <table class="highlight centered
-                              responsive-table" id="account-table">
-                    <thead <?php
-                    if (count($trainees) > 1) {
-                        echo 'id="clickable"';
-                    } ?>>
-                    <tr>
-                        <th>ETUDIANT</th>
-                        <th>FORMATION</th>
-                        <th>GROUPE</th>
-                        <th>
-                            <div class="tooltip-container tooltip"
-                                 data-tooltip="Dernier antécédent
-                                 d'accompagnement"
-                                 data-position="top">(?)</div>
-                            HISTORIQUE
-                        </th>
-                        <th>TYPE</th>
-                        <th>ENTREPRISE</th>
-                        <th>SUJET</th>
-                        <th>ADRESSE</th>
-                        <th>
-                            <div class="tooltip-container tooltip"
-                                 data-tooltip=
-                                 "Durée moyenne vous séparant du lieu du stage"
-                                 data-position="top">(?)
-                            </div>POSITION</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                            <?php foreach ($trainees as $row): ?>
-                        <tr class="account-row">
-                            <td>
-                                <?php echo $row["student_name"] . " "
-                                . $row["student_firstname"] ?>
-                            </td>
-                            <td>
-                                <?php echo str_replace(
-                                    '_', ' ', $row["formation"]
-                                ); ?>
-                            </td>
-                            <td>
-                                <?php echo str_replace(
-                                    '_', ' ', $row["class_group"]
-                                ); ?>
-                            </td>
-                            <td>
-                                <?php echo $row['internshipTeacher'] > 0
-                                ? $row['year'] : '❌'; ?>
-                            </td>
-                            <td>
-                                <?php echo strtolower(
-                                    $row['type']
-                                ) === "internship" ? "Stage" : "Alternance"; ?>
-                            </td>
-                            <td>
-                                <?php echo str_replace(
-                                    '_', ' ', $row["company_name"]
-                                ); ?>
-                            </td>
-                            <td>
-                                <?php echo str_replace(
-                                    '_', ' ', $row["internship_subject"]
-                                ); ?>
-                            </td>
-                            <td>
-                                <?php echo str_replace(
-                                    '_', "'", $row['address']
-                                ); ?>
-                            </td>
-                            <td>~<?php echo $row['duration'] ?> minutes</td>
-                        </tr>
-                            <?php endforeach; ?>
-                    </tbody>
-                </table>
-
-                <div id="pagination-controls" class="center-align">
-                    <button type="button" class="waves-effect waves-light btn"
-                        id="first-page"><i class="material-icons" type="button">
-                        first_page
-                    </i></button>
-                    <button type="button" class="waves-effect waves-light btn"
-                        id="prev-page"><i class="material-icons" type="button">
-                        arrow_back
-                    </i></button>
-                    <div id="page-numbers"></div>
-                    <button type="button" class="waves-effect waves-light btn"
-                        id="next-page"><i class="material-icons" type="button">
-                        arrow_forward
-                    </i></button>
-                    <button type="button" class="waves-effect waves-light btn"
-                        id="last-page"><i class="material-icons" type="button">
-                        last_page
-                    </i></button>
                 </div>
-                <div class="input-field col s6 m2">
-                    <label for="rows-per-page">Nombre de lignes par page
-                        <select id="rows-per-page">
-                            <option value="10" selected>10</option>
-                            <option value="20">20</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                            <option value="<?php echo count($trainees)?>">
-                                Tout
-                            </option>
-                        </select>
-                    </label>
                 </div>
+                <a href="/intramu" class="deco">Deconnexion</a>
+
 
             </div>
-                        <?php endif; ?>
+            <div>
+                TUTOR TABLE ICI
+            </div>
         </main>
+        <script>
+            function adjustValue(id, delta) {
+                const input = document.getElementById(id);
+                let value = parseInt(input.value) || 0;
+                value += delta;
+                if (value >= 0 && value <= 100) {
+                    input.value = value;
+                }
+            }
+        </script>
                         <?php
-                    }
+
     }
 }

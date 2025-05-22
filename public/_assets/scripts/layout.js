@@ -1,9 +1,10 @@
-/**
- * Initialisation du Menu Hamburger(sidenav) Materialize
- */
-document.addEventListener(
-    'DOMContentLoaded', function () {
-        const elems = document.querySelectorAll('.sidenav');
-        M.Sidenav.init(elems);
+const toggleMenu = document.getElementById('toggleMenu');
+const mainNav = document.getElementById('mainNav');
+
+toggleMenu.onclick = function() {
+    if (mainNav.style.display === 'none') {
+        mainNav.style.display = 'flex';
+    } else {
+        mainNav.style.display = 'none';
     }
-);
+};
