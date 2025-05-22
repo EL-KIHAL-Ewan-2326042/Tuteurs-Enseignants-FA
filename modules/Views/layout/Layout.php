@@ -68,6 +68,22 @@ materialize/1.0.0/css/materialize.min.css"
 openlayers.github.io@master/en/v6.5.0/css/ol.css"
                       type="text/css">
                 <link href="/_assets/styles/layout.css" rel="stylesheet">
+                <!-- import de jquery pour datatables -->
+                <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+                <!-- Datatables -->
+                <link href="https://cdn.datatables.net/v/dt/jszip-3.10.1/dt-2.3.1/b-3.2.3/b-html5-3.2.3/b-print-3.2.3/cr-2.1.0/fc-5.0.4/fh-4.0.2/kt-2.12.1/r-3.0.4/rg-1.5.1/rr-1.5.0/sp-2.3.3/sl-3.0.0/sr-1.4.1/datatables.min.css" rel="stylesheet" integrity="sha384-GtIvcdMAKob7NWWr7RiaLQQIiPJxV6mh6xzMZyAcBoNPd9ncw8pHzQQ/WH3i+dav" crossorigin="anonymous">
+
+                <script src="https://cdn.datatables.net/v/dt/jszip-3.10.1/dt-2.3.1/b-3.2.3/b-html5-3.2.3/b-print-3.2.3/cr-2.1.0/fc-5.0.4/fh-4.0.2/kt-2.12.1/r-3.0.4/rg-1.5.1/rr-1.5.0/sp-2.3.3/sl-3.0.0/sr-1.4.1/datatables.min.js" integrity="sha384-co6kyZuor4wcWh3jmK7akJDnA0v0x201Du7NXjrjCN3kHzW5rPpgkIwrUa63Ty5z" crossorigin="anonymous"></script>
+                <!-- colvis -->
+                <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.colVis.min.js"></script>
+
+                <!-- searchbuilder -->
+                <link href="https://cdn.datatables.net/searchbuilder/1.8.2/css/searchBuilder.dataTables.min.css" rel="stylesheet" />
+                <script src="https://cdn.datatables.net/searchbuilder/1.8.2/js/dataTables.searchBuilder.min.js"></script>
+
+                <!-- page input -->
+                <script src="https://cdn.datatables.net/plug-ins/2.3.1/pagination/input.js"></script>
+
                 <?php
                 echo '<link href="' . $cssFilePath . '" rel="stylesheet">';
                 ?>
@@ -187,6 +203,7 @@ openlayers.github.io@master/en/v6.5.0/css/ol.css"
         <script src="/_assets/scripts/layout.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/
 materialize/1.0.0/js/materialize.min.js"></script>
+        <script src="/_assets/scripts/datatables/datatables-config.js"></script>
         <?php
         if ($jsFilePath) {
             echo '<script src="' . $jsFilePath . '"></script>';
