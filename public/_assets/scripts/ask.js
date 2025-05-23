@@ -5,27 +5,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// Fonction pour sélectionner tous les éléments visibles
-function selectAllVisible() {
+function toggleSelection() {
     let table = $('#homepage-table').DataTable();
-    let currentMode = table.select.items();
+    let selectedRows = table.rows({selected: true}).count();
+    let toggleButton = $('#toggleSelectBtn');
 
-    if (currentMode === 'row') {
-        table.rows({page: 'current'}).select();
-    } else {
-        table.columns(':visible').select();
-    }
-}
-
-// Fonction pour désélectionner tous les éléments
-function deselectAll() {
-    let table = $('#homepage-table').DataTable();
-    let currentMode = table.select.items();
-
-    if (currentMode === 'row') {
+    if (selectedRows > 0) {
         table.rows().deselect();
+        toggleButton.text('Tout sélectionner');
     } else {
-        table.columns().deselect();
+        table.rows({page: 'current'}).select();
+        toggleButton.text('Tout désélectionner');
     }
 }
 
@@ -34,14 +24,13 @@ function initializeDataTable() {
     fetch('/api/datatable', {
         method: 'POST'
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Contenu JSON :', data);
-    })
-    .catch(error => {
-        console.error('Erreur :', error);
-    });
-
+        .then(response => response.json())
+        .then(data => {
+            console.log('Contenu JSON :', data);
+        })
+        .catch(error => {
+            console.error('Erreur :', error);
+        });
 
 
     new DataTable('#homepage-table', {
@@ -51,7 +40,7 @@ function initializeDataTable() {
         order: [],
         ordering: true,
         serverSide: true,
-        stateSave: true,
+        stateSave: false,
         pageLength: 10,
         processing: true,
         // ""pagingType": "input",
@@ -60,7 +49,6 @@ function initializeDataTable() {
             url: '/api/datatable',
             type: 'POST',
             dataSrc: 'data',
-            cache: true
         },
         columns: [
             {data: 'student'},
@@ -70,7 +58,7 @@ function initializeDataTable() {
             {data: 'company'},
             {data: 'subject'},
             {data: 'address'},
-            {data: 'distance'}
+            {data: 'distance'},
         ],
 
         select: {
@@ -78,11 +66,24 @@ function initializeDataTable() {
             items: 'row'
         },
 
+        lengthMenu: [10, 20, 50, 100],
+
         language: {
             select: {
                 rows: {_: "%d lignes sélectionnées", 0: "", 1: "1 ligne sélectionnée"},
                 columns: "", cells: ""
-            }
+            },
+            buttons: {
+                copy: 'Copier',
+                print: 'Imprimer',
+                colvis: "Visibilité colonnes",
+                colvisRestore: "Rétablir visibilité",
+            },
+            lengthMenu: "Afficher _MENU_ entrées",
+            search: '',
+            info: "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+            infoEmpty: 'Aucune entrée',
+            infoFiltered: "(filtrées depuis un total de _MAX_ entrées)"
         },
 
         layout: {
@@ -107,21 +108,21 @@ function initializeDataTable() {
                     'colvis',
                     {
                         text: 'Tout sélectionner',
-                        attr: {id: 'selectAllBtn', class: 'dt-button select-all-btn'},
-                        action: selectAllVisible
-                    },
-                    {
-                        text: 'Tout désélectionner',
-                        attr: {id: 'deselectAllBtn', class: 'dt-button deselect-all-btn'},
-                        action: deselectAll
+                        attr: {id: 'toggleSelectBtn', class: 'dt-button toggle-select-btn'},
+                        action: function(e, dt, node, config) {
+                            toggleSelection();
+                        }
                     }
-                ]
+                ],
             },
+
             topEnd: {
-                search: {placeholder: 'Rechercher...'}
+                search: {placeholder: 'Rechercher...'},
             },
-            bottomStart: ['info'],
+
+            bottomStart: ['pageLength', 'info'],
             bottomEnd: ['paging']
         }
     });
+
 }

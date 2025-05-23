@@ -426,7 +426,7 @@ class Teacher extends Model
             $dataQuery .= ' ORDER BY ' . $columns[$order['column']] . ' '
                 . (strtoupper($order['dir']) === 'DESC' ? 'DESC' : 'ASC');
         } else {
-            $dataQuery .= ' ORDER BY student.student_name ASC';
+            $dataQuery .= ' ORDER BY s.student_name ASC';
         }
 
         $dataQuery .= ' LIMIT :limit OFFSET :offset';
