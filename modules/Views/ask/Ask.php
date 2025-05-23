@@ -22,6 +22,7 @@ use Blog\Models\Department;
 use Blog\Models\Internship;
 use Blog\Models\Student;
 use Blog\Models\Teacher;
+use Blog\Views\components\Table;
 
 /**
  * Classe gérant l'affichage de la page 'Accueil'
@@ -66,53 +67,25 @@ readonly class Ask
      */
     public function showView(): void
     {
+        $headers = ['Élève', 'Formation', 'Groupe', 'Historique', 'Entreprise', 'Sujet', 'Adresse', 'Distance'];
+
+        $jsColumns = [
+            ['data' => 'student'],
+            ['data' => 'formation'],
+            ['data' => 'group'],
+            ['data' => 'history'],
+            ['data' => 'company'],
+            ['data' => 'subject'],
+            ['data' => 'address'],
+            ['data' => 'distance'],
+        ];
         ?>
         <main>
             <div>
 
 
             <section>
-                <form method="post" class="center-align table">
-                    <table class="highlight centered responsive-table" id="homepage-table">
-                        <thead>
-                        <tr>
-                            <th>ETUDIANT</th>
-                            <th>FORMATION</th>
-                            <th>GROUPE</th>
-                            <th>
-                                <div class="tooltip-container tooltip"
-                                     data-tooltip="Dernier antécédent d'accompagnement"
-                                     data-position="top">(?)</div>
-                                HISTORIQUE
-                            </th>
-                            <th>ENTREPRISE</th>
-                            <th>SUJET</th>
-                            <th>ADRESSE</th>
-                            <th>
-                                <div class="tooltip-container tooltip"
-                                     data-tooltip="Durée moyenne vous séparant du lieu du stage"
-                                     data-position="top">(?)</div>
-                                POSITION
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        </tbody>
-                    </table>
-
-
-
-                    <button class="waves-effect waves-light
-                            btn btn-annuler tooltip"
-                            type="reset" id="resetForm" data-tooltip=
-                            "Annuler les modifications"
-                            data-position="top">Annuler</button>
-                    <button class="waves-effect waves-light btn tooltip"
-                            name="selecInternshipSubmitted" value="1"
-                            type="submit" data-tooltip="Envoyer vos choix"
-                            data-position="top">Valider</button>
-                </form>
-
+                <?php Table::render('homepage-table', $headers, $jsColumns, '/api/datatable'); ?>
 
             </section>
             <section id="map" >
