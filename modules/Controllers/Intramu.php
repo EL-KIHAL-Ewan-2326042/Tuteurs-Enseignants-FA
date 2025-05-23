@@ -66,7 +66,7 @@ class Intramu
     {
         if (isset($_SESSION['identifier'])) {
             session_destroy();
-            header('Location: /homepage');
+            header('Location: /intramu');
             exit();
         }
 
