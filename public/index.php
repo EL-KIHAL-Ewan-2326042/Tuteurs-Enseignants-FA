@@ -131,11 +131,11 @@ session_start();
 $uri = strtok($_SERVER['REQUEST_URI'], '?');
 $router = new Router($uri);
 $router->get('/api/datatable', function() {
-    (new \Blog\Controllers\AjaxController())->handleDataTable();
+    (new \Blog\Controllers\AjaxController())->handleDataTable("account");
 });
 
 $router->post('/api/datatable', function() {
-    (new \Blog\Controllers\AjaxController())->handleDataTable();
+    (new \Blog\Controllers\AjaxController())->handleDataTable("account");
 });
 /**
  * Crée une action associée à une URI donnée.

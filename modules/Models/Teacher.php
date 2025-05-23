@@ -340,7 +340,7 @@ class Teacher extends Model
      *
      * @return array Tableau des stages avec les informations associées
      */
-    public function paginate(
+    public function paginateAsk(
         string $identifier,
         int $start,
         int $length,
@@ -450,5 +450,99 @@ class Teacher extends Model
     }
 
 
+    public function paginateAccount(
+        string $identifier,
+        int $start,
+        int $length,
+        string $search = '',
+        array $order = []
+    ): array {
+        $columns = [
+            'student',
+            'formation',
+            'group',
+            'company',
+            'subject',
+            'end_date',
+            'address',
+            'distance'
+        ];
+        $countQuery = "
+        SELECT COUNT(*) as total
+        FROM student s
+        JOIN internship i ON s.student_number = i.student_number
+        LEFT JOIN distance d ON i.id_teacher = d.id_teacher AND i.internship_identifier = d.internship_identifier
+        WHERE i.end_date_internship > NOW() AND i.id_teacher = :identifier";
+
+        if (!empty($search)) {
+            $countQuery .= ' AND (s.student_name ILIKE :search OR 
+                               s.student_firstname ILIKE :search OR 
+                               s.formation ILIKE :search OR 
+                               s.class_group ILIKE :search OR 
+                               i.company_name ILIKE :search OR 
+                               i.internship_subject ILIKE :search OR 
+                               i.address ILIKE :search)';
+        }
+
+        $countStmt = $this->_db->getConn()->prepare($countQuery);
+        $countStmt->bindValue(':identifier', $identifier);
+        if (!empty($search)) {
+            $searchParam = '%' . $search . '%';
+            $countStmt->bindValue(':search', $searchParam);
+        }
+        $countStmt->execute();
+        $total = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+        $dataQuery = "
+        SELECT 
+            CONCAT(s.student_firstname, ' ', s.student_name) AS student, 
+            s.formation, 
+            s.class_group AS group,
+            i.company_name AS company,
+            i.internship_subject AS subject,
+                                 i.end_date_internship AS end_date,
+            i.address,
+            d.distance
+        FROM student s
+        JOIN internship i ON s.student_number = i.student_number
+        LEFT JOIN distance d ON i.id_teacher = d.id_teacher AND i.internship_identifier = d.internship_identifier
+        WHERE i.end_date_internship > NOW() AND i.id_teacher = :identifier";
+
+        if (!empty($search)) {
+            $dataQuery .= ' AND (s.student_name ILIKE :search OR 
+                              s.student_firstname ILIKE :search OR 
+                              s.formation ILIKE :search OR 
+                              s.class_group ILIKE :search OR 
+                              i.company_name ILIKE :search OR 
+                              i.internship_subject ILIKE :search OR 
+                              i.address ILIKE :search)';
+        }
+        if (!empty($order) && isset($order['column']) &&
+            isset($columns[$order['column']]) && $columns[$order['column']] !== null) {
+            $dataQuery .= ' ORDER BY ' . $columns[$order['column']] . ' '
+                . (strtoupper($order['dir']) === 'DESC' ? 'DESC' : 'ASC');
+        } else {
+            $dataQuery .= ' ORDER BY s.student_name ASC';
+        }
+
+        $dataQuery .= ' LIMIT :limit OFFSET :offset';
+
+        $dataStmt = $this->_db->getConn()->prepare($dataQuery);
+        $dataStmt->bindValue(':identifier', $identifier);
+        if (!empty($search)) {
+            $dataStmt->bindValue(':search', $searchParam);
+        }
+        $dataStmt->bindValue(':limit', $length, PDO::PARAM_INT);
+        $dataStmt->bindValue(':offset', $start, PDO::PARAM_INT);
+        $dataStmt->execute();
+
+
+        $results = $dataStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return [
+            'data' => $results,
+            'total' => (int)$total
+        ];
+    }
 
 }

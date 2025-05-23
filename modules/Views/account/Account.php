@@ -20,6 +20,7 @@ namespace Blog\Views\account;
 
 use Blog\Models\Internship;
 use Blog\Models\Teacher;
+use Blog\Views\components\Table;
 
 /**
  * Classe gérant l'affichage de la page 'Compte'
@@ -62,7 +63,18 @@ class Account
      */
     public function showView(): void
     {
+        $headers = ['Élève', 'Formation', 'Groupe', 'Entreprise', 'Sujet', 'Fin De Stage', 'Adresse', 'Distance'];
 
+        $jsColumns = [
+            ['data' => 'student'],
+            ['data' => 'formation'],
+            ['data' => 'group'],
+            ['data' => 'company'],
+            ['data' => 'subject'],
+            ['data' => 'end_date'],
+            ['data' => 'address'],
+            ['data' => 'distance'],
+        ];
         $trainees = $this->internshipModel->getInterns($_SESSION['identifier']);
         $result = $this->teacherModel
             ->getMaxNumberTrainees($_SESSION['identifier']);
@@ -232,7 +244,7 @@ class Account
 
             </div>
             <div>
-                TUTOR TABLE ICI
+                <?php Table::render('homepage-table', $headers, $jsColumns, '/api/datatable'); ?>
             </div>
         </main>
         <script>

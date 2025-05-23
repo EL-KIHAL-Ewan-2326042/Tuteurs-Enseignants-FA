@@ -10,7 +10,7 @@ main > div {
     height: 90%;
     display: flex;
     gap: 2rem;
-    justify-content: center;
+    justify-content: space-around;
 
 }
 main >div > section:first-child {

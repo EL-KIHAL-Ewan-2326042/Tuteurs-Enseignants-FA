@@ -23,7 +23,7 @@ class AjaxController
      *
      * @return void
      */
-    public function handleDataTable(): void
+    #[NoReturn] public function handleDataTable(string $type): void
     {
 
         // Vérifier l'authentification
@@ -46,13 +46,28 @@ class AjaxController
                 'dir' => $_POST['order'][0]['dir']
             ];
         }
-        $result = $teacherModel->paginate(
-            $_SESSION['identifier'],
-            $start,
-            $length,
-            $search,
-            $order
-        );
+        switch ($type) {
+            case 'ask':
+                $result = $teacherModel->paginateAsk(
+                    $_SESSION['identifier'],
+                    $start,
+                    $length,
+                    $search,
+                    $order
+                );
+                break;
+            case 'account':
+                $result = $teacherModel->paginateAccount(
+                    $_SESSION['identifier'],
+                    $start,
+                    $length,
+                    $search,
+                    $order
+                );
+                break;
+
+        }
+
         $this->sendJsonResponse([
             'draw' => $draw,
             'recordsTotal' => $result['total'],
