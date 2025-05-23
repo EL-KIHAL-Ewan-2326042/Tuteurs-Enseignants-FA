@@ -45,6 +45,7 @@ function initializeDataTable() {
 
 
     new DataTable('#homepage-table', {
+        scrollX: true,
         keys: true,
         fixedHeader: true,
         order: [],

@@ -32,3 +32,12 @@ main > div > section:first-child form {
     max-height: 100%;
     max-width: 100%;
 }
+
+main > div > section:first-child {
+    overflow-x: auto;
+}
+
+#homepage-table {
+    table-layout: auto;
+    width: 100%;
+}
