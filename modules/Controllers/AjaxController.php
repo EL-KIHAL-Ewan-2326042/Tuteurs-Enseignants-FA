@@ -34,15 +34,11 @@ class AjaxController
 
         $db = Database::getInstance();
         $teacherModel = new Teacher($db);
-        $internshipModel = new Internship($db);
 
-        // Récupérer les paramètres de DataTables
         $draw = isset($_POST['draw']) ? intval($_POST['draw']) : 1;
         $start = isset($_POST['start']) ? intval($_POST['start']) : 0;
         $length = isset($_POST['length']) ? intval($_POST['length']) : 10;
         $search = $_POST['search']['value'] ?? '';
-
-        // Gestion du tri
         $order = [];
         if (isset($_POST['order'][0])) {
             $order = [
@@ -50,57 +46,18 @@ class AjaxController
                 'dir' => $_POST['order'][0]['dir']
             ];
         }
-
-        // Vérifier que des départements sont sélectionnés
-        if (empty($_SESSION['selecDep'])) {
-            $this->sendJsonResponse([
-                'draw' => $draw,
-                'recordsTotal' => 0,
-                'recordsFiltered' => 0,
-                'data' => []
-            ]);
-            return;
-        }
-
-        // Obtenir les données paginées
-        $data = $teacherModel->paginate(
-            $_SESSION['selecDep'],
+        $result = $teacherModel->paginate(
             $_SESSION['identifier'],
             $start,
             $length,
             $search,
             $order
         );
-
-        // Compter les enregistrements
-        $recordsTotal = $teacherModel->countAll($_SESSION['selecDep']);
-        $recordsFiltered = $teacherModel->countFiltered($_SESSION['selecDep'], $search);
-
-        // Formater les données pour DataTables
-        $formattedData = [];
-        foreach ($data as $row) {
-            $formattedData[] = [
-                'student' => $row['student_name'] . ' ' . $row['student_firstname'],
-                'formation' => str_replace('_', ' ', $row['formation']),
-                'group' => str_replace('_', ' ', $row['class_group']),
-                'history' => $row['internshipTeacher'] > 0 ? $row['year'] : '❌',
-                'company' => str_replace('_', ' ', $row['company_name']),
-                'subject' => str_replace('_', ' ', $row['internship_subject']),
-                'address' => str_replace('_', "'", $row['address']),
-                'duration' => '~' . $row['duration'] . ' minute' . ($row['duration'] > 1 ? 's' : ''),
-                'choice' => '<label class="center"><input type="checkbox" name="selecInternship[]" class="center-align filled-in" value="' . $row['internship_identifier'] . '" ' . ($row['requested'] ? 'checked="checked"' : '') . '/><span>Cocher</span></label>',
-                'DT_RowData' => [
-                    'address' => str_replace('_', "'", $row['address']),
-                    'company' => str_replace('_', ' ', $row['company_name'])
-                ]
-            ];
-        }
-
         $this->sendJsonResponse([
             'draw' => $draw,
-            'recordsTotal' => $recordsTotal,
-            'recordsFiltered' => $recordsFiltered,
-            'data' => $formattedData
+            'recordsTotal' => $result['total'],
+            'recordsFiltered' => $result['total'],
+            'data' => $result['data']
         ]);
     }
 
@@ -112,7 +69,7 @@ class AjaxController
      *
      * @return void
      */
-    private function sendJsonResponse(array $data, int $status = 200): void
+    #[NoReturn] private function sendJsonResponse(array $data, int $status = 200): void
     {
         header('Content-Type: application/json');
         header('Cache-Control: max-age=3600, public'); // 1 heure de cache

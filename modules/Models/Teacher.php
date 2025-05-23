@@ -334,175 +334,121 @@ class Teacher extends Model
      * Récupère les stages disponibles pour l'enseignant, avec pagination,
      * recherche et tri pour DataTables
      *
-     * @param array  $departments Départements sélectionnés
      * @param string $identifier  Identifiant de l'enseignant connecté
      * @param int    $start       Index de départ pour la pagination
      * @param int    $length      Nombre d'éléments à récupérer
-     * @param string $search      Texte de recherche global
-     * @param array  $order       Informations de tri [column, direction]
      *
      * @return array Tableau des stages avec les informations associées
      */
     public function paginate(
-        array $departments,
         string $identifier,
         int $start,
         int $length,
         string $search = '',
         array $order = []
     ): array {
-        // Liste des colonnes pour le tri
         $columns = [
-            0 => 'student.student_name',
-            1 => 'student.formation',
-            2 => 'student.class_group',
-            3 => null, // Historique - pas directement triable via SQL
-            4 => 'internship.company_name',
-            5 => 'internship.internship_subject',
-            6 => 'internship.address',
-            7 => null, // Position/Durée - pas directement triable via SQL
-            8 => null  // Choix - pas directement triable via SQL
+            'student',
+            'formation',
+            'group',
+            'history',
+            'company',
+            'subject',
+            'address',
+            'distance'       
         ];
+        $countQuery = "
+        WITH cte_histo AS (
+            SELECT id_teacher
+            FROM internship
+            WHERE end_date_internship < NOW()
+            GROUP BY id_teacher
+        )
+        SELECT COUNT(*) as total
+        FROM student s
+        JOIN internship i ON s.student_number = i.student_number
+        LEFT JOIN cte_histo h ON i.id_teacher = h.id_teacher
+        LEFT JOIN distance d ON :id_teacher = d.id_teacher AND i.internship_identifier = d.internship_identifier
+        WHERE i.end_date_internship > NOW()";
 
-        // Construit les placeholders pour les départements
-        $placeholders = implode(',', array_fill(0, count($departments), '?'));
-        $params = $departments;
-
-        // Construction de la requête SQL de base
-        $query = 'SELECT DISTINCT internship.internship_identifier, internship.company_name, '
-            . 'internship.internship_subject, internship.address, '
-            . 'internship.student_number, internship.type, '
-            . 'student.student_name, student.student_firstname, '
-            . 'student.formation, student.class_group '
-            . 'FROM internship '
-            . 'JOIN student ON internship.student_number = student.student_number '
-            . 'JOIN study_at ON internship.student_number = study_at.student_number '
-            . 'WHERE study_at.department_name IN (' . $placeholders . ') '
-            . 'AND internship.id_teacher IS NULL '
-            . 'AND internship.end_date_internship > CURRENT_DATE';
-
-        // Ajout de la condition de recherche
         if (!empty($search)) {
-            $query .= ' AND (student.student_name ILIKE ? OR '
-                . 'student.student_firstname ILIKE ? OR '
-                . 'student.formation ILIKE ? OR '
-                . 'student.class_group ILIKE ? OR '
-                . 'internship.company_name ILIKE ? OR '
-                . 'internship.internship_subject ILIKE ? OR '
-                . 'internship.address ILIKE ?)';
-            $searchParam = '%' . $search . '%';
-            $params = array_merge($params, array_fill(0, 7, $searchParam));
+            $countQuery .= ' AND (s.student_name ILIKE :search OR 
+                               s.student_firstname ILIKE :search OR 
+                               s.formation ILIKE :search OR 
+                               s.class_group ILIKE :search OR 
+                               i.company_name ILIKE :search OR 
+                               i.internship_subject ILIKE :search OR 
+                               i.address ILIKE :search)';
         }
 
-        // Ajout de l'ordre de tri
+        $countStmt = $this->_db->getConn()->prepare($countQuery);
+        $countStmt->bindValue(':id_teacher', $identifier);
+        if (!empty($search)) {
+            $searchParam = '%' . $search . '%';
+            $countStmt->bindValue(':search', $searchParam);
+        }
+        $countStmt->execute();
+        $total = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+        $dataQuery = "
+        WITH cte_histo AS (
+            SELECT id_teacher, array_agg(start_date_internship ORDER BY id_teacher) AS history
+            FROM internship
+            WHERE end_date_internship < NOW()
+            GROUP BY id_teacher
+        )
+        SELECT 
+            CONCAT(s.student_firstname, ' ', s.student_name) AS student, 
+            s.formation, 
+            s.class_group AS group,
+            h.history,
+            i.company_name AS company,
+            i.internship_subject AS subject,
+            i.address,
+            d.distance
+        FROM student s
+        JOIN internship i ON s.student_number = i.student_number
+        LEFT JOIN cte_histo h ON i.id_teacher = h.id_teacher
+        LEFT JOIN distance d ON :id_teacher2 = d.id_teacher AND i.internship_identifier = d.internship_identifier
+        WHERE i.end_date_internship > NOW()";
+
+        if (!empty($search)) {
+            $dataQuery .= ' AND (s.student_name ILIKE :search OR 
+                              s.student_firstname ILIKE :search OR 
+                              s.formation ILIKE :search OR 
+                              s.class_group ILIKE :search OR 
+                              i.company_name ILIKE :search OR 
+                              i.internship_subject ILIKE :search OR 
+                              i.address ILIKE :search)';
+        }
         if (!empty($order) && isset($order['column']) &&
             isset($columns[$order['column']]) && $columns[$order['column']] !== null) {
-            $query .= ' ORDER BY ' . $columns[$order['column']] . ' '
+            $dataQuery .= ' ORDER BY ' . $columns[$order['column']] . ' '
                 . (strtoupper($order['dir']) === 'DESC' ? 'DESC' : 'ASC');
         } else {
-            $query .= ' ORDER BY student.student_name ASC';
+            $dataQuery .= ' ORDER BY student.student_name ASC';
         }
 
-        // Ajout de la pagination
-        $query .= ' LIMIT ? OFFSET ?';
-        $params[] = $length;
-        $params[] = $start;
+        $dataQuery .= ' LIMIT :limit OFFSET :offset';
 
-        // Exécution de la requête
-        $stmt = $this->_db->getConn()->prepare($query);
-        $stmt->execute($params);
-        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // Enrichir les résultats avec des informations supplémentaires
-        $internshipModel = new Internship($this->_db);
-        $requests = $internshipModel->getRequests($identifier);
-        if (!$requests) {
-            $requests = [];
-        }
-
-        foreach ($results as $row) {
-            // Historique de tutorat
-            $internships = $internshipModel->getInternships($row['student_number']);
-            $row['year'] = "";
-            $row['internshipTeacher'] = $internships ?
-                $internshipModel->getInternshipTeacher(
-                    $internships, $identifier, $row['year']
-                ) : 0;
-
-            // Si l'enseignant a déjà demandé à tutorer ce stage
-            $row['requested'] = in_array($row['internship_identifier'], $requests);
-
-            // Durée/distance depuis l'adresse de l'enseignant
-            $row['duration'] = $internshipModel->getDistance(
-                $row['internship_identifier'],
-                $identifier,
-                isset($row['id_teacher'])
-            );
-        }
-        return $results;
-    }
-
-    /**
-     * Compte le nombre total de stages disponibles sans filtrage
-     *
-     * @param array $departments Départements sélectionnés
-     *
-     * @return int Nombre total de stages
-     */
-    public function countAll(array $departments): int
-    {
-        $placeholders = implode(',', array_fill(0, count($departments), '?'));
-
-        $query = 'SELECT COUNT(DISTINCT internship.internship_identifier) '
-            . 'FROM internship '
-            . 'JOIN study_at ON internship.student_number = study_at.student_number '
-            . 'WHERE study_at.department_name IN (' . $placeholders . ') '
-            . 'AND internship.id_teacher IS NULL '
-            . 'AND internship.end_date_internship > CURRENT_DATE';
-
-        $stmt = $this->_db->getConn()->prepare($query);
-        $stmt->execute($departments);
-
-        return (int)$stmt->fetchColumn();
-    }
-
-    /**
-     * Compte le nombre de stages disponibles après application des filtres
-     *
-     * @param array  $departments Départements sélectionnés
-     * @param string $search      Texte de recherche global
-     *
-     * @return int Nombre de stages après filtrage
-     */
-    public function countFiltered(array $departments, string $search = ''): int
-    {
-        $placeholders = implode(',', array_fill(0, count($departments), '?'));
-        $params = $departments;
-
-        $query = 'SELECT COUNT(DISTINCT internship.internship_identifier) '
-            . 'FROM internship '
-            . 'JOIN student ON internship.student_number = student.student_number '
-            . 'JOIN study_at ON internship.student_number = study_at.student_number '
-            . 'WHERE study_at.department_name IN (' . $placeholders . ') '
-            . 'AND internship.id_teacher IS NULL '
-            . 'AND internship.end_date_internship > CURRENT_DATE';
-
+        $dataStmt = $this->_db->getConn()->prepare($dataQuery);
+        $dataStmt->bindValue(':id_teacher2', $identifier);
         if (!empty($search)) {
-            $query .= ' AND (student.student_name ILIKE ? OR '
-                . 'student.student_firstname ILIKE ? OR '
-                . 'student.formation ILIKE ? OR '
-                . 'student.class_group ILIKE ? OR '
-                . 'internship.company_name ILIKE ? OR '
-                . 'internship.internship_subject ILIKE ? OR '
-                . 'internship.address ILIKE ?)';
-            $searchParam = '%' . $search . '%';
-            $params = array_merge($params, array_fill(0, 7, $searchParam));
+            $dataStmt->bindValue(':search', $searchParam);
         }
+        $dataStmt->bindValue(':limit', $length, PDO::PARAM_INT);
+        $dataStmt->bindValue(':offset', $start, PDO::PARAM_INT);
+        $dataStmt->execute();
 
-        $stmt = $this->_db->getConn()->prepare($query);
-        $stmt->execute($params);
 
-        return (int)$stmt->fetchColumn();
+        $results = $dataStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return [
+            'data' => $results,
+            'total' => (int)$total
+        ];
     }
+
+
 
 }
