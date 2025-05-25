@@ -44,10 +44,6 @@ class Layout
             <link rel="icon" type="image/x-icon" href="/favicon.ico">
             <link href="/_assets/styles/layout.css" rel="stylesheet">
 
-            <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-                    integrity="sha384-TKffAe9yYtJqUGAz+kLRKT2F8j+cdKIBhKX5vq2HPJZGo0SExRACykjOZMWPz/mX"
-                    crossorigin="anonymous"
-                    defer></script>
             <!-- import de jquery pour datatables -->
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
             <!-- Datatables -->
@@ -158,8 +154,7 @@ class Layout
                     </div>
         </footer>
         <script src="/_assets/scripts/layout.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/
-materialize/1.0.0/js/materialize.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <?php
     if ($jsFilePath) {
         echo '<script src="' . $jsFilePath . '"></script>';

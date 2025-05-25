@@ -60,6 +60,31 @@ class Dashboard
         ?>
         <main>
             <h1 class="center-align flow-text"> Gestion des données </h1>
+
+            <!-- Toggles switches -->
+            <div class="toggles-container">
+                <div class="switch-container">
+                    <div class="switch">
+                        <label>
+                            Import
+                            <input type="checkbox" id="import-export-toggle">
+                            <span class="lever"></span>
+                            Export
+                        </label>
+                    </div>
+                </div>
+                <div class="switch-container">
+                    <div class="switch">
+                        <label>
+                            Simple
+                            <input type="checkbox" id="simple-advanced-toggle">
+                            <span class="lever"></span>
+                            Avancé
+                        </label>
+                    </div>
+                </div>
+            </div>
+
             <div class="choose">
                 <div class="choose-item" id="choose-students">
                     <div class="icon-circle">

@@ -146,12 +146,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const targetSection = document.getElementById(targetId);
             const isActive = item.classList.contains('active');
 
-            // Retirer "active" et cacher toutes les sections
+            // Cacher toutes les sections
             items.forEach(i => i.classList.remove('active'));
             Object.values(mapping).forEach(id => {
                 const section = document.getElementById(id);
                 section.classList.remove('visible');
-                // petit delay pour laisser l'animation se finir
+                // petit délai pour laisser l'animation se finir
                 setTimeout(() => {
                     if (!section.classList.contains('visible')) {
                         section.style.display = 'none';
@@ -164,7 +164,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 targetSection.style.display = 'block';
                 void targetSection.offsetWidth;
                 targetSection.classList.add('visible');
+                if (window.innerWidth <= 600) {
+                    targetSection.scrollIntoView({behavior: 'smooth'});
+                }
             }
         });
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    const importExportToggle = document.getElementById('import-export-toggle');
+    const simpleAdvancedToggle = document.getElementById('simple-advanced-toggle');
+
+    importExportToggle.addEventListener('change', function() {
+        const mode = this.checked ? 'export' : 'import';
+        console.log('Mode sélectionné:', mode);
+    });
+
+    simpleAdvancedToggle.addEventListener('change', function() {
+        const mode = this.checked ? 'advanced' : 'simple';
+        console.log('Mode sélectionné:', mode);
     });
 });
