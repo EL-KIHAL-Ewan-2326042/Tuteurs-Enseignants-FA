@@ -1,28 +1,176 @@
+@import "global.css";
+
 /* Spécification du style pour la balise <main> */
 main {
     display: flex;
     flex-wrap: wrap;
     flex-direction: column;
     justify-content: center;
+    --icon-size: 4em;
+    --plus-size: 1.5em;
 }
 
 label{
-    color: #2c2c2c !important;
+    color: var(--couleur-violet);
 }
 
 h1 {
+    text-align: center;
     font-size: 2.92rem;
     margin: 1.95rem 0 1.168rem 0;
-    color: #00558B;
+    color: var(--couleur-bleu-roi);
 }
 
+/*
+.choose {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin: 30px 0;
+}
+
+.choose-item {
+    text-align: center;
+    font-style: italic;
+    color: var(--couleur-violet);
+    position: relative;
+}
+
+.icon-circle {
+    width: 100px;
+    height: 100px;
+    border: 3px solid black;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px auto;
+    background-color: white;
+}
+
+.main-icon {
+    font-size: 48px;
+    color: black;
+}
+
+.plus-icon {
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+    font-size: 28px;
+    background: white;
+    border: 2px solid black;
+    border-radius: 50%;
+    padding: 2px;
+    box-shadow: 2px 2px 0 black;
+}
+
+@media (max-width: 600px) {
+    .choose {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+section {
+    display: none;
+    padding: 2em;
+    font-size: 1.2em;
+}
+*/
+
+.choose {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    margin: 30px 0;
+}
+
+.choose-item {
+    text-align: center;
+    color: var(--couleur-violet);
+    cursor: pointer;
+    transition: transform 0.2s;
+    width: 120px;
+}
+
+.choose-item.active .icon-circle {
+    border-color: var(--couleur-or);
+    /*background-color: var(--couleur-or); */
+}
+
+.choose-item:hover {
+    transform: scale(1.05);
+}
+
+.icon-circle {
+    width: 100px;
+    height: 100px;
+    border: 3px solid black;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px auto;
+    background-color: white;
+}
+
+.main-icon {
+    font-size: 48px;
+    color: black;
+}
+
+.plus-icon {
+    position: absolute;
+    bottom: -10px;
+    right: -10px;
+    font-size: 28px;
+    background: white;
+    border: 2px solid black;
+    border-radius: 50%;
+    padding: 2px;
+    box-shadow: 2px 2px 0 black;
+}
+
+section {
+    display: none;
+    /* margin-top: 20px; */
+    padding: 5vh 5vw;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    margin-top: 2em;
+}
+
+section.visible {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+@media (max-width: 600px) {
+    .choose {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+/*
+=====================================================
+SEPARATEUR
+=====================================================
+*/
+
 h2 {
-    color: #00558B;
     font-size: 2.28rem;
     margin: 25px 25px 25px 10px;
 }
 
 h3 {
+    text-align: center;
     font-size: 1.64rem;
     margin: 1.1rem 0 0.656rem 0;
     color: #00558B;
@@ -81,29 +229,4 @@ h3 {
 
 .errorMessage{
     color: red;
-}
-
-/* Style des boutons de la page */
-.btn{
-    background-color : #00558B;
-}
-
-.btn:hover {
-    background-color: #E8CE7E;
-}
-
-/* Style des options dans le menu déroulant du select */
-.dropdown-content li>a, .dropdown-content li>span{
-    padding: 15px;
-    color: #00558B;
-}
-
-input[type="checkbox"].filled-in:checked + span:after {
-    background-color: #00558B !important;
-    border-color: #00558B !important;
-}
-
-/* Style des select */
-.select-wrapper input.select-dropdown{
-    margin: 0 35px 22px 0;
 }

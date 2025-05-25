@@ -623,7 +623,7 @@ class Model
 
         // Lier les valeurs des données aux paramètres nommés dans le requête
         foreach ($data as $index => $value) {
-            $stmt->bindValue(":column" . ($index + 1), $value ?: null);
+            $stmt->bindValue(":column" . ($index + 1), $value === '' || $value === false ? null : $value);
         }
 
         $stmt->execute();

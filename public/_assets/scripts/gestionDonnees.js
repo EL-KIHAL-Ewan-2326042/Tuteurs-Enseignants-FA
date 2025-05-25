@@ -97,3 +97,74 @@ function initTooltips()
         }
     );
 }
+
+/* Séparateur */
+/*
+document.addEventListener('DOMContentLoaded', () => {
+    const mapping = {
+        'choose-students': 'students-section',
+        'choose-teachers': 'teachers-section',
+        'choose-internships': 'internships-section'
+    };
+
+    const items = document.querySelectorAll('.choose-item');
+
+    items.forEach(item => {
+        item.addEventListener('click', () => {
+            const targetId = mapping[item.id];
+            const targetSection = document.getElementById(targetId);
+
+            const isActive = item.classList.contains('active');
+
+            // Réinitialiser tous les éléments et masquer toutes les sections
+            items.forEach(i => i.classList.remove('active'));
+            Object.values(mapping).forEach(id => {
+                document.getElementById(id).style.display = 'none';
+            });
+
+            // Si l'élément n'était pas actif, on l'active
+            if (!isActive) {
+                item.classList.add('active');
+                targetSection.style.display = 'block';
+            }
+        });
+    });
+
+}); */
+document.addEventListener('DOMContentLoaded', () => {
+    const mapping = {
+        'choose-students': 'students-section',
+        'choose-teachers': 'teachers-section',
+        'choose-internships': 'internships-section'
+    };
+
+    const items = document.querySelectorAll('.choose-item');
+
+    items.forEach(item => {
+        item.addEventListener('click', () => {
+            const targetId = mapping[item.id];
+            const targetSection = document.getElementById(targetId);
+            const isActive = item.classList.contains('active');
+
+            // Retirer "active" et cacher toutes les sections
+            items.forEach(i => i.classList.remove('active'));
+            Object.values(mapping).forEach(id => {
+                const section = document.getElementById(id);
+                section.classList.remove('visible');
+                // petit delay pour laisser l'animation se finir
+                setTimeout(() => {
+                    if (!section.classList.contains('visible')) {
+                        section.style.display = 'none';
+                    }
+                }, 300); // même durée que la transition CSS
+            });
+
+            if (!isActive) {
+                item.classList.add('active');
+                targetSection.style.display = 'block';
+                void targetSection.offsetWidth;
+                targetSection.classList.add('visible');
+            }
+        });
+    });
+});

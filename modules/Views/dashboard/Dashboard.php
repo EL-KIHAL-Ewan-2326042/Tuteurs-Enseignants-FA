@@ -60,6 +60,36 @@ class Dashboard
         ?>
         <main>
             <h1 class="center-align flow-text"> Gestion des données </h1>
+            <div class="choose">
+                <div class="choose-item" id="choose-students">
+                    <div class="icon-circle">
+                        <i class="material-icons main-icon">school</i>
+                        <i class="material-icons plus-icon">add</i>
+                    </div>
+                    <label>Étudiants</label>
+                </div>
+
+                <div class="choose-item" id="choose-teachers">
+                    <div class="icon-circle">
+                        <i class="material-icons main-icon">supervisor_account</i>
+                        <i class="material-icons plus-icon">add</i>
+                    </div>
+                    <label>Enseignants</label>
+                </div>
+
+                <div class="choose-item" id="choose-internships">
+                    <div class="icon-circle">
+                        <i class="material-icons main-icon">work</i>
+                        <i class="material-icons plus-icon">add</i>
+                    </div>
+                    <label>Stages</label>
+                </div>
+            </div>
+
+            <!-- Sections -->
+            <section id="students-section">Contenu des étudiants</section>
+            <section id="teachers-section">Contenu des enseignants</section>
+            <section id="internships-section">Contenu des stages</section>
 
             <!--Exportation-->
             <div class="export">

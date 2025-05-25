@@ -80,7 +80,7 @@ class HomePage
 
                 </div>
                 <div>
-                    <a href="/ask">Tout les étudiants</a>
+                    <a href="/ask">Tous les étudiants</a>
                     <a href="/account">Explorer</a>
                 </div>
             </section>
