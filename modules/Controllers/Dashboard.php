@@ -115,120 +115,33 @@ class Dashboard
         // Vérification du rôle de l'utilisateur
         if (isset($_SESSION['role_name'])
             && ((is_array($_SESSION['role_name'])
-            && in_array('Admin_dep', $_SESSION['role_name']))
-            || ($_SESSION['role_name'] === 'Admin_dep'))
+                    && in_array('Admin_dep', $_SESSION['role_name']))
+                || ($_SESSION['role_name'] === 'Admin_dep'))
         ) {
-
-            // Traitement des requêtes POST
+            // Détermine s'il s'agit d'une action d'import ou d'export
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                // Gestion de l'importation de fichiers CSV spécifiques
-                if (isset($_FILES['student'])
-                    || isset($_FILES['teacher'])
-                    || isset($_FILES['internship'])
-                ) {
-                    $tableName = $_POST['table_name'] ?? null;
-
-                    if ($tableName && $model->isValidTable($tableName)) {
-                        try {
-                            $csvFile = null;
-
-                            // Détection du fichier importé
-                            if (isset($_FILES['student'])) {
-                                $csvFile = $_FILES['student']['tmp_name'];
-                            } elseif (isset($_FILES['teacher'])) {
-                                $csvFile = $_FILES['teacher']['tmp_name'];
-                            } elseif (isset($_FILES['internship'])) {
-                                $csvFile = $_FILES['internship']['tmp_name'];
-                            } else {
-                                $errorMessage = "Aucun fichier CSV valide détecté";
-                            }
-
-                            if ($csvFile) {
-                                // Validation du fichier et
-                                // correspondances des en-têtes
-                                $csvHeaders = $model->getCsvHeaders($csvFile);
-
-                                if (mime_content_type($csvFile) !== 'text/plain') {
-                                    $errorMessage = "Le fichier uploadé "
-                                    . "n'est pas un CSV valide.";
-                                    return;
-
-                                } elseif (!$model->validateHeaders(
-                                    $csvHeaders, $tableName
-                                )
-                                ) {
-                                    $errorMessage = "Les en-têtes du fichier CSV ne "
-                                    . "correspondent pas à la structure de "
-                                    . "la table $tableName.";
-                                    return;
-
-                                    // Importation des données dans la table
-                                } elseif ($model->processCsv($csvFile, $tableName)) {
-                                    $message .= "L'importation du fichier CSV pour "
-                                    . "la table $tableName a été réalisée avec "
-                                    . "succès! <br>";
-                                } else {
-                                    $errorMessage .= "Une erreur est survenue lors "
-                                    . "de l'importation pour la table $tableName. "
-                                    . "<br>";
-                                }
-                            }
-                        } catch (Exception $e) {
-                            $errorMessage .= "Erreur lors de l'importation : "
-                            . $this->handleExceptionMessage($e);
-                        }
-                    } else {
-                        $errorMessage = "Table non valide ou non reconnue.";
-                    }
-
-                    // Gestion de l'exportation des fichiers CSV
-                } elseif (isset($_POST['export_list'])) {
-                    $tableName = $_POST['export_list'];
-                    if ($model->isValidTable($tableName)) {
-                        try {
-                            $headers = $model->getTableColumn($tableName);
-                            if ($tableName == 'teacher') {
-                                $headers = array_merge(
-                                    $headers, ['address$type'], ['discipline_name']
-                                );
-                            }
-                            $model->exportToCsvByDepartment($tableName, $headers);
-                        } catch (Exception $e) {
-                            echo "Erreur lors de l'exportation : "
-                            . $this->handleExceptionMessage($e);
-                        }
-                    } else {
-                        echo "Table inconnue pour l'export";
-                    }
-
-                    // Gestion de l'exportation des modèles en CSV
-                } elseif (isset($_POST['export_model'])) {
-                    $tableName = $_POST['export_model'];
-                    if ($model->isValidTable($tableName)) {
-                        try{
-                            $model->exportModel($tableName);
-                        } catch (Exception $e) {
-                            echo "Erreur lors de l'exportation : "
-                            . $this->handleExceptionMessage($e);
-                        }
-                    }
-                } else {
-                    echo "Aucun fichier CSV n'est reconnu.";
+                if (isset($_FILES['student']) || isset($_FILES['teacher'])
+                    || isset($_FILES['internship'])) {
+                    // Rediriger vers le contrôleur Import
+                    $importController = new Import($this->_layout, $model);
+                    list($message, $errorMessage) = $importController->processImport($_POST, $_FILES);
+                } elseif (isset($_POST['export_list']) || isset($_POST['export_model'])) {
+                    // Rediriger vers le contrôleur Export
+                    $exportController = new Export($this->_layout, $model);
+                    $exportController->processExport($_POST);
+                    return; // Export génère directement le fichier
                 }
             }
 
-            // Définition de variables
+            // Affichage de la vue dashboard
             $title = "Gestion des données";
             $cssFilePath = '_assets/styles/gestionDonnees.css';
             $jsFilePath = '_assets/scripts/gestionDonnees.js';
             $view = new \Blog\Views\dashboard\Dashboard($message, $errorMessage);
 
-            // Affichage de la vue dashboard
             $this->_layout->renderTop($title, $cssFilePath);
             $view->showView();
             $this->_layout->renderBottom($jsFilePath);
-
-            // Redirection de l'utilisateur si il n'a pas les autorisations
         } else {
             header('Location: /homepage');
         }

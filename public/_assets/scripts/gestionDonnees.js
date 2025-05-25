@@ -178,11 +178,89 @@ document.addEventListener('DOMContentLoaded', function() {
 
     importExportToggle.addEventListener('change', function() {
         const mode = this.checked ? 'export' : 'import';
-        console.log('Mode sélectionné:', mode);
+        console.log('IMP/EXP Mode sélectionné:', mode);
     });
 
     simpleAdvancedToggle.addEventListener('change', function() {
         const mode = this.checked ? 'advanced' : 'simple';
-        console.log('Mode sélectionné:', mode);
+        console.log('SIM/AVA Mode sélectionné:', mode);
     });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Éléments DOM
+    const importExportToggle = document.getElementById('import-export-toggle');
+    const importContent = document.getElementById('import-content');
+    const exportContent = document.getElementById('export-content');
+
+    // Gestionnaires des catégories
+    const studentsBtn = document.getElementById('choose-students');
+    const teachersBtn = document.getElementById('choose-teachers');
+    const internshipsBtn = document.getElementById('choose-internships');
+
+    // Fonction pour charger le contenu
+    async function loadContent(type, category = '') {
+        try {
+            const response = await fetch(`/api/${type}?category=${category}`);
+
+            if (!response.ok) {
+                throw new Error(`Failed to load ${type} content: ${response.status}`);
+            }
+
+            const html = await response.text();
+
+            if (type === 'import') {
+                importContent.innerHTML = html;
+                importContent.style.display = 'block';
+                exportContent.style.display = 'none';
+            } else {
+                exportContent.innerHTML = html;
+                exportContent.style.display = 'block';
+                importContent.style.display = 'none';
+            }
+
+            // Initialize any new tooltips or select inputs in the loaded content
+            updateSelectOptions();
+            initTooltips();
+        } catch (error) {
+            console.error(`Error loading content: ${error.message}`);
+            // Show user-friendly error message in the content area
+            const errorMessage = `<div class="error-message card-panel red lighten-4">
+            <p>Une erreur s'est produite lors du chargement du contenu. Veuillez réessayer.</p>
+        </div>`;
+
+            if (type === 'import') {
+                importContent.innerHTML = errorMessage;
+            } else {
+                exportContent.innerHTML = errorMessage;
+            }
+        }
+    }
+    // Gestionnaire pour le toggle import/export
+    importExportToggle.addEventListener('change', function() {
+        if (this.checked) {
+            loadContent('export');
+        } else {
+            loadContent('import');
+        }
+    });
+
+    // Gestionnaires pour les catégories
+    studentsBtn.addEventListener('click', function() {
+        const type = importExportToggle.checked ? 'export' : 'import';
+        loadContent(type, 'students');
+    });
+
+    teachersBtn.addEventListener('click', function() {
+        const type = importExportToggle.checked ? 'export' : 'import';
+        loadContent(type, 'teachers');
+    });
+
+    internshipsBtn.addEventListener('click', function() {
+        const type = importExportToggle.checked ? 'export' : 'import';
+        loadContent(type, 'internships');
+    });
+
+    // Chargement initial
+    loadContent('import');
 });

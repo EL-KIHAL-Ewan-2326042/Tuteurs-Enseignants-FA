@@ -164,6 +164,11 @@ section.visible {
     line-height: 24px;
     color: var(--couleur-bleu-roi);
     font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    position: relative;
 }
 
 .switch label input[type=checkbox] {

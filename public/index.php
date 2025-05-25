@@ -18,7 +18,10 @@
  * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
  */
 
+use Blog\Controllers\AjaxController;
 use Blog\Views;
+use Blog\Views\dashboard\Export;
+use Blog\Views\dashboard\Import;
 use includes\Autoloader;
 use includes\exceptions\RouterException;
 use includes\Route;
@@ -131,12 +134,25 @@ session_start();
 $uri = strtok($_SERVER['REQUEST_URI'], '?');
 $router = new Router($uri);
 $router->get('/api/datatable', function() {
-    (new \Blog\Controllers\AjaxController())->handleDataTable("account");
+    (new AjaxController())->handleDataTable("account");
 });
 
 $router->post('/api/datatable', function() {
-    (new \Blog\Controllers\AjaxController())->handleDataTable("account");
+    (new AjaxController())->handleDataTable("account");
 });
+
+$router->get('/api/import', function() {
+    $category = $_GET['category'] ?? '';
+    $view = new Import($category);
+    $view->showView();
+});
+
+$router->get('/api/export', function() {
+    $category = $_GET['category'] ?? '';
+    $view = new Export($category);
+    $view->showView();
+});
+
 /**
  * Crée une action associée à une URI donnée.
  *
