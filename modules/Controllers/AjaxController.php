@@ -25,7 +25,6 @@ class AjaxController
      */
     #[NoReturn] public function handleDataTable(string $type): void
     {
-
         // Vérifier l'authentification
         if (!isset($_SESSION['identifier'])) {
             $this->sendJsonResponse(['error' => 'Non autorisé'], 401);
@@ -55,6 +54,25 @@ class AjaxController
                     $search,
                     $order
                 );
+                foreach ($result['data'] as &$row) {
+                    if (isset($row['distance'])) {
+                        $row['distance'] .= ' min';
+                    }
+                    if (empty($row['history'])) {
+                        $row['history'] = '<i class="material-icons red-text tooltipped" data-tooltip="Aucune date">close</i>';
+                    } else {
+                        if (is_array($row['history'])) {
+                            $cleanDates = array_map(function ($date) {
+                                return str_replace(['{', '}'], '', htmlspecialchars($date));
+                            }, $row['history']);
+                            $row['history'] = implode('<br>', $cleanDates);
+                        } else {
+                            $row['history'] = str_replace(['{', '}'], '', htmlspecialchars($row['history']));
+                        }
+                    }
+                }
+
+
                 break;
             case 'account':
                 $result = $teacherModel->paginateAccount(

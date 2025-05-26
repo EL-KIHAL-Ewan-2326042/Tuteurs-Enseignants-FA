@@ -53,3 +53,7 @@ a, li {
 .fs8 {
     font-size: .8rem;
 }
+
+.red-text {
+    color: var(--couleur-vin);
+}

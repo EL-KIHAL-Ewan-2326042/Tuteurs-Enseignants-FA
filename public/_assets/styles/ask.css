@@ -3,11 +3,11 @@ main {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 80vh;
+    min-height: 80vh;
 }
 main > div {
     width: 100%;
-    height: 90%;
+    min-height: 80vh;
     display: flex;
     gap: 2rem;
     justify-content: space-around;
@@ -33,11 +33,27 @@ main > div > section:first-child form {
     max-width: 100%;
 }
 
-main > div > section:first-child {
-    overflow-x: auto;
-}
-
 #homepage-table {
     table-layout: auto;
     width: 100%;
+}
+.marker-blue {
+    filter: hue-rotate(200deg) saturate(200%);
+}
+
+.marker-yellow {
+    filter: hue-rotate(60deg) saturate(300%);
+}
+
+
+@media screen and (max-width: 850px) {
+
+
+    main > div {
+        flex-direction: column;
+    }
+
+    main >div > section {
+        min-width: 100%;
+    }
 }

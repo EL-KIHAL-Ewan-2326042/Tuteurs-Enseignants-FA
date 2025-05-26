@@ -244,7 +244,7 @@ class Account
 
             </div>
             <div>
-                <?php Table::render('homepage-table', $headers, $jsColumns, '/api/datatable'); ?>
+                <?php Table::render('homepage-table', $headers, $jsColumns, '/api/datatable/account'); ?>
             </div>
         </main>
         <script>

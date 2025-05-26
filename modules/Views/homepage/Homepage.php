@@ -51,7 +51,7 @@ class HomePage
 
                 <span class="carre" style="
     bottom: 30%;
-    left: 18%;
+    left: 13%;
     width: 7vw;
     height: 7vw;
     rotate: 20deg;
@@ -59,7 +59,7 @@ class HomePage
   "></span>
 
                 <span class="carre" style="
-    top: 55%;
+    top: 70%;
     right: 22%;
     width: 6vw;
     height: 6vw;

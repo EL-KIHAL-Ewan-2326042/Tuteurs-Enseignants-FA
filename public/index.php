@@ -133,12 +133,21 @@ session_start();
  */
 $uri = strtok($_SERVER['REQUEST_URI'], '?');
 $router = new Router($uri);
-$router->get('/api/datatable', function() {
-    (new AjaxController())->handleDataTable("account");
+
+$router->get('/api/datatable/ask', function() {
+    (new \Blog\Controllers\AjaxController())->handleDataTable("ask");
 });
 
-$router->post('/api/datatable', function() {
-    (new AjaxController())->handleDataTable("account");
+$router->post('/api/datatable/ask', function() {
+    (new \Blog\Controllers\AjaxController())->handleDataTable("ask");
+});
+
+$router->get('/api/datatable/account', function() {
+    (new \Blog\Controllers\AjaxController())->handleDataTable("account");
+});
+
+$router->post('/api/datatable/account', function() {
+    (new \Blog\Controllers\AjaxController())->handleDataTable("account");
 });
 
 $router->get('/api/import', function() {
