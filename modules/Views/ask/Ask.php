@@ -67,133 +67,124 @@ readonly class Ask
      */
     public function showView(): void
     {
-        $headers = ['Élève', 'Formation', 'Groupe', 'Historique', 'Entreprise', 'Sujet', 'Adresse', 'Distance'];
+        $headers = ['Élève', 'Distance','Formation', 'Entreprise', 'Groupe', 'Historique', 'Sujet', 'Adresse'];
 
         $jsColumns = [
             ['data' => 'student'],
+            ['data' => 'distance'],
             ['data' => 'formation'],
+            ['data' => 'company'],
             ['data' => 'group'],
             ['data' => 'history'],
-            ['data' => 'company'],
             ['data' => 'subject'],
             ['data' => 'address'],
-            ['data' => 'distance'],
         ];
         ?>
         <main>
             <div>
-
-
-            <section>
-                <?php Table::render('homepage-table', $headers, $jsColumns, '/api/datatable/ask'); ?>
-
-            </section>
-            <section id="map" >
-
-            </section>
+                <section>
+                    <?php Table::render('homepage-table', $headers, $jsColumns, '/api/datatable/ask'); ?>
+                </section>
+                <section id="map" >
+                </section>
             </div>
         </main>
-
         <script>
+            /* ------- carte -------- */
             const map = L.map('map').setView([43.2965, 5.3698], 13);
-
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
 
-            let markers = [];
+            /* ------- variables globales -------- */
+            let markers       = [];
             let teacherMarker = null;
+            let teacherCoord  = null;
 
+            /* ------- cache géocodage -------- */
             const cacheGeocoding = JSON.parse(localStorage.getItem('geoCache') || '{}');
-
-            function saveCache() {
-                localStorage.setItem('geoCache', JSON.stringify(cacheGeocoding));
-            }
-
-            function clearMarkers() {
-                markers.forEach(marker => {
-                    if (marker !== teacherMarker) {
-                        map.removeLayer(marker);
-                    }
-                });
-                markers = teacherMarker ? [teacherMarker] : [];
-            }
+            const saveCache      = () => localStorage.setItem('geoCache', JSON.stringify(cacheGeocoding));
 
             async function geocodeAddress(address) {
-                if (cacheGeocoding[address]) {
-                    return cacheGeocoding[address];
-                }
+                if (cacheGeocoding[address]) return cacheGeocoding[address];
 
                 try {
-                    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
-                    const data = await response.json();
-
-                    if (data.length > 0) {
-                        const coords = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
-                        cacheGeocoding[address] = coords;
-                        saveCache();
-                        return coords;
+                    const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
+                    const d = await r.json();
+                    if (d.length) {
+                        const c = [parseFloat(d[0].lat), parseFloat(d[0].lon)];
+                        cacheGeocoding[address] = c; saveCache();
+                        return c;
                     }
-                } catch (error) {
-                    console.error('Erreur géocodage:', error);
-                }
-
+                } catch (e) { console.error('Erreur géocodage :', e); }
                 return null;
             }
 
-            function createColoredIcon(cssClass) {
-                const icon = L.icon({
-                    iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-                    shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-                    iconSize: [25, 41],
+            /* ------- fabrique d’icônes colorées -------- */
+            function iconWithClass(cls) {
+                return L.icon({
+                    iconUrl   : 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+                    shadowUrl : 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+                    iconSize  : [25, 41],
                     iconAnchor: [12, 41],
-                    popupAnchor: [1, -34],
-                    shadowSize: [41, 41],
-                    className: cssClass // for coloring
+                    popupAnchor:[1, -34],
+                    shadowSize:[41, 41],
+                    className : cls
                 });
-                return icon;
+            }
+            const yellowIcon = iconWithClass('marker-yellow'); // prof
+            const blueIcon   = iconWithClass('marker-blue');   // élèves sélectionnés
+
+            /* ------- gestion des marqueurs -------- */
+            function clearMarkers() {
+                markers.forEach(m => { if (m !== teacherMarker) map.removeLayer(m); });
+                markers = teacherMarker ? [teacherMarker] : [];
             }
 
-            const yellowIcon = createColoredIcon('marker-yellow');
-            const blueIcon = createColoredIcon('marker-blue');
+            function addMarker(coord, label, icon) {
+                const m = L.marker(coord, { icon }).addTo(map).bindPopup(label);
+                markers.push(m);
+            }
 
+            /* ------- marqueur du prof (permanent) -------- */
             <?php if (!empty($_SESSION['address'])) : ?>
             (async () => {
-                const teacherAddress = "<?php echo $_SESSION['address'][0]['address']; ?>";
-                const coord = await geocodeAddress(teacherAddress);
-                if (coord) {
-                    teacherMarker = L.marker(coord, { icon: yellowIcon }).addTo(map).bindPopup("Votre position");
+                const teacherAddress = "<?= addslashes($_SESSION['address'][0]['address']); ?>";
+                teacherCoord = await geocodeAddress(teacherAddress);
+                if (teacherCoord) {
+                    teacherMarker = L.marker(teacherCoord, { icon: yellowIcon })
+                        .addTo(map)
+                        .bindPopup("Votre position");
                     markers.push(teacherMarker);
-                    map.setView(coord, 13);
+                    map.setView(teacherCoord, 13);
                 }
             })();
             <?php endif; ?>
 
+            /* ------- interaction DataTable -------- */
             $(document).ready(function () {
                 const table = $('#homepage-table').DataTable();
 
                 table.on('select deselect', async function () {
                     clearMarkers();
-                    const selectedData = table.rows({ selected: true }).data().toArray();
-                    const bounds = [];
 
-                    for (const row of selectedData) {
-                        const address = row.address;
-                        const label = row.student + ' - ' + row.company;
+                    const selected = table.rows({ selected: true }).data().toArray();
+                    const bounds   = [];
 
-                        if (address) {
-                            const coord = await geocodeAddress(address);
-                            if (coord) {
-                                const marker = L.marker(coord, { icon: blueIcon }).addTo(map).bindPopup(label);
-                                markers.push(marker);
-                                bounds.push(coord);
-                            }
+                    for (const row of selected) {
+                        const { address, student, company } = row;
+                        if (!address) continue;
+
+                        const coord = await geocodeAddress(address);
+                        if (coord) {
+                            addMarker(coord, `${student} - ${company}`, blueIcon);
+                            bounds.push(coord);
                         }
                     }
 
-                    if (bounds.length > 0) {
-                        map.fitBounds(bounds, { padding: [50, 50] });
-                    }
+                    if (teacherCoord) bounds.push(teacherCoord);
+
+                    if (bounds.length) map.fitBounds(bounds, { padding: [50, 50] });
                 });
             });
         </script>
