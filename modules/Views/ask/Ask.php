@@ -85,7 +85,7 @@ readonly class Ask
 
 
             <section>
-                <?php Table::render('homepage-table', $headers, $jsColumns, '/api/datatable'); ?>
+                <?php Table::render('homepage-table', $headers, $jsColumns, '/api/datatable/ask'); ?>
 
             </section>
             <section id="map" >
@@ -93,37 +93,113 @@ readonly class Ask
             </section>
             </div>
         </main>
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
         <script>
-            $(document).ready(function() {
-
-                <?php if (!empty($_SESSION['address'])) : ?>
-                const teacherAddress = "<?php echo $_SESSION['address'][0]['address']; ?>";
-                <?php endif;
-                if(isset($_SESSION['selected_student']['address'])) : ?>
-                const companyAddress = "<?php echo $_SESSION['selected_student']['address']; ?>";
-                <?php endif; ?>
-            });
-
-            var map = L.map('map').setView([43.2965, 5.3698], 13);
+            const map = L.map('map').setView([43.2965, 5.3698], 13);
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                attribution: '&copy; OpenStreetMap contributors'
             }).addTo(map);
 
-            var marker = L.marker([43.2965, 5.3698]).addTo(map)
-                .bindPopup('Aix-Marseille Université')
-                .openPopup();
+            let markers = [];
+            let teacherMarker = null;
+
+            const cacheGeocoding = JSON.parse(localStorage.getItem('geoCache') || '{}');
+
+            function saveCache() {
+                localStorage.setItem('geoCache', JSON.stringify(cacheGeocoding));
+            }
+
+            function clearMarkers() {
+                markers.forEach(marker => {
+                    if (marker !== teacherMarker) {
+                        map.removeLayer(marker);
+                    }
+                });
+                markers = teacherMarker ? [teacherMarker] : [];
+            }
+
+            async function geocodeAddress(address) {
+                if (cacheGeocoding[address]) {
+                    return cacheGeocoding[address];
+                }
+
+                try {
+                    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`);
+                    const data = await response.json();
+
+                    if (data.length > 0) {
+                        const coords = [parseFloat(data[0].lat), parseFloat(data[0].lon)];
+                        cacheGeocoding[address] = coords;
+                        saveCache();
+                        return coords;
+                    }
+                } catch (error) {
+                    console.error('Erreur géocodage:', error);
+                }
+
+                return null;
+            }
+
+            function createColoredIcon(cssClass) {
+                const icon = L.icon({
+                    iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+                    shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41],
+                    className: cssClass // for coloring
+                });
+                return icon;
+            }
+
+            const yellowIcon = createColoredIcon('marker-yellow');
+            const blueIcon = createColoredIcon('marker-blue');
 
             <?php if (!empty($_SESSION['address'])) : ?>
-            const teacherAddress = "<?php echo $_SESSION['address'][0]['address']; ?>";
-            <?php endif;
-            if(isset($_SESSION['selected_student']['address'])) : ?>
-            const companyAddress = "<?php echo $_SESSION['selected_student']['address']; ?>";
+            (async () => {
+                const teacherAddress = "<?php echo $_SESSION['address'][0]['address']; ?>";
+                const coord = await geocodeAddress(teacherAddress);
+                if (coord) {
+                    teacherMarker = L.marker(coord, { icon: yellowIcon }).addTo(map).bindPopup("Votre position");
+                    markers.push(teacherMarker);
+                    map.setView(coord, 13);
+                }
+            })();
             <?php endif; ?>
 
+            $(document).ready(function () {
+                const table = $('#homepage-table').DataTable();
+
+                table.on('select deselect', async function () {
+                    clearMarkers();
+                    const selectedData = table.rows({ selected: true }).data().toArray();
+                    const bounds = [];
+
+                    for (const row of selectedData) {
+                        const address = row.address;
+                        const label = row.student + ' - ' + row.company;
+
+                        if (address) {
+                            const coord = await geocodeAddress(address);
+                            if (coord) {
+                                const marker = L.marker(coord, { icon: blueIcon }).addTo(map).bindPopup(label);
+                                markers.push(marker);
+                                bounds.push(coord);
+                            }
+                        }
+                    }
+
+                    if (bounds.length > 0) {
+                        map.fitBounds(bounds, { padding: [50, 50] });
+                    }
+                });
+            });
         </script>
+
+
+
         <?php
 
         unset($_SESSION['selected_student']);

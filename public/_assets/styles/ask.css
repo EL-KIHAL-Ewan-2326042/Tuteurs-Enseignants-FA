@@ -41,3 +41,10 @@ main > div > section:first-child {
     table-layout: auto;
     width: 100%;
 }
+.marker-blue {
+    filter: hue-rotate(200deg) saturate(200%);
+}
+
+.marker-yellow {
+    filter: hue-rotate(60deg) saturate(300%);
+}

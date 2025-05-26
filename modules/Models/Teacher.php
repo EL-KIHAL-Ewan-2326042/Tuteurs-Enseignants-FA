@@ -363,13 +363,19 @@ class Teacher extends Model
             FROM internship
             WHERE end_date_internship < NOW()
             GROUP BY id_teacher
+        ), cte_teacher_dep as (
+        	select distinct hr.department_name
+        	from has_role hr
+        	where user_id = :id_teacher
         )
         SELECT COUNT(*) as total
         FROM student s
         JOIN internship i ON s.student_number = i.student_number
         LEFT JOIN cte_histo h ON i.id_teacher = h.id_teacher
         LEFT JOIN distance d ON :id_teacher = d.id_teacher AND i.internship_identifier = d.internship_identifier
-        WHERE i.end_date_internship > NOW()";
+        left join has_role hr on s.student_number = hr.user_id
+        WHERE i.end_date_internship > NOW() and hr.department_name in (select * from cte_teacher_dep)
+        ";
 
         if (!empty($search)) {
             $countQuery .= ' AND (s.student_name ILIKE :search OR 
@@ -396,8 +402,12 @@ class Teacher extends Model
             FROM internship
             WHERE end_date_internship < NOW()
             GROUP BY id_teacher
+        ), cte_teacher_dep as (
+        	select distinct hr.department_name
+        	from has_role hr
+        	where user_id = :id_teacher2
         )
-        SELECT 
+        SELECT
             CONCAT(s.student_firstname, ' ', s.student_name) AS student, 
             s.formation, 
             s.class_group AS group,
@@ -410,7 +420,9 @@ class Teacher extends Model
         JOIN internship i ON s.student_number = i.student_number
         LEFT JOIN cte_histo h ON i.id_teacher = h.id_teacher
         LEFT JOIN distance d ON :id_teacher2 = d.id_teacher AND i.internship_identifier = d.internship_identifier
-        WHERE i.end_date_internship > NOW()";
+        left join has_role hr on s.student_number = hr.user_id
+        WHERE i.end_date_internship > NOW() and hr.department_name in (select * from cte_teacher_dep)
+        ";
 
         if (!empty($search)) {
             $dataQuery .= ' AND (s.student_name ILIKE :search OR 

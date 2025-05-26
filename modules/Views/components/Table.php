@@ -25,12 +25,67 @@ class Table
         echo '</table>';
         $jsColumnsJson = json_encode($jsColumns);
         ?>
+        <style>
+            table.dataTable {
+                background-color: var(--couleur-blanc);
+                border-collapse: collapse;
+                width: 100%;
+                border-radius: 8px 8px  0 0;
+                overflow: hidden;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            }
+            /* Table header */
+            table.dataTable thead {
+                background-color: var(--couleur-bleu-roi);
+                color: var(--couleur-blanc);
+            }
+            table.dataTable thead th {
+                padding: .5rem 1rem;
+                font-size: 0.9rem;
+                text-align: left;
+                border-bottom: 2px solid var(--couleur-bleu-roi);
+            }
 
+            /* Table body */
+            table.dataTable tbody tr {
+                transition: background-color 0.3s ease;
+            }
+
+            table.dataTable tbody tr:nth-child(even) {
+                background-color: var(--couleur-bleu-pale);
+            }
+
+            table.dataTable tbody tr:hover {
+                background-color: var(--couleur-jaune);
+            }
+
+            table.dataTable tbody td {
+                padding: 10px 14px;
+                font-size: 0.85rem;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
+            #homepage-table_wrapper button, #homepage-table_wrapper input {
+                transition: all .2s ease-in;
+                background: transparent;
+                border: 1px solid var(--couleur-bleu-roi);
+
+                color: var(--couleur-bleu-roi);
+            }
+            #homepage-table_wrapper button:hover {
+                transition: all .2s ease-in;
+                background-color: var(--couleur-bleu);
+                border: 1px solid var(--couleur-bleu);
+                color: var(--couleur-jaune);
+
+            }
+        </style>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 if (!$.fn.DataTable.isDataTable('#<?= $id ?>')) {
                     new DataTable('#<?= $id ?>', {
                         scrollX: true,
+                        responsive: true,
                         keys: true,
                         fixedHeader: true,
                         order: [],
@@ -61,6 +116,7 @@ class Table
                                 colvis: "Visibilité colonnes",
                                 colvisRestore: "Rétablir visibilité",
                             },
+                            emptyTable: "Aucune donnée disponible dans le tableau",
                             lengthMenu: "Afficher _MENU_ entrées",
                             search: '',
                             info: "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
