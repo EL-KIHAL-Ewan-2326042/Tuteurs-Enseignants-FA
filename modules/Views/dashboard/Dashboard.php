@@ -61,6 +61,17 @@ class Dashboard
         <main>
             <h1 class="center-align flow-text"> Gestion des données </h1>
 
+            <div id="mode-title" class="center-align">
+                <span class="tooltip-container" data-tooltip=
+                "1. Exporter le modèle correspondant <br>
+                 2. Inscrivez vos données <br>
+                 3. Vérifiez que le séparateur est bien une virgule (avec un éditeur de texte) <br>
+                 4. Vérifiez qu'un texte comportant une virgule soit encadré par
+                 des guillemets (avec un éditeur de texte) <br>
+                 5. Importez le fichier csv ci-dessous">(?)</span>
+                <span id="mode-text">Mode avancé - Importer</span>
+            </div>
+
             <!-- Toggles switches -->
             <div class="toggles-container">
                 <div class="switch-container">
@@ -77,7 +88,7 @@ class Dashboard
                     <div class="switch">
                         <label>
                             Simple
-                            <input type="checkbox" id="simple-advanced-toggle" checked>
+                            <input type="checkbox" id="simple-advanced-toggle" checked onclick="return false;">
                             <span class="lever"></span>
                             Avancé
                         </label>
@@ -111,19 +122,14 @@ class Dashboard
                 </div>
             </div>
 
-            <!-- Sections -->
-            <section id="students-section">Contenu des étudiants</section>
-            <section id="teachers-section">Contenu des enseignants</section>
-            <section id="internships-section">Contenu des stages</section>
-
             <!-- Sections pour le contenu dynamique -->
             <div id="content-container">
                 <div id="import-content" class="content-section">
-                    <!-- Le contenu d'import sera chargé ici par JavaScript -->
+
                 </div>
 
                 <div id="export-content" class="content-section" style="display:none;">
-                    <!-- Le contenu d'export sera chargé ici par JavaScript -->
+
                 </div>
             </div>
 

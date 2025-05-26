@@ -98,8 +98,16 @@ section {
 
 .choose-item.active .icon-circle {
     border-color: var(--couleur-or);
+    border-width: 4px;
     /*background-color: var(--couleur-or); */
 }
+
+.choose-item.active .plus-icon {
+    border-color: var(--couleur-or);
+    color: var(--couleur-emeraude);
+    /*background-color: var(--couleur-or); */
+}
+
 
 .choose-item:hover {
     transform: scale(1.05);
@@ -244,6 +252,116 @@ section.visible {
 
 .switch label .lever {
     transform: scale(1.3);
+}
+
+/* Mode title */
+#mode-title {
+    margin: 15px 0;
+    font-size: 1.2rem;
+    color: var(--couleur-violet);
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Import */
+#import-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-field {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 2em 0;
+    width: 100%;
+}
+
+/* Grand bouton de sélection de fichier */
+.file-field .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--couleur-lavande);
+    color: var(--couleur-violet);
+    padding: 1.25em 2.5em;
+    border-radius: 0.5em;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-bottom: 1.5em;
+    width: 80%;
+    max-width: 20em;
+    height: 3.75em;
+    position: relative;
+}
+
+.file-field .btn i.material-icons {
+    margin-right: 0.6em;
+}
+
+.file-field .btn:hover {
+    transform: translateY(-0.125em);
+    box-shadow: 0 0.25em 0.5em rgba(0, 0, 0, 0.2);
+}
+
+.file-field .btn span {
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+/* Container pour le nom du fichier */
+.file-field .file-path-wrapper {
+    width: 90%;
+    max-width: 30em;
+    margin-bottom: 2em;
+    text-align: center;
+}
+
+.file-field .file-path-wrapper input {
+    text-align: center;
+    font-size: 1em;
+}
+
+/* Bouton Valider */
+.btn.waves-effect.waves-light[type="submit"] {
+    background-color: var(--couleur-emeraude);
+    color: white;
+    width: 80%;
+    max-width: 20em;
+    height: 3em;
+    font-size: 1.2em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    border-radius: 0.4em;
+    box-shadow: 0 0.125em 0.3em rgba(0,0,0,0.2);
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.btn.waves-effect.waves-light[type="submit"]:hover {
+    background-color: var(--couleur-vert);
+    transform: translateY(-0.125em);
+}
+
+.btn.waves-effect.waves-light[type="submit"] i {
+    margin-left: 0.6em;
+}
+
+/* Ajustements responsifs */
+@media (max-width: 40em) {
+    .file-field .btn {
+        width: 90%;
+        padding: 1em 1.5em;
+        font-size: 0.9em;
+    }
+
+    .btn.waves-effect.waves-light[type="submit"] {
+        width: 80%;
+        font-size: 1em;
+    }
 }
 
 /* Téléphones et tablettes */

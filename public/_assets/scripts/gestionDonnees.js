@@ -131,47 +131,77 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 }); */
-document.addEventListener('DOMContentLoaded', () => {
-    const mapping = {
-        'choose-students': 'students-section',
-        'choose-teachers': 'teachers-section',
-        'choose-internships': 'internships-section'
-    };
+const importContent = document.getElementById('import-content');
+const exportContent = document.getElementById('export-content');
 
+// Fonction pour charger le contenu
+async function loadContent(type, category = '') {
+    try {
+        const response = await fetch(`/api/${type}?category=${category}`);
+
+        if (!response.ok) {
+            throw new Error(`Impossible de charger le contenu ${type}, erreur: ${response.status}`);
+        }
+
+        const html = await response.text();
+
+        if (type === 'import') {
+            importContent.innerHTML = html;
+            importContent.style.display = 'block';
+            exportContent.style.display = 'none';
+        } else {
+            exportContent.innerHTML = html;
+            exportContent.style.display = 'block';
+            importContent.style.display = 'none';
+        }
+
+        updateSelectOptions();
+        initTooltips();
+    } catch (error) {
+        console.error(`Error loading content: ${error.message}`);
+        const errorMessage = `<div class="error-message card-panel red lighten-4">
+            <p>Une erreur s'est produite lors du chargement du contenu. Veuillez réessayer.</p>
+        </div>`;
+
+        if (type === 'import') {
+            importContent.innerHTML = errorMessage;
+        } else {
+            exportContent.innerHTML = errorMessage;
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
     const items = document.querySelectorAll('.choose-item');
+    const importExportToggle = document.getElementById('import-export-toggle');
 
     items.forEach(item => {
-        item.addEventListener('click', () => {
-            const targetId = mapping[item.id];
-            const targetSection = document.getElementById(targetId);
-            const isActive = item.classList.contains('active');
+        item.addEventListener('click', function() {
+            // Vérifie si l'élément était déjà actif
+            const wasActive = this.classList.contains('active');
 
-            // Cacher toutes les sections
+            // Réinitialiser tous les éléments
             items.forEach(i => i.classList.remove('active'));
-            Object.values(mapping).forEach(id => {
-                const section = document.getElementById(id);
-                section.classList.remove('visible');
-                // petit délai pour laisser l'animation se finir
-                setTimeout(() => {
-                    if (!section.classList.contains('visible')) {
-                        section.style.display = 'none';
-                    }
-                }, 300); // même durée que la transition CSS
-            });
 
-            if (!isActive) {
-                item.classList.add('active');
-                targetSection.style.display = 'block';
-                void targetSection.offsetWidth;
-                targetSection.classList.add('visible');
-                if (window.innerWidth <= 600) {
-                    targetSection.scrollIntoView({behavior: 'smooth'});
-                }
+            if (!wasActive) {
+                // Si l'élément n'était PAS actif, on l'active
+                this.classList.add('active');
+
+                // Charger le contenu correspondant
+                const category = this.id.replace('choose-', '');
+                const type = importExportToggle.checked ? 'export' : 'import';
+                loadContent(type, category);
+            } else {
+                // Si l'élément était déjà actif, on le laisse désélectionné
+                // et on cache le contenu
+                importContent.style.display = 'none';
+                exportContent.style.display = 'none';
             }
         });
     });
 });
 
+// Gestion des modes Import/Export et Simple/Avancé
 document.addEventListener('DOMContentLoaded', function() {
     const importExportToggle = document.getElementById('import-export-toggle');
     const simpleAdvancedToggle = document.getElementById('simple-advanced-toggle');
@@ -198,44 +228,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const teachersBtn = document.getElementById('choose-teachers');
     const internshipsBtn = document.getElementById('choose-internships');
 
-    // Fonction pour charger le contenu
-    async function loadContent(type, category = '') {
-        try {
-            const response = await fetch(`/api/${type}?category=${category}`);
-
-            if (!response.ok) {
-                throw new Error(`Failed to load ${type} content: ${response.status}`);
-            }
-
-            const html = await response.text();
-
-            if (type === 'import') {
-                importContent.innerHTML = html;
-                importContent.style.display = 'block';
-                exportContent.style.display = 'none';
-            } else {
-                exportContent.innerHTML = html;
-                exportContent.style.display = 'block';
-                importContent.style.display = 'none';
-            }
-
-            // Initialize any new tooltips or select inputs in the loaded content
-            updateSelectOptions();
-            initTooltips();
-        } catch (error) {
-            console.error(`Error loading content: ${error.message}`);
-            // Show user-friendly error message in the content area
-            const errorMessage = `<div class="error-message card-panel red lighten-4">
-            <p>Une erreur s'est produite lors du chargement du contenu. Veuillez réessayer.</p>
-        </div>`;
-
-            if (type === 'import') {
-                importContent.innerHTML = errorMessage;
-            } else {
-                exportContent.innerHTML = errorMessage;
-            }
-        }
-    }
     // Gestionnaire pour le toggle import/export
     importExportToggle.addEventListener('change', function() {
         if (this.checked) {
@@ -264,3 +256,24 @@ document.addEventListener('DOMContentLoaded', function() {
     // Chargement initial
     loadContent('import');
 });
+
+const importExportToggle = document.getElementById('import-export-toggle');
+const simpleAdvancedToggle = document.getElementById('simple-advanced-toggle');
+
+// Fonction pour mettre à jour le texte du mode
+function updateModeText() {
+    const modeText = document.getElementById('mode-text');
+
+    if (modeText) {
+        const importExportMode = importExportToggle.checked ? 'Exporter' : 'Importer';
+        const simpleAdvancedMode = simpleAdvancedToggle.checked ? 'avancé' : 'simple';
+
+        modeText.textContent = `Mode ${simpleAdvancedMode} - ${importExportMode}`;
+    }
+}
+
+importExportToggle.addEventListener('change', updateModeText);
+simpleAdvancedToggle.addEventListener('change', updateModeText);
+
+// Initialiser le texte au chargement
+updateModeText();
