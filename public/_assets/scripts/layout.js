@@ -24,7 +24,6 @@ function initDataTable(id, ajaxUrl, columns) {
         scrollX: true,
         responsive: true,
         keys: true,
-        fixedHeader: true,
         order: [],
         ordering: true,
         serverSide: true,
