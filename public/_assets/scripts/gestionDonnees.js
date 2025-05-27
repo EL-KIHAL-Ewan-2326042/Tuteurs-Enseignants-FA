@@ -201,22 +201,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Gestion des modes Import/Export et Simple/Avancé
-document.addEventListener('DOMContentLoaded', function() {
-    const importExportToggle = document.getElementById('import-export-toggle');
-    const simpleAdvancedToggle = document.getElementById('simple-advanced-toggle');
-
-    importExportToggle.addEventListener('change', function() {
-        const mode = this.checked ? 'export' : 'import';
-        console.log('IMP/EXP Mode sélectionné:', mode);
-    });
-
-    simpleAdvancedToggle.addEventListener('change', function() {
-        const mode = this.checked ? 'advanced' : 'simple';
-        console.log('SIM/AVA Mode sélectionné:', mode);
-    });
-});
-
 document.addEventListener('DOMContentLoaded', function() {
     // Éléments DOM
     const importExportToggle = document.getElementById('import-export-toggle');

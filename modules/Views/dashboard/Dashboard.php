@@ -88,7 +88,9 @@ class Dashboard
                     <div class="switch">
                         <label>
                             Simple
-                            <input type="checkbox" id="simple-advanced-toggle" checked onclick="return false;">
+                            <input type="checkbox" id="simple-advanced-toggle"
+                                   checked
+                                   onclick="return false;">
                             <span class="lever"></span>
                             Avancé
                         </label>
