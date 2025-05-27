@@ -239,7 +239,7 @@ class Account
 
                 </div>
                 </div>
-                <a href="/intramu" class="deco">Deconnexion</a>
+                <a onclick="disconnect();" class="logoutBtn deco">Déconnexion</a>
 
 
             </div>

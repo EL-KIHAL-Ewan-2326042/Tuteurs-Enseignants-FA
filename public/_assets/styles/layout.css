@@ -96,6 +96,26 @@ footer a {
     width: 100%;
 }
 
+/* Bouton de déconnexion */
+.logout-btn {
+    margin-left: 1.6rem;
+    display: flex;
+    align-items: center;
+    color: var(--couleur-blanc);
+    cursor: pointer;
+}
+
+.logout-btn:hover {
+    color: var(--couleur-jaune);
+}
+
+header div {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1.6rem;
+}
+
 @media screen and (max-width: 920px) {
 
     header, footer {

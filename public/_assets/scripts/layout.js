@@ -8,3 +8,9 @@ toggleMenu.onclick = function() {
         mainNav.style.display = 'none';
     }
 };
+
+function disconnect() {
+    if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+        window.location.href = '/intramu';
+    }
+}
