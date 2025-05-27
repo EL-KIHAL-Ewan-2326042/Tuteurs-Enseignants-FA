@@ -20,6 +20,7 @@
 
 use Blog\Controllers\AjaxController;
 use Blog\Views;
+use Blog\Views\components\ViewStage;
 use Blog\Views\dashboard\Export;
 use Blog\Views\dashboard\Import;
 use includes\Autoloader;
@@ -149,6 +150,16 @@ $router->get('/api/datatable/account', function() {
 $router->post('/api/datatable/account', function() {
     (new \Blog\Controllers\AjaxController())->handleDataTable("account");
 });
+$router->get('/api/datatable/stage/([A-Za-z0-9]+)', function() {
+    (new \Blog\Controllers\AjaxController())->handleDataTable("stage", basename($_SERVER['REQUEST_URI']));
+});
+$router->post('/api/datatable/stage/([A-Za-z0-9]+)', function() {
+    (new \Blog\Controllers\AjaxController())->handleDataTable("stage", basename($_SERVER['REQUEST_URI']));
+});
+$router->get('/api/viewStage/([A-Za-z0-9]+)', function () {
+    \Blog\Views\components\ViewStage::render(basename($_SERVER['REQUEST_URI']));
+});
+
 
 $router->get('/api/import', function() {
     $category = $_GET['category'] ?? '';

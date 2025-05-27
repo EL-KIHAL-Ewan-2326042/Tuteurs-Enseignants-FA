@@ -59,27 +59,6 @@ function addMarker(coord,label,icn){
     }
 })();
 
-/* ==================== DataTables ==================== */
-/*  fonction utilitaire globale pour (ré)initialiser un DataTable */
-window.initDataTable = function(id, ajaxUrl, columns){
-    if ($.fn.DataTable.isDataTable('#'+id)){
-        $('#'+id).DataTable().ajax.url(ajaxUrl).load();
-        return;
-    }
-    new DataTable('#'+id,{
-        scrollX:true,responsive:true,keys:true,fixedHeader:true,
-        order:[],ordering:true,serverSide:true,stateSave:false,
-        pageLength:10,processing:true,
-        ajax:{url:ajaxUrl,type:'POST',dataSrc:'data'},
-        columns:columns,
-        select:{items:'row'},
-        lengthMenu:[10,20,50,100],
-        language:{select:{rows:{_: "%d lignes sélectionnées",0:"",1:"1 ligne sélectionnée"}},
-            emptyTable:"Aucune donnée disponible",search:'',info:"_START_-_END_ / _TOTAL_"},
-        layout:{bottomStart:['pageLength','info'],bottomEnd:['paging']}
-    });
-};
-
 /* ========== table principale déjà présente au chargement ========== */
 document.addEventListener('DOMContentLoaded', ()=>{
     initDataTable('homepage-table','/api/datatable/ask', window.JS_COLUMNS);

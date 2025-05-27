@@ -14,3 +14,101 @@ function disconnect() {
         window.location.href = '/intramu';
     }
 }
+function initDataTable(id, ajaxUrl, columns) {
+    if ($.fn.DataTable.isDataTable('#' + id)) {
+        $('#' + id).DataTable().ajax.url(ajaxUrl).load();
+        return;
+    }
+
+    new DataTable('#' + id, {
+        scrollX: true,
+        responsive: true,
+        keys: true,
+        fixedHeader: true,
+        order: [],
+        ordering: true,
+        serverSide: true,
+        stateSave: false,
+        pageLength: 10,
+        processing: true,
+        ajax: {
+            url: ajaxUrl,
+            type: 'POST',
+            dataSrc: 'data',
+        },
+        columns: columns,
+        select: {
+            style: 'multi',
+            items: 'row'
+        },
+        lengthMenu: [10, 20, 50, 100],
+        language: {
+            select: {
+                rows: {
+                    _: "%d lignes sélectionnées",
+                    0: "",
+                    1: "1 ligne sélectionnée"
+                },
+                columns: "",
+                cells: ""
+            },
+            buttons: {
+                copy: 'Copier',
+                print: 'Imprimer',
+                colvis: "Afficher / masquer",
+                colvisRestore: "Rétablir visibilité",
+            },
+            emptyTable: "Aucune donnée disponible dans le tableau",
+            lengthMenu: "Afficher _MENU_ entrées",
+            search: '',
+            info: "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
+            infoEmpty: 'Aucune entrée',
+            infoFiltered: "(filtrées depuis un total de _MAX_ entrées)"
+        },
+        layout: {
+            topStart: {
+                buttons: [
+                    {
+                        extend: 'copy',
+                        text: '<i class="material-icons tiny">content_copy</i> Copier',
+                        exportOptions: { columns: ':visible' }
+                    },
+                    {
+                        extend: 'excel',
+                        exportOptions: { columns: ':visible' }
+                    },
+                    {
+                        extend: 'csv',
+                        exportOptions: { columns: ':visible' }
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="material-icons tiny">print</i> Imprimer',
+                        exportOptions: { columns: ':visible' }
+                    },
+                    'colvis',
+                    {
+                        text: '<i class="material-icons tiny">select_all</i> <span id="selectText">Tout sélectionner</span>',
+                        attr: { id: 'toggleSelectBtn', class: 'dt-button toggle-select-btn' },
+                        action: function () {
+                            let table = $('#' + id).DataTable();
+                            let selected = table.rows({ selected: true }).count();
+                            if (selected > 0) {
+                                table.rows().deselect();
+                                $('#toggleSelectBtn').text('Tout sélectionner');
+                            } else {
+                                table.rows({ page: 'current' }).select();
+                                $('#toggleSelectBtn').text('Tout désélectionner');
+                            }
+                        }
+                    }
+                ],
+            },
+            topEnd: {
+                search: { placeholder: 'Rechercher...' },
+            },
+            bottomStart: ['pageLength', 'info'],
+            bottomEnd: ['paging']
+        }
+    });
+}
