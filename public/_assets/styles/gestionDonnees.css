@@ -350,12 +350,85 @@ section.visible {
     margin-left: 0.6em;
 }
 
+/* Export */
+.export-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5em;
+    padding: 2em 1.5em;
+    width: 100%; /* Match the full width of parent */
+    max-width: 40em; /* Reduced max-width to match import form better */
+    margin: 1.5em auto;
+    border-radius: 0.5em;
+    box-shadow: 0 0.15em 0.5em rgba(0, 0, 0, 0.1);
+}
+
+/* Make sure row centers its content properly */
+.row {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.export-item {
+    width: 100%;
+    margin: 0.5em 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.export-item .switch {
+    margin-bottom: 1em;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.export-item .switch label {
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 15em;
+}
+
+/* Container for list and model info */
+#list-info, #model-info {
+    width: 100%;
+    max-width: 30em;
+    text-align: center;
+    padding: 0.7em;
+    border-radius: 0.4em;
+    background-color: rgba(0, 85, 139, 0.05);
+}
+
+#list-info p, #model-info p {
+    margin: 0.5em 0;
+    font-size: 1em;
+    color: var(--couleur-bleu-roi);
+}
+
+/* Export button sizing to match import button */
+.export-item .btn.waves-effect.waves-light {
+    width: 60%;
+    max-width: 12em;
+    height: 2.8em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0.8em auto;
+    font-size: 1rem;
+}
+
 /* Ajustements responsifs */
 @media (max-width: 40em) {
     .file-field .btn {
         width: 90%;
         padding: 1em 1.5em;
-        font-size: 0.9em;
     }
 
     .btn.waves-effect.waves-light[type="submit"] {
@@ -380,6 +453,43 @@ section.visible {
         justify-content: center;
         gap: 20px;
         margin: 0 auto 20px auto;
+    }
+}
+
+/* Media queries bonus */
+@media (max-width: 48em) { /* ~768px */
+    .export-container {
+        width: 95%;
+        padding: 1.8em 1em;
+        margin: 1em auto;
+    }
+
+    .export-item .switch label {
+        width: 12em;
+        font-size: 1em;
+    }
+
+    .export-item .btn.waves-effect.waves-light {
+        width: 80%;
+    }
+}
+
+@media (max-width: 30em) { /* ~480px */
+    h3 {
+        font-size: 1.4em;
+    }
+
+    .export-item .switch label {
+        width: 10em;
+        font-size: 0.9em;
+    }
+
+    #list-info p, #model-info p {
+        font-size: 1em;
+    }
+
+    .export-container {
+        padding: 1.5em 0.8em;
     }
 }
 

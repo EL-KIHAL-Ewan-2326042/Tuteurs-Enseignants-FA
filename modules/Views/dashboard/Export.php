@@ -9,73 +9,69 @@ class Export
 
     public function showView(): void
     {
+        // Configuration pour chaque catégorie
+        $config = [
+            'students' => [
+                'title' => 'Exporter des données d\'étudiants',
+                'table_name' => 'student',
+                'display_name' => 'étudiants'
+            ],
+            'teachers' => [
+                'title' => 'Exporter des données d\'enseignants',
+                'table_name' => 'teacher',
+                'display_name' => 'enseignants'
+            ],
+            'internships' => [
+                'title' => 'Exporter des données de stages',
+                'table_name' => 'internship',
+                'display_name' => 'stages'
+            ]
+        ];
+
         ?>
-        <div class="export">
-            <div class="card-panel white">
-                <!--Exportation des listes : Etudiants/enseignants/Stages-->
-                <div class="tooltip-container" data-tooltip=
-                "Exportation des données d'une liste
-                    choisie dans un fichier .csv">(?)</div>
-                <h2>Exporter une liste :</h2>
-                <form action="/dashboard" method="POST">
-                    <div>
-                        <label>
-                            <span>Choisissez la liste à exporter</span>
 
-                            <select name="export_list" required>
-                                <option value="" disabled selected>Choisir</option>
-                                <?php if (empty($this->category) || $this->category === 'students'): ?>
-                                    <option value="student">Etudiants</option>
-                                <?php endif; ?>
+        <div class="row">
+            <?php
+            if (empty($this->category)) {
+                echo '<div class="file-field input-field"><p>Veuillez sélectionner une catégorie.</p></div>';
+                return;
+            }
+            elseif (!isset($config[$this->category])) {
+                echo '<div class="file-field input-field"><p>Catégorie non reconnue.</p></div>';
+                return;
+            }
 
-                                <?php if (empty($this->category) || $this->category === 'teachers'): ?>
-                                    <option value="teacher">Enseignants</option>
-                                <?php endif; ?>
+            // Récupérer la configuration pour cette catégorie
+            $currentConfig = $config[$this->category];
+            ?>
 
-                                <?php if (empty($this->category) || $this->category === 'internships'): ?>
-                                    <option value="internship">Stages</option>
-                                <?php endif; ?>
-                            </select>
-                        </label>
+            <h3><?php echo $currentConfig['title']; ?></h3>
+
+            <div class="card-panel white export-container">
+                <div class="switch center-align export-item">
+                    <label>
+                        Liste complète
+                        <input type="checkbox" id="export-type-toggle" class="export-toggle">
+                        <span class="lever"></span>
+                        Modèle vide
+                    </label>
+                </div>
+
+                <form action="/dashboard" method="POST" id="export-form" class="export-item">
+                    <input type="hidden" id="export-field" name="export_list" value="<?php echo $currentConfig['table_name']; ?>">
+
+                    <div class="center-align export-item">
+                        <div id="list-info" class="tooltip-container" data-tooltip="Exportation des données complètes dans un fichier CSV">
+                            <p>Vous allez exporter la liste complète des <?php echo $currentConfig['display_name']; ?>.</p>
+                        </div>
+                        <div id="model-info" class="tooltip-container" style="display: none;" data-tooltip="Exportation d'un modèle vide avec uniquement les en-têtes de colonnes">
+                            <p>Vous allez exporter un modèle vide pour <?php echo $currentConfig['display_name']; ?>.</p>
+                        </div>
                     </div>
-                    <div class="input-field">
-                        <button class="btn waves-effect waves-light"
-                                type="submit">Exporter
-                            <i class="material-icons right">send</i>
-                        </button>
-                    </div>
-                </form>
-            </div>
 
-            <!--Exportation des modèles des tables-->
-            <div class="card-panel white">
-                <div class="tooltip-container" data-tooltip=
-                "Exportation d'un modèle d'une liste choisie dans un fichier
-                    .csv (Pour avoir seulement le nom des colonnes)">(?)</div>
-                <h2>Exporter un modèle:</h2>
-                <form action="/dashboard" method="POST">
-                    <div>
-                        <label>
-                            <span>Choisissez le modèle à exporter</span>
-                            <select name="export_model" required>
-                                <option disabled selected>Choisir</option>
-                                <?php if (empty($this->category) || $this->category === 'students'): ?>
-                                    <option value="student">Etudiants</option>
-                                <?php endif; ?>
-
-                                <?php if (empty($this->category) || $this->category === 'teachers'): ?>
-                                    <option value="teacher">Enseignants</option>
-                                <?php endif; ?>
-
-                                <?php if (empty($this->category) || $this->category === 'internships'): ?>
-                                    <option value="internship">Stages</option>
-                                <?php endif; ?>
-                            </select>
-                        </label>
-                    </div>
-                    <div class="input-field">
-                        <button class="btn waves-effect waves-light"
-                                type="submit">Exporter
+                    <div class="input-field center-align export-item">
+                        <button class="btn waves-effect waves-light" type="submit">
+                            Exporter
                             <i class="material-icons right">send</i>
                         </button>
                     </div>

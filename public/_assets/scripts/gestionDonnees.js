@@ -277,3 +277,78 @@ simpleAdvancedToggle.addEventListener('change', updateModeText);
 
 // Initialiser le texte au chargement
 updateModeText();
+
+// Export
+// Gestion du toggle d'exportation (liste vs modèle)
+function setupExportToggle() {
+    const toggle = document.getElementById('export-type-toggle');
+    if (!toggle) return;
+
+    const exportField = document.getElementById('export-field');
+    const listInfo = document.getElementById('list-info');
+    const modelInfo = document.getElementById('model-info');
+
+    // État initial
+    if (toggle.checked) {
+        exportField.name = 'export_model';
+        listInfo.style.display = 'none';
+        modelInfo.style.display = 'block';
+    } else {
+        exportField.name = 'export_list';
+        listInfo.style.display = 'block';
+        modelInfo.style.display = 'none';
+    }
+
+    // Gestion du changement
+    toggle.addEventListener('change', function() {
+        if (this.checked) {
+            // Mode modèle
+            exportField.name = 'export_model';
+            listInfo.style.display = 'none';
+            modelInfo.style.display = 'block';
+        } else {
+            // Mode liste
+            exportField.name = 'export_list';
+            listInfo.style.display = 'block';
+            modelInfo.style.display = 'none';
+        }
+    });
+}
+
+// Modification de la fonction loadContent pour initialiser les toggles après chargement
+async function loadContent(type, category = '') {
+    try {
+        const response = await fetch(`/api/${type}?category=${category}`);
+
+        if (!response.ok) {
+            throw new Error(`Impossible de charger le contenu ${type}, erreur: ${response.status}`);
+        }
+
+        const html = await response.text();
+
+        if (type === 'import') {
+            importContent.innerHTML = html;
+            importContent.style.display = 'block';
+            exportContent.style.display = 'none';
+        } else {
+            exportContent.innerHTML = html;
+            exportContent.style.display = 'block';
+            importContent.style.display = 'none';
+            setupExportToggle(); // Initialiser le toggle d'export après chargement
+        }
+
+        updateSelectOptions();
+        initTooltips();
+    } catch (error) {
+        console.error(`Error loading content: ${error.message}`);
+        const errorMessage = `<div class="error-message card-panel red lighten-4">
+            <p>Une erreur s'est produite lors du chargement du contenu. Veuillez réessayer.</p>
+        </div>`;
+
+        if (type === 'import') {
+            importContent.innerHTML = errorMessage;
+        } else {
+            exportContent.innerHTML = errorMessage;
+        }
+    }
+}
