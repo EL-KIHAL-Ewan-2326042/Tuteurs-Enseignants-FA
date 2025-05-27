@@ -31,7 +31,7 @@
 
 
 * {
-    font-family: var(--main-family);
+    font-family: var(--main-family), sans-serif;
     padding: 0;
     margin: 0;
 }
