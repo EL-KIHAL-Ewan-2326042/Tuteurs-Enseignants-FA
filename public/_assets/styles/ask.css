@@ -9,6 +9,7 @@ main > div {
     width: 100%;
     min-height: 80vh;
     display: flex;
+    padding: 1rem;
     gap: 2rem;
     justify-content: space-around;
 
@@ -16,6 +17,7 @@ main > div {
 main >div > section:first-child {
     max-width: 55%;
     max-height: 100%;
+    overflow: auto;
 }
 main > div > section:first-child form {
     width: 100%;
@@ -24,7 +26,8 @@ main > div > section:first-child form {
 #map {
     box-shadow: rgba(14, 30, 37, 0.12) 0px 2px 4px 0px, rgba(14, 30, 37, 0.32) 0px 2px 16px 0px;
     border-radius: .4rem;
-    width: 35%;
+    width: 100%;
+    height: 100%;
     background-color: var(--couleur-bleu-roi);
 }
 
@@ -45,7 +48,18 @@ main > div > section:first-child form {
     filter: hue-rotate(60deg) saturate(300%);
 }
 
+main > div > div {
+    position: relative;
+    width: 35%;
+    max-height: 80vh;
+}
 
+#toggleViewBtn {
+    z-index: 100000000000000000000;
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+}
 @media screen and (max-width: 850px) {
 
 

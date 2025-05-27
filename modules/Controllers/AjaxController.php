@@ -23,7 +23,7 @@ class AjaxController
      *
      * @return void
      */
-    #[NoReturn] public function handleDataTable(string $type): void
+    #[NoReturn] public function handleDataTable(string $type, ?string $id = null): void
     {
         // Vérifier l'authentification
         if (!isset($_SESSION['identifier'])) {
@@ -33,6 +33,7 @@ class AjaxController
 
         $db = Database::getInstance();
         $teacherModel = new Teacher($db);
+        $internshipModel = new Internship($db);
 
         $draw = isset($_POST['draw']) ? intval($_POST['draw']) : 1;
         $start = isset($_POST['start']) ? intval($_POST['start']) : 0;
@@ -83,6 +84,14 @@ class AjaxController
                     $order
                 );
                 break;
+            case 'stage':
+                $result = $internshipModel->paginateStage(
+                    $id,
+                    $start,
+                    $length,
+                    $search,
+                    $order
+                );
 
         }
 

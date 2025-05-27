@@ -797,4 +797,58 @@ class Model
 
         exit();
     }
+    private function paginateGeneric(
+        string $identifier,
+        int $start,
+        int $length,
+        string $search,
+        array $order,
+        array $columns,
+        string $baseCountQuery,
+        string $baseDataQuery,
+        array $bindings = []
+    ): array {
+        $searchParam = '%' . $search . '%';
+
+        // Prepare COUNT query
+        if (!empty($search)) {
+            $baseCountQuery .= ' AND (' . implode(' OR ', array_map(fn($col) => "$col ILIKE :search", $bindings['searchable'])) . ')';
+        }
+        $countStmt = $this->_db->getConn()->prepare($baseCountQuery);
+        $countStmt->bindValue(':identifier', $identifier);
+        if (!empty($search)) {
+            $countStmt->bindValue(':search', $searchParam);
+        }
+        $countStmt->execute();
+        $total = (int)$countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+        // Prepare DATA query
+        if (!empty($search)) {
+            $baseDataQuery .= ' AND (' . implode(' OR ', array_map(fn($col) => "$col ILIKE :search", $bindings['searchable'])) . ')';
+        }
+        if (!empty($order) && isset($order['column']) && isset($columns[$order['column']])) {
+            $colName = $columns[$order['column']];
+            $dir = strtoupper($order['dir']) === 'DESC' ? 'DESC' : 'ASC';
+            $baseDataQuery .= " ORDER BY $colName $dir";
+        } else {
+            $baseDataQuery .= ' ORDER BY s.student_name ASC';
+        }
+        $baseDataQuery .= ' LIMIT :limit OFFSET :offset';
+
+        $dataStmt = $this->_db->getConn()->prepare($baseDataQuery);
+        $dataStmt->bindValue(':identifier', $identifier);
+        if (!empty($search)) {
+            $dataStmt->bindValue(':search', $searchParam);
+        }
+        $dataStmt->bindValue(':limit', $length, PDO::PARAM_INT);
+        $dataStmt->bindValue(':offset', $start, PDO::PARAM_INT);
+        $dataStmt->execute();
+        $results = $dataStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return [
+            'data' => $results,
+            'total' => $total
+        ];
+    }
+
 }

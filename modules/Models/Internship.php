@@ -966,4 +966,127 @@ class Internship extends Model
         // Retourne True si un enregistrement existe, False sinon
         return $stmt->fetchColumn() > 0;
     }
+
+    public function paginateStage(
+        string $identifier,
+        int $start,
+        int $length,
+        string $search = '',
+        array $order = []
+    ): array {
+        $columns = [
+            'prof',
+            'history',
+            'distance',
+            'discipline',
+            'score',
+            'entreprise',
+        ];
+
+        // Requête pour compter le total, avec le même filtre que la requête principale
+        $countQuery = "
+    WITH cte_histo AS (
+        SELECT id_teacher, array_agg(start_date_internship ORDER BY id_teacher) AS history
+        FROM internship
+        WHERE end_date_internship < NOW()
+        GROUP BY id_teacher
+    )
+    SELECT COUNT(DISTINCT i.internship_identifier) as total
+    FROM internship i
+    JOIN teacher t ON TRUE
+    LEFT JOIN cte_histo h ON t.id_teacher = h.id_teacher
+    LEFT JOIN is_taught it ON t.id_teacher = it.id_teacher
+    LEFT JOIN LATERAL (
+        SELECT distance
+        FROM distance d2
+        WHERE d2.id_teacher = t.id_teacher
+          AND d2.internship_identifier = i.internship_identifier
+        ORDER BY distance ASC
+        LIMIT 1
+    ) d ON TRUE
+    WHERE i.internship_identifier = :identifier";
+
+        if (!empty($search)) {
+            $countQuery .= ' AND (
+            CONCAT(t.teacher_firstname, \' \', t.teacher_name) ILIKE :search OR
+            it.discipline_name ILIKE :search OR
+            i.company_name ILIKE :search
+        )';
+        }
+
+        $countStmt = $this->_db->getConn()->prepare($countQuery);
+        $countStmt->bindValue(':identifier', $identifier);
+        if (!empty($search)) {
+            $searchParam = '%' . $search . '%';
+            $countStmt->bindValue(':search', $searchParam);
+        }
+        $countStmt->execute();
+        $total = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+        // Requête principale pour récupérer les données paginées
+        $dataQuery = "
+    WITH cte_histo AS (
+        SELECT id_teacher, array_agg(start_date_internship ORDER BY id_teacher) AS history
+        FROM internship
+        WHERE end_date_internship < NOW()
+        GROUP BY id_teacher
+    )
+    SELECT DISTINCT
+        CONCAT(t.teacher_firstname, ' ', t.teacher_name) AS prof,
+        h.history,
+        d.distance AS distance,
+        it.discipline_name AS discipline,
+        i.relevance_score AS score,
+        i.company_name AS entreprise,
+        i.student_number
+    FROM internship i
+    JOIN teacher t ON TRUE
+    LEFT JOIN cte_histo h ON t.id_teacher = h.id_teacher
+    LEFT JOIN is_taught it ON t.id_teacher = it.id_teacher
+    LEFT JOIN LATERAL (
+        SELECT distance
+        FROM distance d2
+        WHERE d2.id_teacher = t.id_teacher
+          AND d2.internship_identifier = i.internship_identifier
+        ORDER BY distance ASC
+        LIMIT 1
+    ) d ON TRUE
+    WHERE i.internship_identifier = :identifier";
+
+        if (!empty($search)) {
+            $dataQuery .= ' AND (
+            CONCAT(t.teacher_firstname, \' \', t.teacher_name) ILIKE :search OR
+            it.discipline_name ILIKE :search OR
+            i.company_name ILIKE :search
+        )';
+        }
+
+        if (!empty($order) && isset($order['column']) &&
+            isset($columns[$order['column']]) && $columns[$order['column']] !== null) {
+            $dataQuery .= ' ORDER BY ' . $columns[$order['column']] . ' '
+                . (strtoupper($order['dir']) === 'DESC' ? 'DESC' : 'ASC');
+        } else {
+            $dataQuery .= ' ORDER BY prof ASC';
+        }
+
+        $dataQuery .= ' LIMIT :limit OFFSET :offset';
+
+        $dataStmt = $this->_db->getConn()->prepare($dataQuery);
+        $dataStmt->bindValue(':identifier', $identifier);
+        if (!empty($search)) {
+            $dataStmt->bindValue(':search', $searchParam);
+        }
+        $dataStmt->bindValue(':limit', $length, PDO::PARAM_INT);
+        $dataStmt->bindValue(':offset', $start, PDO::PARAM_INT);
+        $dataStmt->execute();
+
+        $results = $dataStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        return [
+            'data' => $results,
+            'total' => (int)$total
+        ];
+    }
+
+
 }

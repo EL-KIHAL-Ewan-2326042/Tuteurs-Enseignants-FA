@@ -415,7 +415,8 @@ class Teacher extends Model
             i.company_name AS company,
             i.internship_subject AS subject,
             i.address,
-            d.distance
+            d.distance,
+            i.internship_identifier
         FROM student s
         JOIN internship i ON s.student_number = i.student_number
         LEFT JOIN cte_histo h ON i.id_teacher = h.id_teacher
