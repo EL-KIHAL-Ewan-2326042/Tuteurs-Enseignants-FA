@@ -79,6 +79,19 @@ class Table
                 color: var(--couleur-jaune);
 
             }
+
+            .dt-buttons {
+                display: flex;
+                flex-basis: max-content;
+                flex-flow: row wrap;
+                font-size: 0.95rem;
+            }
+
+            .dt-buttons span {
+                height: 100%;
+            }
+
+
         </style>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
@@ -128,6 +141,7 @@ class Table
                                 buttons: [
                                     {
                                         extend: 'copy',
+                                        text: '<i class="material-icons tiny">content_copy</i> Copier',
                                         exportOptions: {columns: ':visible'}
                                     },
                                     {
@@ -140,11 +154,12 @@ class Table
                                     },
                                     {
                                         extend: 'print',
+                                        text: '<i class="material-icons tiny">print</i> Imprimer',
                                         exportOptions: {columns: ':visible'}
                                     },
                                     'colvis',
                                     {
-                                        text: 'Tout sélectionner',
+                                        text: '<i class="material-icons tiny">select_all</i> <span id="selectText">Tout sélectionner</span>',
                                         attr: {id: 'toggleSelectBtn', class: 'dt-button toggle-select-btn'},
                                         action: function () {
                                             let table = $('#<?= $id ?>').DataTable();
