@@ -113,7 +113,7 @@ class Table
                             buttons: {
                                 copy: 'Copier',
                                 print: 'Imprimer',
-                                colvis: "Visibilité colonnes",
+                                colvis: "Afficher / masquer",
                                 colvisRestore: "Rétablir visibilité",
                             },
                             emptyTable: "Aucune donnée disponible dans le tableau",
