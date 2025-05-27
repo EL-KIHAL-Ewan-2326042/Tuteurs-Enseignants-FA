@@ -153,7 +153,7 @@ class Account
                     <div class="fs8">
                         <div>
                             <div class="df ac g1">
-                                <i class="material-icons left tiny">supervisor_account</i><span>Roles:</span>
+                                <i class="material-icons left tiny">supervisor_account</i><span>Rôles:</span>
                             </div>
 
                             <ul class="df ac g1">
@@ -232,7 +232,8 @@ class Account
                                 </div>
                         <button type="submit"
                                         name="newMaxSubmitted"
-                                        value="1">
+                                        value="1"
+                                        id="save-changes">
                                     Enregistrer les modifications
                         </button>
                     </form>
