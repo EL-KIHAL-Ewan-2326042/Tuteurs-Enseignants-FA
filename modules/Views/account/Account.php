@@ -172,7 +172,7 @@ class Account
 
                             <ul>
                                 <?php foreach ($_SESSION['address'] as $addr): ?>
-                                    <li class="fs8"><?= htmlspecialchars($addr['address']) ?></li>
+                                    <li class="fs8"><a target="_blank" href="https://www.google.com/maps/search/?api=1&query=<?= urlencode($addr['address']) ?>"> <?= htmlspecialchars($addr['address']) ?></a></li>
                                 <?php endforeach; ?>
                             </ul>
                         </div>
