@@ -37,7 +37,6 @@ function initDataTable(id, ajaxUrl, columns) {
         },
         columns: columns,
         select: {
-            style: 'multi',
             items: 'row'
         },
         lengthMenu: [10, 20, 50, 100],

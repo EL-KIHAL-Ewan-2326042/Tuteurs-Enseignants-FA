@@ -120,4 +120,6 @@ class AjaxController
         echo json_encode($data);
         exit();
     }
+
+
 }

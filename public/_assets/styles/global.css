@@ -40,7 +40,9 @@ a, li {
     list-style: none;
     text-decoration: none;
 }
-
+.fdc {
+    flex-direction: column;
+}
 .df {
     display: flex;
 }

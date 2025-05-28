@@ -134,7 +134,36 @@ class Dashboard
 
                 </div>
             </div>
-
+            <form class="col card-panel white z-depth-3 s10 m5 l5"
+                  style="padding: 20px;" action="./dispatcher"
+                  method="post" id="associate-form">
+                <div class="row">
+                    <p class="text">Associe un enseignant à un stage
+                        (ne prend pas en compte le nombre maximum d'étudiant,
+                        mais le fait que le stage soit déjà attribué)</p>
+                    <div class="input-field col s6">
+                        <input id="searchTeacher" name="searchTeacher"
+                               type="text" class="validate">
+                        <label for="searchTeacher">Enseignant</label>
+                    </div>
+                    <div class="input-field col s6">
+                        <input id="searchInternship" name="searchInternship"
+                               type="text" class="validate">
+                        <label for="searchInternship">Stage</label>
+                    </div>
+                    <div id="searchResults"></div>
+                    <div class="col s12">
+                        <button
+                                type="submit" name="action"
+                                data-position="top"
+                                data-tooltip="Valider l'association">
+                            Associer
+                            <i class=
+                               "material-icons right">arrow_downward</i>
+                        </button>
+                    </div>
+                </div>
+            </form>
             <p class="message"><?php echo $this->message; ?></p>
             <p class="errorMessage"><?php echo $this->errorMessage; ?></p>
 
