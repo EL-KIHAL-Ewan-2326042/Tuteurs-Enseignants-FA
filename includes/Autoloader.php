@@ -60,7 +60,7 @@ class Autoloader
         $baseDir = __DIR__ . '/../modules/';
 
         if ($class === 'includes\Database') {
-            include __DIR__ . '/Database.php';
+            include_once __DIR__ . '/Database.php';
             return;
         }
 
@@ -77,9 +77,9 @@ class Autoloader
         }
 
         if (file_exists($file)) {
-            include $file;
+            include_once $file;
         } else {
-            include __DIR__ . '/../modules/Controllers/Error404.php';
+            include_once __DIR__ . '/../modules/Controllers/Error404.php';
         }
     }
 }

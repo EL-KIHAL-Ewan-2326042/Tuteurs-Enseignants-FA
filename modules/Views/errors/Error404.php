@@ -1,22 +1,4 @@
 <?php
-/**
- * Fichier contenant la vue de la page 'Erreur 404'
- * apparaissant quand la page recherchée est introuvable
- *
- * PHP version 8.3
- *
- * @category View
- * @package  TutorMap/modules/Views/error404
- *
- * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
- * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
- * @author Kerbadou Islem <islem.kerbadou@etu.univ-amu.fr>
- * @author Pellet Casimir <casimir.pellet@etu.univ-amu.fr>
- *
- * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
- * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
- */
-
 namespace Blog\Views\errors;
 
 /**
