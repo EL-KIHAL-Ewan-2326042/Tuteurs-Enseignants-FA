@@ -160,6 +160,11 @@ $router->get('/api/viewStage/([A-Za-z0-9]+)', function () {
     \Blog\Views\components\ViewStage::render(basename($_SERVER['REQUEST_URI']));
 });
 
+$router->post('/api/dispatch-list', function () {
+    (new \Blog\Controllers\AjaxController())->getDispatchList();
+});
+
+
 
 $router->get('/api/import', function() {
     $category = $_GET['category'] ?? '';

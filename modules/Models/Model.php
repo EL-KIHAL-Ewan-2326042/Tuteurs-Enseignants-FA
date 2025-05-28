@@ -110,7 +110,43 @@ class Model
 
         return (int)$duration;
     }
+    public function getDispatchList(): void
+    {
+        header('Content-Type: application/json');
 
+        $dictCoef = $_SESSION['last_dict_coef'] ?? [];
+        if (empty($dictCoef)) {
+            echo json_encode(['data' => []]);
+            exit();
+        }
+
+        $resultDispatchList = $this->internshipModel
+            ->dispatcher(
+                $this->departmentModel,
+                $this->teacherModel,
+                $dictCoef
+            )[0];
+
+        $data = [];
+        foreach ($resultDispatchList as $item) {
+            $checkboxValue = $item['id_teacher'] . '$' . $item['internship_identifier'] . '$' . $item['score'];
+            $companyName = $item['company_name'];
+
+            $data[] = [
+                'teacher' => $item['teacher_firstname'] . ' ' . $item['teacher_name'] . ' (' . $item['id_teacher'] . ')',
+                'student' => $item['student_firstname'] . ' ' . $item['student_name'] . ' (' . $item['student_number'] . ')',
+                'internship' => $companyName . ' (' . $item['internship_identifier'] . ')',
+                'formation' => $item['formation'],
+                'group' => $item['class_group'],
+                'subject' => $item['internship_subject'],
+                'address' => $item['address'],
+                'score' => $item['score'],
+                'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . htmlspecialchars($checkboxValue) . '">'
+            ];
+        }
+
+        echo json_encode(['data' => $data]);
+    }
     public function calculateRelevanceTeacherStudentsAssociate(array $teacher, array $dictCoef, array $internship): array
     {
         $identifier = $teacher['id_teacher'];

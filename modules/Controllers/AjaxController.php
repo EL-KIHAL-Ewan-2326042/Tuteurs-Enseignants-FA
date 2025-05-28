@@ -18,6 +18,48 @@ use JetBrains\PhpStorm\NoReturn;
 
 class AjaxController
 {
+    public function getDispatchList(): void
+    {
+        header('Content-Type: application/json');
+
+        $db = Database::getInstance();
+        $teacherModel = new Teacher($db);
+        $internshipModel = new Internship($db);
+        $departmentModel = new Department($db);
+        $dictCoef = $_SESSION['last_dict_coef'] ?? [];
+        if (empty($dictCoef)) {
+            echo json_encode(['data' => []]);
+            exit();
+        }
+
+        $resultDispatchList = $internshipModel
+            ->dispatcher(
+                $departmentModel,
+                $teacherModel,
+                $dictCoef
+            )[0];
+
+        $data = [];
+        foreach ($resultDispatchList as $item) {
+            $checkboxValue = $item['id_teacher'] . '$' . $item['internship_identifier'] . '$' . $item['score'];
+            $companyName = $item['company_name'];
+
+            $data[] = [
+                'teacher' => $item['teacher_firstname'] . ' ' . $item['teacher_name'] . ' (' . $item['id_teacher'] . ')',
+                'student' => $item['student_firstname'] . ' ' . $item['student_name'] . ' (' . $item['student_number'] . ')',
+                'internship' => $companyName . ' (' . $item['internship_identifier'] . ')',
+                'formation' => $item['formation'],
+                'group' => $item['class_group'],
+                'subject' => $item['internship_subject'],
+                'address' => $item['address'],
+                'score' => $item['score'],
+                'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . htmlspecialchars($checkboxValue) . '">'
+            ];
+        }
+
+        echo json_encode(['data' => $data]);
+    }
+
     /**
      * Traite les requêtes AJAX pour les tableaux DataTables
      *
@@ -34,6 +76,8 @@ class AjaxController
         $db = Database::getInstance();
         $teacherModel = new Teacher($db);
         $internshipModel = new Internship($db);
+        $departmentModel = new Department($db);
+
 
         $draw = isset($_POST['draw']) ? intval($_POST['draw']) : 1;
         $start = isset($_POST['start']) ? intval($_POST['start']) : 0;
@@ -92,6 +136,11 @@ class AjaxController
                     $search,
                     $order
                 );
+                break;
+
+
+
+
 
         }
 
@@ -120,6 +169,9 @@ class AjaxController
         echo json_encode($data);
         exit();
     }
+
+
+
 
 
 }

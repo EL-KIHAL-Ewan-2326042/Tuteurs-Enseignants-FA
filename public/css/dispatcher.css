@@ -1,0 +1,53 @@
+.map-container {
+    height: 500px;
+    width: 100%;
+    margin: 20px 0;
+}
+
+#map {
+    height: 100%;
+    width: 100%;
+}
+
+.legend-color-box {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.legend-color-box.red { background-color: #f44336; }
+.legend-color-box.blue { background-color: #2196F3; }
+.legend-color-box.yellow { background-color: #ffeb3b; }
+
+.legend-line-box {
+    display: inline-block;
+    width: 20px;
+    height: 2px;
+    background-color: #000;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.dataTables_wrapper {
+    padding: 20px;
+}
+
+.custom-marker-icon {
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
+}
+
+.custom-marker-icon.teacher {
+    background-color: #f44336;
+}
+
+.custom-marker-icon.company {
+    background-color: #ffeb3b;
+}
+
+.custom-marker-icon.other-teacher {
+    background-color: #2196F3;
+} 

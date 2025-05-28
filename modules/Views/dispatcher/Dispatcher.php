@@ -1,73 +1,19 @@
 <?php
-/**
- * Fichier contenant la vue de la page 'Répartiteur'
- *
- * PHP version 8.3
- *
- * @category View
- * @package  TutorMap/modules/Views/dispatcher
- *
- * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
- * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
- * @author Kerbadou Islem <islem.kerbadou@etu.univ-amu.fr>
- * @author Pellet Casimir <casimir.pellet@etu.univ-amu.fr>
- *
- * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
- * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
- */
 
 namespace Blog\Views\dispatcher;
 
-use Blog\Models\Department;
-use Blog\Models\Internship;
-use Blog\Models\Teacher;
-use Blog\Models\User;
 use Blog\Views\components\CoefBackup;
+use Blog\Views\components\Table;
+use Blog\Views\components\ViewStage;
+use Blog\Models\Internship;
 
-/**
- * Classe gérant l'affichage de la page 'Répartiteur'
- *
- * PHP version 8.3
- *
- * @category View
- * @package  TutorMap/modules/Views/dispatcher
- *
- * @author Alvares Titouan <titouan.alvares@etu.univ-amu.fr>
- * @author Avias Daphné <daphne.avias@etu.univ-amu.fr>
- * @author Kerbadou Islem <islem.kerbadou@etu.univ-amu.fr>
- * @author Pellet Casimir <casimir.pellet@etu.univ-amu.fr>
- *
- * @license MIT License https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants/blob/main/LICENSE
- * @link    https://github.com/AVIAS-Daphne-2326010/Tuteurs-Enseignants
- */
 class Dispatcher
 {
-
-    /**
-     * Initialise les attributs passés en paramètre
-     *
-     * @param Internship $internshipModel         Instance de la classe Internship
-     *                                            servant de modèle
-     * @param User       $userModel               Instance de la classe User
-     *                                            servant de modèle
-     * @param Teacher    $teacherModel            Instance de la classe Teacher
-     *                                            servant de modèle
-     * @param Department $departmentModel         Instance de la classe Department
-     *                                            servant de modèle
-     * @param string     $errorMessageAfterSort   Message d'erreur s'affichant quand
-     *                                            la répartition n'a pas fonctionné
-     * @param string     $errorMessageDirectAssoc Message d'erreur s'affichant quand
-     *                                            l'association n'a pas fonctionné
-     * @param string     $checkMessageDirectAssoc Message s'affichant quand
-     *                                            la répartition a fonctionné
-     * @param string     $checkMessageAfterSort   Message s'affichant quand
-     *                                            l'association a fonctionné
-     */
     public function __construct(
         private Internship $internshipModel,
-        private User $userModel,
-        private Teacher $teacherModel,
-        private Department $departmentModel,
+        private $userModel,
+        private $teacherModel,
+        private $departmentModel,
         private string $errorMessageAfterSort,
         private string $errorMessageDirectAssoc,
         private string $checkMessageDirectAssoc,
@@ -75,24 +21,135 @@ class Dispatcher
     ) {
     }
 
-    /**
-     * Affiche la page 'Répartiteur'
-     *
-     * @return void
-     */
     public function showView(): void
     {
         ?>
         <main>
             <?php
-        if (!isset($_POST['action']) || $_POST['action'] !== 'generate') : CoefBackup::render($this->userModel, $this->errorMessageAfterSort, $this->checkMessageAfterSort); ?>
+            if (($_POST['action'] ?? '') !== 'generate') {
+                // Affichage du formulaire
+                CoefBackup::render(
+                    $this->userModel,
+                    $this->errorMessageAfterSort,
+                    $this->checkMessageAfterSort
+                );
+            } if (isset($_POST['coef']) && isset($_POST['action'])
+            && $_POST['action'] === 'generate'
+        ) : ?>
+        <div class="center">
 
-              <?php endif ?>
+            <div id="map" class="map-container" style="position: relative;">
+                <div id="map-loading-overlay" style="display: none;">
+                    <div class="loading-message">Mise à jour de la map...</div>
+                    <div class="progress">
+                        <div class="indeterminate"></div>
+                    </div>
+                </div>
+            </div>
 
-        </main>
+            <div class="card-container">
+                <div class="card-panel white z-depth-1 dispatcher-legend-card">
+                    <h6 class="flow-text
+                    dispatcher-legend-title">Légende de la carte</h6>
+                    <ul class="browser-default dispatcher-legend-list">
+                        <li><span class="legend-color-box
+                        red"></span> Enseignant sélectionné:
+                        Peut être changé lors d'un clique sur une colonne</li>
+                        <li><span class="legend-color-box
+                        blue"></span> Autres enseignants: comprend seulement
+                        ceux du même département que celui de l'élève</li>
+                        <li><span class="legend-color-box
+                        yellow"></span> Entreprise: l'entreprise de
+                            l'élève selectionné</li>
+                        <li>
+                            <span class="legend-line-box"></span
+                            > Distance entre l'enseignant et l'entreprise
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="card-panel white z-depth-1 dispatcher-info-card">
+                    <h6 class="flow-text
+dispatcher-info-title">Informations</h6>
+                    <p class="dispatcher-info-text">
+                        <i class="material-icons
+    left tiny">mouse</i
+                        > Cliquez sur une ligne du tableau
+                        pour afficher la vue étudiante et
+                        les informations
+                        de l'étudiant sur la carte.
+                    </p>
+                    <p class="dispatcher-info-text">
+                        <i class="material-icons left
+                        tiny">sort</i> Vous pouvez trier le tableau
+                        en cliquant sur le titre d'une colonne.
+                    </p>
+                    <p class="dispatcher-info-text">
+                        <i class="material-icons
+                        left tiny">settings</i> Critères et coefficients
+                        utilisés pour la répartition :
+                        <?php
+                        $dictCoef = array_filter(
+                            $_POST['coef'], function ($coef, $key) {
+                                return isset($_POST['criteria_on'][$key]);
+                            }, ARRAY_FILTER_USE_BOTH
+                        );
+                        ?>
+                        <?php if (!empty($dictCoef)) : ?>
+                    <ul>
+                            <?php foreach ($dictCoef as $name => $coef): ?>
+                            <li><strong>
+                                <?php echo $name; ?>
+                                </strong> : <?php echo $coef; ?></li>
+                            <?php endforeach; ?>
+                    </ul>
+                    <?php else: ?>
+                        Aucun critère sélectionné.
+                    <?php endif; ?>
+                    </p>
+                </div>
+            </div>
+
+        <form action="./dispatcher" method="post">
+            <?php
+            // Sauvegarde dans la session pour l'API
+            $_SESSION['last_dict_coef'] = array_filter($_POST['coef'], function ($coef, $key) {
+                return isset($_POST['criteria_on'][$key]);
+            }, ARRAY_FILTER_USE_BOTH);
+
+            Table::render(
+                'dispatch-table',
+                ['Enseignant', 'Etudiant', 'Stage', 'Formation', 'Groupe', 'Sujet', 'Adresse', 'Score', 'Associer'],
+                [
+                    ['data' => 'teacher'],
+                    ['data' => 'student'],
+                    ['data' => 'internship'],
+                    ['data' => 'formation'],
+                    ['data' => 'group'],
+                    ['data' => 'subject'],
+                    ['data' => 'address'],
+                    ['data' => 'score'],
+                    ['data' => 'associate']
+                ],
+                '/api/dispatch-list'
+            );
+            ?>
+            <br>
+            <button type="submit" name="selecInternshipSubmitted" value="1" class="btn">Valider</button>
+        </form>
+
+    <?php endif; ?>
+
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var tooltips = document.querySelectorAll('.tooltipped');
+                M.Tooltip.init(tooltips);
+            })
+        </script>
         <?php
-    }
 
+    }
     /**
      * Renvoie les éléments HTML correspondant à l'affichage
      * en étoiles du score passé en paramètre
