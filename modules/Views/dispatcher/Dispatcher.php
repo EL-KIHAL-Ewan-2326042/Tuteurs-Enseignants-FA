@@ -94,6 +94,9 @@ class Dispatcher
                     #toggleViewBtn {
                         z-index: 1000; position: absolute; bottom: 1rem; left: 1rem;
                     }
+                    .marker-red { filter: hue-rotate(0deg) saturate(2) brightness(1.2); }
+                    .marker-yellow { filter: hue-rotate(60deg) saturate(1.5) brightness(1.1); }
+                    .marker-blue { filter: hue-rotate(220deg) saturate(1.3) brightness(1); }
                 </style>
 
                 <script>
@@ -139,16 +142,20 @@ class Dispatcher
                                 className: cls
                             });
                         }
-                        const yellowIcon = icon('marker-yellow'), blueIcon = icon('marker-blue');
+                        const redIcon = icon('marker-red');
+                        const yellowIcon = icon('marker-yellow');
+                        const blueIcon = icon('marker-blue');
 
                         // ==================== Markers ====================
                         function clearMarkers() {
-                            markers.forEach(m => { if (m !== teacherMarker) map.removeLayer(m); });
-                            markers = teacherMarker ? [teacherMarker] : [];
+                            markers.forEach(m => map.removeLayer(m));
+                            markers = [];
+                            teacherMarker = null;
                         }
                         function addMarker(coord, label, icn) {
                             const m = L.marker(coord, { icon: icn }).addTo(map).bindPopup(label);
                             markers.push(m);
+                            return m;
                         }
 
                         // ==================== Teacher Position (if provided) ====================
@@ -157,13 +164,94 @@ class Dispatcher
                             if (addr) {
                                 teacherCoord = await geocode(addr);
                                 if (teacherCoord) {
-                                    teacherMarker = L.marker(teacherCoord, { icon: yellowIcon })
-                                        .addTo(map).bindPopup('Votre position');
-                                    markers.push(teacherMarker);
+                                    teacherMarker = addMarker(teacherCoord, 'Votre position', redIcon);
                                     map.setView(teacherCoord, 13);
                                 }
                             }
                         })();
+
+                        // ==================== Stage View Teacher Markers ====================
+                        async function displayStageTeachers(internshipId) {
+                            try {
+                                // Récupérer les données des professeurs pour ce stage via la DataTable
+                                const stageTable = $('#viewStage').DataTable();
+
+                                // Vérifier si la DataTable existe et a des données
+                                if (!stageTable || !stageTable.data()) {
+                                    console.log('DataTable non initialisée, tentative de récupération directe des données');
+                                    // Fallback : récupérer directement via l'API
+                                    const response = await fetch(`/api/datatable/stage/${internshipId}`);
+                                    const data = await response.json();
+                                    await processTeachersData(data.data || []);
+                                    return;
+                                }
+
+                                // Récupérer les données de la DataTable
+                                const teachers = stageTable.data().toArray().slice(0, 10);
+                                await processTeachersData(teachers);
+
+                            } catch (error) {
+                                console.error('Erreur lors du chargement des données des professeurs:', error);
+                            }
+                        }
+
+                        async function processTeachersData(teachers) {
+                            if (!teachers || teachers.length === 0) return;
+
+                            const bounds = [];
+
+                            // Calculer le score maximum
+                            const scores = teachers.map(t => parseFloat(t.score) || 0);
+                            const maxScore = Math.max(...scores);
+                            const hasUniqueMaxScore = scores.filter(s => s === maxScore).length === 1;
+
+                            // Ajouter les markers des professeurs
+                            for (const teacher of teachers) {
+                                if (!teacher.prof) continue;
+
+                                // Extraire les informations du professeur
+                                let teacherName = teacher.prof;
+                                let teacherAddress = '';
+
+                                // Si le format contient une adresse après " - "
+                                if (teacher.prof.includes(' - ')) {
+                                    const parts = teacher.prof.split(' - ');
+                                    teacherName = parts[0];
+                                    teacherAddress = parts[1];
+                                } else {
+                                    // Utiliser une adresse par défaut ou chercher dans d'autres champs
+                                    teacherAddress = teacher.address || teacher.prof;
+                                }
+
+                                if (!teacherAddress) continue;
+
+                                const coord = await geocode(teacherAddress);
+                                if (coord) {
+                                    bounds.push(coord);
+
+                                    // Déterminer la couleur du marker
+                                    let markerIcon = blueIcon; // Couleur par défaut
+                                    let label = `${teacherName}<br>Score: ${teacher.score || 'N/A'}`;
+
+                                    // Vérifier si c'est le professeur avec le meilleur score
+                                    const teacherScore = parseFloat(teacher.score) || 0;
+                                    if (hasUniqueMaxScore && teacherScore === maxScore) {
+                                        markerIcon = yellowIcon;
+                                        label += '<br><strong>Meilleur score</strong>';
+                                    }
+
+                                    addMarker(coord, label, markerIcon);
+                                }
+                            }
+
+                            // Inclure la position du professeur connecté dans les bounds
+                            if (teacherCoord) bounds.push(teacherCoord);
+
+                            // Ajuster la vue pour inclure tous les markers
+                            if (bounds.length > 0) {
+                                map.fitBounds(bounds, { padding: [50, 50] });
+                            }
+                        }
 
                         // ==================== DataTable Interaction ====================
                         const table = $('#dispatch-table').DataTable();
@@ -171,6 +259,12 @@ class Dispatcher
 
                         table.on('select deselect', async () => {
                             clearMarkers();
+
+                            // Remettre le marker du professeur connecté
+                            if (teacherCoord) {
+                                teacherMarker = addMarker(teacherCoord, 'Votre position', redIcon);
+                            }
+
                             const sel = table.rows({ selected: true }).data().toArray();
                             const bounds = [];
                             for (const row of sel) {
@@ -206,6 +300,8 @@ class Dispatcher
                         if (internshipParam) {
                             toggleBtn.disabled = false;
                             toggleIcon.textContent = 'apps';
+                            // Afficher les markers des professeurs si on est déjà en vue stage
+                            setTimeout(() => displayStageTeachers(internshipParam), 1000);
                         } else {
                             toggleBtn.disabled = true;
                             toggleIcon.textContent = 'assignment_ind';
@@ -255,11 +351,33 @@ class Dispatcher
                                     { data: 'score' },
                                     { data: 'entreprise' }
                                 ];
-                                initDataTable('viewStage', `/api/datatable/stage/${selectedId}`, stageCols);
+
+                                // Effacer les markers existants
+                                clearMarkers();
+                                if (teacherCoord) {
+                                    teacherMarker = addMarker(teacherCoord, 'Votre position', redIcon);
+                                }
 
                                 tableCont.style.display = 'none';
                                 stageCont.style.display = '';
                                 toggleIcon.textContent = 'apps';
+
+                                // Initialiser la DataTable et attendre qu'elle soit prête
+                                const stageTable = initDataTable('viewStage', `/api/datatable/stage/${selectedId}`, stageCols);
+
+                                // Attendre que la DataTable soit complètement chargée
+                                if (stageTable && stageTable.ajax) {
+                                    stageTable.ajax.reload(async () => {
+                                        // Une fois les données chargées, afficher les markers
+                                        await displayStageTeachers(selectedId);
+                                    });
+                                } else {
+                                    // Fallback si initDataTable ne retourne pas l'objet table
+                                    setTimeout(async () => {
+                                        await displayStageTeachers(selectedId);
+                                    }, 1000);
+                                }
+
                             } else {
                                 url.searchParams.delete('internship');
                                 history.replaceState(null, '', url.toString());
@@ -267,6 +385,12 @@ class Dispatcher
                                 stageCont.style.display = 'none';
                                 tableCont.style.display = '';
                                 toggleIcon.textContent = 'assignment_ind';
+
+                                // Revenir à l'affichage normal
+                                clearMarkers();
+                                if (teacherCoord) {
+                                    teacherMarker = addMarker(teacherCoord, 'Votre position', redIcon);
+                                }
                             }
                         });
                     });
