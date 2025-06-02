@@ -12,12 +12,14 @@ namespace Blog\Controllers;
 
 use Blog\Models\Department;
 use Blog\Models\Internship;
+use Blog\Models\Model;
 use Blog\Models\Teacher;
 use includes\Database;
 use JetBrains\PhpStorm\NoReturn;
 
 class AjaxController
 {
+
     public function getDispatchList(): void
     {
         header('Content-Type: application/json');
@@ -40,6 +42,7 @@ class AjaxController
             )[0];
 
         $data = [];
+        $scores = []; // Tableau pour stocker les scores
         foreach ($resultDispatchList as $item) {
             $checkboxValue = $item['id_teacher'] . '$' . $item['internship_identifier'] . '$' . $item['score'];
             $companyName = $item['company_name'];
@@ -53,13 +56,45 @@ class AjaxController
                 'subject' => $item['internship_subject'],
                 'address' => $item['address'],
                 'score' => $item['score'],
-                'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . htmlspecialchars($checkboxValue) . '">'
+                'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . htmlspecialchars($checkboxValue) . '">',
+                'internship_identifier' => $item['internship_identifier']
             ];
+
+            $scores[] = $item['score'];
         }
+
+        $_SESSION['dispatch_scores'] = $scores;
 
         echo json_encode(['data' => $data]);
     }
 
+
+    function renderStars(float $score): string
+    {
+        $fullStars = floor($score);
+
+        $decimalPart = $score - $fullStars;
+
+        $halfStars = ($decimalPart > 0 && $decimalPart < 1) ? 1 : 0;
+
+        $emptyStars = 5 - $fullStars - $halfStars;
+
+        $stars = '';
+
+        for ($i = 0; $i < $fullStars; $i++) {
+            $stars .= '<span class="filled"></span>';
+        }
+
+        if ($halfStars) {
+            $stars .= '<span class="half"></span>';
+        }
+
+        for ($i = 0; $i < $emptyStars; $i++) {
+            $stars .= '<span class="empty"></span>';
+        }
+
+        return $stars;
+    }
     /**
      * Traite les requêtes AJAX pour les tableaux DataTables
      *
@@ -136,6 +171,10 @@ class AjaxController
                     $search,
                     $order
                 );
+                foreach ($result['data'] as &$row) {
+                    // $row['score'] est un float, on appelle renderStars pour générer les étoiles
+                    $row['score'] = $this->renderStars((float)$row['score']);
+                }
                 break;
 
 
@@ -150,6 +189,21 @@ class AjaxController
             'recordsFiltered' => $result['total'],
             'data' => $result['data']
         ]);
+    }
+    public function getViewStage(string $internshipId): void
+    {
+        header('Content-Type: application/json');
+
+        $db = Database::getInstance();
+        $internshipModel = new Internship($db);
+
+        // Récupérer les données de viewStage
+        $viewStageData = $internshipModel->paginateStage($internshipId, 0, 10);
+
+        // Inclure les scores de dispatcher-list
+        $viewStageData['dispatch_scores'] = $_SESSION['dispatch_scores'] ?? [];
+
+        echo json_encode($viewStageData);
     }
 
     /**

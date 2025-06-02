@@ -151,10 +151,10 @@ $router->post('/api/datatable/account', function() {
     (new \Blog\Controllers\AjaxController())->handleDataTable("account");
 });
 $router->get('/api/datatable/stage/([A-Za-z0-9]+)', function() {
-    (new \Blog\Controllers\AjaxController())->handleDataTable("stage", basename($_SERVER['REQUEST_URI']));
+    (new \Blog\Controllers\AjaxController())->getViewStage( basename($_SERVER['REQUEST_URI']));
 });
 $router->post('/api/datatable/stage/([A-Za-z0-9]+)', function() {
-    (new \Blog\Controllers\AjaxController())->handleDataTable("stage", basename($_SERVER['REQUEST_URI']));
+    (new \Blog\Controllers\AjaxController())->getViewStage( basename($_SERVER['REQUEST_URI']));
 });
 $router->get('/api/viewStage/([A-Za-z0-9]+)', function () {
     \Blog\Views\components\ViewStage::render(basename($_SERVER['REQUEST_URI']));

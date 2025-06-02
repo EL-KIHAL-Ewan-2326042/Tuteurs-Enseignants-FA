@@ -115,7 +115,7 @@ class Internship extends Model
     }
 
 
-    public function getDistance(string $internship_identifier, string $id_teacher, bool $bound): int
+    public function getDistance(string $internship_identifier, string $id_teacher, bool $bound = false): int
     {
         if (isset($this->cache['getDistance'][$internship_identifier][$id_teacher])) {
             return $this->cache['getDistance'][$internship_identifier][$id_teacher];
@@ -179,7 +179,6 @@ class Internship extends Model
             $minDuration = 60;
         }
 
-        if (!$bound) {
             $stmt = $conn->prepare(
                 'INSERT INTO Distance (id_teacher, internship_identifier, distance) 
              VALUES (:teacher, :internship, :distance) 
@@ -190,7 +189,6 @@ class Internship extends Model
                 ':internship' => $internship_identifier,
                 ':distance' => $minDuration,
             ]);
-        }
 
         $this->cache['getDistance'][$internship_identifier][$id_teacher] = $minDuration;
 
@@ -679,7 +677,7 @@ class Internship extends Model
         $countStmt->execute();
         $total = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-        $dataQuery = "WITH cte_histo AS (SELECT id_teacher, array_agg(start_date_internship ORDER BY id_teacher) AS history FROM internship WHERE end_date_internship < NOW() GROUP BY id_teacher) SELECT DISTINCT CONCAT(t.teacher_firstname, ' ', t.teacher_name) AS prof, h.history, d.distance AS distance, it.discipline_name AS discipline, i.relevance_score AS score, i.company_name AS entreprise, i.student_number FROM internship i JOIN teacher t ON TRUE LEFT JOIN cte_histo h ON t.id_teacher = h.id_teacher LEFT JOIN is_taught it ON t.id_teacher = it.id_teacher LEFT JOIN LATERAL (SELECT distance FROM distance d2 WHERE d2.id_teacher = t.id_teacher AND d2.internship_identifier = i.internship_identifier ORDER BY distance ASC LIMIT 1) d ON TRUE WHERE i.internship_identifier = :identifier";
+        $dataQuery = "WITH cte_histo AS (SELECT id_teacher, array_agg(start_date_internship ORDER BY id_teacher) AS history FROM internship WHERE end_date_internship < NOW() GROUP BY id_teacher) SELECT DISTINCT CONCAT(t.teacher_firstname, ' ', t.teacher_name) AS prof, h.history, d.distance AS distance, it.discipline_name AS discipline, i.relevance_score AS score, i.company_name AS entreprise, i.student_number, i.internship_identifier FROM internship i JOIN teacher t ON TRUE LEFT JOIN cte_histo h ON t.id_teacher = h.id_teacher LEFT JOIN is_taught it ON t.id_teacher = it.id_teacher LEFT JOIN LATERAL (SELECT distance FROM distance d2 WHERE d2.id_teacher = t.id_teacher AND d2.internship_identifier = i.internship_identifier ORDER BY distance ASC LIMIT 1) d ON TRUE WHERE i.internship_identifier = :identifier";
 
         if (!empty($search)) {
             $dataQuery .= ' AND (CONCAT(t.teacher_firstname, \' \', t.teacher_name) ILIKE :search OR it.discipline_name ILIKE :search OR i.company_name ILIKE :search)';

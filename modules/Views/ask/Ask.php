@@ -54,6 +54,15 @@ readonly class Ask
                             $jsColumns,
                             '/api/datatable/ask'
                         ); ?>
+                        <button class="waves-effect waves-light
+            btn btn-annuler tooltip"
+                                type="reset" id="resetForm" data-tooltip=
+                                "Annuler les modifications"
+                                data-position="top">Annuler</button>
+                        <button class="waves-effect waves-light btn tooltip"
+                                name="selecInternshipSubmitted" value="1"
+                                type="submit" data-tooltip="Envoyer vos choix"
+                                data-position="top">Valider</button>
                     </div>
 
                     <div id="viewStageContainer" <?= $internshipId ? '' : 'style="display:none;"' ?>>

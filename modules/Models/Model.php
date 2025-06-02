@@ -147,6 +147,20 @@ class Model
 
         echo json_encode(['data' => $data]);
     }
+    public function insertScoreIntoDatabase(array $data): void
+    {
+        $query = "UPDATE public.internship SET relevance_score = :score WHERE internship_identifier = :internship_identifier AND student_number = :student_number";
+
+        $stmt = $this->_db->getConn()->prepare($query);
+
+        $stmt->bindValue(':score', $data['score']);
+        $stmt->bindValue(':internship_identifier', $data['internship_identifier']);
+        $stmt->bindValue(':student_number', $data['student_number']);
+
+        $stmt->execute();
+    }
+
+
     public function calculateRelevanceTeacherStudentsAssociate(array $teacher, array $dictCoef, array $internship): array
     {
         $identifier = $teacher['id_teacher'];
@@ -228,6 +242,8 @@ class Model
             "score" => round($ScoreFinal, 2),
             "type" => $internship['type']
         ];
+
+        $this->insertScoreIntoDatabase($newList);
 
         if (!empty($newList)) {
             return $newList;

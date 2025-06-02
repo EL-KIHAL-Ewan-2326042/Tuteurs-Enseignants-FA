@@ -163,17 +163,6 @@ class Layout
     if ($jsFilePath) {
         echo '<script src="' . $jsFilePath . '"></script>';
     }
-    $currentUri = $_SERVER['REQUEST_URI'];
-
-    if ($currentUri === '/' || $currentUri === '/homepage'
-        || $currentUri === '/dispatcher'
-    ) {
-        echo '<script async defer
-            src="https://cdn.jsdelivr.net/gh/openlayers/
-openlayers.github.io@master/en/v6.5.0/build/ol.js" 
-            onload="initMap()">
-          </script>';
-    }
     ?>
         </body>
         </html>

@@ -18,172 +18,249 @@ class Dispatcher
         private string $errorMessageDirectAssoc,
         private string $checkMessageDirectAssoc,
         private string $checkMessageAfterSort
-    ) {
-    }
+    ) {}
 
     public function showView(): void
     {
         ?>
         <main>
             <?php
+
+            $internshipId = $_GET['internship'] ?? null;
+            $btnDisabled = $internshipId ? '' : 'disabled';
+            $btnIcon = $internshipId ? 'apps' : 'assignment_ind';
+
             if (($_POST['action'] ?? '') !== 'generate') {
-                // Affichage du formulaire
                 CoefBackup::render(
                     $this->userModel,
                     $this->errorMessageAfterSort,
                     $this->checkMessageAfterSort
                 );
-            } if (isset($_POST['coef']) && isset($_POST['action'])
-            && $_POST['action'] === 'generate'
-        ) : ?>
-        <div class="center">
+            }
 
-            <div id="map" class="map-container" style="position: relative;">
-                <div id="map-loading-overlay" style="display: none;">
-                    <div class="loading-message">Mise à jour de la map...</div>
-                    <div class="progress">
-                        <div class="indeterminate"></div>
+            if (
+                isset($_POST['coef'], $_POST['action']) &&
+                $_POST['action'] === 'generate'
+            ):
+                $_SESSION['last_dict_coef'] = array_filter($_POST['coef'], fn($coef, $key) =>
+                isset($_POST['criteria_on'][$key]), ARRAY_FILTER_USE_BOTH);
+                ?>
+
+                <div class="partie2">
+                    <div id="tableContainer" class="dataTable">
+                        <form action="./dispatcher" method="post">
+                            <?php
+                            Table::render(
+                                'dispatch-table',
+                                ['Etudiant','Enseignant', 'Stage', 'Formation', 'Groupe', 'Sujet', 'Adresse', 'Score', 'Associer'],
+                                [
+                                    ['data' => 'student'],
+                                    ['data' => 'teacher'],
+                                    ['data' => 'internship'],
+                                    ['data' => 'formation'],
+                                    ['data' => 'group'],
+                                    ['data' => 'subject'],
+                                    ['data' => 'address'],
+                                    ['data' => 'score'],
+                                    ['data' => 'associate'],
+                                    ['data' => 'internship_identifier'],
+                                ],
+                                '/api/dispatch-list'
+                            );
+                            ?>
+                            <button type="submit" name="selecInternshipSubmitted" value="1" class="btn">Valider</button>
+                        </form>
+                    </div>
+
+                    <div id="viewStageContainer" class="dataTable" <?= $internshipId ? '' : 'style="display:none;"' ?>>
+                        <?php if ($internshipId) ViewStage::render($internshipId); ?>
+                    </div>
+
+                    <div class="cont-map">
+                        <button id="toggleViewBtn" title="Basculer la vue" <?= $btnDisabled ?>>
+                            <i class="material-icons" id="toggleIcon"><?= $btnIcon ?></i>
+                        </button>
+                        <section id="map"></section>
                     </div>
                 </div>
-            </div>
 
-            <div class="card-container">
-                <div class="card-panel white z-depth-1 dispatcher-legend-card">
-                    <h6 class="flow-text
-                    dispatcher-legend-title">Légende de la carte</h6>
-                    <ul class="browser-default dispatcher-legend-list">
-                        <li><span class="legend-color-box
-                        red"></span> Enseignant sélectionné:
-                        Peut être changé lors d'un clique sur une colonne</li>
-                        <li><span class="legend-color-box
-                        blue"></span> Autres enseignants: comprend seulement
-                        ceux du même département que celui de l'élève</li>
-                        <li><span class="legend-color-box
-                        yellow"></span> Entreprise: l'entreprise de
-                            l'élève selectionné</li>
-                        <li>
-                            <span class="legend-line-box"></span
-                            > Distance entre l'enseignant et l'entreprise
-                        </li>
-                    </ul>
-                </div>
+                <style>
+                    main { max-width: 100%; min-height: 80vh; }
+                    .partie2 { display: flex; gap: 2rem; margin: 1rem; justify-content: space-around; }
+                    .partie2 > .dataTable { max-width: 65%; overflow: auto; max-height: 80vh }
+                    .partie2 > .cont-map { width: 35%; position: relative; }
+                    #map {
+                        width: 100%; height: 100%;
+                        background-color: var(--couleur-bleu-roi);
+                        border-radius: .4rem;
+                        box-shadow: 0 2px 16px rgba(14, 30, 37, 0.32);
+                    }
+                    #toggleViewBtn {
+                        z-index: 1000; position: absolute; bottom: 1rem; left: 1rem;
+                    }
+                </style>
 
-                <div class="card-panel white z-depth-1 dispatcher-info-card">
-                    <h6 class="flow-text
-dispatcher-info-title">Informations</h6>
-                    <p class="dispatcher-info-text">
-                        <i class="material-icons
-    left tiny">mouse</i
-                        > Cliquez sur une ligne du tableau
-                        pour afficher la vue étudiante et
-                        les informations
-                        de l'étudiant sur la carte.
-                    </p>
-                    <p class="dispatcher-info-text">
-                        <i class="material-icons left
-                        tiny">sort</i> Vous pouvez trier le tableau
-                        en cliquant sur le titre d'une colonne.
-                    </p>
-                    <p class="dispatcher-info-text">
-                        <i class="material-icons
-                        left tiny">settings</i> Critères et coefficients
-                        utilisés pour la répartition :
-                        <?php
-                        $dictCoef = array_filter(
-                            $_POST['coef'], function ($coef, $key) {
-                                return isset($_POST['criteria_on'][$key]);
-                            }, ARRAY_FILTER_USE_BOTH
-                        );
-                        ?>
-                        <?php if (!empty($dictCoef)) : ?>
-                    <ul>
-                            <?php foreach ($dictCoef as $name => $coef): ?>
-                            <li><strong>
-                                <?php echo $name; ?>
-                                </strong> : <?php echo $coef; ?></li>
-                            <?php endforeach; ?>
-                    </ul>
-                    <?php else: ?>
-                        Aucun critère sélectionné.
-                    <?php endif; ?>
-                    </p>
-                </div>
-            </div>
+                <script>
+                    document.addEventListener('DOMContentLoaded', () => {
+                        const map = L.map('map').setView([43.2965, 5.3698], 13);
+                        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                            attribution: '&copy; OpenStreetMap contributors'
+                        }).addTo(map);
 
-        <form action="./dispatcher" method="post">
+                        let markers = [], teacherMarker = null, teacherCoord = null;
+                        const toggleIcon = document.getElementById('toggleIcon');
+                        const toggleBtn = document.getElementById('toggleViewBtn');
+                        const tableCont = document.getElementById('tableContainer');
+                        const stageCont = document.getElementById('viewStageContainer');
+
+                        // ==================== Geocoding Helpers with Cache ====================
+                        const geoCache = JSON.parse(localStorage.getItem('geoCache') || '{}');
+                        const saveCache = () => localStorage.setItem('geoCache', JSON.stringify(geoCache));
+                        async function geocode(addr) {
+                            if (geoCache[addr]) return geoCache[addr];
+                            try {
+                                const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr)}`);
+                                const d = await r.json();
+                                if (d.length) {
+                                    const c = [+d[0].lat, +d[0].lon];
+                                    geoCache[addr] = c;
+                                    saveCache();
+                                    return c;
+                                }
+                            } catch (e) { console.error('Geocoding error:', e); }
+                            return null;
+                        }
+
+                        // ==================== Icons ====================
+                        function icon(cls) {
+                            return L.icon({
+                                iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+                                shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+                                iconSize: [25, 41],
+                                iconAnchor: [12, 41],
+                                popupAnchor: [1, -34],
+                                shadowSize: [41, 41],
+                                className: cls
+                            });
+                        }
+                        const yellowIcon = icon('marker-yellow'), blueIcon = icon('marker-blue');
+
+                        // ==================== Markers ====================
+                        function clearMarkers() {
+                            markers.forEach(m => { if (m !== teacherMarker) map.removeLayer(m); });
+                            markers = teacherMarker ? [teacherMarker] : [];
+                        }
+                        function addMarker(coord, label, icn) {
+                            const m = L.marker(coord, { icon: icn }).addTo(map).bindPopup(label);
+                            markers.push(m);
+                        }
+
+                        // ==================== Teacher Position (if provided) ====================
+                        (async () => {
+                            const addr = window.TEACHER_ADDRESS;
+                            if (addr) {
+                                teacherCoord = await geocode(addr);
+                                if (teacherCoord) {
+                                    teacherMarker = L.marker(teacherCoord, { icon: yellowIcon })
+                                        .addTo(map).bindPopup('Votre position');
+                                    markers.push(teacherMarker);
+                                    map.setView(teacherCoord, 13);
+                                }
+                            }
+                        })();
+
+                        // ==================== DataTable Interaction ====================
+                        const table = $('#dispatch-table').DataTable();
+                        let selectedId = null;
+
+                        table.on('select deselect', async () => {
+                            clearMarkers();
+                            const sel = table.rows({ selected: true }).data().toArray();
+                            const bounds = [];
+                            for (const row of sel) {
+                                if (!row.address) continue;
+                                const coord = await geocode(row.address);
+                                if (coord) {
+                                    addMarker(coord, `${row.student} - ${row.subject}`, blueIcon);
+                                    bounds.push(coord);
+                                }
+                            }
+                            if (teacherCoord) bounds.push(teacherCoord);
+                            if (bounds.length) map.fitBounds(bounds, { padding: [50, 50] });
+
+                            // Toggle button state
+                            if (sel.length === 1) {
+                                selectedId = sel[0].internship_identifier;
+                                toggleBtn.disabled = false;
+                            } else {
+                                selectedId = null;
+                                toggleBtn.disabled = true;
+                            }
+                        });
+
+                        // ==================== Toggle Stage/Table View ====================
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const internshipParam = urlParams.get('internship');
+
+                        if (internshipParam) {
+                            toggleBtn.disabled = false;
+                            toggleIcon.textContent = 'apps';
+                        } else {
+                            toggleBtn.disabled = true;
+                            toggleIcon.textContent = 'assignment_ind';
+                        }
+
+                        toggleBtn.addEventListener('click', async () => {
+                            const url = new URL(window.location.href);
+
+                            if (tableCont.style.display !== 'none') {
+                                if (!selectedId) return;
+
+                                url.searchParams.set('internship', selectedId);
+                                history.replaceState(null, '', url.toString());
+
+                                const html = await (await fetch(`/api/viewStage/${selectedId}`)).text();
+                                stageCont.innerHTML = '';
+                                const frag = document.createRange().createContextualFragment(html);
+                                stageCont.appendChild(frag);
+
+                                frag.querySelectorAll('script').forEach(s => {
+                                    const ns = document.createElement('script');
+                                    if (s.src) ns.src = s.src; else ns.textContent = s.textContent;
+                                    document.head.appendChild(ns);
+                                });
+
+                                // Re-init stage DataTable
+                                const stageCols = [
+                                    { data: 'prof' },
+                                    { data: 'history' },
+                                    { data: 'distance' },
+                                    { data: 'discipline' },
+                                    { data: 'score' },
+                                    { data: 'entreprise' }
+                                ];
+                                initDataTable('viewStage', `/api/datatable/stage/${selectedId}`, stageCols);
+
+                                tableCont.style.display = 'none';
+                                stageCont.style.display = '';
+                                toggleIcon.textContent = 'apps';
+                            } else {
+                                url.searchParams.delete('internship');
+                                history.replaceState(null, '', url.toString());
+
+                                stageCont.style.display = 'none';
+                                tableCont.style.display = '';
+                                toggleIcon.textContent = 'assignment_ind';
+                            }
+                        });
+                    });
+                </script>
+
+
             <?php
-            // Sauvegarde dans la session pour l'API
-            $_SESSION['last_dict_coef'] = array_filter($_POST['coef'], function ($coef, $key) {
-                return isset($_POST['criteria_on'][$key]);
-            }, ARRAY_FILTER_USE_BOTH);
-
-            Table::render(
-                'dispatch-table',
-                ['Enseignant', 'Etudiant', 'Stage', 'Formation', 'Groupe', 'Sujet', 'Adresse', 'Score', 'Associer'],
-                [
-                    ['data' => 'teacher'],
-                    ['data' => 'student'],
-                    ['data' => 'internship'],
-                    ['data' => 'formation'],
-                    ['data' => 'group'],
-                    ['data' => 'subject'],
-                    ['data' => 'address'],
-                    ['data' => 'score'],
-                    ['data' => 'associate']
-                ],
-                '/api/dispatch-list'
-            );
+            endif;
             ?>
-            <br>
-            <button type="submit" name="selecInternshipSubmitted" value="1" class="btn">Valider</button>
-        </form>
-
-    <?php endif; ?>
-
-        </div>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                var tooltips = document.querySelectorAll('.tooltipped');
-                M.Tooltip.init(tooltips);
-            })
-        </script>
+        </main>
         <?php
-
-    }
-    /**
-     * Renvoie les éléments HTML correspondant à l'affichage
-     * en étoiles du score passé en paramètre
-     *
-     * @param float $score Score de pertinence que
-     *                     l'on veut convertir en étoiles
-     *
-     * @return string Chaîne de caractères contenant
-     * les étoiles correspondant au score
-     */
-    function renderStars(float $score): string
-    {
-        $fullStars = floor($score);
-
-        $decimalPart = $score - $fullStars;
-
-        $halfStars = ($decimalPart > 0 && $decimalPart < 1) ? 1 : 0;
-
-        $emptyStars = 5 - $fullStars - $halfStars;
-
-        $stars = '';
-
-        for ($i = 0; $i < $fullStars; $i++) {
-            $stars .= '<span class="filled"></span>';
-        }
-
-        if ($halfStars) {
-            $stars .= '<span class="half"></span>';
-        }
-
-        for ($i = 0; $i < $emptyStars; $i++) {
-            $stars .= '<span class="empty"></span>';
-        }
-
-        return $stars;
     }
 }

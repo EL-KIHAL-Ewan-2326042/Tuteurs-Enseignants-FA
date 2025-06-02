@@ -13,7 +13,7 @@ class Homepage
     }
 
     public function show(): void {
-        $title = "Homepage";
+        $title = "HomePage";
         $cssFilePath = '/_assets/styles/homepage.css';
         $jsFilePath = '/_assets/scripts/homepage.js';
 
