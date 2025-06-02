@@ -671,6 +671,7 @@ class Internship extends Model
     SELECT COUNT(DISTINCT i.internship_identifier) as total
     FROM internship i
     JOIN teacher t ON TRUE
+    LEFT JOIN has_address ha ON t.id_teacher = ha.id_teacher
     LEFT JOIN cte_histo h ON t.id_teacher = h.id_teacher
     LEFT JOIN is_taught it ON t.id_teacher = it.id_teacher
     LEFT JOIN LATERAL (
@@ -708,9 +709,11 @@ class Internship extends Model
         i.relevance_score AS score,
         i.company_name AS entreprise,
         i.student_number,
-        i.internship_identifier
+        i.internship_identifier,
+        ha.address as teacher_address
     FROM internship i
     JOIN teacher t ON TRUE
+    LEFT JOIN has_address ha ON t.id_teacher = ha.id_teacher
     LEFT JOIN cte_histo h ON t.id_teacher = h.id_teacher
     LEFT JOIN is_taught it ON t.id_teacher = it.id_teacher
     LEFT JOIN LATERAL (

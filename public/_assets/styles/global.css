@@ -43,6 +43,11 @@ a, li {
 .fdc {
     flex-direction: column;
 }
+
+.marker-red { filter: hue-rotate(0deg) saturate(2) brightness(1.2); }
+.marker-yellow { filter: hue-rotate(60deg) saturate(1.5) brightness(1.1); }
+.marker-blue { filter: hue-rotate(220deg) saturate(1.3) brightness(1); }
+
 .df {
     display: flex;
 }
