@@ -25,7 +25,6 @@ class Dispatcher
         ?>
         <main>
             <?php
-
             $internshipId = $_GET['internship'] ?? null;
             $btnDisabled = $internshipId ? '' : 'disabled';
             $btnIcon = $internshipId ? 'apps' : 'assignment_ind';
@@ -38,21 +37,17 @@ class Dispatcher
                 );
             }
 
-            if (
-                isset($_POST['coef'], $_POST['action']) &&
-                $_POST['action'] === 'generate'
-            ):
+            if (isset($_POST['coef'], $_POST['action']) && $_POST['action'] === 'generate'):
                 $_SESSION['last_dict_coef'] = array_filter($_POST['coef'], fn($coef, $key) =>
                 isset($_POST['criteria_on'][$key]), ARRAY_FILTER_USE_BOTH);
                 ?>
-
                 <div class="partie2">
                     <div id="tableContainer" class="dataTable">
                         <form action="./dispatcher" method="post">
                             <?php
                             Table::render(
                                 'dispatch-table',
-                                ['Etudiant','Enseignant', 'Stage', 'Formation', 'Groupe', 'Sujet', 'Adresse', 'Score', 'Associer'],
+                                ['Etudiant','Enseignant', 'Stage', 'Formation', 'Groupe', 'Sujet', 'Adresse', 'Score', 'internship_identifier', 'teacher_address', 'Associer'],
                                 [
                                     ['data' => 'student'],
                                     ['data' => 'teacher'],
@@ -62,8 +57,9 @@ class Dispatcher
                                     ['data' => 'subject'],
                                     ['data' => 'address'],
                                     ['data' => 'score'],
-                                    ['data' => 'associate'],
                                     ['data' => 'internship_identifier'],
+                                    ['data' => 'teacher_address'],
+                                    ['data' => 'associate']
                                 ],
                                 '/api/dispatch-list'
                             );
@@ -184,6 +180,11 @@ class Dispatcher
                                     addMarker(coord, `${row.student} - ${row.subject}`, blueIcon);
                                     bounds.push(coord);
                                 }
+                                const coordt = await geocode(row.teacher_address);
+                                if (coordt) {
+                                    addMarker(coordt, `${row.teacher}`, yellowIcon);
+                                    bounds.push(coordt);
+                                }
                             }
                             if (teacherCoord) bounds.push(teacherCoord);
                             if (bounds.length) map.fitBounds(bounds, { padding: [50, 50] });
@@ -210,6 +211,24 @@ class Dispatcher
                             toggleIcon.textContent = 'assignment_ind';
                         }
 
+                        // Précharger les données pour la vue stage
+                        let stageDataCache = {};
+                        async function preloadStageData(internshipId) {
+                            if (!stageDataCache[internshipId]) {
+                                const response = await fetch(`/api/viewStage/${internshipId}`);
+                                const html = await response.text();
+                                stageDataCache[internshipId] = html;
+                            }
+                        }
+
+                        // Précharger les données pour les stages sélectionnés
+                        table.on('select', async () => {
+                            const sel = table.rows({ selected: true }).data().toArray();
+                            if (sel.length === 1) {
+                                await preloadStageData(sel[0].internship_identifier);
+                            }
+                        });
+
                         toggleBtn.addEventListener('click', async () => {
                             const url = new URL(window.location.href);
 
@@ -219,16 +238,13 @@ class Dispatcher
                                 url.searchParams.set('internship', selectedId);
                                 history.replaceState(null, '', url.toString());
 
-                                const html = await (await fetch(`/api/viewStage/${selectedId}`)).text();
-                                stageCont.innerHTML = '';
-                                const frag = document.createRange().createContextualFragment(html);
-                                stageCont.appendChild(frag);
-
-                                frag.querySelectorAll('script').forEach(s => {
-                                    const ns = document.createElement('script');
-                                    if (s.src) ns.src = s.src; else ns.textContent = s.textContent;
-                                    document.head.appendChild(ns);
-                                });
+                                // Utiliser les données préchargées
+                                if (stageDataCache[selectedId]) {
+                                    stageCont.innerHTML = stageDataCache[selectedId];
+                                } else {
+                                    const html = await (await fetch(`/api/viewStage/${selectedId}`)).text();
+                                    stageCont.innerHTML = html;
+                                }
 
                                 // Re-init stage DataTable
                                 const stageCols = [
@@ -255,12 +271,9 @@ class Dispatcher
                         });
                     });
                 </script>
-
-
-            <?php
-            endif;
-            ?>
+            <?php endif; ?>
         </main>
+
         <?php
     }
 }

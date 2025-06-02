@@ -21,52 +21,56 @@ class AjaxController
 {
 
     public function getDispatchList(): void
-    {
-        header('Content-Type: application/json');
+{
+    header('Content-Type: application/json');
 
-        $db = Database::getInstance();
-        $teacherModel = new Teacher($db);
-        $internshipModel = new Internship($db);
-        $departmentModel = new Department($db);
-        $dictCoef = $_SESSION['last_dict_coef'] ?? [];
-        if (empty($dictCoef)) {
-            echo json_encode(['data' => []]);
-            exit();
-        }
-
-        $resultDispatchList = $internshipModel
-            ->dispatcher(
-                $departmentModel,
-                $teacherModel,
-                $dictCoef
-            )[0];
-
-        $data = [];
-        $scores = []; // Tableau pour stocker les scores
-        foreach ($resultDispatchList as $item) {
-            $checkboxValue = $item['id_teacher'] . '$' . $item['internship_identifier'] . '$' . $item['score'];
-            $companyName = $item['company_name'];
-
-            $data[] = [
-                'teacher' => $item['teacher_firstname'] . ' ' . $item['teacher_name'] . ' (' . $item['id_teacher'] . ')',
-                'student' => $item['student_firstname'] . ' ' . $item['student_name'] . ' (' . $item['student_number'] . ')',
-                'internship' => $companyName . ' (' . $item['internship_identifier'] . ')',
-                'formation' => $item['formation'],
-                'group' => $item['class_group'],
-                'subject' => $item['internship_subject'],
-                'address' => $item['address'],
-                'score' => $item['score'],
-                'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . htmlspecialchars($checkboxValue) . '">',
-                'internship_identifier' => $item['internship_identifier']
-            ];
-
-            $scores[] = $item['score'];
-        }
-
-        $_SESSION['dispatch_scores'] = $scores;
-
-        echo json_encode(['data' => $data]);
+    $db = Database::getInstance();
+    $teacherModel = new Teacher($db);
+    $internshipModel = new Internship($db);
+    $departmentModel = new Department($db);
+    $dictCoef = $_SESSION['last_dict_coef'] ?? [];
+    if (empty($dictCoef)) {
+        echo json_encode(['data' => []]);
+        exit();
     }
+
+    $resultDispatchList = $internshipModel
+        ->dispatcher(
+            $departmentModel,
+            $teacherModel,
+            $dictCoef
+        )[0];
+
+    $data = [];
+    $scores = []; // Tableau pour stocker les scores
+    foreach ($resultDispatchList as $item) {
+        $checkboxValue = $item['id_teacher'] . '$' . $item['internship_identifier'] . '$' . $item['score'];
+        $companyName = $item['company_name'];
+
+        $teacherAddress = $teacherModel->getTeacherAddress($item['id_teacher']);
+
+        $data[] = [
+            'teacher' => $item['teacher_firstname'] . ' ' . $item['teacher_name'] . ' (' . $item['id_teacher'] . ')',
+            'student' => $item['student_firstname'] . ' ' . $item['student_name'] . ' (' . $item['student_number'] . ')',
+            'internship' => $companyName . ' (' . $item['internship_identifier'] . ')',
+            'formation' => $item['formation'],
+            'group' => $item['class_group'],
+            'subject' => $item['internship_subject'],
+            'address' => $item['address'],
+            'teacher_address' => $teacherAddress,
+            'score' => $item['score'],
+            'internship_identifier' => $item['internship_identifier'],
+            'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . htmlspecialchars($checkboxValue) . '">'
+        ];
+
+        $scores[] = $item['score'];
+    }
+
+    $_SESSION['dispatch_scores'] = $scores;
+
+    echo json_encode(['data' => $data]);
+}
+
 
 
     function renderStars(float $score): string

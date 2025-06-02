@@ -217,6 +217,22 @@ class Teacher extends Model
         $this->cache['getDepTeacher'][$teacher_id] = $result;
         return $result;
     }
+    public function getTeacherAddress(string $teacher_id): ?string
+    {
+        $query = 'SELECT address FROM has_address WHERE id_teacher = :teacher_id LIMIT 1';
+        $stmt = $this->_db->getConn()->prepare($query);
+        $stmt->bindParam(':teacher_id', $teacher_id);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        // Vérifier si le résultat n'est pas vide et si l'adresse existe
+        if ($result && isset($result['address'])) {
+            return $result['address'];
+        }
+
+        return null;
+    }
+
 
     public function paginateAsk(string $identifier, int $start, int $length, string $search = '', array $order = []): array
     {
