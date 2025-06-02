@@ -14,7 +14,7 @@ function disconnect() {
         window.location.href = '/intramu';
     }
 }
-function initDataTable(id, ajaxUrl, columns) {
+function initDataTable(id, ajaxUrl, columns, paginationEnabled = true) {
     if ($.fn.DataTable.isDataTable('#' + id)) {
         $('#' + id).DataTable().ajax.url(ajaxUrl).load();
         return;
@@ -40,6 +40,12 @@ function initDataTable(id, ajaxUrl, columns) {
             items: 'row'
         },
         lengthMenu: [10, 20, 50, 100],
+
+        // Désactive pagination / info si paginationEnabled = false
+        paging: paginationEnabled,
+        info: paginationEnabled,
+        lengthChange: paginationEnabled,
+
         language: {
             select: {
                 rows: {
@@ -57,11 +63,11 @@ function initDataTable(id, ajaxUrl, columns) {
                 colvisRestore: "Rétablir visibilité",
             },
             emptyTable: "Aucune donnée disponible dans le tableau",
-            lengthMenu: "Afficher _MENU_ entrées",
+            lengthMenu: paginationEnabled ? "Afficher _MENU_ entrées" : "",
             search: '',
-            info: "Affichage de _START_ à _END_ sur _TOTAL_ entrées",
-            infoEmpty: 'Aucune entrée',
-            infoFiltered: "(filtrées depuis un total de _MAX_ entrées)"
+            info: paginationEnabled ? "Affichage de _START_ à _END_ sur _TOTAL_ entrées" : "",
+            infoEmpty: paginationEnabled ? 'Aucune entrée' : '',
+            infoFiltered: paginationEnabled ? "(filtrées depuis un total de _MAX_ entrées)" : ''
         },
         layout: {
             topStart: {
@@ -105,8 +111,11 @@ function initDataTable(id, ajaxUrl, columns) {
             topEnd: {
                 search: { placeholder: 'Rechercher...' },
             },
-            bottomStart: ['pageLength', 'info'],
-            bottomEnd: ['paging']
+
+            // Affiche ou cache selon paginationEnabled
+            bottomStart: paginationEnabled ? ['pageLength', 'info'] : [],
+            bottomEnd: paginationEnabled ? ['paging'] : []
         }
     });
 }
+

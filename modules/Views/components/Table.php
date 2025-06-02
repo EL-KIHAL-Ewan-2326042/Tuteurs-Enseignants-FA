@@ -14,7 +14,7 @@ class Table
      *
      * @return void
      */
-    public static function render(string $id, array $columns, array $jsColumns, string $ajaxUrl): void
+    public static function render(string $id, array $columns, array $jsColumns, string $ajaxUrl, bool $paginationEnabled = true): void
     {
         echo '<table id="' . htmlspecialchars($id) . '" class="display nowrap" style="width:100%">';
         echo '<thead><tr>';
@@ -95,9 +95,10 @@ class Table
         </style>
         <script>
             document.addEventListener('DOMContentLoaded', function () {
-                window.initDataTable('<?= $id ?>', '<?= $ajaxUrl ?>', <?= $jsColumnsJson ?>);
+                window.initDataTable('<?= $id ?>', '<?= $ajaxUrl ?>', <?= $jsColumnsJson ?>, <?= json_encode($paginationEnabled) ?>);
             });
         </script>
+
 
         <?php
     }
