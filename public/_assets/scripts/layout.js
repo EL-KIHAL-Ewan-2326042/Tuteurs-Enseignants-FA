@@ -14,6 +14,7 @@ function disconnect() {
         window.location.href = '/intramu';
     }
 }
+
 function initDataTable(id, ajaxUrl, columns, paginationEnabled = true) {
     if ($.fn.DataTable.isDataTable('#' + id)) {
         $('#' + id).DataTable().ajax.url(ajaxUrl).load();

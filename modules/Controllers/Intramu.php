@@ -88,6 +88,7 @@ class Intramu
                 $_SESSION['fullName'] = $teacherModel->getFullName($identifierLogs);
                 $_SESSION['roles'] = $userModel->getRoles($identifierLogs);
                 $_SESSION['role_name'] = $userModel->getHighestRole($identifierLogs);
+                $_SESSION['role_name_clean'] = $userModel->getCleanHighestRole($identifierLogs);
                 $_SESSION['role_department'] = $userModel
                     ->getRoleDepartment($identifierLogs);
                 $_SESSION['address'] = $teacherModel->getAddress($identifierLogs);

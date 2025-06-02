@@ -128,7 +128,7 @@ class Layout
                         <a href="/account">
                         <span><?php echo $_SESSION['fullName']['teacher_firstname']
                                 . ' ' . $_SESSION['fullName']['teacher_name'] ?></span>
-                                        <span><?php echo $_SESSION['identifier']?></span>
+                                        <span><?php echo $_SESSION['role_name_clean']?></span>
                                     </a>
                                     <a onclick="disconnect();" class="logout-btn" title="Déconnexion">
                                         <i class="material-icons">power_settings_new</i>
