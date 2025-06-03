@@ -652,33 +652,47 @@ class Internship extends Model
             'entreprise',
         ];
 
-        $countQuery = "WITH cte_histo AS (
-        SELECT id_teacher, array_agg(start_date_internship ORDER BY id_teacher) AS history
-        FROM internship
-        WHERE end_date_internship < NOW()
-        GROUP BY id_teacher
-    )
-    SELECT COUNT(DISTINCT i.internship_identifier) as total
-    FROM internship i
-    JOIN teacher t ON TRUE
-    LEFT join LATERAL (
-    	select address 
-    	from has_address ha
-    	where t.id_teacher = ha.id_teacher
-    	limit 1
-    ) ha on true 
-    LEFT JOIN cte_histo h ON t.id_teacher = h.id_teacher
-    LEFT JOIN is_taught it ON t.id_teacher = it.id_teacher
-    LEFT JOIN LATERAL (
-        SELECT distance
-        FROM distance d2
-        WHERE d2.id_teacher = t.id_teacher AND d2.internship_identifier = i.internship_identifier
-        ORDER BY distance ASC LIMIT 1
-    ) d ON TRUE
-    WHERE i.internship_identifier = :identifier and relevance_score is not null";
+        // Build the ORDER BY clause if $order is provided
+        $orderClause = '';
+        if (!empty($order) && isset($columns[$order[0]['column']])) {
+            $column = $columns[$order[0]['column']];
+            $dir = strtoupper($order[0]['dir']) === 'DESC' ? 'DESC' : 'ASC';
+            $orderClause = " ORDER BY $column $dir";
+        }
+
+        // --- COUNT QUERY ---
+        $countQuery = "
+        WITH cte_histo AS (
+            SELECT id_teacher, array_agg(start_date_internship ORDER BY id_teacher) AS history
+            FROM internship
+            WHERE end_date_internship < NOW()
+            GROUP BY id_teacher
+        )
+        SELECT COUNT(DISTINCT i.internship_identifier) AS total
+        FROM internship i
+        JOIN teacher t ON TRUE
+        LEFT JOIN LATERAL (
+            SELECT address
+            FROM has_address ha
+            WHERE t.id_teacher = ha.id_teacher
+            LIMIT 1
+        ) ha ON TRUE
+        LEFT JOIN cte_histo h ON t.id_teacher = h.id_teacher
+        LEFT JOIN is_taught it ON t.id_teacher = it.id_teacher
+        LEFT JOIN LATERAL (
+            SELECT distance
+            FROM distance d2
+            WHERE d2.id_teacher = t.id_teacher AND d2.internship_identifier = i.internship_identifier
+            ORDER BY distance ASC LIMIT 1
+        ) d ON TRUE
+        WHERE i.internship_identifier = :identifier ";
 
         if (!empty($search)) {
-            $countQuery .= ' AND (CONCAT(t.teacher_firstname, \' \', t.teacher_name) ILIKE :search OR it.discipline_name ILIKE :search OR i.company_name ILIKE :search)';
+            $countQuery .= " AND (
+            CONCAT(t.teacher_firstname, ' ', t.teacher_name) ILIKE :search OR
+            it.discipline_name ILIKE :search OR
+            i.company_name ILIKE :search
+        )";
         }
 
         $countStmt = $this->_db->getConn()->prepare($countQuery);
@@ -690,56 +704,59 @@ class Internship extends Model
         $countStmt->execute();
         $total = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-        $dataQuery = "WITH cte_histo AS (
-        SELECT id_teacher, array_agg(start_date_internship ORDER BY id_teacher) AS history
-        FROM internship
-        WHERE end_date_internship < NOW()
-        GROUP BY id_teacher
-    )
-    SELECT DISTINCT
-        CONCAT(t.teacher_firstname, ' ', t.teacher_name) AS prof,
-        h.history,
-        d.distance AS distance,
-        it.discipline_name AS discipline,
-        i.relevance_score AS score,
-        i.company_name AS entreprise,
-        i.student_number,
-        i.internship_identifier,
-        ha.address as teacher_address
-    FROM internship i
-    JOIN teacher t ON TRUE
-    LEFT join LATERAL (
-    	select address 
-    	from has_address ha
-    	where t.id_teacher = ha.id_teacher
-    	limit 1
-    ) ha on true 
-    LEFT JOIN cte_histo h ON t.id_teacher = h.id_teacher
-    LEFT JOIN is_taught it ON t.id_teacher = it.id_teacher
-    LEFT JOIN LATERAL (
-        SELECT distance
-        FROM distance d2
-        WHERE d2.id_teacher = t.id_teacher AND d2.internship_identifier = i.internship_identifier
-        ORDER BY distance ASC LIMIT 1
-    ) d ON TRUE
-    WHERE i.internship_identifier = :identifier and relevance_score is not null";
+        // --- DATA QUERY ---
+        $dataQuery = "
+        WITH cte_histo AS (
+            SELECT id_teacher, array_agg(start_date_internship ORDER BY id_teacher) AS history
+            FROM internship
+            WHERE end_date_internship < NOW()
+            GROUP BY id_teacher
+        )
+        SELECT DISTINCT
+            CONCAT(t.teacher_firstname, ' ', t.teacher_name) AS prof,
+            h.history,
+            d.distance AS distance,
+            it.discipline_name AS discipline,
+            i.relevance_score AS score,
+            i.company_name AS entreprise,
+            i.student_number,
+            i.internship_identifier,
+            ha.address AS teacher_address
+        FROM internship i
+        JOIN teacher t ON TRUE
+        LEFT JOIN LATERAL (
+            SELECT address
+            FROM has_address ha
+            WHERE t.id_teacher = ha.id_teacher
+            LIMIT 1
+        ) ha ON TRUE
+        LEFT JOIN cte_histo h ON t.id_teacher = h.id_teacher
+        LEFT JOIN is_taught it ON t.id_teacher = it.id_teacher
+        LEFT JOIN LATERAL (
+            SELECT distance
+            FROM distance d2
+            WHERE d2.id_teacher = t.id_teacher AND d2.internship_identifier = i.internship_identifier
+            ORDER BY distance ASC LIMIT 1
+        ) d ON TRUE
+        WHERE i.internship_identifier = :identifier 
+        order by i.relevance_score ASC";
 
         if (!empty($search)) {
-            $dataQuery .= ' AND (CONCAT(t.teacher_firstname, \' \', t.teacher_name) ILIKE :search OR it.discipline_name ILIKE :search OR i.company_name ILIKE :search)';
+            $dataQuery .= " AND (
+            CONCAT(t.teacher_firstname, ' ', t.teacher_name) ILIKE :search OR
+            it.discipline_name ILIKE :search OR
+            i.company_name ILIKE :search
+        )";
         }
 
-        // Ordre forcé par score descendant, ignore $order param
-        $dataQuery .= ' ORDER BY score DESC';
-
-        // Limite forcée à 10, ignore $length param
-        $dataQuery .= ' LIMIT 10 OFFSET :offset';
+        $dataQuery .= $orderClause . " LIMIT :limit OFFSET :offset";
 
         $dataStmt = $this->_db->getConn()->prepare($dataQuery);
         $dataStmt->bindValue(':identifier', $identifier);
         if (!empty($search)) {
             $dataStmt->bindValue(':search', $searchParam);
         }
-        // Fixe limit à 10 en dur, donc pas besoin de bindValue :limit
+        $dataStmt->bindValue(':limit', $length, PDO::PARAM_INT);
         $dataStmt->bindValue(':offset', $start, PDO::PARAM_INT);
         $dataStmt->execute();
 
@@ -747,8 +764,9 @@ class Internship extends Model
 
         return [
             'data' => $results,
-            'total' => (int)$total
+            'total' => (int) $total
         ];
     }
+
 
 }

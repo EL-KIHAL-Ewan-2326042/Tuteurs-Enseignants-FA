@@ -252,6 +252,7 @@ class Model
             "id_teacher" => $identifier,
             "internship_identifier" => $internship['internship_identifier'],
             "student_number" => $internship['student_number'],
+            "distance" => $distance,
             "score" => round($ScoreFinal, 2),
             "type" => $internship['type']
         ];
@@ -590,6 +591,9 @@ where maxi_number_intern > nb_stage  and maxi_number_apprentice > nb_alternance
 
         }
 
+        usort($final, function ($a, $b) {
+            return $b['score'] <=> $a['score'];
+        });
 
         return $final;
     }

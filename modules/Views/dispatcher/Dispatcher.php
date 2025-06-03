@@ -47,17 +47,18 @@ class Dispatcher
                             <?php
                             Table::render(
                                 'dispatch-table',
-                                ['Etudiant','Enseignant', 'Stage', 'Sujet', 'Adresse', 'Score', 'internship_identifier', 'teacher_address', 'Associer'],
+                                ['Associer','Etudiant','Enseignant', 'Stage', 'Score','Distance', 'Sujet','Adresse', 'internship_identifier', 'teacher_address'],
                                 [
+                                    ['data' => 'associate'],
                                     ['data' => 'student'],
                                     ['data' => 'teacher'],
                                     ['data' => 'internship'],
+                                    ['data' => 'score'],
+                                    ['data' => 'distance'],
                                     ['data' => 'subject'],
                                     ['data' => 'address'],
-                                    ['data' => 'score'],
                                     ['data' => 'internship_identifier'],
-                                    ['data' => 'teacher_address'],
-                                    ['data' => 'associate']
+                                    ['data' => 'teacher_address']
                                 ],
                                 '/api/dispatch-list'
                             );

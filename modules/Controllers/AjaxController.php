@@ -54,6 +54,7 @@ class AjaxController
             'address' => $item['address'],
             'teacher_address' => $teacherAddress,
             'score' => $item['score'],
+            'position' => $item['distance'],
             'internship_identifier' => $item['internship_identifier'],
             'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . htmlspecialchars($checkboxValue) . '">'
         ];

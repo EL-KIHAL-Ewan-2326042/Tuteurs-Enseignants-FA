@@ -24,6 +24,6 @@ class ViewStage
             ['data' => 'entreprise'],
         ];
 
-        Table::render('viewStage', $headers, $jsColumns, '/api/datatable/stage/' . urlencode(trim($idStage)), false);
+        Table::render('viewStage', $headers, $jsColumns, '/api/datatable/stage/' . urlencode(trim($idStage)), true);
     }
 }
