@@ -115,7 +115,7 @@ class Internship extends Model
     }
 
 
-    public function getDistance(string $internship_identifier, string $id_teacher, bool $bound = false): int
+    public function getDistance(string $internship_identifier, string $id_teacher, bool $bound = false): int | null
     {
         if (isset($this->cache['getDistance'][$internship_identifier][$id_teacher])) {
             return $this->cache['getDistance'][$internship_identifier][$id_teacher];
