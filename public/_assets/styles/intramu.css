@@ -7,6 +7,7 @@ main {
 h1 , label{
     color: var(--couleur-bleu-roi);
 }
+
 p {
     color: var(--couleur-bleu);
 }
@@ -72,7 +73,7 @@ button {
 }
 
 .form-section article h1 {
-    font-size: 2rem;
+    font-size: 1.6rem;
 }
 .form-section article p {
     font-weight: lighter;
