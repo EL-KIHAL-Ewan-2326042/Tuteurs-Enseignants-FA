@@ -103,7 +103,7 @@ class AjaxController
                 'subject' => $item['internship_subject'],
                 'address' => $item['address'],
                 'teacher_address' => $teacherAddress,
-                'score' => $item['relevance_score'],
+                'score' => $this->renderStars($item['relevance_score']),
                 'internship_identifier' => $item['internship_identifier'],
                 'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . htmlspecialchars($checkboxValue) . '" checked>'
             ];
@@ -126,7 +126,7 @@ class AjaxController
                 'subject' => $item['internship_subject'],
                 'address' => $item['address'],
                 'teacher_address' => $teacherAddress,
-                'score' => $item['score'],
+                'score' => $this->renderStars($item['score']),
                 'internship_identifier' => $item['internship_identifier'],
                 'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . htmlspecialchars($checkboxValue) . '">'
             ];
@@ -141,8 +141,11 @@ class AjaxController
 
 
 
-    function renderStars(float $score): string
+    function renderStars(float | null $score): string | null
     {
+        if ($score === null) {
+            return null;
+        }
         $fullStars = floor($score);
 
         $decimalPart = $score - $fullStars;
@@ -165,7 +168,7 @@ class AjaxController
             $stars .= '<span class="empty"></span>';
         }
 
-        return $stars;
+        return '<div class="star-rating" title="Score : ' . number_format($score, 1) . ' / 5" style="cursor: default; z-index: 10000000000;">' . $stars . '</div>';
     }
     /**
      * Traite les requêtes AJAX pour les tableaux DataTables
@@ -244,8 +247,9 @@ class AjaxController
                     $order
                 );
                 foreach ($result['data'] as &$row) {
-                    // $row['score'] est un float, on appelle renderStars pour générer les étoiles
-                    $row['score'] = $this->renderStars((float)$row['score']);
+                    if (isset($row['score'])) {
+                        $row['score'] = $this->renderStars((float)$row['score']);
+                    }
                 }
                 break;
 

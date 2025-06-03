@@ -240,14 +240,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 stageCont.innerHTML = html;
             }
 
-            // Re-init stage DataTable
             const stageCols = [
                 { data: 'prof' },
-                { data: 'history' },
                 { data: 'distance' },
                 { data: 'discipline' },
                 { data: 'score' },
-                { data: 'entreprise' }
+                { data: 'entreprise' },
+                { data: 'history' },
             ];
 
             // Effacer les markers existants

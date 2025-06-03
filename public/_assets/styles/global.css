@@ -78,3 +78,17 @@ a, li {
     font-family: sans-serif;
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 }
+
+.filled::before {
+    content: "★";
+    color: gold;
+}
+.half::before {
+    content: "★";
+    color: gold;
+    opacity: 0.5;
+}
+.empty::before {
+    content: "☆";
+    color: lightgray;
+}
