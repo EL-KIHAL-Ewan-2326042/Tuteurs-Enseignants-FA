@@ -13,15 +13,15 @@ class ViewStage
      */
     public static function render(string $idStage): void
     {
-        $headers = ['Professeur', 'Historique', 'Position', 'Discipline', 'Score', 'Entreprise'];
+        $headers = ['Professeur', 'Position', 'Discipline', 'Score', 'Entreprise', 'Historique'];
 
         $jsColumns = [
             ['data' => 'prof'],
-            ['data' => 'history'],
             ['data' => 'distance'],
             ['data' => 'discipline'],
             ['data' => 'score'],
             ['data' => 'entreprise'],
+            ['data' => 'history'],
         ];
 
         Table::render('viewStage', $headers, $jsColumns, '/api/datatable/stage/' . urlencode(trim($idStage)), true);
