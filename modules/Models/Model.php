@@ -43,73 +43,37 @@ class Model
      * Géocode une adresse en latitude/longitude en utilisant Nominatim avec cache local.
      */
     public function geocodeAddress(string $address): ?array
-    {
-        // Vérifier si l'adresse est déjà en cache
-        $cacheKey = md5($address);
-        if (isset($this->cache[$cacheKey])) {
-            return $this->cache[$cacheKey];
-        }
+{
+    $url = "https://nominatim.openstreetmap.org/search?format=json&q="
+        . urlencode($address);
 
-        // URL de base de l'API Nominatim
-        $url = 'https://nominatim.openstreetmap.org/search';
+    $options = [
+        "http" => [
+            "header" =>
+                "User-Agent: MonApplication/1.0 (contact@monapplication.com)"
+        ]
+    ];
 
-        // Paramètres de la requête
-        $params = [
-            'q' => $address,
-            'format' => 'json',
-            'limit' => 1,
-            'addressdetails' => 1
-        ];
+    $context = stream_context_create($options);
 
-        // Construction de l'URL avec les paramètres
-        $requestUrl = $url . '?' . http_build_query($params);
-
-        try {
-            // Configuration de cURL pour la requête HTTP
-            $ch = curl_init();
-            curl_setopt_array($ch, [
-                CURLOPT_URL => $requestUrl,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_TIMEOUT => 5,
-                // Nominatim exige un User-Agent personnalisé
-                CURLOPT_USERAGENT => 'TutormapFA/1.0 (iut-aix-informatique@univ-amu.fr)',
-                CURLOPT_REFERER => $_SERVER['HTTP_HOST'] ?? 'localhost'
-            ]);
-
-            // Exécution de la requête
-            $response = curl_exec($ch);
-            $error = curl_error($ch);
-            curl_close($ch);
-
-            if ($response === false) {
-                throw new Exception("Erreur de requête Nominatim: $error");
-            }
-
-            // Décoder la réponse JSON
-            $data = json_decode($response, true);
-
-            // Vérifier si des résultats ont été trouvés
-            if (empty($data)) {
-                $coordinates = null;
-            } else {
-                $coordinates = [
-                    'lat' => (float)$data[0]['lat'],
-                    'lng' => (float)$data[0]['lon']
-                ];
-            }
-
-            // Mettre en cache le résultat
-            $this->cache[$cacheKey] = $coordinates;
-            $this->saveCache();
-
-            // Respecter la politique d'utilisation de Nominatim (1 requête par seconde)
-            sleep(1);
-
-            return $coordinates;
-        } catch (Exception $e) {
-            return null;
-        }
+    try {
+        $response = @file_get_contents($url, false, $context);
     }
+    catch (Exception) {
+        return null;
+    }
+
+    $data = json_decode($response, true);
+
+    if (!empty($data)) {
+        return [
+            'lat' => $data[0]['lat'],
+            'lng' => $data[0]['lon']
+        ];
+    }
+
+    return null;
+}
 
     public function calculateDuration(array $latLngInternship, array $latLngTeacher): ?int
     {
@@ -283,8 +247,8 @@ class Model
         $ScoreFinal = ($totalScore * 5) / $totalCoef;
 
         $newList = [
-            "teacher_firstname" => $teacher['teacher_firstname'],
-            "teacher_name" => $teacher['teacher_name'],
+            "teacher_firstname" => 'errr',
+            "teacher_name" => 'eezeezz',
             "company_name" => $internship['company_name'],
             "internship_subject" => $internship['internship_subject'],
             "address" => $internship['address'],

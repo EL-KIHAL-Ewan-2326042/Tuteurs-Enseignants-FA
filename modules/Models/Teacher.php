@@ -335,4 +335,12 @@ class Teacher extends Model
             'total' => (int)$total
         ];
     }
+
+    public function getAllTeachers()
+    {
+        $stmt = $this->_db->getConn()->prepare("SELECT * FROM teacher");
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }

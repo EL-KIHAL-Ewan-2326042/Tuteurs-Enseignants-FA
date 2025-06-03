@@ -40,7 +40,7 @@ function initDataTable(id, ajaxUrl, columns, paginationEnabled = true) {
         select: {
             items: 'row'
         },
-        lengthMenu: [10, 20, 50, 100],
+        lengthMenu: [10, 20, 50, 100, 1000],
 
         // Désactive pagination / info si paginationEnabled = false
         paging: paginationEnabled,

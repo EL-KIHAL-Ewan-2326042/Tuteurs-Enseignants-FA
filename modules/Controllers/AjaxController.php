@@ -272,15 +272,70 @@ class AjaxController
 
         $db = Database::getInstance();
         $internshipModel = new Internship($db);
+        $teacherModel = new Teacher($db);
+        $model = new Model($db);
 
-        // Récupérer les données de viewStage
-        $viewStageData = $internshipModel->paginateStage($internshipId, 0, 10);
+        // Récupérer tous les enseignants
+        $teachers = $teacherModel->getAllTeachers();
+        $internshipList = $internshipModel->getInternshipById($internshipId);
+        if (empty($internshipList)) {
+            echo json_encode(['error' => 'Stage introuvable']);
+            return;
+        }
+        $internship = $internshipList[0];
 
-        // Inclure les scores de dispatcher-list
-        $viewStageData['dispatch_scores'] = $_SESSION['dispatch_scores'] ?? [];
+        $assignedTeacherId = $internship['id_teacher'] ?? null;
 
-        echo json_encode($viewStageData);
+        $dictCoef = [
+            'Distance' => 1.0,
+            'Discipline' => 1.0,
+            'A été responsable' => 1.0,
+            'Est demandé' => 1.0
+        ];
+
+        $scores = [];
+
+        foreach ($teachers as $teacher) {
+            $scoreData = $model->calculateRelevanceTeacherStudentsAssociate($teacher, $dictCoef, $internship);
+
+            $scoreData['associe'] = ($teacher['id_teacher'] == $assignedTeacherId);
+
+            // Transformation pour coller aux colonnes front
+            $scores[] = [
+                'prof' => $teacher['teacher_firstname'] . ' ' . $teacher['teacher_name'],
+                'distance' => $scoreData['Distance'] ?? null, // à récupérer si disponible, sinon null
+                'discipline' => $scoreData['Discipline'] ?? null,
+                'score' => $scoreData['score'] ?? 0,
+                'entreprise' => $internship['company_name'] ?? '',
+                'history' => $scoreData['A été responsable'] ?? null, // peut-être un nombre ou texte selon ta fonction
+                'associe' => $scoreData['associe'],
+                'id_teacher' => $teacher['id_teacher'], // utile pour check + front si besoin
+            ];
+        }
+
+        // Tri décroissant sur le score
+        usort($scores, fn($a, $b) => $b['score'] <=> $a['score']);
+
+        $top = array_slice($scores, 0, 10);
+
+        // Si enseignant assigné pas dans le top, on l'ajoute
+        if ($assignedTeacherId !== null && !in_array($assignedTeacherId, array_column($top, 'id_teacher'))) {
+            foreach ($scores as $entry) {
+                if ($entry['id_teacher'] == $assignedTeacherId) {
+                    $entry['associe'] = true;
+                    $top[] = $entry;
+                    break;
+                }
+            }
+            usort($top, fn($a, $b) => $b['score'] <=> $a['score']);
+        }
+
+        echo json_encode([
+            'data' => $top
+        ]);
     }
+
+
 
     /**
      * Envoie une réponse JSON avec les en-têtes appropriés

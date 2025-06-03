@@ -768,5 +768,13 @@ class Internship extends Model
         ];
     }
 
+    public function getInternshipById(string $internshipId)
+    {
+        $stmt = $this->_db->getConn()->prepare("SELECT * FROM internship where internship_identifier = :internshipId ");
+        $stmt->bindValue(':internshipId', $internshipId);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 
 }
