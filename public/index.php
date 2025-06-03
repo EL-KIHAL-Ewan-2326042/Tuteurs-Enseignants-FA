@@ -161,8 +161,17 @@ $router->get('/api/viewStage/([A-Za-z0-9]+)', function () {
 });
 
 $router->post('/api/dispatch-list', function () {
-    (new \Blog\Controllers\AjaxController())->getDispatchList();
+    $start = $_POST['start'] ?? 0;
+    $length = $_POST['length'] ?? 10;
+    $search = $_POST['search']['value'] ?? '';
+    $order = [
+        'column' => $_POST['order'][0]['column'] ?? 0,
+        'dir' => $_POST['order'][0]['dir'] ?? 'ASC'
+    ];
+
+    (new \Blog\Controllers\AjaxController())->getDispatchList($start, $length, $search, $order);
 });
+
 
 
 

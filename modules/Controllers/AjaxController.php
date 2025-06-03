@@ -22,77 +22,122 @@ use PDO;
 class AjaxController
 {
 
-    public function getDispatchList(): void
-{
-    header('Content-Type: application/json');
+    public function getDispatchList(int $start, int $length, string $search = '', array $order = []): void
+    {
+        header('Content-Type: application/json');
 
-    $db = Database::getInstance();
-    $teacherModel = new Teacher($db);
-    $studentModel = new Student($db);
-    $model = new Model($db);
-    $dictCoef = $_SESSION['last_dict_coef'] ?? [];
-    if (empty($dictCoef)) {
-        echo json_encode(['data' => []]);
-        exit();
-    }
+        $db = Database::getInstance();
+        $teacherModel = new Teacher($db);
+        $studentModel = new Student($db);
+        $model = new Model($db);
+        $dictCoef = $_SESSION['last_dict_coef'] ?? [];
+        if (empty($dictCoef)) {
+            echo json_encode(['data' => [], 'total' => 0]);
+            exit();
+        }
 
-    $data = [];
-    $scores = [];
-    $resultDispatchList = $model->dispatcherEnMieux($dictCoef);
-
-    $stmt = $db->getConn()->prepare("SELECT * FROM internship WHERE id_teacher IS NOT NULL AND end_date_internship > NOW();");
-    $stmt->execute();
-    $existingAssociations = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($existingAssociations as $item) {
-        $checkboxValue = $item['id_teacher'] . '$' . $item['internship_identifier'] . '$' . $item['relevance_score'];
-        $companyName = $item['company_name'];
-
-        $studentFullName = $studentModel->getFullName($item['student_number']);
-
-        $teacherAddress = $teacherModel->getTeacherAddress($item['id_teacher']);
-        $teacherFullName = $teacherModel->getFullName($item['id_teacher']);
-        $data[] = [
-            'teacher' => $teacherFullName,
-            'student' => $studentFullName,
-            'internship' => $companyName,
-            'subject' => $item['internship_subject'],
-            'address' => $item['address'],
-            'teacher_address' => $teacherAddress,
-            'score' => $item['relevance_score'],
-            'internship_identifier' => $item['internship_identifier'],
-            'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . htmlspecialchars($checkboxValue) . '" checked>'
+        $columns = [
+            'id_teacher',
+            'student_number',
+            'internship_identifier',
+            'subject',
+            'address',
+            'teacher_address',
+            'score',
+            'internship_identifier'
         ];
 
-        $scores[] = $item['relevance_score'];
+        $countQuery = "SELECT COUNT(*) as total FROM internship WHERE id_teacher IS NOT NULL AND end_date_internship > NOW()";
 
+        if (!empty($search)) {
+            $countQuery .= ' AND (company_name ILIKE :search OR internship_subject ILIKE :search OR address ILIKE :search)';
+        }
+
+        $countStmt = $db->getConn()->prepare($countQuery);
+        if (!empty($search)) {
+            $searchParam = '%' . $search . '%';
+            $countStmt->bindValue(':search', $searchParam);
+        }
+        $countStmt->execute();
+        $total = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
+
+        $data = [];
+        $scores = [];
+        $resultDispatchList = $model->dispatcherEnMieux($dictCoef);
+
+        $dataQuery = "SELECT * FROM internship WHERE id_teacher IS NOT NULL AND end_date_internship > NOW()";
+
+        if (!empty($search)) {
+            $dataQuery .= ' AND (company_name ILIKE :search OR internship_subject ILIKE :search OR address ILIKE :search)';
+        }
+
+        if (!empty($order) && isset($order['column']) && isset($columns[$order['column']]) && $columns[$order['column']] !== null) {
+            $dataQuery .= ' ORDER BY ' . $columns[$order['column']] . ' ' . (strtoupper($order['dir']) === 'DESC' ? 'DESC' : 'ASC');
+        } else {
+            $dataQuery .= ' ORDER BY company_name ASC';
+        }
+
+        $dataQuery .= ' LIMIT :limit OFFSET :offset';
+
+        $dataStmt = $db->getConn()->prepare($dataQuery);
+        if (!empty($search)) {
+            $dataStmt->bindValue(':search', $searchParam);
+        }
+        $dataStmt->bindValue(':limit', $length, PDO::PARAM_INT);
+        $dataStmt->bindValue(':offset', $start, PDO::PARAM_INT);
+        $dataStmt->execute();
+        $existingAssociations = $dataStmt->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($existingAssociations as $item) {
+            $checkboxValue = $item['id_teacher'] . '$' . $item['internship_identifier'] . '$' . $item['relevance_score'];
+            $companyName = $item['company_name'];
+
+            $studentFullName = $studentModel->getFullName($item['student_number']);
+
+            $teacherAddress = $teacherModel->getTeacherAddress($item['id_teacher']);
+            $teacherFullName = $teacherModel->getFullName($item['id_teacher']);
+            $data[] = [
+                'teacher' => $teacherFullName,
+                'student' => $studentFullName,
+                'internship' => $companyName,
+                'subject' => $item['internship_subject'],
+                'address' => $item['address'],
+                'teacher_address' => $teacherAddress,
+                'score' => $item['relevance_score'],
+                'internship_identifier' => $item['internship_identifier'],
+                'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . htmlspecialchars($checkboxValue) . '" checked>'
+            ];
+
+            $scores[] = $item['relevance_score'];
+        }
+
+        foreach ($resultDispatchList as $item) {
+            $checkboxValue = $item['id_teacher'] . '$' . $item['internship_identifier'] . '$' . $item['score'];
+            $companyName = $item['company_name'];
+
+            $studentFullName = $studentModel->getFullName($item['student_number']);
+
+            $teacherAddress = $teacherModel->getTeacherAddress($item['id_teacher']);
+            $teacherFullName = $teacherModel->getFullName($item['id_teacher']);
+            $data[] = [
+                'teacher' => $teacherFullName,
+                'student' => $studentFullName,
+                'internship' => $companyName,
+                'subject' => $item['internship_subject'],
+                'address' => $item['address'],
+                'teacher_address' => $teacherAddress,
+                'score' => $item['score'],
+                'internship_identifier' => $item['internship_identifier'],
+                'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . htmlspecialchars($checkboxValue) . '">'
+            ];
+
+            $scores[] = $item['score'];
+        }
+
+        $_SESSION['dispatch_scores'] = $scores;
+
+        echo json_encode(['data' => $data, 'total' => (int)$total]);
     }
-    foreach ($resultDispatchList as $item) {
-        $checkboxValue = $item['id_teacher'] . '$' . $item['internship_identifier'] . '$' . $item['score'];
-        $companyName = $item['company_name'];
-
-        $studentFullName = $studentModel->getFullName($item['student_number']);
-
-        $teacherAddress = $teacherModel->getTeacherAddress($item['id_teacher']);
-        $teacherFullName = $teacherModel->getFullName($item['id_teacher']);
-        $data[] = [
-            'teacher' => $teacherFullName,
-            'student' => $studentFullName,
-            'internship' => $companyName,
-            'subject' => $item['internship_subject'],
-            'address' => $item['address'],
-            'teacher_address' => $teacherAddress,
-            'score' => $item['score'],
-            'internship_identifier' => $item['internship_identifier'],
-            'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . htmlspecialchars($checkboxValue) . '">'
-        ];
-
-        $scores[] = $item['score'];
-    }
-
-    $_SESSION['dispatch_scores'] = $scores;
-
-    echo json_encode(['data' => $data]);
-}
 
 
 

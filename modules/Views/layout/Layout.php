@@ -115,8 +115,8 @@ class Layout
                             }
 
                             if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep') {
-                                echo '<li><a href="/dashboard">dashboard</a></li>';
-                                echo '<li><a href="/dispatcher">dispatcher</a></li>';
+                                echo '<li><a href="/dashboard">Gestions des données</a></li>';
+                                echo '<li><a href="/dispatcher">Répartiteur</a></li>';
                             }
                             ?>
                         </ul>
