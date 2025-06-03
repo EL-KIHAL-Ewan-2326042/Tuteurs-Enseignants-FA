@@ -103,7 +103,7 @@ main {
 .partie2 > .dataTable { max-width: 65%; overflow: auto; max-height: 80vh }
 .partie2 > .cont-map { width: 35%; position: relative; }
 #map {
-    width: 100%; height: 100%;
+    width: 100%; min-height: 80vh; max-height: 80vh;
     background-color: var(--couleur-bleu-roi);
     border-radius: .4rem;
     box-shadow: 0 2px 16px rgba(14, 30, 37, 0.32);

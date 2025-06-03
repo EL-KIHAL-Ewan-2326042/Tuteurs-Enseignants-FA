@@ -33,24 +33,12 @@ class Teacher extends Model
         $this->_db = $db;
     }
 
-    public function getFullName(string $identifier): ?array
+    public function getFullName(string $idTeacher): string
     {
-        if (empty($identifier)) {
-            return null;
-        }
-        if (isset($this->cache['getFullName'][$identifier])) {
-            return $this->cache['getFullName'][$identifier];
-        }
-
-        $db = $this->_db;
-        $query = 'SELECT teacher_name, teacher_firstname FROM teacher WHERE id_teacher = :id_teacher';
-        $stmt = $db->getConn()->prepare($query);
-        $stmt->bindParam(':id_teacher', $identifier);
+        $stmt = $this->_db->getConn()->prepare("SELECT CONCAT(teacher_name, ' ', teacher_firstname) FROM teacher where id_teacher = :idTeacher ");
+        $stmt->bindValue(':idTeacher', $idTeacher);
         $stmt->execute();
-        $result = $stmt->fetch($db->getConn()::FETCH_ASSOC);
-
-        $this->cache['getFullName'][$identifier] = $result;
-        return $result;
+        return $stmt->fetchColumn();
     }
 
     public function getAddress(string $id_teacher): false|array

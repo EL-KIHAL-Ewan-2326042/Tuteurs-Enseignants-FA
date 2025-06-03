@@ -17,6 +17,7 @@ use Blog\Models\Student;
 use Blog\Models\Teacher;
 use includes\Database;
 use JetBrains\PhpStorm\NoReturn;
+use PDO;
 
 class AjaxController
 {
@@ -35,9 +36,36 @@ class AjaxController
         exit();
     }
 
-    $resultDispatchList = $model->dispatcherEnMieux($dictCoef);
     $data = [];
     $scores = [];
+    $resultDispatchList = $model->dispatcherEnMieux($dictCoef);
+
+    $stmt = $db->getConn()->prepare("SELECT * FROM internship WHERE id_teacher IS NOT NULL AND end_date_internship > NOW();");
+    $stmt->execute();
+    $existingAssociations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($existingAssociations as $item) {
+        $checkboxValue = $item['id_teacher'] . '$' . $item['internship_identifier'] . '$' . $item['relevance_score'];
+        $companyName = $item['company_name'];
+
+        $studentFullName = $studentModel->getFullName($item['student_number']);
+
+        $teacherAddress = $teacherModel->getTeacherAddress($item['id_teacher']);
+        $teacherFullName = $teacherModel->getFullName($item['id_teacher']);
+        $data[] = [
+            'teacher' => $teacherFullName,
+            'student' => $studentFullName,
+            'internship' => $companyName,
+            'subject' => $item['internship_subject'],
+            'address' => $item['address'],
+            'teacher_address' => $teacherAddress,
+            'score' => $item['relevance_score'],
+            'internship_identifier' => $item['internship_identifier'],
+            'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . htmlspecialchars($checkboxValue) . '" checked>'
+        ];
+
+        $scores[] = $item['relevance_score'];
+
+    }
     foreach ($resultDispatchList as $item) {
         $checkboxValue = $item['id_teacher'] . '$' . $item['internship_identifier'] . '$' . $item['score'];
         $companyName = $item['company_name'];
@@ -45,16 +73,15 @@ class AjaxController
         $studentFullName = $studentModel->getFullName($item['student_number']);
 
         $teacherAddress = $teacherModel->getTeacherAddress($item['id_teacher']);
-
+        $teacherFullName = $teacherModel->getFullName($item['id_teacher']);
         $data[] = [
-            'teacher' => $item['teacher_firstname'] . ' ' . $item['teacher_name'],
+            'teacher' => $teacherFullName,
             'student' => $studentFullName,
             'internship' => $companyName,
             'subject' => $item['internship_subject'],
             'address' => $item['address'],
             'teacher_address' => $teacherAddress,
             'score' => $item['score'],
-            'position' => $item['distance'],
             'internship_identifier' => $item['internship_identifier'],
             'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . htmlspecialchars($checkboxValue) . '">'
         ];

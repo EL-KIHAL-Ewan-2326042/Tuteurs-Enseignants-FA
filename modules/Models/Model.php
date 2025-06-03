@@ -252,7 +252,6 @@ class Model
             "id_teacher" => $identifier,
             "internship_identifier" => $internship['internship_identifier'],
             "student_number" => $internship['student_number'],
-            "distance" => $distance,
             "score" => round($ScoreFinal, 2),
             "type" => $internship['type']
         ];
@@ -565,30 +564,40 @@ class Model
         $intershipSansTuteur = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $stmt = $this->_db->getConn()->prepare("
-with cte_alternance as (
-	select id_teacher, COUNT(*) as nb_alternance
-	from internship i
-	where end_date_internship > Now() and type = 'alternance'
-	group by id_teacher
-), cte_stage as (
-	select id_teacher, COUNT(*) as nb_stage
-	from internship i
-	where end_date_internship > Now() and type = 'stage'
-	group by id_teacher
-)
-select t.id_teacher, t.teacher_name, t.teacher_firstname from teacher t
-left join cte_alternance ca on t.id_teacher = ca.id_teacher
-left join cte_stage cs on t.id_teacher = cs.id_teacher
-where maxi_number_intern > nb_stage  and maxi_number_apprentice > nb_alternance
+        with cte_alternance as (
+            select id_teacher, COUNT(*) as nb_alternance
+            from internship i
+            where end_date_internship > Now() and type = 'alternance'
+            group by id_teacher
+        ), cte_stage as (
+            select id_teacher, COUNT(*) as nb_stage
+            from internship i
+            where end_date_internship > Now() and type = 'stage'
+            group by id_teacher
+        )
+        select t.id_teacher, t.teacher_name, t.teacher_firstname from teacher t
+        left join cte_alternance ca on t.id_teacher = ca.id_teacher
+        left join cte_stage cs on t.id_teacher = cs.id_teacher
+        where maxi_number_intern > nb_stage and maxi_number_apprentice > nb_alternance
     ");
         $stmt->execute();
         $teacherQuiSontPasFull = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
         foreach ($intershipSansTuteur as $internship) {
+            $bestTeacher = null;
+            $bestScore = -1;
+
             foreach ($teacherQuiSontPasFull as $teacher) {
-                $result = $this->calculateRelevanceTeacherStudentsAssociate($teacher ,$dictCoef, $internship);
-                $final[] = $result;
+                $result = $this->calculateRelevanceTeacherStudentsAssociate($teacher, $dictCoef, $internship);
+                if ($result['score'] > $bestScore) {
+                    $bestScore = $result['score'];
+                    $bestTeacher = $result;
+                }
             }
 
+            if ($bestTeacher !== null) {
+                $final[] = $bestTeacher;
+            }
         }
 
         usort($final, function ($a, $b) {
@@ -597,5 +606,6 @@ where maxi_number_intern > nb_stage  and maxi_number_apprentice > nb_alternance
 
         return $final;
     }
+
 
 }
