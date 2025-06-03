@@ -117,71 +117,79 @@ class Internship extends Model
 
     public function getDistance(string $internship_identifier, string $id_teacher, bool $bound = false): int
     {
+
         if (isset($this->cache['getDistance'][$internship_identifier][$id_teacher])) {
             return $this->cache['getDistance'][$internship_identifier][$id_teacher];
         }
 
         $conn = $this->_db->getConn();
 
-        // Vérifier si distance déjà en base
         $stmt = $conn->prepare('SELECT distance FROM Distance WHERE internship_identifier = :internship AND id_teacher = :teacher');
         $stmt->execute([':internship' => $internship_identifier, ':teacher' => $id_teacher]);
         $distanceDb = $stmt->fetchColumn();
 
-        if ($distanceDb !== false) {
-            $distance = (int)$distanceDb;
-            $this->cache['getDistance'][$internship_identifier][$id_teacher] = $distance;
-            return $distance;
+        if ($distanceDb !== false && $distanceDb > 0) {
+            $this->cache['getDistance'][$internship_identifier][$id_teacher] = (int)$distanceDb;
+            return (int)$distanceDb;
         }
 
-        // Récupérer l'adresse du stage
+        // Get internship address
         $stmt = $conn->prepare('SELECT address FROM Internship WHERE internship_identifier = :internship');
         $stmt->execute([':internship' => $internship_identifier]);
         $internshipAddress = $stmt->fetchColumn();
 
         if (!$internshipAddress) {
-            return 60; // Valeur par défaut si pas d'adresse
+            return 58;
         }
 
-        // Récupérer les adresses de l'enseignant
+        // Get teacher addresses
         $stmt = $conn->prepare('SELECT address FROM Has_address WHERE id_teacher = :teacher');
         $stmt->execute([':teacher' => $id_teacher]);
         $teacherAddresses = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
         if (empty($teacherAddresses)) {
-            return 60; // Valeur par défaut si pas d'adresse enseignant
+            return 59;
         }
 
+        // Geocode internship address
         $latLngInternship = $this->geocodeAddress($internshipAddress);
+
         if (!$latLngInternship) {
-            return 60; // Valeur par défaut si géocodage échoue
+            return 61;
         }
 
         $minDuration = PHP_INT_MAX;
+        $validGeocode = false;
 
         foreach ($teacherAddresses as $address) {
             $latLngTeacher = $this->geocodeAddress($address);
-            if (!$latLngTeacher) {
-                continue;
-            }
 
+            $validGeocode = true;
             $duration = $this->calculateDuration($latLngInternship, $latLngTeacher);
-            if (!is_numeric($duration)) {
-                continue;
+
+            if (is_numeric($duration) && $duration < $minDuration) {
+                $minDuration = $duration;
             }
-
-            $this->cache['getDistance'][$internship_identifier][$id_teacher] = $duration;
-
-            return $duration;
         }
 
-
-        if ($minDuration === PHP_INT_MAX || $minDuration > 999999 || $minDuration < 0) {
-            $minDuration = 60;
+        if (!$validGeocode || $minDuration === PHP_INT_MAX) {
+            return 62;
         }
+
+        $minDuration = max(1, min(999, (int)$minDuration));
+
+        // Save to database
+        $stmt = $conn->prepare('INSERT INTO Distance (internship_identifier, id_teacher, distance)
+                       VALUES (:internship, :teacher, :distance)
+                       ON CONFLICT (internship_identifier, id_teacher) 
+                       DO UPDATE SET distance = :distance');
+        $stmt->execute([
+            ':internship' => $internship_identifier,
+            ':teacher' => $id_teacher,
+            ':distance' => $minDuration
+        ]);
 
         $this->cache['getDistance'][$internship_identifier][$id_teacher] = $minDuration;
-
         return $minDuration;
     }
 
