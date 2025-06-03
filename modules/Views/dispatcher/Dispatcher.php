@@ -47,13 +47,11 @@ class Dispatcher
                             <?php
                             Table::render(
                                 'dispatch-table',
-                                ['Etudiant','Enseignant', 'Stage', 'Formation', 'Groupe', 'Sujet', 'Adresse', 'Score', 'internship_identifier', 'teacher_address', 'Associer'],
+                                ['Etudiant','Enseignant', 'Stage', 'Sujet', 'Adresse', 'Score', 'internship_identifier', 'teacher_address', 'Associer'],
                                 [
                                     ['data' => 'student'],
                                     ['data' => 'teacher'],
                                     ['data' => 'internship'],
-                                    ['data' => 'formation'],
-                                    ['data' => 'group'],
                                     ['data' => 'subject'],
                                     ['data' => 'address'],
                                     ['data' => 'score'],

@@ -166,29 +166,19 @@ class Internship extends Model
             }
 
             $duration = $this->calculateDuration($latLngInternship, $latLngTeacher);
-
-            if ($duration < $minDuration) {
-                $minDuration = $duration;
-                if ($minDuration === 0) {
-                    break; // Durée minimale, arrêt
-                }
+            if (!is_numeric($duration)) {
+                continue;
             }
+
+            $this->cache['getDistance'][$internship_identifier][$id_teacher] = $duration;
+
+            return $duration;
         }
 
-        if ($minDuration === PHP_INT_MAX || $minDuration > 999999) {
+
+        if ($minDuration === PHP_INT_MAX || $minDuration > 999999 || $minDuration < 0) {
             $minDuration = 60;
         }
-
-            $stmt = $conn->prepare(
-                'INSERT INTO Distance (id_teacher, internship_identifier, distance) 
-             VALUES (:teacher, :internship, :distance) 
-             ON CONFLICT (id_teacher, internship_identifier) DO UPDATE SET distance = EXCLUDED.distance'
-            );
-            $stmt->execute([
-                ':teacher' => $id_teacher,
-                ':internship' => $internship_identifier,
-                ':distance' => $minDuration,
-            ]);
 
         $this->cache['getDistance'][$internship_identifier][$id_teacher] = $minDuration;
 
@@ -671,7 +661,12 @@ class Internship extends Model
     SELECT COUNT(DISTINCT i.internship_identifier) as total
     FROM internship i
     JOIN teacher t ON TRUE
-    LEFT JOIN has_address ha ON t.id_teacher = ha.id_teacher
+    LEFT join LATERAL (
+    	select address 
+    	from has_address ha
+    	where t.id_teacher = ha.id_teacher
+    	limit 1
+    ) ha on true 
     LEFT JOIN cte_histo h ON t.id_teacher = h.id_teacher
     LEFT JOIN is_taught it ON t.id_teacher = it.id_teacher
     LEFT JOIN LATERAL (
@@ -713,7 +708,12 @@ class Internship extends Model
         ha.address as teacher_address
     FROM internship i
     JOIN teacher t ON TRUE
-    LEFT JOIN has_address ha ON t.id_teacher = ha.id_teacher
+    LEFT join LATERAL (
+    	select address 
+    	from has_address ha
+    	where t.id_teacher = ha.id_teacher
+    	limit 1
+    ) ha on true 
     LEFT JOIN cte_histo h ON t.id_teacher = h.id_teacher
     LEFT JOIN is_taught it ON t.id_teacher = it.id_teacher
     LEFT JOIN LATERAL (

@@ -119,4 +119,54 @@ function initDataTable(id, ajaxUrl, columns, paginationEnabled = true) {
         }
     });
 }
+const toastQueue = [];
 
+function showToast(message, type = "info") {
+    const colors = {
+        success: "#4CAF50",
+        error: "#f44336",
+        info: "#2196F3"
+    };
+
+    const toast = document.createElement("div");
+    toast.textContent = message;
+    toast.style.position = "fixed";
+    toast.style.bottom = "30px";
+    toast.style.right = "30px";
+    toast.style.backgroundColor = colors[type] || colors.info;
+    toast.style.color = "white";
+    toast.style.padding = "10px 20px";
+    toast.style.borderRadius = "5px";
+    toast.style.boxShadow = "0 2px 8px rgba(0,0,0,0.3)";
+    toast.style.fontSize = "16px";
+    toast.style.zIndex = 9999;
+    toast.style.opacity = "0";
+    toast.style.transition = "opacity 0.5s";
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.style.opacity = "1";
+    }, 10);
+
+    setTimeout(() => {
+        toast.style.opacity = "0";
+        setTimeout(() => {
+            toast.remove();
+        }, 500);
+    }, 3000);
+}
+
+function processToastQueue() {
+    if (toastQueue.length === 0) return;
+    const { message, type } = toastQueue.shift();
+    showToast(message, type);
+    setTimeout(processToastQueue, 3500); // Laisse le temps d’affichage + animation
+}
+
+function addToast(message, type = "info") {
+    toastQueue.push({ message, type });
+    if (toastQueue.length === 1) {
+        processToastQueue();
+    }
+}
