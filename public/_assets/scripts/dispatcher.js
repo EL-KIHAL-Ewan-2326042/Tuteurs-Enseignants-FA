@@ -94,7 +94,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function processTeachersData(teachers) {
-        if (!teachers || teachers.length === 0) return;
+        if (!teachers || teachers.length === 0) {
+            console.log('Aucun enseignant trouvé.');
+            return;
+        }
 
         const bounds = [];
 
@@ -109,22 +112,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Extraire les informations du professeur
             let teacherName = teacher.prof;
-            let teacherAddress = '';
+            let teacherAddress = teacher.teacher_address || ''; // Utiliser teacher_address
 
-            // Si le format contient une adresse après " - "
-            if (teacher.prof.includes(' - ')) {
-                const parts = teacher.prof.split(' - ');
-                teacherName = parts[0];
-                teacherAddress = parts[1];
-            } else {
-                // Utiliser une adresse par défaut ou chercher dans d'autres champs
-                teacherAddress = teacher.address || teacher.prof;
+            if (!teacherAddress) {
+                console.log(`Aucune adresse trouvée pour l'enseignant : ${teacherName}`);
+                continue;
             }
 
-            if (!teacherAddress) continue;
-
+            console.log(`Géocodage de l'adresse : ${teacherAddress}`);
             const coord = await geocode(teacherAddress);
             if (coord) {
+                console.log(`Coordonnées trouvées pour ${teacherName}:`, coord);
                 bounds.push(coord);
 
                 // Déterminer la couleur du marker
@@ -139,6 +137,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 addMarker(coord, label, markerIcon);
+            } else {
+                console.log(`Aucune coordonnée trouvée pour l'adresse : ${teacherAddress}`);
             }
         }
 
