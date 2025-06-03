@@ -19,7 +19,7 @@ class Model
     private array $cache = [];
     private array $preparedStatements = [];
 
-    public function __construct(Database $db, string $photonUrl = 'http://localhost:2322', string $cacheFile = __DIR__ . '/geocode_cache.json')
+    public function __construct(Database $db, string $cacheFile = __DIR__ . '/geocode_cache.json')
     {
         $this->_db = $db;
         $this->cacheFile = $cacheFile;
@@ -43,37 +43,52 @@ class Model
      * Géocode une adresse en latitude/longitude en utilisant Nominatim avec cache local.
      */
     public function geocodeAddress(string $address): ?array
-{
-    $url = "https://nominatim.openstreetmap.org/search?format=json&q="
-        . urlencode($address);
+    {
+        // Nettoyage de l'adresse pour l'utiliser comme clé de cache
+        $key = md5(trim(strtolower($address)));
 
-    $options = [
-        "http" => [
-            "header" =>
-                "User-Agent: MonApplication/1.0 (contact@monapplication.com)"
-        ]
-    ];
+        // Vérifie si l'adresse est déjà en cache
+        if (isset($this->cache[$key])) {
+            return $this->cache[$key];
+        }
 
-    $context = stream_context_create($options);
+        $url = "https://nominatim.openstreetmap.org/search?format=json&q=" . urlencode($address);
 
-    try {
+        $options = [
+            "http" => [
+                "header" => "User-Agent: TutormapFA/1.0 (contact@monapplication.com)"
+            ]
+        ];
+
+        $context = stream_context_create($options);
         $response = @file_get_contents($url, false, $context);
-    }
-    catch (Exception) {
+
+        if ($response === false) {
+            return null;
+        }
+
+        $data = json_decode($response, true);
+        if (json_last_error() !== JSON_ERROR_NONE || empty($data)) {
+            return null;
+        }
+
+        if (isset($data[0]['lat'], $data[0]['lon'])) {
+            $coords = [
+                'lat' => (float)$data[0]['lat'],
+                'lng' => (float)$data[0]['lon']
+            ];
+
+            // Sauvegarde dans le cache et dans le fichier
+            $this->cache[$key] = $coords;
+            $this->saveCache();
+
+            return $coords;
+        }
+
         return null;
     }
 
-    $data = json_decode($response, true);
 
-    if (!empty($data)) {
-        return [
-            'lat' => $data[0]['lat'],
-            'lng' => $data[0]['lon']
-        ];
-    }
-
-    return null;
-}
 
     public function calculateDuration(array $latLngInternship, array $latLngTeacher): ?int
     {
@@ -176,15 +191,13 @@ class Model
 
             if (is_numeric($distance)) {
                 $conn = $this->_db->getConn();
-                $stmt = $conn->prepare(
-                    'INSERT INTO Distance (id_teacher, internship_identifier, distance) 
-     VALUES (:teacher, :internship, :distance)
-     ON CONFLICT (id_teacher, internship_identifier)
-     DO UPDATE SET distance = EXCLUDED.distance'
-                );
+                $stmt = $conn->prepare('INSERT INTO Distance (internship_identifier, id_teacher, distance)
+                                                                      VALUES (:internship, :teacher, :distance)
+                                                                      ON CONFLICT (internship_identifier, id_teacher) 
+                                                                      DO UPDATE SET distance = :distance');
 
                 $stmt->execute([
-                    ':teacher' => $identifier,
+                    ':teacher' => $teacher['id_teacher'],
                     ':internship' => $internship['internship_identifier'],
                     ':distance' => $distance,
                 ]);
