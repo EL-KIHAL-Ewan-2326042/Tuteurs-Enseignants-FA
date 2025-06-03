@@ -159,6 +159,10 @@ $router->post('/api/datatable/stage/([A-Za-z0-9]+)', function() {
 $router->get('/api/viewStage/([A-Za-z0-9]+)', function () {
     \Blog\Views\components\ViewStage::render(basename($_SERVER['REQUEST_URI']));
 });
+$router->get('/api/dispatcherViewStage/([A-Za-z0-9]+)', function () {
+    \Blog\Views\components\DispatcherViewStage::render(basename($_SERVER['REQUEST_URI']));
+});
+
 
 $router->post('/api/dispatch-list', function () {
     $start = $_POST['start'] ?? 0;

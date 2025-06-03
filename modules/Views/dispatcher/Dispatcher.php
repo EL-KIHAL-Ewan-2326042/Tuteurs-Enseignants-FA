@@ -3,6 +3,7 @@
 namespace Blog\Views\dispatcher;
 
 use Blog\Views\components\CoefBackup;
+use Blog\Views\components\DispatcherViewStage;
 use Blog\Views\components\Table;
 use Blog\Views\components\ViewStage;
 use Blog\Models\Internship;
@@ -69,25 +70,7 @@ class Dispatcher
                     <div id="viewStageContainer" class="dataTable" <?= $internshipId ? '' : 'style="display:none;"' ?>>
                         <?php if ($internshipId): ?>
                             <form action="./dispatcher" method="post" id="stageAssociateForm">
-                                <?php
-                                Table::render(
-                                    'viewStage',
-                                    ['Associer','Professeur', 'Position', 'Discipline', 'Score', 'Entreprise', 'Historique'],
-                                    [
-                                        [
-                                            'data' => 'associate',
-                                        ],
-                                        ['data' => 'prof'],
-                                        ['data' => 'distance'],
-                                        ['data' => 'discipline'],
-                                        ['data' => 'score'],
-                                        ['data' => 'entreprise'],
-                                        ['data' => 'history']
-                                    ],
-                                    '/api/datatable/stage/' . urlencode(trim($internshipId)),
-                                    false
-                                );
-                                ?>
+                                <?php DispatcherViewStage::render($internshipId); ?>
                                 <button type="submit" class="btn">Associer sélectionnés</button>
                             </form>
                         <?php endif; ?>

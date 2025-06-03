@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let stageDataCache = {};
     async function preloadStageData(internshipId) {
         if (!stageDataCache[internshipId]) {
-            const response = await fetch(`/api/viewStage/${internshipId}`);
+            const response = await fetch(`/api/dispatcherViewStage/${internshipId}`);
             const html = await response.text();
             stageDataCache[internshipId] = html;
         }
@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (stageDataCache[selectedId]) {
                 stageCont.innerHTML = stageDataCache[selectedId];
             } else {
-                const html = await (await fetch(`/api/viewStage/${selectedId}`)).text();
+                const html = await (await fetch(`/api/dispatcherViewStage/${selectedId}`)).text();
                 stageCont.innerHTML = html;
             }
 
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 { data: 'discipline' },
                 { data: 'score' },
                 { data: 'entreprise' },
-                { data: 'history' }
+                { data: 'history' },
             ];
 
 
