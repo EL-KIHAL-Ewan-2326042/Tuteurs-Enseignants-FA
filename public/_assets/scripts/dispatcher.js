@@ -243,11 +243,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Re-init stage DataTable
             const stageCols = [
                 { data: 'prof' },
+                { data: 'history' },
                 { data: 'distance' },
                 { data: 'discipline' },
                 { data: 'score' },
-                { data: 'entreprise' },
-                { data: 'history' },
+                { data: 'entreprise' }
             ];
 
             // Effacer les markers existants
