@@ -299,7 +299,7 @@ class AjaxController
             $scoreData = $model->calculateRelevanceTeacherStudentsAssociate($teacher, $dictCoef, $internship);
 
             $scoreData['associe'] = ($teacher['id_teacher'] == $assignedTeacherId);
-
+            $teacherAddress = $teacherModel->getTeacherAddress($teacher['id_teacher']);
             // Transformation pour coller aux colonnes front
             $scores[] = [
                 'prof' => $teacher['teacher_firstname'] . ' ' . $teacher['teacher_name'],
@@ -310,6 +310,7 @@ class AjaxController
                 'history' => $scoreData['A été responsable'] ?? null, // peut-être un nombre ou texte selon ta fonction
                 'associe' => $scoreData['associe'],
                 'id_teacher' => $teacher['id_teacher'], // utile pour check + front si besoin
+                'teacher_address' => $teacherAddress,
             ];
         }
 
