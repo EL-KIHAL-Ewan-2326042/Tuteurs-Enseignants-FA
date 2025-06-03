@@ -162,3 +162,10 @@ header div {
         align-items: center;
     }
 }
+
+.material-icons {
+    /* Empeche la selection du texte, tiré de W3Schools */
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
+}
