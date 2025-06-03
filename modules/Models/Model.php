@@ -161,14 +161,31 @@ class Model
     }
 
 
-    public function calculateRelevanceTeacherStudentsAssociate(array $teacher, array $dictCoef, array $internship): array
+    public function calculateRelevanceTeacherStudentsAssociate(array $teacher,array $dictCoef, array $internship): array
     {
         $identifier = $teacher['id_teacher'];
         $dictValues = [];
         $internshipModel = new Internship($this->_db);
 
         if (isset($dictCoef['Distance'])) {
-            $dictValues["Distance"] = $internshipModel->getDistance($internship['internship_identifier'], $identifier, isset($internship['id_teacher']));
+            $distance = $internshipModel->getDistance($internship['internship_identifier'], $identifier, isset($internship['id_teacher']));
+            $dictValues["Distance"] = $distance;
+
+            if (is_numeric($distance)) {
+                $conn = $this->_db->getConn();
+                $stmt = $conn->prepare(
+                    'INSERT INTO Distance (id_teacher, internship_identifier, distance) 
+     VALUES (:teacher, :internship, :distance)
+     ON CONFLICT (id_teacher, internship_identifier)
+     DO UPDATE SET distance = EXCLUDED.distance'
+                );
+
+                $stmt->execute([
+                    ':teacher' => $identifier,
+                    ':internship' => $internship['internship_identifier'],
+                    ':distance' => $distance,
+                ]);
+            }
         }
 
         if (isset($dictCoef['Discipline'])) {
@@ -227,18 +244,14 @@ class Model
         $ScoreFinal = ($totalScore * 5) / $totalCoef;
 
         $newList = [
+            "teacher_firstname" => $teacher['teacher_firstname'],
+            "teacher_name" => $teacher['teacher_name'],
+            "company_name" => $internship['company_name'],
+            "internship_subject" => $internship['internship_subject'],
+            "address" => $internship['address'],
             "id_teacher" => $identifier,
-            "teacher_name" => $teacher["teacher_name"],
-            "teacher_firstname" => $teacher["teacher_firstname"],
-            "student_number" => $internship["student_number"],
-            "student_name" => $internship["student_name"],
-            "student_firstname" => $internship["student_firstname"],
             "internship_identifier" => $internship['internship_identifier'],
-            "internship_subject" => $internship["internship_subject"],
-            "address" => $internship["address"],
-            "company_name" => $internship["company_name"],
-            "formation" => $internship["formation"],
-            "class_group" => $internship["class_group"],
+            "student_number" => $internship['student_number'],
             "score" => round($ScoreFinal, 2),
             "type" => $internship['type']
         ];
@@ -540,46 +553,45 @@ class Model
         exit();
     }
 
-    private function paginateGeneric(string $identifier, int $start, int $length, string $search, array $order, array $columns, string $baseCountQuery, string $baseDataQuery, array $bindings = []): array
-    {
-        $searchParam = '%' . $search . '%';
 
-        if (!empty($search)) {
-            $baseCountQuery .= ' AND (' . implode(' OR ', array_map(fn($col) => "$col ILIKE :search", $bindings['searchable'])) . ')';
-        }
-        $countStmt = $this->_db->getConn()->prepare($baseCountQuery);
-        $countStmt->bindValue(':identifier', $identifier);
-        if (!empty($search)) {
-            $countStmt->bindValue(':search', $searchParam);
-        }
-        $countStmt->execute();
-        $total = (int)$countStmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-        if (!empty($search)) {
-            $baseDataQuery .= ' AND (' . implode(' OR ', array_map(fn($col) => "$col ILIKE :search", $bindings['searchable'])) . ')';
-        }
-        if (!empty($order) && isset($order['column']) && isset($columns[$order['column']])) {
-            $colName = $columns[$order['column']];
-            $dir = strtoupper($order['dir']) === 'DESC' ? 'DESC' : 'ASC';
-            $baseDataQuery .= " ORDER BY $colName $dir";
-        } else {
-            $baseDataQuery .= ' ORDER BY s.student_name ASC';
-        }
-        $baseDataQuery .= ' LIMIT :limit OFFSET :offset';
+    public function dispatcherEnMieux($dictCoef): array {
+        $final = [];
+        $stmt = $this->_db->getConn()->prepare("
+        SELECT * FROM internship WHERE id_teacher IS NULL AND end_date_internship > NOW();
+    ");
+        $stmt->execute();
+        $intershipSansTuteur = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        $dataStmt = $this->_db->getConn()->prepare($baseDataQuery);
-        $dataStmt->bindValue(':identifier', $identifier);
-        if (!empty($search)) {
-            $dataStmt->bindValue(':search', $searchParam);
-        }
-        $dataStmt->bindValue(':limit', $length, PDO::PARAM_INT);
-        $dataStmt->bindValue(':offset', $start, PDO::PARAM_INT);
-        $dataStmt->execute();
-        $results = $dataStmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $this->_db->getConn()->prepare("
+with cte_alternance as (
+	select id_teacher, COUNT(*) as nb_alternance
+	from internship i
+	where end_date_internship > Now() and type = 'alternance'
+	group by id_teacher
+), cte_stage as (
+	select id_teacher, COUNT(*) as nb_stage
+	from internship i
+	where end_date_internship > Now() and type = 'stage'
+	group by id_teacher
+)
+select t.id_teacher, t.teacher_name, t.teacher_firstname from teacher t
+left join cte_alternance ca on t.id_teacher = ca.id_teacher
+left join cte_stage cs on t.id_teacher = cs.id_teacher
+where maxi_number_intern > nb_stage  and maxi_number_apprentice > nb_alternance
+    ");
+        $stmt->execute();
+        $teacherQuiSontPasFull = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($intershipSansTuteur as $internship) {
+            foreach ($teacherQuiSontPasFull as $teacher) {
+                $result = $this->calculateRelevanceTeacherStudentsAssociate($teacher ,$dictCoef, $internship);
+                $final[] = $result;
+            }
 
-        return [
-            'data' => $results,
-            'total' => $total
-        ];
+        }
+
+
+        return $final;
     }
+
 }

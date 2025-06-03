@@ -128,7 +128,7 @@ class Dispatcher
             $internship = $tmp[1];
             $score = floatval($tmp[2]);
 
-            if (in_array($teacher, $listTeacher) 
+            if (in_array($teacher, $listTeacher)
                 && in_array(
                     $internship, $listInternship
                 )
@@ -335,6 +335,9 @@ class Dispatcher
                 $errorMessageDirectAssoc, $checkMessageDirectAssoc,
                 $checkMessageAfterSort
             );
+
+
+
 
             $layout = new Layout();
             $layout->renderTop($title, $cssFilePath);

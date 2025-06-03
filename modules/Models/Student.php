@@ -85,7 +85,13 @@ class Student extends Model
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-
+    public function getFullName(string $studentNumber): string
+    {
+        $stmt = $this->_db->getConn()->prepare("SELECT CONCAT(student_name, ' ', student_firstname) FROM student where student_number = :studentNumber ");
+        $stmt->bindValue(':studentNumber', $studentNumber);
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
     /**
      * Trouve dans le DB les termes correspondant(LIKE)
      * On utilise le POST, avec search qui correspond à la recherche

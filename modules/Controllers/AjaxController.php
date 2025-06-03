@@ -13,6 +13,7 @@ namespace Blog\Controllers;
 use Blog\Models\Department;
 use Blog\Models\Internship;
 use Blog\Models\Model;
+use Blog\Models\Student;
 use Blog\Models\Teacher;
 use includes\Database;
 use JetBrains\PhpStorm\NoReturn;
@@ -26,35 +27,29 @@ class AjaxController
 
     $db = Database::getInstance();
     $teacherModel = new Teacher($db);
-    $internshipModel = new Internship($db);
-    $departmentModel = new Department($db);
+    $studentModel = new Student($db);
+    $model = new Model($db);
     $dictCoef = $_SESSION['last_dict_coef'] ?? [];
     if (empty($dictCoef)) {
         echo json_encode(['data' => []]);
         exit();
     }
 
-    $resultDispatchList = $internshipModel
-        ->dispatcher(
-            $departmentModel,
-            $teacherModel,
-            $dictCoef
-        )[0];
-
+    $resultDispatchList = $model->dispatcherEnMieux($dictCoef);
     $data = [];
-    $scores = []; // Tableau pour stocker les scores
+    $scores = [];
     foreach ($resultDispatchList as $item) {
         $checkboxValue = $item['id_teacher'] . '$' . $item['internship_identifier'] . '$' . $item['score'];
         $companyName = $item['company_name'];
 
+        $studentFullName = $studentModel->getFullName($item['student_number']);
+
         $teacherAddress = $teacherModel->getTeacherAddress($item['id_teacher']);
 
         $data[] = [
-            'teacher' => $item['teacher_firstname'] . ' ' . $item['teacher_name'] . ' (' . $item['id_teacher'] . ')',
-            'student' => $item['student_firstname'] . ' ' . $item['student_name'] . ' (' . $item['student_number'] . ')',
-            'internship' => $companyName . ' (' . $item['internship_identifier'] . ')',
-            'formation' => $item['formation'],
-            'group' => $item['class_group'],
+            'teacher' => $item['teacher_firstname'] . ' ' . $item['teacher_name'],
+            'student' => $studentFullName,
+            'internship' => $companyName,
             'subject' => $item['internship_subject'],
             'address' => $item['address'],
             'teacher_address' => $teacherAddress,
