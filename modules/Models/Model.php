@@ -175,8 +175,11 @@ class Model
                 $conn = $this->_db->getConn();
                 $stmt = $conn->prepare(
                     'INSERT INTO Distance (id_teacher, internship_identifier, distance) 
-                 VALUES (:teacher, :internship, :distance)'
+     VALUES (:teacher, :internship, :distance)
+     ON CONFLICT (id_teacher, internship_identifier)
+     DO UPDATE SET distance = EXCLUDED.distance'
                 );
+
                 $stmt->execute([
                     ':teacher' => $identifier,
                     ':internship' => $internship['internship_identifier'],
