@@ -121,13 +121,3 @@ h5 {
     background-color: var(--couleur-brique);
 }
 
-#save-changes
-{
-    background-color: var(--couleur-bleu-pale);
-    cursor: pointer;
-}
-
-#save-changes:hover {
-    background-color: var(--couleur-vert);
-    color: var(--couleur-blanc);
-}

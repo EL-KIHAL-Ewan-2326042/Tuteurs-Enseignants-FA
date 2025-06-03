@@ -82,7 +82,7 @@
                                 </section>
                                 <?php
                                 $saves = $userModel->showCoefficients($_SESSION['identifier']);
-                                if ($saves): ?>
+                                 ?>
                                 <section>
                                     <h1>La Gestion des sauvegardes</h1>
                                     <label for="save-selector" class="df fdc g1">
@@ -144,12 +144,6 @@
                                     </div>
 
                                 </section>
-
-                                <?php endif; ?>
-
-
-
-
 
                             </form>
 

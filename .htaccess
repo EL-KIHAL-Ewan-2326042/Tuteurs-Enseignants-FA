@@ -1,14 +1,18 @@
 RewriteEngine On
+
+# Base facultative mais utile si tu es dans un sous-dossier
 RewriteBase /
 
-# Si ce n'est pas un répertoire
-RewriteCond %{REQUEST_FILENAME} !-d
+# Ne pas réécrire si fichier ou dossier existe
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
 
-# Si ce n'est pas un fichier
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^(.+)$ index.php [QSA,L]
+# Sinon, rediriger vers index.php
+RewriteRule ^ index.php [QSA,L]
 
-<FilesMatch "\.(css|js|php|ico|png)$">
+# Mise en cache pour certains fichiers
+<FilesMatch "\.(css|js|ico|png)$">
     ExpiresActive On
     ExpiresDefault "access plus 1 year"
 </FilesMatch>
