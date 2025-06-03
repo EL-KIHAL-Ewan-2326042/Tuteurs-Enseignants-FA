@@ -183,20 +183,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Réinitialiser tous les éléments
             items.forEach(i => i.classList.remove('active'));
 
-            if (!wasActive) {
-                // Si l'élément n'était PAS actif, on l'active
-                this.classList.add('active');
+            this.classList.add('active');
 
-                // Charger le contenu correspondant
-                const category = this.id.replace('choose-', '');
-                const type = importExportToggle.checked ? 'export' : 'import';
-                loadContent(type, category);
-            } else {
-                // Si l'élément était déjà actif, on le laisse désélectionné
-                // et on cache le contenu
-                importContent.style.display = 'none';
-                exportContent.style.display = 'none';
-            }
+            // Charger le contenu correspondant
+            const category = this.id.replace('choose-', '');
+            const type = importExportToggle.checked ? 'export' : 'import';
+            loadContent(type, category);
         });
     });
 });
