@@ -22,7 +22,8 @@
     "guzzlehttp/psr7": "^2.7",
     "http-interop/http-factory-guzzle": "^1.2",
     "php-http/guzzle7-adapter": "^1.1",
-    "guzzlehttp/guzzle": "^7.9"
+    "guzzlehttp/guzzle": "^7.9",
+    "ext-curl": "*"
   },
   "config": {
     "allow-plugins": {
