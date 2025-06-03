@@ -67,7 +67,31 @@ class Dispatcher
                     </div>
 
                     <div id="viewStageContainer" class="dataTable" <?= $internshipId ? '' : 'style="display:none;"' ?>>
-                        <?php if ($internshipId) ViewStage::render($internshipId); ?>
+                        <?php if ($internshipId): ?>
+                            <form action="./dispatcher" method="post" id="stageAssociateForm">
+                                <?php
+                                Table::render(
+                                    'viewStage',
+                                    ['Associer','Professeur', 'Position', 'Discipline', 'Score', 'Entreprise', 'Historique'],
+                                    [
+                                        [
+                                            'data' => 'associate',
+                                        ],
+                                        ['data' => 'prof'],
+                                        ['data' => 'distance'],
+                                        ['data' => 'discipline'],
+                                        ['data' => 'score'],
+                                        ['data' => 'entreprise'],
+                                        ['data' => 'history']
+                                    ],
+                                    '/api/datatable/stage/' . urlencode(trim($internshipId)),
+                                    false
+                                );
+                                ?>
+                                <button type="submit" class="btn">Associer sélectionnés</button>
+                            </form>
+                        <?php endif; ?>
+
                     </div>
 
                     <div class="cont-map">

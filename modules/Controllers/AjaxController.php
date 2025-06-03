@@ -274,6 +274,7 @@ class AjaxController
         $internshipModel = new Internship($db);
         $teacherModel = new Teacher($db);
         $model = new Model($db);
+        $dictCoef = $_SESSION['last_dict_coef'] ?? [];
 
         // Récupérer tous les enseignants
         $teachers = $teacherModel->getAllTeachers();
@@ -286,33 +287,30 @@ class AjaxController
 
         $assignedTeacherId = $internship['id_teacher'] ?? null;
 
-        $dictCoef = [
-            'Distance' => 1.0,
-            'Discipline' => 1.0,
-            'A été responsable' => 1.0,
-            'Est demandé' => 1.0
-        ];
-
         $scores = [];
 
         foreach ($teachers as $teacher) {
             $scoreData = $model->calculateRelevanceTeacherStudentsAssociate($teacher, $dictCoef, $internship);
 
-            $scoreData['associe'] = ($teacher['id_teacher'] == $assignedTeacherId);
+            $isAssocie = ($teacher['id_teacher'] == $assignedTeacherId);
+
             $teacherAddress = $teacherModel->getTeacherAddress($teacher['id_teacher']);
-            // Transformation pour coller aux colonnes front
+
             $scores[] = [
+                'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . $teacher['id_teacher'] . '" ' . ($isAssocie ? 'checked' : '') . '>',
                 'prof' => $teacher['teacher_firstname'] . ' ' . $teacher['teacher_name'],
-                'distance' => $scoreData['Distance'] ?? null, // à récupérer si disponible, sinon null
+                'distance' => $scoreData['Distance'] ?? null,
                 'discipline' => $scoreData['Discipline'] ?? null,
                 'score' => $scoreData['score'] ?? 0,
                 'entreprise' => $internship['company_name'] ?? '',
-                'history' => $scoreData['A été responsable'] ?? null, // peut-être un nombre ou texte selon ta fonction
-                'associe' => $scoreData['associe'],
-                'id_teacher' => $teacher['id_teacher'], // utile pour check + front si besoin
+                'history' => $scoreData['A été responsable'] ?? null,
+                'associe' => $isAssocie,
+                'id_teacher' => $teacher['id_teacher'],
                 'teacher_address' => $teacherAddress,
+
             ];
         }
+
 
         // Tri décroissant sur le score
         usort($scores, fn($a, $b) => $b['score'] <=> $a['score']);

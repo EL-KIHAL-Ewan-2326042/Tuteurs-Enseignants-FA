@@ -213,13 +213,7 @@ class Dispatcher
                     exit();
                 }
 
-                $studentView = $internshipModel->relevanceInternship(
-                    $_POST['Internship_identifier'],
-                    $dictCoef
-                );
 
-                header('Content-Type: application/json');
-                echo json_encode($studentView);
                 exit();
             }
 

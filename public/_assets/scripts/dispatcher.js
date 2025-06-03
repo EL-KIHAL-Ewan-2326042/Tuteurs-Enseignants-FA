@@ -241,13 +241,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const stageCols = [
+                { data: 'associate', orderable: false, searchable: false },
                 { data: 'prof' },
                 { data: 'distance' },
                 { data: 'discipline' },
                 { data: 'score' },
                 { data: 'entreprise' },
-                { data: 'history' },
+                { data: 'history' }
             ];
+
 
             // Effacer les markers existants
             clearMarkers();
