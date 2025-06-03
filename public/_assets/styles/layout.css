@@ -79,6 +79,10 @@ footer a {
 .logo {
     font-size: 2rem;
     color: var(--couleur-blanc);
+    /* Empeche la selection du texte, tiré de W3Schools */
+    -webkit-user-select: none; /* Safari */
+    -ms-user-select: none; /* IE 10 and IE 11 */
+    user-select: none; /* Standard syntax */
 }
 .logo:hover {
     color: var(--couleur-jaune);
