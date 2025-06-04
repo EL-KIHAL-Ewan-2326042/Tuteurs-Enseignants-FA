@@ -1,4 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('viewStageContainer').addEventListener('change', function(event) {
+        if (event.target.classList.contains('dispatch-checkbox')) {
+            const checkboxes = this.querySelectorAll('.dispatch-checkbox');
+            checkboxes.forEach(otherCheckbox => {
+                if (otherCheckbox !== event.target) {
+                    otherCheckbox.checked = false;
+                }
+            });
+        }
+    });
+
     const map = L.map('map').setView([43.2965, 5.3698], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
@@ -218,6 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     toggleBtn.addEventListener('click', async () => {
+
         const url = new URL(window.location.href);
 
         if (tableCont.style.display !== 'none') {

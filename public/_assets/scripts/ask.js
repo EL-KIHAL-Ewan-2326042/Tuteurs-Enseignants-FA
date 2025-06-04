@@ -61,6 +61,7 @@ function addMarker(coord,label,icn){
 
 /* ========== table principale déjà présente au chargement ========== */
 document.addEventListener('DOMContentLoaded', ()=>{
+
     initDataTable('homepage-table','/api/datatable/ask', window.JS_COLUMNS);
 
     /* gestion des marqueurs au clic / déclic */

@@ -150,6 +150,7 @@ $router->get('/api/datatable/account', function() {
 $router->post('/api/datatable/account', function() {
     (new \Blog\Controllers\AjaxController())->handleDataTable("account");
 });
+
 $router->get('/api/datatable/stage/([A-Za-z0-9]+)', function() {
     (new \Blog\Controllers\AjaxController())->getViewStage( basename($_SERVER['REQUEST_URI']));
 });
