@@ -296,7 +296,19 @@ class AjaxController
             $isAssocie = ($teacher['id_teacher'] == $assignedTeacherId);
 
             $teacherAddress = $teacherModel->getTeacherAddress($teacher['id_teacher']);
-
+            $history = $scoreData['A été responsable'] ?? null;
+            if (empty($history)) {
+                $history = '<i class="material-icons red-text tooltipped" data-tooltip="Aucune date">close</i>';
+            } else {
+                if (is_array($history)) {
+                    $cleanDates = array_map(function ($date) {
+                        return str_replace(['{', '}'], '', htmlspecialchars($date));
+                    }, $history);
+                    $history = implode('<br>', $cleanDates);
+                } else {
+                    $history = str_replace(['{', '}'], '', htmlspecialchars($history));
+                }
+            }
             $scores[] = [
                 'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . $teacher['id_teacher'] . '" ' . ($isAssocie ? 'checked' : '') . '>',
                 'prof' => $teacher['teacher_firstname'] . ' ' . $teacher['teacher_name'],
@@ -304,7 +316,7 @@ class AjaxController
                 'discipline' => $teacher['discipline_name'] ?? null,
                 'score' => $this->renderStars($scoreData['score'] ?? 0),
                 'entreprise' => $internship['company_name'] ?? '',
-                'history' => $scoreData['A été responsable'] ?? null,
+                'history' => $history,
                 'associe' => $isAssocie,
                 'id_teacher' => $teacher['id_teacher'],
                 'teacher_address' => $teacherAddress,

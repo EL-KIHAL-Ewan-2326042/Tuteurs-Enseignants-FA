@@ -122,12 +122,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
                 document.head.appendChild(ns);
             });
 
-            /* on (ré)initialise le DataTable du stage */
             const stageCols=[
-                {data:'prof'},{data:'history'},{data:'distance'},
-                {data:'discipline'},{data:'score'},{data:'entreprise'}
+                {data:'prof'},{data:'distance'},{data:'score'},
+                {data:'discipline'},{data:'entreprise'},{data:'history'}
             ];
-            initDataTable('viewStage',`/api/datatable/stage/${selectedId}`,stageCols);
+            initDataTable('viewStage',`/api/datatable/stage/${selectedId}`,stageCols, false);
 
             tableCont.style.display = 'none';
             stageCont.style.display = '';
