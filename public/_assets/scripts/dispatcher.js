@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!row.address) continue;
             const coord = await geocode(row.address);
             if (coord) {
-                addMarker(coord, `${row.student} - ${row.subject}`, blueIcon);
+                addMarker(coord, `${row.student} - ${row.subject}`, purpleIcon);
                 bounds.push(coord);
             }
 
