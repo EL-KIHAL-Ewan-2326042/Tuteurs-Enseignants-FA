@@ -181,6 +181,14 @@ class Model
 
     public function calculateRelevanceTeacherStudentsAssociate(array $teacher,array $dictCoef, array $internship): array
     {
+        $defaultCoefs = [
+            'Distance' => 10,
+            'Discipline' => 3,
+            'A été responsable' => 1,
+            'Est demandé' => 1
+        ];
+        $dictCoef = array_merge($defaultCoefs, $dictCoef);
+
         $identifier = $teacher['id_teacher'];
         $dictValues = [];
         $internshipModel = new Internship($this->_db);

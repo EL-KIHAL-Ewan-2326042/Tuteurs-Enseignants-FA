@@ -9,6 +9,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
+    document.getElementById('checkAll').addEventListener('click', function() {
+        var checkboxes = document.querySelectorAll('.dispatch-checkbox');
+        checkboxes.forEach(function(checkbox) {
+            checkbox.checked = true;
+        });
+    });
+
 
     const map = L.map('map').setView([43.2965, 5.3698], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -274,7 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 setTimeout(async () => {
                     await displayStageTeachers(selectedId);
-                }, 1000);
+                }, 10000);
             }
 
         } else {

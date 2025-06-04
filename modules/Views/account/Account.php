@@ -167,12 +167,12 @@ class Account
 
                         <div>
                             <div class="df ac g1">
-                                <i class="material-icons left tiny">location_on</i><span>Adresse:</span>
+                                <i class="material-icons left tiny">location_on</i><span>Adresses:</span>
                             </div>
 
                             <ul>
                                 <?php foreach ($_SESSION['address'] as $addr): ?>
-                                    <li class="fs8"><a target="_blank" href="https://www.google.com/maps/search/?api=1&query=<?= urlencode($addr['address']) ?>"> <?= htmlspecialchars($addr['address']) ?></a></li>
+                                    <li ><a class="fs8 cbr" target="_blank" href="https://www.google.com/maps/search/?api=1&query=<?= urlencode($addr['address']) ?>"> <?= htmlspecialchars($addr['address']) ?></a></li>
                                 <?php endforeach; ?>
                             </ul>
                         </div>

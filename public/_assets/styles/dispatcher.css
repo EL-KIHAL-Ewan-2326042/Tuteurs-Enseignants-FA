@@ -102,6 +102,15 @@ main {
 .partie2 { display: flex; gap: 2rem; margin: 1rem; justify-content: space-around; }
 .partie2 > .dataTable { max-width: 65%; overflow: auto; max-height: 80vh }
 .partie2 > .cont-map { width: 35%; position: relative; }
+.btn-send {
+    padding: .6rem 0;
+    border: none;
+    border-radius: .3rem;
+    color: var(--couleur-blanc);
+    width: 100%;
+
+}
+
 #map {
     width: 100%; min-height: 80vh; max-height: 80vh;
     background-color: var(--couleur-bleu);
@@ -110,4 +119,10 @@ main {
 }
 #toggleViewBtn {
     z-index: 1000; position: absolute; bottom: 1rem; left: 1rem;
+}
+
+#dt {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }

@@ -24,6 +24,6 @@ class ViewStage
             ['data' => 'history'],
         ];
 
-        Table::render('viewStage', $headers, $jsColumns, '/api/datatable/viewStage/' . urlencode(trim($idStage)), true);
+        Table::render('viewStage', $headers, $jsColumns, 'api/datatables/stage/' . urlencode(trim($idStage)), true);
     }
 }
