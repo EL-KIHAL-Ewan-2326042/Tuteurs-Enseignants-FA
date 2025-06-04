@@ -27,7 +27,7 @@ main {
     hyphens: auto;
     line-height: 1;
     font-size: 3.5rem;
-    color: var(--couleur-bleu-roi);
+    color: var(--couleur-bleu);
 }
 .accroche p {
     text-align: center;
@@ -59,7 +59,7 @@ main {
 .accroche>div:last-child a:first-child:hover {
     transition: all .3s ease;
     background-color: var(--couleur-bleu-pale);
-    color: var(--couleur-bleu-roi);
+    color: var(--couleur-bleu);
     border: 1px solid var(--couleur-bleu-pale);
 
 }
@@ -71,7 +71,7 @@ main {
 .accroche>div:last-child a:last-child:hover {
     transition: all .3s ease;
     background-color: var(--couleur-jaune-pale);
-    color: var(--couleur-bleu-roi);
+    color: var(--couleur-bleu);
     border: 1px solid var(--couleur-jaune-pale);
 
 }

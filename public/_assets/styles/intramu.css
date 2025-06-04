@@ -5,7 +5,7 @@ main {
     height: 100vh;
 }
 h1 , label{
-    color: var(--couleur-bleu-roi);
+    color: var(--couleur-bleu);
 }
 
 p {
@@ -39,7 +39,7 @@ form input, form button {
 }
 
 input {
-    border: 1px solid var(--couleur-bleu-roi);
+    border: 1px solid var(--couleur-bleu);
     background-color: transparent;
     padding: .4rem 1rem;
 }
@@ -52,7 +52,7 @@ button {
     padding: 0.6rem 1rem;
     border: none;
     color: var(--couleur-blanc);
-    background-color: var(--couleur-bleu-roi);
+    background-color: var(--couleur-bleu);
 }
 
 .form-section {

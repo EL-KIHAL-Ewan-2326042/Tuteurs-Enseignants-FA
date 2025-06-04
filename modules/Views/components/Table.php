@@ -36,14 +36,14 @@ class Table
             }
             /* Table header */
             table.dataTable thead {
-                background-color: var(--couleur-bleu-roi);
+                background-color: var(--couleur-bleu);
                 color: var(--couleur-blanc);
             }
             table.dataTable thead th {
                 padding: .5rem 1rem;
                 font-size: 0.9rem;
                 text-align: left;
-                border-bottom: 2px solid var(--couleur-bleu-roi);
+                border-bottom: 2px solid var(--couleur-bleu);
             }
 
             /* Table body */

@@ -12,7 +12,7 @@ main >div:first-child {
     justify-content: space-between;
     align-items: center;
     min-height: 100%;
-    border-right: 1px solid var(--couleur-bleu-roi);
+    border-right: 1px solid var(--couleur-bleu);
 }
 main >div:first-child li {
     font-size: .9rem;
@@ -45,7 +45,7 @@ main >div:last-child {
 }
 
 h5 {
-    color: var(--couleur-bleu-roi);
+    color: var(--couleur-bleu);
     text-transform: uppercase;
 }
 
@@ -89,7 +89,7 @@ h5 {
     border-radius: .1rem;
     background-color: var(--couleur-bleu-pale);
     border: 1px solid var(--couleur-bleu);
-    color: var(--couleur-bleu-roi);
+    color: var(--couleur-bleu);
 }
 .dep {
 
@@ -110,8 +110,8 @@ h5 {
 }
 .card button[type="submit"] {
     background-color: transparent;
-    border: 1px solid var(--couleur-bleu-roi);
-    color: var(--couleur-bleu-roi);
+    border: 1px solid var(--couleur-bleu);
+    color: var(--couleur-bleu);
     padding: .3rem;
 }
 .plus {
