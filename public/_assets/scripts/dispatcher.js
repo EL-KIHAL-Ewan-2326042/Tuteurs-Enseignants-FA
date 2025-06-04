@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             await processTeachersData(data.data || []);
         } catch (error) {
-            console.error('Erreur lors du chargement des données des professeurs:', error);
+            console.error('Erreur lors du chargement des données des enseignants:', error);
         }
     }
 
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        console.log('Données professeurs reçues:', teachers);
+        console.log('Données enseignants reçues:', teachers);
         const bounds = [];
 
         // Trouver le score maximum
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const maxScore = Math.max(...scores);
         const hasUniqueMaxScore = scores.filter(s => s === maxScore).length === 1;
 
-        // Limiter à 10 professeurs
+        // Limiter à 10 enseignants
         const limitedTeachers = teachers.slice(0, 10);
 
         for (const teacher of limitedTeachers) {

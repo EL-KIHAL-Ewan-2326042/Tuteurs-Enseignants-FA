@@ -134,6 +134,30 @@ session_start();
  * Initialisation du routage des URI
  */
 $uri = strtok($_SERVER['REQUEST_URI'], '?');
+
+// Redirection vers dashboard si on recharge une des sous-pages du dashboard
+if (preg_match('#^/dashboard/([^/]+)#', $uri)) {
+    header('Location: /dashboard');
+    exit;
+}
+
+if (isset($_SERVER['QUERY_STRING']) && strpos($_SERVER['QUERY_STRING'], 'internship=') !== false) {
+    $queryParams = [];
+    parse_str($_SERVER['QUERY_STRING'], $queryParams);
+
+    // Supprimer le paramètre internship
+    unset($queryParams['internship']);
+
+    // Reconstruire l'URL sans ce paramètre
+    $newUrl = $uri;
+    if (!empty($queryParams)) {
+        $newUrl .= '?' . http_build_query($queryParams);
+    }
+
+    header('Location: ' . $newUrl);
+    exit;
+}
+
 $router = new Router($uri);
 
 $router->get('/api/datatable/ask', function() {

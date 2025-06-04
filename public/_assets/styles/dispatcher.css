@@ -25,7 +25,7 @@ main {
 #forms-section form section {
     padding: 3rem 2rem ;
     border-radius: .3rem;
-    color: var(--couleur-bleu-roi);
+    color: var(--couleur-bleu);
     border: 2px solid currentColor;
     box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
     display: flex;
@@ -104,7 +104,7 @@ main {
 .partie2 > .cont-map { width: 35%; position: relative; }
 #map {
     width: 100%; min-height: 80vh; max-height: 80vh;
-    background-color: var(--couleur-bleu-roi);
+    background-color: var(--couleur-bleu);
     border-radius: .4rem;
     box-shadow: 0 2px 16px rgba(14, 30, 37, 0.32);
 }
