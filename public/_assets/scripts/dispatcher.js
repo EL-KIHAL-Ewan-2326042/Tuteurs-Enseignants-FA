@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Gestion des checkboxes pour la vue des étudiants
     document.getElementById('viewStageContainer').addEventListener('change', function(event) {
         if (event.target.classList.contains('dispatch-checkbox')) {
             const checkboxes = this.querySelectorAll('.dispatch-checkbox');
@@ -9,14 +10,15 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     });
+
     document.getElementById('checkAll').addEventListener('click', function() {
-        var checkboxes = document.querySelectorAll('.dispatch-checkbox');
+        const checkboxes = document.querySelectorAll('.dispatch-checkbox');
         checkboxes.forEach(function(checkbox) {
             checkbox.checked = true;
         });
     });
 
-
+    // Initialisation de la carte
     const map = L.map('map').setView([43.2965, 5.3698], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
@@ -28,9 +30,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const tableCont = document.getElementById('tableContainer');
     const stageCont = document.getElementById('viewStageContainer');
 
-    // ==================== Geocoding Helpers with Cache ====================
+    // Cache pour le géocodage
     const geoCache = JSON.parse(localStorage.getItem('geoCache') || '{}');
     const saveCache = () => localStorage.setItem('geoCache', JSON.stringify(geoCache));
+
     async function geocode(addr) {
         if (geoCache[addr]) return geoCache[addr];
         try {
@@ -42,32 +45,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 saveCache();
                 return c;
             }
-        } catch (e) { console.error('Geocoding error:', e); }
+        } catch (e) {
+            console.error('Geocoding error:', e);
+        }
         return null;
     }
 
-    // ==================== Icons ====================
-    function icon(color) {
-        const colorUrl = {
-            red: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-            yellow: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png',
-            blue: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png'
-        };
+    // Création des icônes
+    function icon(cls) {
         return L.icon({
-            iconUrl: colorUrl[color],
+            iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
             shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
             iconSize: [25, 41],
             iconAnchor: [12, 41],
             popupAnchor: [1, -34],
-            shadowSize: [41, 41]
+            shadowSize: [41, 41],
+            className: cls
         });
     }
 
-    const redIcon = icon('red');
-    const yellowIcon = icon('yellow');
-    const blueIcon = icon('blue');
+    const redIcon = icon('marker-red');
+    const yellowIcon = icon('marker-yellow');
+    const blueIcon = icon('marker-blue');
+    const pinkIcon = icon('marker-pink');
 
-    // ==================== Markers ====================
+    // Gestion des marqueurs
     function clearMarkers() {
         markers.forEach(m => map.removeLayer(m));
         markers = [];
@@ -80,76 +82,68 @@ document.addEventListener('DOMContentLoaded', () => {
         return m;
     }
 
-    // ==================== Teacher Position ====================
-    (async () => {
-        const addr = window.TEACHER_ADDRESS;
-        if (addr) {
-            teacherCoord = await geocode(addr);
-            if (teacherCoord) {
-                teacherMarker = addMarker(teacherCoord, 'Votre position', redIcon);
-                map.setView(teacherCoord, 13);
-            }
-        }
-    })();
 
-    // ==================== Stage View Teacher Markers ====================
+    // Affichage des enseignants pour la vue des stages
     async function displayStageTeachers(internshipId) {
-        console.log('Affichage des marqueurs pour stage', internshipId);
         try {
             const response = await fetch(`/api/datatable/stage/${internshipId}`);
             const data = await response.json();
             await processTeachersData(data.data || []);
         } catch (error) {
-            console.error('Erreur lors du chargement des données des enseignants:', error);
+            console.error('Error loading teacher data:', error);
         }
     }
 
+    // Traitement des données des enseignants
     async function processTeachersData(teachers) {
         if (!teachers || teachers.length === 0) {
-            console.log('Aucun enseignant trouvé.');
+            console.log('No teachers found.');
             return;
         }
 
-        console.log('Données enseignants reçues:', teachers);
         const bounds = [];
+        const scores = teachers.map(t => {
+            const scoreText = t.score || "Score : 0 / 5";
+            const match = scoreText.match(/Score : (\d+\.\d+) \/ 5/);
+            return match ? parseFloat(match[1]) : 0;
+        });
 
-        // Trouver le score maximum
-        const scores = teachers.map(t => parseFloat(t.score) || 0);
         const maxScore = Math.max(...scores);
         const hasUniqueMaxScore = scores.filter(s => s === maxScore).length === 1;
 
-        // Limiter à 10 enseignants
-        const limitedTeachers = teachers.slice(0, 10);
 
-        for (const teacher of limitedTeachers) {
-            if (!teacher.prof) continue;
-
+        for (const teacher of teachers) {
+            console.log(teacher)
             const teacherName = teacher.prof;
             const teacherAddress = teacher.teacher_address || '';
 
             if (!teacherAddress) {
-                console.log(`Aucune adresse trouvée pour l'enseignant : ${teacherName}`);
+                console.log(`No address found for teacher: ${teacherName}`);
                 continue;
             }
 
             const coord = await geocode(teacherAddress);
             if (!coord) {
-                console.log(`Coordonnées introuvables pour : ${teacherAddress}`);
+                console.log(`Coordinates not found for: ${teacherAddress}`);
                 continue;
             }
 
             bounds.push(coord);
 
-            const teacherScore = parseFloat(teacher.score) || 0;
+            const scoreText = teacher.score || "Score : 0 / 5";
+            const match = scoreText.match(/Score : (\d+\.\d+) \/ 5/);
+            const teacherScore = match ? parseFloat(match[1]) : 0;
+
             const isAssociated = teacher.associate === true || teacher.associate === "true";
 
+            console.log(teacher.score, maxScore)
             let markerIcon = blueIcon;
             let label = `${teacherName}<br>Score: ${teacher.score || 'N/A'}`;
 
             if (isAssociated) {
                 markerIcon = redIcon;
                 label += '<br><strong>Déjà associé</strong>';
-            } else if (hasUniqueMaxScore && teacherScore === maxScore) {
+            } else if (teacherScore === maxScore) {
                 markerIcon = yellowIcon;
                 label += '<br><strong>Meilleur score</strong>';
             }
@@ -164,8 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-
-    // ==================== DataTable Interaction ====================
+    // Interaction avec la table des étudiants
     const table = $('#dispatch-table').DataTable();
     let selectedId = null;
 
@@ -205,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ==================== Toggle Stage/Table View ====================
+    // Gestion du basculement entre les vues
     const urlParams = new URLSearchParams(window.location.search);
     const internshipParam = urlParams.get('internship');
 
@@ -236,7 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     toggleBtn.addEventListener('click', async () => {
-
         const url = new URL(window.location.href);
 
         if (tableCont.style.display !== 'none') {
