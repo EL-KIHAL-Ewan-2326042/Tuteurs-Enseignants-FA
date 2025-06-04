@@ -30,7 +30,7 @@ class CoefBackup
                 ?>
 
                 <section>
-                    <h1>Le Répartiteur </h1>
+                    <p>Le Répartiteur </p>
                     <div>
                         <?php foreach ($listCriteria as $criteria):
                             $value = $criteria['coef'];
@@ -69,7 +69,7 @@ class CoefBackup
                 <?php $saves = $userModel->showCoefficients($_SESSION['identifier']); ?>
 
                 <section>
-                    <h1>La Gestion des sauvegardes</h1>
+                    <p>La Gestion des sauvegardes</p>
                     <label for="save-selector" class="df fdc g1">
                         Sélectionnez une sauvegarde
                         <select id="save-selector" name="save-selector" onchange="this.form.submit()">

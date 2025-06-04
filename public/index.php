@@ -24,6 +24,7 @@ use Blog\Views\components\ViewStage;
 use Blog\Views\dashboard\Export;
 use Blog\Views\dashboard\Import;
 use includes\Autoloader;
+use includes\Database;
 use includes\exceptions\RouterException;
 use includes\Route;
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -186,6 +187,23 @@ $router->get('/api/viewStage/([A-Za-z0-9]+)', function () {
 });
 $router->get('/api/dispatcherViewStage/([A-Za-z0-9]+)', function () {
     \Blog\Views\components\DispatcherViewStage::render(basename($_SERVER['REQUEST_URI']));
+});
+$router->post('/api/update-internship-request', function() {
+    $db = Database::getInstance();
+    $internshipModel = new \Blog\Models\Internship($db);
+
+    $teacher = $_POST['teacher'] ?? null;
+    $internship = $_POST['internship'] ?? null;
+    if ($teacher && $internship) {
+        $result = $internshipModel->updateSearchedStudentInternship(true, $teacher, $internship);
+        if ($result === true) {
+            echo json_encode(['success' => true, 'message' => 'Request updated successfully']);
+        } else {
+            echo json_encode(['success' => false, 'message' => $result]);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Missing parameters']);
+    }
 });
 
 

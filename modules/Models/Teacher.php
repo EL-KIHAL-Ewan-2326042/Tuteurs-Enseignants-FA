@@ -258,9 +258,8 @@ class Teacher extends Model
 
         if (!empty($order) && isset($order['column']) && isset($columns[$order['column']])) {
             $columnName = $columns[$order['column']];
-            // Vérifiez si la colonne est un alias ou nécessite un nom de table
             if ($columnName == 'group') {
-                $columnName = 's.class_group'; // Utilisez le nom de colonne réel dans la base de données
+                $columnName = 's.class_group';
             }
             $dataQuery .= ' ORDER BY ' . $columnName . ' ' . (strtoupper($order['dir']) === 'DESC' ? 'DESC' : 'ASC');
         } else {
@@ -285,6 +284,7 @@ class Teacher extends Model
             'total' => (int)$total
         ];
     }
+
 
 
     public function paginateAccount(string $identifier, int $start, int $length, string $search = '', array $order = []): array
