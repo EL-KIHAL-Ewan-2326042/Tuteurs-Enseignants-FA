@@ -135,7 +135,9 @@ class AjaxController
         }
 
         $_SESSION['dispatch_scores'] = $scores;
-
+        usort($data, function ($a, $b) {
+            return strcmp($a['student'], $b['student']);
+        });
         echo json_encode(['data' => $data, 'total' => (int)$total]);
     }
 
@@ -225,9 +227,8 @@ class AjaxController
                             $row['history'] = str_replace(['{', '}'], '', htmlspecialchars($row['history']));
                         }
                     }
+                    $row['associate'] = '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . htmlspecialchars($row['id_teacher'] . '$' . $row['internship_identifier']) . '">';
                 }
-
-
                 break;
             case 'account':
                 $result = $teacherModel->paginateAccount(

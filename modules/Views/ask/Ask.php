@@ -13,19 +13,19 @@ readonly class Ask
 {
     public function __construct(
         private Internship $internshipModel,
-        private Student    $studentModel,
-        private Teacher    $teacherModel,
+        private Student $studentModel,
+        private Teacher $teacherModel,
         private Department $departmentModel
-    ) { }
+    ) {}
 
     public function showView(): void
     {
         /* ---------- table principale ---------- */
 
-        $headers = ['Élève', 'Position','Formation', 'Entreprise', 'Groupe',
-            'Historique', 'Sujet', 'Adresse'];
+        $headers = ['Demander', 'Élève', 'Position', 'Formation', 'Entreprise', 'Groupe', 'Historique', 'Sujet', 'Adresse'];
 
         $jsColumns = [
+            ['data' => 'associate', 'orderable' => false, 'searchable' => false],
             ['data' => 'student'],
             ['data' => 'distance'],
             ['data' => 'formation'],
@@ -44,9 +44,6 @@ readonly class Ask
         <main>
             <div>
                 <section>
-
-
-                    <!-- ---------- TABLE ---------- -->
                     <div id="tableContainer" <?= $internshipId ? 'style="display:none;"' : '' ?>>
                         <?php Table::render(
                             'homepage-table',
@@ -54,10 +51,8 @@ readonly class Ask
                             $jsColumns,
                             '/api/datatable/ask'
                         ); ?>
-                        <button class="waves-effect waves-light
-            btn btn-annuler tooltip"
-                                type="reset" id="resetForm" data-tooltip=
-                                "Annuler les modifications"
+                        <button class="waves-effect waves-light btn btn-annuler tooltip"
+                                type="reset" id="resetForm" data-tooltip="Annuler les modifications"
                                 data-position="top">Annuler</button>
                         <button class="waves-effect waves-light btn tooltip"
                                 name="selecInternshipSubmitted" value="1"

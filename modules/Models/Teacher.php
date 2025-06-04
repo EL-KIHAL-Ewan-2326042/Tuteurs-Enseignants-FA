@@ -232,7 +232,8 @@ class Teacher extends Model
             'company',
             'subject',
             'address',
-            'distance'
+            'distance',
+            'id_teacher'
         ];
         $countQuery = "WITH cte_histo AS (SELECT id_teacher FROM internship WHERE end_date_internship < NOW() GROUP BY id_teacher), cte_teacher_dep as (select distinct hr.department_name from has_role hr where user_id = :id_teacher) SELECT COUNT(*) as total FROM student s JOIN internship i ON s.student_number = i.student_number LEFT JOIN cte_histo h ON i.id_teacher = h.id_teacher LEFT JOIN distance d ON :id_teacher = d.id_teacher AND i.internship_identifier = d.internship_identifier left join has_role hr on s.student_number = hr.user_id WHERE i.end_date_internship > NOW()  and i.id_teacher is null";
 
@@ -249,7 +250,7 @@ class Teacher extends Model
         $countStmt->execute();
         $total = $countStmt->fetch(PDO::FETCH_ASSOC)['total'];
 
-        $dataQuery = "WITH cte_histo AS (SELECT id_teacher, array_agg(start_date_internship ORDER BY id_teacher) AS history FROM internship WHERE end_date_internship < NOW() GROUP BY id_teacher), cte_teacher_dep as (select distinct hr.department_name from has_role hr where user_id = :id_teacher2) SELECT CONCAT(s.student_firstname, ' ', s.student_name) AS student, s.formation, s.class_group AS group, h.history, i.company_name AS company, i.internship_subject AS subject, i.address, d.distance, i.internship_identifier FROM student s JOIN internship i ON s.student_number = i.student_number LEFT JOIN cte_histo h ON i.id_teacher = h.id_teacher LEFT JOIN distance d ON :id_teacher2 = d.id_teacher AND i.internship_identifier = d.internship_identifier left join has_role hr on s.student_number = hr.user_id WHERE i.end_date_internship > NOW()  and i.id_teacher is null";
+        $dataQuery = "WITH cte_histo AS (SELECT id_teacher, array_agg(start_date_internship ORDER BY id_teacher) AS history FROM internship WHERE end_date_internship < NOW() GROUP BY id_teacher), cte_teacher_dep as (select distinct hr.department_name from has_role hr where user_id = :id_teacher2) SELECT CONCAT(s.student_firstname, ' ', s.student_name) AS student, s.formation, s.class_group AS group, h.history, i.company_name AS company, i.id_teacher, i.internship_subject AS subject, i.address, d.distance, i.internship_identifier FROM student s JOIN internship i ON s.student_number = i.student_number LEFT JOIN cte_histo h ON i.id_teacher = h.id_teacher LEFT JOIN distance d ON :id_teacher2 = d.id_teacher AND i.internship_identifier = d.internship_identifier left join has_role hr on s.student_number = hr.user_id WHERE i.end_date_internship > NOW()  and i.id_teacher is null";
 
         if (!empty($search)) {
             $dataQuery .= ' AND (s.student_name ILIKE :search OR s.student_firstname ILIKE :search OR s.formation ILIKE :search OR s.class_group ILIKE :search OR i.company_name ILIKE :search OR i.internship_subject ILIKE :search OR i.address ILIKE :search)';
