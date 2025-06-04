@@ -309,10 +309,12 @@ class AjaxController
                     $history = str_replace(['{', '}'], '', htmlspecialchars($history));
                 }
             }
+            $position = isset($scoreData['Distance']) ? $scoreData['Distance'] . " min" : null;
+
             $scores[] = [
                 'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . $teacher['id_teacher'] . '" ' . ($isAssocie ? 'checked' : '') . '>',
                 'prof' => $teacher['teacher_firstname'] . ' ' . $teacher['teacher_name'],
-                'distance' => $scoreData['Distance'] ?? null . " min",
+                'distance' => $position,
                 'discipline' => $teacher['discipline_name'] ?? null,
                 'score' => $this->renderStars($scoreData['score'] ?? 0),
                 'entreprise' => $internship['company_name'] ?? '',

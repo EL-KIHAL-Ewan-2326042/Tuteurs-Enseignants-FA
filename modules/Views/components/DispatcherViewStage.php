@@ -36,7 +36,7 @@ class DispatcherViewStage
         // Ajout du bouton Valider
         echo '<form action="./dispatcher" method="post">';
         echo '<input type="hidden" name="internship_id" value="' . htmlspecialchars($idStage) . '">';
-        echo '<button type="submit" name="associateTeachers" class="btn">Valider</button>';
+        echo '<button type="submit" name="associateTeachers" class="btn-send">Valider</button>';
         echo '</form>';
     }
 }

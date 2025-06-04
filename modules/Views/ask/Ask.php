@@ -44,21 +44,20 @@ readonly class Ask
         <main>
             <div>
                 <section>
-                    <div id="tableContainer" <?= $internshipId ? 'style="display:none;"' : '' ?>>
+                    <form id="tableContainer" method="post" <?= $internshipId ? 'style="display:none;"' : '' ?>>
                         <?php Table::render(
                             'homepage-table',
                             $headers,
                             $jsColumns,
                             '/api/datatable/ask'
                         ); ?>
-                        <button class="waves-effect waves-light btn btn-annuler tooltip"
-                                type="reset" id="resetForm" data-tooltip="Annuler les modifications"
-                                data-position="top">Annuler</button>
-                        <button class="waves-effect waves-light btn tooltip"
-                                name="selecInternshipSubmitted" value="1"
-                                type="submit" data-tooltip="Envoyer vos choix"
-                                data-position="top">Valider</button>
-                    </div>
+                        <div id="askBtnCont">
+                            <button class=" btn-annuler tooltip" type="reset"  data-tooltip="Annuler les modifications" data-position="top">Annuler</button>
+                            <button class="btn-send" name="selecInternshipSubmitted" value="1" type="submit" data-tooltip="Envoyer vos choix" data-position="top">Valider</button>
+                        </div>
+                    </form>
+
+
 
                     <div id="viewStageContainer" <?= $internshipId ? '' : 'style="display:none;"' ?>>
                         <?php if ($internshipId) ViewStage::render($internshipId); ?>
@@ -74,6 +73,8 @@ readonly class Ask
             </div>
         </main>
         <script>
+            console.log('<?= json_encode($_SESSION)  ?>');
+            window.TEACHER_ID = '<?php echo $_SESSION['identifier']; ?>'
             window.JS_COLUMNS = <?= json_encode($jsColumns) ?>;
             window.TEACHER_ADDRESS = <?= json_encode(!empty($_SESSION['address'][0]['address']) ? $_SESSION['address'][0]['address'] : null) ?>;
         </script>

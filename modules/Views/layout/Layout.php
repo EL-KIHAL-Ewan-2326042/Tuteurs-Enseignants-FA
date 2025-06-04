@@ -129,7 +129,7 @@ class Layout
                         <span><?php echo $_SESSION['fullName'] ?></span>
                                         <span><?php echo $_SESSION['role_name']?></span>
                                     </a>
-                                    <a onclick="disconnect();" class="logout-btn" title="Déconnexion">
+                                    <a onclick="disconnect();" href="/intramu" class="logout-btn" title="Déconnexion">
                                         <i class="material-icons">power_settings_new</i>
                                     </a>
                         <?php } ?>
