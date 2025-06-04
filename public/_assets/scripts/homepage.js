@@ -249,7 +249,7 @@ document.addEventListener(
 );
 
 /**
- * Initialise la carte en fonction des adresses du professeur et de l'entreprise
+ * Initialise la carte en fonction des adresses de l'enseignant et de l'entreprise
  *
  * @returns {Promise<void>}
  */
