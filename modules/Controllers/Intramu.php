@@ -91,6 +91,8 @@ class Intramu
                 $_SESSION['role_name_clean'] = $userModel->getCleanHighestRole($identifierLogs);
                 $_SESSION['role_department'] = $userModel
                     ->getRoleDepartment($identifierLogs);
+                $_SESSION['role_department_clean'] = $userModel
+                    ->getCleanRoleDepartment($identifierLogs);
                 $_SESSION['address'] = $teacherModel->getAddress($identifierLogs);
                 if (is_array($_SESSION['roles'])) {
                     if (in_array('Enseignant', $_SESSION['roles'])) {

@@ -234,6 +234,35 @@ class User extends Model
         }
 
         $db = $this->_db;
+        $query = 'SELECT DISTINCT department.department_name FROM department
+                    JOIN has_role ON has_role.department_name = department.department_name
+                    WHERE has_role.user_id LIKE :user_id;';
+
+        $stmt = $db->getConn()->prepare($query);
+        $stmt->bindParam(':user_id', $identifier);
+        $stmt->execute();
+
+        $roles = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
+
+        return $roles ?: [];
+    }
+
+    /**
+     * Récupère le nom complet du département auquel l'utilisateur passé en paramètre appartient
+     *
+     * @param string $identifier Identifiant de l'utilisateur
+     *
+     * @return false|array Renvoie false si l'identifiant ne correspond pas à celui
+     *  de l'utilisateur connecté, sinon renvoie une liste contenant les départements
+     * auxquels il appartient qui peut être vide s'il n'y en a aucun
+     */
+    public function getCleanRoleDepartment(string $identifier): false|array
+    {
+        if ($_SESSION['identifier'] !== $identifier) {
+            return false;
+        }
+
+        $db = $this->_db;
         $query = 'SELECT DISTINCT department.department_full_name FROM department
                     JOIN has_role ON has_role.department_name = department.department_name
                     WHERE has_role.user_id LIKE :user_id;';
