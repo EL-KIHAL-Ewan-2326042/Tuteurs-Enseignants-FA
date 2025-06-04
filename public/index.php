@@ -216,6 +216,11 @@ $router->get('/api/export', function() {
     $view->showView();
 });
 
+$router->get('/api/association', function() {
+    $view = new \Blog\Views\dashboard\Association();
+    $view->showView();
+});
+
 /**
  * Crée une action associée à une URI donnée.
  *
