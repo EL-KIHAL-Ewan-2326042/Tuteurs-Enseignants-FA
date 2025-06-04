@@ -122,48 +122,53 @@ class Dashboard
                     </div>
                     <label>Stages</label>
                 </div>
+
+                <?php
+                // Vérification du rôle admin_dep
+                $isAdminDep = false;
+                if (isset($_SESSION['role_name'])) {
+                    if (is_array($_SESSION['role_name'])) {
+                        $isAdminDep = in_array('Admin_dep', $_SESSION['role_name']);
+                    } else {
+                        $isAdminDep = $_SESSION['role_name'] === 'Admin_dep';
+                    }
+                }
+                if ($isAdminDep):
+                    ?>
+                
+                    <div class="choose-item" id="choose-association">
+                        <div class="icon-circle">
+                            <i class="material-icons main-icon">person_add</i>
+                            <i class="material-icons plus-icon">add</i>
+                        </div>
+                        <label>Association</label>
+                    </div>
+
+                    <div class="choose-item" id="choose-parametrage">
+                        <div class="icon-circle">
+                            <i class="material-icons main-icon">settings</i>
+                            <i class="material-icons plus-icon">add</i>
+                        </div>
+                        <label>Paramétrage enseignants</label>
+                    </div>
+                <?php endif; ?>
+
+
             </div>
 
-            <!-- Sections pour le contenu dynamique -->
-            <div id="content-container">
+            <!-- Utilisation de row au lieu de content-container -->
+            <div class="row dashboard-content-row">
                 <div id="import-content" class="content-section">
-
+                    <!-- Contenu chargé dynamiquement -->
+                    <div class="loading-placeholder">
+                        <p>Veuillez sélectionner une catégorie</p>
+                    </div>
                 </div>
 
                 <div id="export-content" class="content-section" style="display:none;">
-
+                    <!-- Contenu chargé dynamiquement -->
                 </div>
             </div>
-            <form class="col card-panel white z-depth-3 s10 m5 l5"
-                  style="padding: 20px;" action="./dispatcher"
-                  method="post" id="associate-form">
-                <div class="row">
-                    <p class="text">Associe un enseignant à un stage
-                        (ne prend pas en compte le nombre maximum d'étudiant,
-                        mais le fait que le stage soit déjà attribué)</p>
-                    <div class="input-field col s6">
-                        <input id="searchTeacher" name="searchTeacher"
-                               type="text" class="validate">
-                        <label for="searchTeacher">Enseignant</label>
-                    </div>
-                    <div class="input-field col s6">
-                        <input id="searchInternship" name="searchInternship"
-                               type="text" class="validate">
-                        <label for="searchInternship">Stage</label>
-                    </div>
-                    <div id="searchResults"></div>
-                    <div class="col s12">
-                        <button
-                                type="submit" name="action"
-                                data-position="top"
-                                data-tooltip="Valider l'association">
-                            Associer
-                            <i class=
-                               "material-icons right">arrow_downward</i>
-                        </button>
-                    </div>
-                </div>
-            </form>
             <p class="message"><?php echo $this->message; ?></p>
             <p class="errorMessage"><?php echo $this->errorMessage; ?></p>
 

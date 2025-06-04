@@ -517,11 +517,30 @@ class Model
                 default => throw new Exception("Table non reconnue : " . $tableName),
             };
         } else {
-            $query = "SELECT teacher.maxi_number_intern, teacher.maxi_number_apprentice, teacher.id_teacher, teacher.teacher_name, teacher.teacher_firstname, CONCAT(has_address.address, '$', has_address.type) AS address_type, is_taught.discipline_name AS discipline FROM teacher JOIN has_role ON teacher.id_teacher = has_role.user_id JOIN department ON department.department_name = has_role.department_name JOIN has_address ON teacher.id_teacher = has_address.id_teacher JOIN is_taught ON teacher.id_teacher = is_taught.id_teacher WHERE department.department_name = :department group by teacher.id_teacher, maxi_number_intern, maxi_number_apprentice, teacher_name, teacher_firstname, address_type, discipline";
+            $query = "SELECT teacher.maxi_number_intern, teacher.maxi_number_apprentice, teacher.id_teacher, 
+                      teacher.teacher_mail, teacher.teacher_name, teacher.teacher_firstname, 
+                      CONCAT(has_address.address, '$', has_address.type) AS address_type, 
+                      is_taught.discipline_name AS discipline 
+                      FROM teacher 
+                      JOIN has_role ON teacher.id_teacher = has_role.user_id 
+                      JOIN department ON department.department_name = has_role.department_name 
+                      JOIN has_address ON teacher.id_teacher = has_address.id_teacher 
+                      JOIN is_taught ON teacher.id_teacher = is_taught.id_teacher 
+                      WHERE department.department_name = :department 
+                      GROUP BY teacher.id_teacher, maxi_number_intern, maxi_number_apprentice, 
+                      teacher_mail, teacher_name, teacher_firstname, address_type, discipline";
         }
 
         if (is_array($department)) {
-            $department = $department[0] ?? '';
+            if (!empty($department)) {
+                $department = $department[0];
+            } else {
+                throw new Exception("Le département n'est pas défini correctement.");
+            }
+        }
+
+        if (empty($department)) {
+            throw new Exception("Le département n'est pas défini.");
         }
 
         $stmt = $db->getConn()->prepare($query);
