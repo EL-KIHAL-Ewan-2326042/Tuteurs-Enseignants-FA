@@ -262,6 +262,8 @@ class Model
         $newList = [
             "teacher_firstname" => 'errr',
             "teacher_name" => 'eezeezz',
+            "Distance" =>$distance,
+            "Discipline" =>$dictValues["Discipline"],
             "company_name" => $internship['company_name'],
             "internship_subject" => $internship['internship_subject'],
             "address" => $internship['address'],

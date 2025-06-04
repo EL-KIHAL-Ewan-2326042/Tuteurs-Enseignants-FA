@@ -5,7 +5,6 @@ namespace Blog\Views\dispatcher;
 use Blog\Views\components\CoefBackup;
 use Blog\Views\components\DispatcherViewStage;
 use Blog\Views\components\Table;
-use Blog\Views\components\ViewStage;
 use Blog\Models\Internship;
 
 class Dispatcher
@@ -69,12 +68,8 @@ class Dispatcher
 
                     <div id="viewStageContainer" class="dataTable" <?= $internshipId ? '' : 'style="display:none;"' ?>>
                         <?php if ($internshipId): ?>
-                            <form action="./dispatcher" method="post" id="stageAssociateForm">
-                                <?php DispatcherViewStage::render($internshipId); ?>
-                                <button type="submit" class="btn">Associer sélectionnés</button>
-                            </form>
+                            <?php DispatcherViewStage::render($internshipId); ?>
                         <?php endif; ?>
-
                     </div>
 
                     <div class="cont-map">
@@ -86,7 +81,6 @@ class Dispatcher
                 </div>
             <?php endif; ?>
         </main>
-
         <?php
     }
 }

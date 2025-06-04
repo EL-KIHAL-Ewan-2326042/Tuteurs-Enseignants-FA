@@ -338,7 +338,21 @@ class Teacher extends Model
 
     public function getAllTeachers()
     {
-        $stmt = $this->_db->getConn()->prepare("SELECT * FROM teacher");
+        $stmt = $this->_db->getConn()->prepare("SELECT 
+    t.*, 
+    it.discipline_name 
+FROM 
+    teacher t
+LEFT JOIN LATERAL (
+    SELECT 
+        it.discipline_name 
+    FROM 
+        is_taught it 
+    WHERE 
+        it.id_teacher = t.id_teacher
+    LIMIT 1
+) it ON true;
+");
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
