@@ -13,7 +13,7 @@ class ViewStage
      */
     public static function render(string $idStage): void
     {
-        $headers = ['Professeur', 'Position', 'Discipline', 'Entreprise', 'Score', 'Historique'];
+        $headers = ['Enseignant', 'Position', 'Score','Discipline', 'Entreprise',  'Historique'];
 
         $jsColumns = [
             ['data' => 'prof'],

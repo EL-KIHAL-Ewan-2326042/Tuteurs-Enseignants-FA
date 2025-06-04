@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
             stageCont.style.display = '';
             toggleIcon.textContent = 'apps';
 
-            const stageTable = initDataTable('viewStage', `/api/datatable/stage/${selectedId}`, stageCols);
+            const stageTable = initDataTable('viewStage', `/api/datatable/stage/${selectedId}`, stageCols, false);
 
             if (stageTable && stageTable.ajax) {
                 stageTable.ajax.reload(async () => {
