@@ -330,22 +330,21 @@ class AjaxController
         // Tri décroissant sur le score
         usort($scores, fn($a, $b) => $b['score'] <=> $a['score']);
 
-        $top = array_slice($scores, 0, 10);
 
         // Si enseignant assigné pas dans le top, on l'ajoute
-        if ($assignedTeacherId !== null && !in_array($assignedTeacherId, array_column($top, 'id_teacher'))) {
+        if ($assignedTeacherId !== null && !in_array($assignedTeacherId, array_column($scores, 'id_teacher'))) {
             foreach ($scores as $entry) {
                 if ($entry['id_teacher'] == $assignedTeacherId) {
                     $entry['associe'] = true;
-                    $top[] = $entry;
+                    $scores[] = $entry;
                     break;
                 }
             }
-            usort($top, fn($a, $b) => $b['score'] <=> $a['score']);
+            usort($scores, fn($a, $b) => $b['score'] <=> $a['score']);
         }
 
         echo json_encode([
-            'data' => $top
+            'data' => $scores
         ]);
     }
 

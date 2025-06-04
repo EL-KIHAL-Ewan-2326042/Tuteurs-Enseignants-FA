@@ -43,7 +43,7 @@ class Dispatcher
                 ?>
                 <div class="partie2">
                     <div id="tableContainer" class="dataTable">
-                        <form action="./dispatcher" method="post">
+                        <form action="./dispatcher" method="post" id="dt">
                             <?php
                             Table::render(
                                 'dispatch-table',
@@ -62,7 +62,8 @@ class Dispatcher
                                 '/api/dispatch-list'
                             );
                             ?>
-                            <button type="submit" name="selecInternshipSubmitted" value="1" class="btn">Valider</button>
+                            <button type="submit" name="selecInternshipSubmitted" value="1" class="btn-send">Valider</button>
+                            <button type="button" id="checkAll" name="checkAll" class="btn-info">Tout cocher</button>
                         </form>
                     </div>
 

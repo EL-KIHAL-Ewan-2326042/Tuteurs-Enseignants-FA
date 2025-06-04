@@ -60,7 +60,12 @@ a, li {
 .fs8 {
     font-size: .8rem;
 }
-
+.cbr {
+    color: var(--couleur-bleu-roi);
+}
+.fs6 {
+    font-size: .6rem;
+}
 .red-text {
     color: var(--couleur-vin);
 }
@@ -135,21 +140,28 @@ table.dataTable tbody td {
     border-bottom: 1px solid #e0e0e0;
 }
 
-#homepage-table_wrapper button, #homepage-table_wrapper input {
+#homepage-table_wrapper button, #viewStage_wrapper button, #viewStage_wrapper input,#dispatch-table_wrapper button, #dispatch-table_wrapper input, #homepage-table_wrapper input {
     transition: all .2s ease-in;
     background: transparent;
     border: 1px solid var(--couleur-bleu-roi);
 
     color: var(--couleur-bleu-roi);
 }
-#homepage-table_wrapper button:hover {
+#homepage-table_wrapper button:hover, #viewStage_wrapper button:hover, #dispatch-table_wrapper button:hover {
     transition: all .2s ease-in;
-    background-color: var(--couleur-bleu);
-    border: 1px solid var(--couleur-bleu);
+    background-color: var(--couleur-bleu-roi);
+    border: 1px solid var(--couleur-bleu-roi);
     color: var(--couleur-jaune);
 
 }
+.btn-info {
+    padding: .6rem 0;
+    border: none;
+    border-radius: .3rem;
+    color: var(--couleur-bleu-roi);
+    width: 100%;
 
+}
 .dt-buttons {
     display: flex;
     flex-basis: max-content;
@@ -161,8 +173,6 @@ table.dataTable tbody td {
     height: 100%;
 }
 
-
-
-.cp:hover {
-    cursor: pointer;
+button:hover {
+    cursor: pointer !important;
 }
