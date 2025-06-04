@@ -314,13 +314,25 @@ class Internship extends Model
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $keywords = $result['keywords'] ?? '';
-        $internshipTokens = $keywords ? preg_split('/[\s_]+/', trim($keywords)) : [];
-        if (empty($internshipTokens)) {
+        $keywordsString = $result['keywords'] ?? '';
+
+        // Si pas de mots-clés, retourner 0
+        if (empty($keywordsString)) {
             return 0.0;
         }
 
-        // Récupérer les disciplines de l’enseignant
+        // Parser les keywords
+        $keywordsString = trim($keywordsString, '{}');
+        $internshipKeywords = str_getcsv($keywordsString);
+        $internshipKeywords = array_map(function($item) {
+            return trim($item, '"');
+        }, $internshipKeywords);
+
+        if (empty($internshipKeywords)) {
+            return 0.0;
+        }
+
+        // Récupérer les disciplines de l'enseignant
         $stmt = $conn->prepare("SELECT discipline_name FROM is_taught WHERE id_teacher = :id");
         $stmt->bindParam(':id', $identifier);
         $stmt->execute();
@@ -330,25 +342,18 @@ class Internship extends Model
             return 0.0;
         }
 
-        $teacherTokens = preg_split('/[\s_]+/', implode(' ', $disciplines));
-        if (empty($teacherTokens)) {
-            return 0.0;
+        // Calculer le score
+        $matchCount = 0;
+        foreach ($internshipKeywords as $keyword) {
+            if (in_array($keyword, $disciplines)) {
+                $matchCount++;
+            }
         }
 
-        // Recherche rapide avec array_flip
-        $teacherTokensFlipped = array_flip($teacherTokens);
-
-        $score = 0.0;
-        $internshipCount = count($internshipTokens);
-
-        foreach ($internshipTokens as $token) {
-            if (isset($teacherTokensFlipped[$token])) {
-                $score += 1 / $internshipCount;
-                if ($score >= 1.0) {
-                    $score = 1.0;
-                    break;
-                }
-            }
+        // Calculer le score en fonction du nombre de correspondances
+        $score = $matchCount / count($internshipKeywords);
+        if ($score > 1.0) {
+            $score = 1.0;
         }
 
         $this->cache['scoreDiscipSubject'][$internshipId][$identifier] = $score;
