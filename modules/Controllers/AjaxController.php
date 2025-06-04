@@ -138,7 +138,12 @@ class AjaxController
         usort($data, function ($a, $b) {
             return strcmp($a['student'], $b['student']);
         });
-        echo json_encode(['data' => $data, 'total' => (int)$total]);
+        echo json_encode([
+            'draw' => intval($_POST['draw'] ?? 1),
+            'recordsTotal' => $total,
+            'recordsFiltered' => $total,
+            'data' => $data
+        ]);
     }
 
 

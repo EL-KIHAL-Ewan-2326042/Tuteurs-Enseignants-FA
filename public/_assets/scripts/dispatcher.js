@@ -51,14 +51,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return null;
     }
 
-    // Création des icônes
-    function icon(cls) {
+    function icon(cls, size = [25, 41]) {
         return L.icon({
             iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
             shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
+            iconSize: size,
+            iconAnchor: [size[0] / 2, size[1]],
+            popupAnchor: [0, -size[1] / 2],
             shadowSize: [41, 41],
             className: cls
         });
@@ -67,7 +66,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const redIcon = icon('marker-red');
     const yellowIcon = icon('marker-yellow');
     const blueIcon = icon('marker-blue');
-    const pinkIcon = icon('marker-pink');
+
+    const largeRedIcon = icon('marker-red', [35, 55]);
+    const largeYellowIcon = icon('marker-yellow', [35, 55]);
 
     // Gestion des marqueurs
     function clearMarkers() {
@@ -109,11 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         const maxScore = Math.max(...scores);
-        const hasUniqueMaxScore = scores.filter(s => s === maxScore).length === 1;
-
 
         for (const teacher of teachers) {
-            console.log(teacher)
             const teacherName = teacher.prof;
             const teacherAddress = teacher.teacher_address || '';
 
@@ -135,16 +133,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const teacherScore = match ? parseFloat(match[1]) : 0;
 
             const isAssociated = teacher.associate === true || teacher.associate === "true";
-
-            console.log(teacher.score, maxScore)
+            console.log(teacher.associate, isAssociated)
             let markerIcon = blueIcon;
-            let label = `${teacherName}<br>Score: ${teacher.score || 'N/A'}`;
+            let label = `${teacherName}<br>Score: ${teacherScore}`;
 
             if (isAssociated) {
-                markerIcon = redIcon;
+                markerIcon = largeRedIcon; // Utilisez une icône plus grande pour les enseignants associés
                 label += '<br><strong>Déjà associé</strong>';
             } else if (teacherScore === maxScore) {
-                markerIcon = yellowIcon;
+                markerIcon = largeYellowIcon; // Utilisez une icône plus grande pour les enseignants avec le score maximum
                 label += '<br><strong>Meilleur score</strong>';
             }
 
