@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const redIcon = icon('marker-red');
     const yellowIcon = icon('marker-yellow');
     const blueIcon = icon('marker-blue');
-
+    const purpleIcon = icon('marker-p', [35, 55])
     const largeRedIcon = icon('marker-red', [35, 55]);
     const largeYellowIcon = icon('marker-yellow', [35, 55]);
 
@@ -89,11 +89,27 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(`/api/datatable/stage/${internshipId}`);
             const data = await response.json();
-            await processTeachersData(data.data || []);
+
+            if (data.data && data.data.length > 0) {
+                await processTeachersData(data.data);
+
+                // Géocodage de l'adresse de l'étudiant
+                const studentAddress = data.data[0].internship_address;
+                const studentCoord = await geocode(studentAddress);
+
+                if (studentCoord) {
+                    addMarker(studentCoord, "Etudiant", purpleIcon);
+                } else {
+                    console.log(`Coordinates not found for student address: ${studentAddress}`);
+                }
+            } else {
+                console.log('No data found for the given internship ID.');
+            }
         } catch (error) {
             console.error('Error loading teacher data:', error);
         }
     }
+
 
     // Traitement des données des enseignants
     async function processTeachersData(teachers) {
@@ -132,10 +148,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const match = scoreText.match(/Score : (\d+\.\d+) \/ 5/);
             const teacherScore = match ? parseFloat(match[1]) : 0;
 
-            const isAssociated = teacher.associate === true || teacher.associate === "true";
-            console.log(teacher.associate, isAssociated)
+            const isAssociated = /checked/.test(teacher.associate);
             let markerIcon = blueIcon;
             let label = `${teacherName}<br>Score: ${teacherScore}`;
+
 
             if (isAssociated) {
                 markerIcon = largeRedIcon; // Utilisez une icône plus grande pour les enseignants associés
@@ -249,7 +265,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 { data: 'discipline' },
                 { data: 'entreprise' },
                 { data: 'history' },
-                { data: 'teacher_address' }
+                { data: 'teacher_address' },
+                {data: 'internship_address'}
             ];
 
             clearMarkers();

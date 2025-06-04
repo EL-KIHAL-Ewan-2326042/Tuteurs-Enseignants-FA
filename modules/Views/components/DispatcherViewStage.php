@@ -13,7 +13,7 @@ class DispatcherViewStage
      */
     public static function render(string $idStage): void
     {
-        $headers = ['Associer', 'Professeur', 'Position', 'Score', 'Discipline', 'Entreprise', 'Historique', 'Adresse'];
+        $headers = ['Associer', 'Professeur', 'Position', 'Score', 'Discipline', 'Entreprise', 'Historique', 'Adresse', 'Adresse du Stage'];
         $jsColumns = [
             ['data' => 'associate'],
             ['data' => 'prof'],
@@ -23,6 +23,7 @@ class DispatcherViewStage
             ['data' => 'entreprise'],
             ['data' => 'history'],
             ['data' => 'teacher_address'],
+            ['data' => 'internship_address'],
         ];
 
         Table::render(

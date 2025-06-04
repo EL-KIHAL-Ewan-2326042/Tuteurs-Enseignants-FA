@@ -279,6 +279,7 @@ class AjaxController
         $db = Database::getInstance();
         $internshipModel = new Internship($db);
         $teacherModel = new Teacher($db);
+        $studentModel = new Student($db);
         $model = new Model($db);
         $dictCoef = $_SESSION['last_dict_coef'] ?? [];
 
@@ -299,7 +300,6 @@ class AjaxController
             $scoreData = $model->calculateRelevanceTeacherStudentsAssociate($teacher, $dictCoef, $internship);
 
             $isAssocie = ($teacher['id_teacher'] == $assignedTeacherId);
-
             $teacherAddress = $teacherModel->getTeacherAddress($teacher['id_teacher']);
             $history = $scoreData['A été responsable'] ?? null;
             if (empty($history)) {
@@ -327,7 +327,7 @@ class AjaxController
                 'associe' => $isAssocie,
                 'id_teacher' => $teacher['id_teacher'],
                 'teacher_address' => $teacherAddress,
-
+                'internship_address' => $internship['address'] ?? '',
             ];
         }
 
