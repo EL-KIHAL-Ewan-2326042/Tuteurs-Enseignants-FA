@@ -299,9 +299,9 @@ class AjaxController
             $scores[] = [
                 'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . $teacher['id_teacher'] . '" ' . ($isAssocie ? 'checked' : '') . '>',
                 'prof' => $teacher['teacher_firstname'] . ' ' . $teacher['teacher_name'],
-                'distance' => $scoreData['Distance'] ?? null,
-                'discipline' => $scoreData['Discipline'] ?? null,
-                'score' => $scoreData['score'] ?? 0,
+                'distance' => $scoreData['Distance'] ?? null . " min",
+                'discipline' => $teacher['discipline_name'] ?? null,
+                'score' => $this->renderStars($scoreData['score'] ?? 0),
                 'entreprise' => $internship['company_name'] ?? '',
                 'history' => $scoreData['A été responsable'] ?? null,
                 'associe' => $isAssocie,

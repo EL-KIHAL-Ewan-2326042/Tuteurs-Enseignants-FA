@@ -29,20 +29,25 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==================== Icons ====================
-    function icon(cls) {
+    function icon(color) {
+        const colorUrl = {
+            red: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+            yellow: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-yellow.png',
+            blue: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png'
+        };
         return L.icon({
-            iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+            iconUrl: colorUrl[color],
             shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
             iconSize: [25, 41],
             iconAnchor: [12, 41],
             popupAnchor: [1, -34],
-            shadowSize: [41, 41],
-            className: cls
+            shadowSize: [41, 41]
         });
     }
-    const redIcon = icon('marker-red');
-    const yellowIcon = icon('marker-yellow');
-    const blueIcon = icon('marker-blue');
+
+    const redIcon = icon('red');
+    const yellowIcon = icon('yellow');
+    const blueIcon = icon('blue');
 
     // ==================== Markers ====================
     function clearMarkers() {
@@ -50,13 +55,14 @@ document.addEventListener('DOMContentLoaded', () => {
         markers = [];
         teacherMarker = null;
     }
+
     function addMarker(coord, label, icn) {
         const m = L.marker(coord, { icon: icn }).addTo(map).bindPopup(label);
         markers.push(m);
         return m;
     }
 
-    // ==================== Teacher Position (if provided) ====================
+    // ==================== Teacher Position ====================
     (async () => {
         const addr = window.TEACHER_ADDRESS;
         if (addr) {
@@ -70,24 +76,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ==================== Stage View Teacher Markers ====================
     async function displayStageTeachers(internshipId) {
+        console.log('Affichage des marqueurs pour stage', internshipId);
         try {
-            // Récupérer les données des professeurs pour ce stage via la DataTable
-            const stageTable = $('#viewStage').DataTable();
-
-            // Vérifier si la DataTable existe et a des données
-            if (!stageTable || !stageTable.data()) {
-                console.log('DataTable non initialisée, tentative de récupération directe des données');
-                // Fallback : récupérer directement via l'API
-                const response = await fetch(`/api/datatable/stage/${internshipId}`);
-                const data = await response.json();
-                await processTeachersData(data.data || []);
-                return;
-            }
-
-            // Récupérer les données de la DataTable
-            const teachers = stageTable.data().toArray().slice(0, 10);
-            await processTeachersData(teachers);
-
+            const response = await fetch(`/api/datatable/stage/${internshipId}`);
+            const data = await response.json();
+            await processTeachersData(data.data || []);
         } catch (error) {
             console.error('Erreur lors du chargement des données des professeurs:', error);
         }
@@ -99,57 +92,60 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        console.log('Données professeurs reçues:', teachers);
         const bounds = [];
 
-        // Calculer le score maximum
+        // Trouver le score maximum
         const scores = teachers.map(t => parseFloat(t.score) || 0);
         const maxScore = Math.max(...scores);
         const hasUniqueMaxScore = scores.filter(s => s === maxScore).length === 1;
 
-        // Ajouter les markers des professeurs
-        for (const teacher of teachers) {
+        // Limiter à 10 professeurs
+        const limitedTeachers = teachers.slice(0, 10);
+
+        for (const teacher of limitedTeachers) {
             if (!teacher.prof) continue;
 
-            // Extraire les informations du professeur
-            let teacherName = teacher.prof;
-            let teacherAddress = teacher.teacher_address || ''; // Utiliser teacher_address
+            const teacherName = teacher.prof;
+            const teacherAddress = teacher.teacher_address || '';
 
             if (!teacherAddress) {
                 console.log(`Aucune adresse trouvée pour l'enseignant : ${teacherName}`);
                 continue;
             }
 
-            console.log(`Géocodage de l'adresse : ${teacherAddress}`);
             const coord = await geocode(teacherAddress);
-            if (coord) {
-                console.log(`Coordonnées trouvées pour ${teacherName}:`, coord);
-                bounds.push(coord);
-
-                // Déterminer la couleur du marker
-                let markerIcon = blueIcon; // Couleur par défaut
-                let label = `${teacherName}<br>Score: ${teacher.score || 'N/A'}`;
-
-                // Vérifier si c'est le professeur avec le meilleur score
-                const teacherScore = parseFloat(teacher.score) || 0;
-                if (hasUniqueMaxScore && teacherScore === maxScore) {
-                    markerIcon = yellowIcon;
-                    label += '<br><strong>Meilleur score</strong>';
-                }
-
-                addMarker(coord, label, markerIcon);
-            } else {
-                console.log(`Aucune coordonnée trouvée pour l'adresse : ${teacherAddress}`);
+            if (!coord) {
+                console.log(`Coordonnées introuvables pour : ${teacherAddress}`);
+                continue;
             }
+
+            bounds.push(coord);
+
+            const teacherScore = parseFloat(teacher.score) || 0;
+            const isAssociated = teacher.associate === true || teacher.associate === "true";
+
+            let markerIcon = blueIcon;
+            let label = `${teacherName}<br>Score: ${teacher.score || 'N/A'}`;
+
+            if (isAssociated) {
+                markerIcon = redIcon;
+                label += '<br><strong>Déjà associé</strong>';
+            } else if (hasUniqueMaxScore && teacherScore === maxScore) {
+                markerIcon = yellowIcon;
+                label += '<br><strong>Meilleur score</strong>';
+            }
+
+            addMarker(coord, label, markerIcon);
         }
 
-        // Inclure la position du professeur connecté dans les bounds
         if (teacherCoord) bounds.push(teacherCoord);
 
-        // Ajuster la vue pour inclure tous les markers
         if (bounds.length > 0) {
             map.fitBounds(bounds, { padding: [50, 50] });
         }
     }
+
 
     // ==================== DataTable Interaction ====================
     const table = $('#dispatch-table').DataTable();
@@ -157,14 +153,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     table.on('select deselect', async () => {
         clearMarkers();
-
-        // Remettre le marker du professeur connecté
         if (teacherCoord) {
             teacherMarker = addMarker(teacherCoord, 'Votre position', redIcon);
         }
 
         const sel = table.rows({ selected: true }).data().toArray();
         const bounds = [];
+
         for (const row of sel) {
             if (!row.address) continue;
             const coord = await geocode(row.address);
@@ -172,16 +167,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 addMarker(coord, `${row.student} - ${row.subject}`, blueIcon);
                 bounds.push(coord);
             }
+
             const coordt = await geocode(row.teacher_address);
             if (coordt) {
                 addMarker(coordt, `${row.teacher}`, yellowIcon);
                 bounds.push(coordt);
             }
         }
+
         if (teacherCoord) bounds.push(teacherCoord);
         if (bounds.length) map.fitBounds(bounds, { padding: [50, 50] });
 
-        // Toggle button state
         if (sel.length === 1) {
             selectedId = sel[0].internship_identifier;
             toggleBtn.disabled = false;
@@ -198,14 +194,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (internshipParam) {
         toggleBtn.disabled = false;
         toggleIcon.textContent = 'apps';
-        // Afficher les markers des professeurs si on est déjà en vue stage
         setTimeout(() => displayStageTeachers(internshipParam), 1000);
     } else {
         toggleBtn.disabled = true;
         toggleIcon.textContent = 'assignment_ind';
     }
 
-    // Précharger les données pour la vue stage
+    // Préchargement des données
     let stageDataCache = {};
     async function preloadStageData(internshipId) {
         if (!stageDataCache[internshipId]) {
@@ -215,7 +210,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Précharger les données pour les stages sélectionnés
     table.on('select', async () => {
         const sel = table.rows({ selected: true }).data().toArray();
         if (sel.length === 1) {
@@ -232,7 +226,6 @@ document.addEventListener('DOMContentLoaded', () => {
             url.searchParams.set('internship', selectedId);
             history.replaceState(null, '', url.toString());
 
-            // Utiliser les données préchargées
             if (stageDataCache[selectedId]) {
                 stageCont.innerHTML = stageDataCache[selectedId];
             } else {
@@ -244,14 +237,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 { data: 'associate', orderable: false, searchable: false },
                 { data: 'prof' },
                 { data: 'distance' },
-                { data: 'discipline' },
                 { data: 'score' },
+                { data: 'discipline' },
                 { data: 'entreprise' },
                 { data: 'history' },
+                { data: 'teacher_address' }
             ];
 
-
-            // Effacer les markers existants
             clearMarkers();
             if (teacherCoord) {
                 teacherMarker = addMarker(teacherCoord, 'Votre position', redIcon);
@@ -261,17 +253,13 @@ document.addEventListener('DOMContentLoaded', () => {
             stageCont.style.display = '';
             toggleIcon.textContent = 'apps';
 
-            // Initialiser la DataTable et attendre qu'elle soit prête
             const stageTable = initDataTable('viewStage', `/api/datatable/stage/${selectedId}`, stageCols);
 
-            // Attendre que la DataTable soit complètement chargée
             if (stageTable && stageTable.ajax) {
                 stageTable.ajax.reload(async () => {
-                    // Une fois les données chargées, afficher les markers
                     await displayStageTeachers(selectedId);
                 });
             } else {
-                // Fallback si initDataTable ne retourne pas l'objet table
                 setTimeout(async () => {
                     await displayStageTeachers(selectedId);
                 }, 1000);
@@ -285,7 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
             tableCont.style.display = '';
             toggleIcon.textContent = 'assignment_ind';
 
-            // Revenir à l'affichage normal
             clearMarkers();
             if (teacherCoord) {
                 teacherMarker = addMarker(teacherCoord, 'Votre position', redIcon);

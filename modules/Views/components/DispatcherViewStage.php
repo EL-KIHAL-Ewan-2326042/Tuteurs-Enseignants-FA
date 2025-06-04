@@ -13,16 +13,16 @@ class DispatcherViewStage
      */
     public static function render(string $idStage): void
     {
-        $headers = ['Associer', 'Professeur', 'Position', 'Discipline', 'Score', 'Entreprise', 'Historique'];
-
+        $headers = ['Associer', 'Professeur', 'Position', 'Score', 'Discipline', 'Entreprise', 'Historique', 'Adresse'];
         $jsColumns = [
             ['data' => 'associate'],
             ['data' => 'prof'],
             ['data' => 'distance'],
-            ['data' => 'discipline'],
             ['data' => 'score'],
+            ['data' => 'discipline'],
             ['data' => 'entreprise'],
             ['data' => 'history'],
+            ['data' => 'teacher_address'],
         ];
 
         Table::render(
@@ -32,5 +32,10 @@ class DispatcherViewStage
             '/api/datatable/stage/' . urlencode(trim($idStage)),
             false
         );
+
+        // Ajout du bouton Valider
+        echo '<form action="./dispatcher" method="post">';
+        echo '<button type="submit" name="associateTeachers" class="btn">Valider</button>';
+        echo '</form>';
     }
 }
