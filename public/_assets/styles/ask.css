@@ -13,13 +13,16 @@ main {
 .btn-annuler {
     background-color: var(--couleur-vin);
 }
-
 #askBtnCont button {
     border-radius: .2rem;
     color: var(--couleur-blanc);
     width: 50%;
     border: none;
     padding: .6rem 0;
+}
+
+#askBtnCont button:hover {
+    cursor: pointer;
 }
 main > div {
     width: 100%;
