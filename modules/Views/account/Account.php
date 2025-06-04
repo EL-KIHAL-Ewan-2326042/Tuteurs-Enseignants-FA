@@ -148,7 +148,7 @@ class Account
                 <div>
                 <div>
                     <h5>
-                        A propos de vous
+                        À propos de vous
                     </h5>
                     <div class="fs8">
                         <div>
@@ -196,46 +196,55 @@ class Account
                         Stages et alternances assignés
                     </h5>
                     <form method="post" name="max_internship" class="card fs8">
-                                <div class="df ac g1">
-                                    <label for="newMaxIntern">Stages max: </label>
-                                    <div >
-                                        <button type="button" onclick="adjustValue('newMaxIntern', -1)" class="btn-m moin">
-                                            <i class="material-icons tiny">remove</i>
-                                        </button>
-                                        <input type="number"
-                                               id="newMaxIntern"
-                                               name="newMaxIntern"
-                                               min="0"
-                                               max="100"
-                                               value="<?php echo $result['intern'] ?: 0; ?>"/>
-                                        <button type="button" onclick="adjustValue('newMaxIntern', 1)" class="btn-m plus">
-                                            <i class="material-icons tiny">add</i>
-                                        </button>
-                                    </div>
+                        <div class="df ac g1">
+                            <label for="newMaxIntern">Stages max: </label>
+                            <?php if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep'): ?>
+                                <div>
+                                    <button type="button" onclick="adjustValue('newMaxIntern', -1)" class="btn-m moin">
+                                        <i class="material-icons tiny">remove</i>
+                                    </button>
+                                    <input type="number"
+                                           id="newMaxIntern"
+                                           name="newMaxIntern"
+                                           min="0"
+                                           max="100"
+                                           value="<?php echo $result['intern'] ?: 0; ?>"/>
+                                    <button type="button" onclick="adjustValue('newMaxIntern', 1)" class="btn-m plus">
+                                        <i class="material-icons tiny">add</i>
+                                    </button>
                                 </div>
-                                <div class="df ac g1">
-                                    <label for="newMaxApprentice">Alternances max: </label>
-                                    <div >
-                                        <button type="button" onclick="adjustValue('newMaxApprentice', -1)" class="btn-m moin">
-                                            <i class="material-icons tiny">remove</i>
-                                        </button>
-                                        <input type="number"
-                                               id="newMaxApprentice"
-                                               name="newMaxApprentice"
-                                               min="0"
-                                               max="100"
-                                               value="<?php echo $result['apprentice'] ?: 0; ?>" />
-                                        <button type="button" onclick="adjustValue('newMaxApprentice', 1)" class="btn-m plus">
-                                            <i class="material-icons tiny">add</i>
-                                        </button>
-                                    </div>
+                            <?php else: ?>
+                                <span><?php echo $result['intern'] ?: 0; ?></span>
+                            <?php endif; ?>
+                        </div>
+
+                        <div class="df ac g1">
+                            <label for="newMaxApprentice">Alternances max: </label>
+                            <?php if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep'): ?>
+                                <div>
+                                    <button type="button" onclick="adjustValue('newMaxApprentice', -1)" class="btn-m moin">
+                                        <i class="material-icons tiny">remove</i>
+                                    </button>
+                                    <input type="number"
+                                           id="newMaxApprentice"
+                                           name="newMaxApprentice"
+                                           min="0"
+                                           max="100"
+                                           value="<?php echo $result['apprentice'] ?: 0; ?>" />
+                                    <button type="button" onclick="adjustValue('newMaxApprentice', 1)" class="btn-m plus">
+                                        <i class="material-icons tiny">add</i>
+                                    </button>
                                 </div>
-                        <button type="submit"
-                                        name="newMaxSubmitted"
-                                        value="1"
-                                        id="save-changes">
-                                    Enregistrer les modifications
-                        </button>
+                            <?php else: ?>
+                                <span><?php echo $result['apprentice'] ?: 0; ?></span>
+                            <?php endif; ?>
+                        </div>
+
+                        <?php if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep'): ?>
+                            <button type="submit" name="newMaxSubmitted" value="1" id="save-changes">
+                                Enregistrer les modifications
+                            </button>
+                        <?php endif; ?>
                     </form>
 
                 </div>
