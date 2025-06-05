@@ -46,11 +46,6 @@ class Aboutus
         ?>
         <main>
             <div class="row">
-                <div class="col s12 m7 l7 push-l5">
-                    <img class="responsive-img"
-                        src="https://imgur.com/AqAvrsS.png"
-                        alt="image de l'université">
-                </div>
                 <div class="col s12 m5 l5 pull-l7">
                     <h3> A Propos </h3> <br>
                     <p> Ce site a été développé dans le cadre d'une Situation 
