@@ -89,7 +89,6 @@ class Model
     }
 
 
-
     public function calculateDuration(array $latLngInternship, array $latLngTeacher): ?int
     {
         $url = sprintf(
@@ -166,6 +165,7 @@ class Model
 
         echo json_encode(['data' => $data]);
     }
+
     public function insertScoreIntoDatabase(array $data): void
     {
         $query = "UPDATE public.internship SET relevance_score = :score WHERE internship_identifier = :internship_identifier AND student_number = :student_number";
@@ -180,7 +180,7 @@ class Model
     }
 
 
-    public function calculateRelevanceTeacherStudentsAssociate(array $teacher,array $dictCoef, array $internship): array
+    public function calculateRelevanceTeacherStudentsAssociate(array $teacher, array $dictCoef, array $internship): array
     {
         $defaultCoefs = [
             'Distance' => 10,
@@ -271,8 +271,8 @@ class Model
         $newList = [
             "teacher_firstname" => 'errr',
             "teacher_name" => 'eezeezz',
-            "Distance" =>$distance,
-            "Discipline" =>$dictValues["Discipline"],
+            "Distance" => $distance,
+            "Discipline" => $dictValues["Discipline"],
             "company_name" => $internship['company_name'],
             "internship_subject" => $internship['internship_subject'],
             "address" => $internship['address'],
@@ -414,8 +414,10 @@ class Model
                 $this->prepareTeacherImport($handle, $headers);
             } else if ($tableName === 'student') {
                 $this->prepareStudentImport($handle, $headers);
+            } else if ($tableName === 'internship') {
+                $this->prepareInternshipImport($handle, $headers);
             } else {
-                $this->prepareRegularImport($handle, $headers, $tableName, $primaryKey);
+                throw new  Exception("Table inconnue pour l'import");
             }
 
             $conn->commit();
@@ -445,36 +447,6 @@ class Model
         ];
 
         return $keyMap[$tableName] ?? 'id';
-    }
-
-    /**
-     * Importe les données pour les tables standard
-     */
-    private function prepareRegularImport($handle, array $headers, string $tableName, string $primaryKey): void
-    {
-        // Lecture ligne par ligne
-        while (($data = fgetcsv($handle)) !== false) {
-            if (count($data) !== count($headers)) {
-                throw new Exception("Nombre de colonnes incorrect à la ligne");
-            }
-
-            $rowData = array_combine($headers, $data);
-
-            // Vérifier si l'enregistrement existe déjà
-            $stmt = $this->_db->getConn()->prepare("SELECT COUNT(*) FROM $tableName WHERE $primaryKey = :key");
-            $stmt->bindValue(':key', $rowData[$primaryKey]);
-            $stmt->execute();
-
-            $exists = $stmt->fetchColumn() > 0;
-
-            if ($exists) {
-                // UPDATE
-                $this->updateRecord($tableName, $rowData, $primaryKey);
-            } else {
-                // INSERT
-                $this->insertRecord($tableName, $rowData);
-            }
-        }
     }
 
     /**
@@ -529,12 +501,14 @@ class Model
         }
     }
 
-    /**
-     * Traitement spécial pour l'import des enseignants
-     */
     private function prepareTeacherImport($handle, array $headers): void
     {
         $conn = $this->_db->getConn();
+        $department = $_SESSION['role_department'] ?? 'IUT_INFO_AIX';
+
+        if (is_array($department) && !empty($department)) {
+            $department = $department[0];
+        }
 
         while (($data = fgetcsv($handle)) !== false) {
             if (count($data) !== count($headers)) {
@@ -544,52 +518,231 @@ class Model
             $rowData = array_combine($headers, $data);
             $teacherId = $rowData['id_teacher'];
 
-            // Vérifier si l'enseignant existe déjà
+            // Extraire les données d'adresse et discipline avant traitement
+            $addressData = $rowData['address$type'] ?? '';
+            $disciplineData = $rowData['discipline_name'] ?? '';
+
+            // Supprimer les colonnes spéciales du tableau de données enseignant
+            unset($rowData['address$type'], $rowData['discipline_name']);
+
+            // Vérifier si l'enseignant existe déjà dans user_connect
+            $stmt = $conn->prepare("SELECT COUNT(*) FROM user_connect WHERE user_id = :id");
+            $stmt->bindValue(':id', $teacherId);
+            $stmt->execute();
+            $userExists = $stmt->fetchColumn() > 0;
+
+            // Créer l'entrée dans user_connect si nécessaire
+            if (!$userExists) {
+                $stmt = $conn->prepare("INSERT INTO user_connect (user_id, user_pass) VALUES (:id, '')");
+                $stmt->bindValue(':id', $teacherId);
+                $stmt->execute();
+            }
+
+            // Vérifier si l'enseignant existe déjà dans teacher
             $stmt = $conn->prepare("SELECT COUNT(*) FROM teacher WHERE id_teacher = :id");
             $stmt->bindValue(':id', $teacherId);
             $stmt->execute();
             $exists = $stmt->fetchColumn() > 0;
 
-            // Traitement des données enseignant
-            $teacherData = array_filter($rowData, function($key) {
-                return !in_array($key, ['address$type', 'discipline_name']);
-            }, ARRAY_FILTER_USE_KEY);
-
             if ($exists) {
-                $this->updateRecord('teacher', $teacherData, 'id_teacher');
+                // Mettre à jour l'enseignant
+                $this->updateRecord('teacher', $rowData, 'id_teacher');
             } else {
-                $this->insertRecord('teacher', $teacherData);
-            }
+                // Insérer le nouvel enseignant
+                $this->insertRecord('teacher', $rowData);
 
-            // Traitement de l'adresse si présente
-            if (isset($rowData['address$type'])) {
-                list($address, $type) = explode('$', $rowData['address$type'] . '$home');
-
-                // Supprimer les anciennes adresses
-                $stmt = $conn->prepare("DELETE FROM has_address WHERE id_teacher = :id");
+                // Ajouter l'enseignant au département avec le bon role "Enseignant"
+                $stmt = $conn->prepare("INSERT INTO has_role (user_id, role_name, department_name) VALUES (:id, 'Enseignant', :dept)");
                 $stmt->bindValue(':id', $teacherId);
-                $stmt->execute();
-
-                // Insérer la nouvelle adresse
-                $stmt = $conn->prepare("INSERT INTO has_address (id_teacher, address, type) VALUES (:id, :address, :type)");
-                $stmt->bindValue(':id', $teacherId);
-                $stmt->bindValue(':address', $address);
-                $stmt->bindValue(':type', $type);
+                $stmt->bindValue(':dept', $department);
                 $stmt->execute();
             }
 
-            // Traitement de la discipline si présente
-            if (isset($rowData['discipline_name'])) {
-                // Supprimer les anciennes disciplines
-                $stmt = $conn->prepare("DELETE FROM is_taught WHERE id_teacher = :id");
-                $stmt->bindValue(':id', $teacherId);
-                $stmt->execute();
+            // Traiter les adresses (format: "adresse1$type1|adresse2$type2|...")
+            $this->processTeacherAddresses($conn, $teacherId, $addressData);
 
-                // Insérer la nouvelle discipline
-                $stmt = $conn->prepare("INSERT INTO is_taught (id_teacher, discipline_name) VALUES (:id, :discipline)");
-                $stmt->bindValue(':id', $teacherId);
-                $stmt->bindValue(':discipline', $rowData['discipline_name']);
-                $stmt->execute();
+            // Traiter les disciplines (format: "discipline1|discipline2|...")
+            $this->processTeacherDisciplines($conn, $teacherId, $disciplineData);
+        }
+    }
+
+    /**
+     * Traite les adresses d'un enseignant à partir d'une chaîne formatée
+     */
+    private function processTeacherAddresses($conn, string $teacherId, string $addressString): void
+    {
+        // Supprimer les anciennes adresses
+        $stmt = $conn->prepare("DELETE FROM has_address WHERE id_teacher = :id");
+        $stmt->bindValue(':id', $teacherId);
+        $stmt->execute();
+
+        if (empty($addressString)) {
+            return;
+        }
+
+        // Traiter chaque adresse
+        $addresses = explode('|', $addressString);
+        foreach ($addresses as $addressEntry) {
+            // Format attendu: "adresse$type"
+            $parts = explode('$', $addressEntry, 2);
+            $address = trim($parts[0]);
+            $type = isset($parts[1]) ? trim($parts[1]) : 'Domicile_1';
+
+            if (empty($address)) continue;
+
+            // Insérer l'adresse
+            $stmt = $conn->prepare("INSERT INTO has_address (id_teacher, address, type) VALUES (:id, :address, :type)");
+            $stmt->bindValue(':id', $teacherId);
+            $stmt->bindValue(':address', $address);
+            $stmt->bindValue(':type', $type);
+            $stmt->execute();
+        }
+    }
+
+    /**
+     * Traite les disciplines d'un enseignant à partir d'une chaîne formatée
+     */
+    private function processTeacherDisciplines($conn, string $teacherId, string $disciplineString): void
+    {
+        // Supprimer les anciennes disciplines
+        $stmt = $conn->prepare("DELETE FROM is_taught WHERE id_teacher = :id");
+        $stmt->bindValue(':id', $teacherId);
+        $stmt->execute();
+
+        if (empty($disciplineString)) {
+            return;
+        }
+
+        // Traiter chaque discipline
+        $disciplines = explode('|', $disciplineString);
+        foreach ($disciplines as $discipline) {
+            $discipline = trim($discipline);
+            if (empty($discipline)) continue;
+
+            // Insérer la discipline
+            $stmt = $conn->prepare("INSERT INTO is_taught (id_teacher, discipline_name) VALUES (:id, :discipline)");
+            $stmt->bindValue(':id', $teacherId);
+            $stmt->bindValue(':discipline', $discipline);
+            $stmt->execute();
+        }
+    }
+
+    /**
+     * Traitement spécial pour l'import des stages
+     */
+    private function prepareInternshipImport($handle, array $headers): void
+    {
+        $conn = $this->_db->getConn();
+
+        while (($data = fgetcsv($handle)) !== false) {
+            if (count($data) > count($headers)) {
+                $extraColumns = array_slice($data, count($headers));
+                $data = array_slice($data, 0, count($headers));
+                $data[count($headers) - 1] = implode(', ', array_merge(
+                    [$data[count($headers) - 1]],
+                    $extraColumns
+                ));
+            } else if (count($data) < count($headers)) {
+                throw new Exception("Nombre de colonnes insuffisant à la ligne");
+            }
+
+            $rowData = array_combine($headers, $data);
+
+            if (isset($rowData['relevance_score']) && $rowData['relevance_score'] === '') {
+                $rowData['relevance_score'] = null;
+            }
+
+            if (isset($rowData['id_teacher']) && $rowData['id_teacher'] === '') {
+                $rowData['id_teacher'] = null;
+            }
+
+            $internshipId = $rowData['internship_identifier'];
+
+            if (isset($rowData['keywords']) && !empty($rowData['keywords'])) {
+                // Convert keywords to PostgreSQL array format
+                $keywords = explode('|', $rowData['keywords']);
+                $keywords = array_map('trim', $keywords);
+                $keywords = array_filter($keywords);
+
+                if (!empty($keywords)) {
+                    $keywordsStr = '{' . implode(',', array_map(function ($keyword) {
+                            return '"' . str_replace('"', '\"', $keyword) . '"';
+                        }, $keywords)) . '}';
+                    $rowData['keywords'] = $keywordsStr;
+                }
+            }
+
+
+            // Vérifier si le stage existe déjà
+            $stmt = $conn->prepare("SELECT COUNT(*) FROM internship WHERE internship_identifier = :id");
+            $stmt->bindValue(':id', $internshipId);
+            $stmt->execute();
+            $exists = $stmt->fetchColumn() > 0;
+
+            // Respecter l'ordre des dépendances pour éviter les violations de contraintes d'intégrité
+            if ($exists) {
+                // 1. Mise à jour de la table distance si applicable
+                if (isset($rowData['id_teacher']) && !empty($rowData['id_teacher'])) {
+                    $stmt = $conn->prepare("SELECT COUNT(*) FROM distance WHERE internship_identifier = :internship_id AND id_teacher = :teacher_id");
+                    $stmt->bindValue(':internship_id', $internshipId);
+                    $stmt->bindValue(':teacher_id', $rowData['id_teacher']);
+                    $stmt->execute();
+
+                    if ($stmt->fetchColumn() > 0) {
+                        // Mettre à jour distance
+                        $stmt = $conn->prepare("UPDATE distance SET distance = 0 WHERE internship_identifier = :internship_id AND id_teacher = :teacher_id");
+                        $stmt->bindValue(':internship_id', $internshipId);
+                        $stmt->bindValue(':teacher_id', $rowData['id_teacher']);
+                        $stmt->execute();
+                    }
+                }
+
+                // 2. Mise à jour du stage
+                $this->updateRecord('internship', $rowData, 'internship_identifier');
+
+                // 3. Mise à jour de addr_name si une adresse est fournie
+                if (isset($rowData['address']) && !empty($rowData['address'])) {
+                    $stmt = $conn->prepare("SELECT COUNT(*) FROM addr_name WHERE address = :address");
+                    $stmt->bindValue(':address', $rowData['address']);
+                    $stmt->execute();
+
+                    if ($stmt->fetchColumn() > 0) {
+                        // Mettre à jour addr_name (généralement la latitude/longitude)
+                        $stmt = $conn->prepare("UPDATE addr_name SET address = address WHERE address = :address");
+                        $stmt->bindValue(':address', $rowData['address']);
+                        $stmt->execute();
+                    } else {
+                        // Insérer dans addr_name
+                        $stmt = $conn->prepare("INSERT INTO addr_name (address) VALUES (:address)");
+                        $stmt->bindValue(':address', $rowData['address']);
+                        $stmt->execute();
+                    }
+                }
+            } else {
+                // S'assurer que l'adresse existe avant d'insérer le stage
+                if (isset($rowData['address']) && !empty($rowData['address'])) {
+                    $stmt = $conn->prepare("SELECT COUNT(*) FROM addr_name WHERE address = :address");
+                    $stmt->bindValue(':address', $rowData['address']);
+                    $stmt->execute();
+
+                    if ($stmt->fetchColumn() == 0) {
+                        // Créer l'adresse d'abord
+                        $stmt = $conn->prepare("INSERT INTO addr_name (address) VALUES (:address)");
+                        $stmt->bindValue(':address', $rowData['address']);
+                        $stmt->execute();
+                    }
+                }
+
+                // Insérer le nouveau stage
+                $this->insertRecord('internship', $rowData);
+
+                // Puis créer l'entrée distance si un enseignant est assigné
+                if (isset($rowData['id_teacher']) && !empty($rowData['id_teacher'])) {
+                    $stmt = $conn->prepare("INSERT INTO distance (internship_identifier, id_teacher, distance) VALUES (:internship_id, :teacher_id, 0)");
+                    $stmt->bindValue(':internship_id', $internshipId);
+                    $stmt->bindValue(':teacher_id', $rowData['id_teacher']);
+                    $stmt->execute();
+                }
             }
         }
     }
@@ -673,34 +826,48 @@ class Model
         }
 
         if ($tableName != 'teacher') {
-            $query = "SELECT " . implode(',', array_map(fn($header) => "$tableName." . $header, $headers)) . " FROM $tableName";
+            // Use specific query for internship to handle array type conversion
+            if ($tableName == 'internship') {
+                // Create column list with special handling for keywords column
+                $columnList = [];
+                foreach ($headers as $header) {
+                    if ($header == 'keywords') {
+                        // Convert PostgreSQL array to pipe-separated string to avoid CSV parsing issues
+                        $columnList[] = "array_to_string(keywords, '|') as keywords";
+                    } else {
+                        $columnList[] = "$tableName.$header";
+                    }
+                }
+                $query = "SELECT " . implode(',', $columnList) . " FROM $tableName";
+            } else {
+                $query = "SELECT " . implode(',', array_map(fn($header) => "$tableName.$header", $headers)) . " FROM $tableName";
+            }
 
             $query .= match ($tableName) {
-                'internship' => " JOIN student ON internship.student_number = student.student_number JOIN study_at ON study_at.student_number = student.student_number WHERE study_at.department_name = :department",
-                'student' => " JOIN study_at ON student.student_number = study_at.student_number WHERE study_at.department_name = :department",
+                'internship' => " JOIN student ON internship.student_number = student.student_number 
+                             JOIN study_at ON study_at.student_number = student.student_number 
+                             WHERE study_at.department_name = :department",
+                'student' => " JOIN study_at ON student.student_number = study_at.student_number 
+                          WHERE study_at.department_name = :department",
                 default => throw new Exception("Table non reconnue : " . $tableName),
             };
         } else {
-            $query = "SELECT teacher.maxi_number_intern, teacher.maxi_number_apprentice, teacher.id_teacher, 
-                      teacher.teacher_mail, teacher.teacher_name, teacher.teacher_firstname, 
-                      CONCAT(has_address.address, '$', has_address.type) AS address_type, 
-                      is_taught.discipline_name AS discipline 
-                      FROM teacher 
-                      JOIN has_role ON teacher.id_teacher = has_role.user_id 
-                      JOIN department ON department.department_name = has_role.department_name 
-                      JOIN has_address ON teacher.id_teacher = has_address.id_teacher 
-                      JOIN is_taught ON teacher.id_teacher = is_taught.id_teacher 
-                      WHERE department.department_name = :department 
-                      GROUP BY teacher.id_teacher, maxi_number_intern, maxi_number_apprentice, 
-                      teacher_mail, teacher_name, teacher_firstname, address_type, discipline";
+            $query = "SELECT teacher.maxi_number_intern, teacher.maxi_number_apprentice, teacher.id_teacher,
+                              teacher.teacher_mail, teacher.teacher_name, teacher.teacher_firstname,
+                              string_agg(DISTINCT CONCAT(has_address.address, '$', has_address.type), '|') AS \"address\$type\",
+                              string_agg(DISTINCT is_taught.discipline_name, '|') AS discipline_name
+                              FROM teacher
+                              JOIN has_role ON teacher.id_teacher = has_role.user_id
+                              JOIN department ON department.department_name = has_role.department_name
+                              JOIN has_address ON teacher.id_teacher = has_address.id_teacher
+                              JOIN is_taught ON teacher.id_teacher = is_taught.id_teacher
+                              WHERE department.department_name = :department
+                              GROUP BY teacher.id_teacher, maxi_number_intern, maxi_number_apprentice,
+                              teacher_mail, teacher_name, teacher_firstname";
         }
 
         if (is_array($department)) {
-            if (!empty($department)) {
-                $department = $department[0];
-            } else {
-                throw new Exception("Le département n'est pas défini correctement.");
-            }
+            $department = !empty($department) ? $department[0] : throw new Exception("Le département n'est pas défini correctement.");
         }
 
         if (empty($department)) {
@@ -712,15 +879,9 @@ class Model
         $stmt->execute();
 
         while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            if ($tableName == 'teacher') {
-                if (isset($row['address_type']) && isset($row['discipline_name'])) {
-                    $row['address$type'] = $row['address_type'] . ' ' . $row['discipline_name'];
-                    unset($row['address_type']);
-                    unset($row['discipline_name']);
-                }
-            }
             fputcsv($output, $row, ',');
         }
+
         fclose($output);
         $csvData = ob_get_clean();
         echo $csvData;
@@ -763,8 +924,8 @@ class Model
     }
 
 
-
-    public function dispatcherEnMieux($dictCoef): array {
+    public function dispatcherEnMieux($dictCoef): array
+    {
         $final = [];
         $stmt = $this->_db->getConn()->prepare("
         SELECT * FROM internship WHERE id_teacher IS NULL AND end_date_internship > NOW();

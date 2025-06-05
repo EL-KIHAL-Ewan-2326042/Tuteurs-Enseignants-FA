@@ -29,26 +29,37 @@ class Import
                 // Détection du fichier importé
                 if (isset($files['student'])) {
                     $csvFile = $files['student']['tmp_name'];
+                    $importType = 'student';
                 } elseif (isset($files['teacher'])) {
                     $csvFile = $files['teacher']['tmp_name'];
+                    $importType = 'teacher';
                 } elseif (isset($files['internship'])) {
                     $csvFile = $files['internship']['tmp_name'];
+                    $importType = 'internship';
                 } else {
                     $errorMessage = "Aucun fichier CSV valide détecté";
+                    return [$message, $errorMessage];
                 }
 
                 if ($csvFile) {
                     // Validation du fichier et correspondances des en-têtes
                     $csvHeaders = $this->_model->getCsvHeaders($csvFile);
 
-                    if (mime_content_type($csvFile) !== 'text/plain') {
-                        $errorMessage = "Le fichier uploadé n'est pas un CSV valide.";
+                    // Accept more CSV MIME types
+                    $mimeType = mime_content_type($csvFile);
+                    $validCsvTypes = ['text/plain', 'text/csv', 'application/csv', 'text/comma-separated-values', 'application/vnd.ms-excel'];
+
+                    if (!in_array($mimeType, $validCsvTypes)) {
+                        $errorMessage = "Le fichier uploadé n'est pas un CSV valide. Type détecté: $mimeType";
                     } elseif (!$this->_model->validateHeaders($csvHeaders, $tableName)) {
                         $errorMessage = "Les en-têtes du fichier CSV ne correspondent pas à la structure de la table $tableName.";
-                    } elseif ($this->_model->processCsv($csvFile, $tableName)) {
-                        $message = "L'importation du fichier CSV pour la table $tableName a été réalisée avec succès!";
                     } else {
-                        $errorMessage = "Une erreur est survenue lors de l'importation pour la table $tableName.";
+                        // Use the processCsv method which now uses our specialized import functions
+                        if ($this->_model->processCsv($csvFile, $tableName)) {
+                            $message = "L'importation du fichier CSV pour la table $tableName a été réalisée avec succès!";
+                        } else {
+                            $errorMessage = "Une erreur est survenue lors de l'importation pour la table $tableName.";
+                        }
                     }
                 }
             } catch (Exception $e) {
