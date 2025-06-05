@@ -14,7 +14,6 @@ class Homepage
         ?>
         <main>
             <section class="decoration">
-                <!-- 4 ronds -->
                 <span class="rond" style="
     top: 15%;
     left: 8%;
@@ -40,7 +39,6 @@ class Homepage
     color: var(--couleur-or);
   "></span>
 
-                <!-- 3 carrés -->
                 <span class="rond" style="
     top: 12%;
     right: 38%;
@@ -81,7 +79,7 @@ class Homepage
                 </div>
                 <div>
                     <a href="/ask">Tous les étudiants</a>
-                    <a href="/account">Explorer</a>
+                    <a href="/account">Mon profil</a>
                 </div>
             </section>
         </main>
