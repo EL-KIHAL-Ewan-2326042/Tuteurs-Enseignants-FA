@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let markers = [], teacherMarker = null, teacherCoord = null;
     const toggleIcon = document.getElementById('toggleIcon');
 
-    // Fonctions de géocodage et d'icônes
     const geoCache = JSON.parse(localStorage.getItem('geoCache') || '{}');
     const saveCache = () => localStorage.setItem('geoCache', JSON.stringify(geoCache));
 
@@ -71,10 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })();
 
-    // Initialisation de la table
     initDataTable('homepage-table', '/api/datatable/ask', window.JS_COLUMNS);
 
-    // Gestion des marqueurs au clic / déclic
     const table = $('#homepage-table').DataTable();
     table.on('select deselect', async () => {
         clearMarkers();
@@ -96,16 +93,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    function getCheckedRowsData() {
+        const checkedRows = [];
+        const checkboxes = document.querySelectorAll('.dispatch-checkbox:checked');
+
+        checkboxes.forEach(checkbox => {
+            const row = checkbox.closest('tr');
+            if (row) {
+                const rowData = table.row(row).data();
+                if (rowData) {
+                    const checkboxValue = checkbox.value;
+                    const [teacherId, internshipId] = checkboxValue.split('$');
+
+                    checkedRows.push({
+                        ...rowData,
+                        teacher_id: teacherId,
+                        internship_identifier: internshipId
+                    });
+                }
+            }
+        });
+
+        return checkedRows;
+    }
+
     const validateButton = document.querySelector('button[name="selecInternshipSubmitted"]');
     validateButton.addEventListener('click', async function(event) {
         event.preventDefault();
 
-        const selectedRows = table.rows({ selected: true }).data().toArray();
-        if (selectedRows.length === 0) {
+        const checkedRows = getCheckedRowsData();
+
+        if (checkedRows.length === 0) {
             Swal.fire({
                 icon: 'error',
                 title: 'Oops...',
-                text: 'Veuillez sélectionner au moins une ligne.',
+                text: 'Veuillez cocher au moins une case "Demander".',
             });
             return;
         }
@@ -119,39 +141,65 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        for (const row of selectedRows) {
-            const response = await fetch('/api/update-internship-request', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: new URLSearchParams({
-                    add: true,
-                    teacher: window.TEACHER_ID,
-                    internship: row.internship_identifier
-                })
-            });
+        validateButton.disabled = true;
+        validateButton.innerHTML = '<i class="material-icons">hourglass_empty</i> Traitement...';
 
-            const data = await response.json();
-            if (!data.success) {
-                console.error('Error:', data.message);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Une erreur est survenue lors de l\'enregistrement des demandes.',
+        let hasError = false;
+
+        try {
+            for (const row of checkedRows) {
+                const response = await fetch('/api/update-internship-request', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({
+                        add: true,
+                        teacher: window.TEACHER_ID,
+                        internship: row.internship_identifier
+                    })
                 });
-                break;
-            }
-        }
 
-        Swal.fire({
-            icon: 'success',
-            title: 'Succès',
-            text: 'Les demandes ont été enregistrées avec succès.',
-        });
+                const data = await response.json();
+                if (!data.success) {
+                    console.error('Error:', data.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: `Une erreur est survenue lors de l'enregistrement de la demande pour ${row.student}.`,
+                    });
+                    hasError = true;
+                    break;
+                }
+            }
+
+            if (!hasError) {
+                document.querySelectorAll('.dispatch-checkbox:checked').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+
+                table.ajax.reload();
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Succès',
+                    text: `${checkedRows.length} demande(s) ont été enregistrée(s) avec succès.`,
+                });
+            }
+        } catch (error) {
+            console.error('Erreur lors de l\'envoi des demandes:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Erreur',
+                text: 'Une erreur inattendue s\'est produite.',
+            });
+        } finally {
+            // Réactiver le bouton
+            validateButton.disabled = false;
+            validateButton.innerHTML = 'Valider';
+        }
     });
 
-    // Gestion du bouton toggle
     const toggleBtn = document.getElementById('toggleViewBtn'),
         tableCont = document.getElementById('tableContainer'),
         stageCont = document.getElementById('viewStageContainer');
@@ -223,6 +271,29 @@ document.addEventListener('DOMContentLoaded', () => {
             stageCont.style.display = 'none';
             tableCont.style.display = '';
             toggleIcon.textContent = 'assignment_ind';
+        }
+    });
+
+    document.addEventListener('change', async function(event) {
+        if (event.target.classList.contains('dispatch-checkbox')) {
+            const checkedRows = getCheckedRowsData();
+
+            clearMarkers();
+            const bounds = [];
+
+            for (const row of checkedRows) {
+                if (!row.address) continue;
+                const coord = await geocode(row.address);
+                if (coord) {
+                    addMarker(coord, `${row.student} - ${row.company}`, purpleIcon);
+                    bounds.push(coord);
+                }
+            }
+
+            if (teacherCoord) bounds.push(teacherCoord);
+            if (bounds.length) {
+                map.fitBounds(bounds, { padding: [50, 50] });
+            }
         }
     });
 });

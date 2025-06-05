@@ -34,9 +34,20 @@ class CoefBackup
                     <div>
                     <span>Coefficients</span>
                     <div>
-                        <?php foreach ($listCriteria as $criteria):
+                        <?php
+                        function normalize_name($string) {
+                            // Supprimer les accents
+                            $string = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $string);
+                            // Remplacer les espaces par des underscores
+                            $string = str_replace(' ', '_', $string);
+                            // Mettre en minuscules
+                            return strtolower($string);
+                        }
+
+                        foreach ($listCriteria as $criteria):
                             $value = $criteria['coef'];
-                            $name = $criteria['name_criteria'];
+                            $originalName = $criteria['name_criteria'];
+                            $name = normalize_name($originalName);
                             $description = $criteria['description'];
                             ?>
                             <div>
@@ -49,8 +60,8 @@ class CoefBackup
                                            checked="checked"
                                            hidden="hidden"/>
                                     <span data-position="top" data-tooltip="<?php echo $description ?>">
-                                    <?php echo $name; ?>
-                                </span>
+                <?php echo $originalName; ?>
+            </span>
                                 </label>
                                 <input type="number"
                                        name="coef[<?php echo $name; ?>]"
@@ -58,9 +69,9 @@ class CoefBackup
                                        min="1" max="100"
                                        value="<?php echo $value ?>"
                                 /><label for="<?php echo $name; ?>" style="display: none;">Coefficient</label>
-
                             </div>
                         <?php endforeach; ?>
+
 
                     </div>
                     </div>
