@@ -127,7 +127,7 @@ class Layout
                     <?php if (isset($_SESSION['identifier'])) { ?>
                         <a href="/account">
                         <span><?php echo $_SESSION['fullName'] ?></span>
-                                        <span><?php echo $_SESSION['role_name']?></span>
+                                        <span><?php echo $_SESSION['role_name_clean']?></span>
                                     </a>
                                     <a onclick="disconnect();" href="/intramu" class="logout-btn" title="Déconnexion">
                                         <i class="material-icons">power_settings_new</i>

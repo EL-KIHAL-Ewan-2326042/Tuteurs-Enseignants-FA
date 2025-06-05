@@ -5,7 +5,10 @@ main {
     flex-direction: column;
     max-width: 100%; min-height: 80vh;
 }
-
+.mpsection > p:first-child {
+    font-size: 1.4rem;
+    font-weight: 600;
+}
 
 #forms-section {
     height: 80vh;
