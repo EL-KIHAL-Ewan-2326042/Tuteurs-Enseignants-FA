@@ -177,10 +177,20 @@ $router->post('/api/datatable/account', function() {
 });
 
 $router->get('/api/datatable/stage/([A-Za-z0-9]+)', function() {
-    (new \Blog\Controllers\AjaxController())->getViewStage( basename($_SERVER['REQUEST_URI']));
+    $search = $_POST['search']['value'] ?? '';
+    $order = [
+        'column' => $_POST['order'][0]['column'] ?? 0,
+        'dir' => $_POST['order'][0]['dir'] ?? 'ASC'
+    ];
+    (new \Blog\Controllers\AjaxController())->getViewStage( basename($_SERVER['REQUEST_URI']), $search, $order );
 });
 $router->post('/api/datatable/stage/([A-Za-z0-9]+)', function() {
-    (new \Blog\Controllers\AjaxController())->getViewStage( basename($_SERVER['REQUEST_URI']));
+    $search = $_POST['search']['value'] ?? '';
+    $order = [
+        'column' => $_POST['order'][0]['column'] ?? 0,
+        'dir' => $_POST['order'][0]['dir'] ?? 'ASC'
+    ];
+    (new \Blog\Controllers\AjaxController())->getViewStage( basename($_SERVER['REQUEST_URI']), $search, $order );
 });
 $router->get('/api/viewStage/([A-Za-z0-9]+)', function () {
     \Blog\Views\components\ViewStage::render(basename($_SERVER['REQUEST_URI']));

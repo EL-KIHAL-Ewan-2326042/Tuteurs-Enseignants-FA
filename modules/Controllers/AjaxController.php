@@ -272,7 +272,7 @@ class AjaxController
             'data' => $result['data']
         ]);
     }
-    public function getViewStage(string $internshipId): void
+    public function getViewStage(string $internshipId, string $search = '', array $order = []): void
     {
         header('Content-Type: application/json');
 
@@ -283,8 +283,6 @@ class AjaxController
         $model = new Model($db);
         $dictCoef = $_SESSION['last_dict_coef'] ?? [];
 
-        // Récupérer tous les enseignants
-        $teachers = $teacherModel->getAllTeachers();
         $internshipList = $internshipModel->getInternshipById($internshipId);
         if (empty($internshipList)) {
             echo json_encode(['error' => 'Stage introuvable']);
@@ -294,13 +292,14 @@ class AjaxController
 
         $assignedTeacherId = $internship['id_teacher'] ?? null;
 
+        $teachers = $teacherModel->getAllTeachers();
         $scores = [];
 
         foreach ($teachers as $teacher) {
             $scoreData = $model->calculateRelevanceTeacherStudentsAssociate($teacher, $dictCoef, $internship);
-
             $isAssocie = ($teacher['id_teacher'] == $assignedTeacherId);
             $teacherAddress = $teacherModel->getTeacherAddress($teacher['id_teacher']);
+
             $history = $scoreData['A été responsable'] ?? null;
             if (empty($history)) {
                 $history = '<i class="material-icons red-text tooltipped" data-tooltip="Aucune date">close</i>';
@@ -314,6 +313,7 @@ class AjaxController
                     $history = str_replace(['{', '}'], '', htmlspecialchars($history));
                 }
             }
+
             $position = isset($scoreData['Distance']) ? $scoreData['Distance'] . " min" : null;
 
             $scores[] = [
@@ -331,17 +331,73 @@ class AjaxController
             ];
         }
 
+        // Apply search filter
+        if (!empty($search)) {
+            $scores = array_filter($scores, function ($score) use ($search) {
+                return stripos($score['prof'], $search) !== false ||
+                    stripos($score['distance'], $search) !== false ||
+                    stripos($score['discipline'], $search) !== false ||
+                    stripos($score['entreprise'], $search) !== false ||
+                    stripos($score['history'], $search) !== false ||
+                    stripos($score['teacher_address'], $search) !== false ||
+                    stripos($score['internship_address'], $search) !== false;
+            });
+        }
 
-        // Tri décroissant sur le score
-        usort($scores, fn($a, $b) => $b['score'] <=> $a['score']);
+        // Apply sorting
+        if (!empty($order) && isset($order['column']) && isset($order['dir'])) {
+            $column = $order['column'];
+            $dir = $order['dir'];
+            usort($scores, function ($a, $b) use ($column, $dir) {
+                $keys = [
+                    'associate', 'prof', 'distance', 'discipline', 'score', 'entreprise', 'history', 'teacher_address', 'internship_address'
+                ];
+                $key = $keys[$column] ?? 'score';
+                if ($dir === 'asc') {
+                    return strcmp($a[$key], $b[$key]);
+                } else {
+                    return strcmp($b[$key], $a[$key]);
+                }
+            });
+        } else {
+            // Default sorting by score descending
+            usort($scores, fn($a, $b) => $b['score'] <=> $a['score']);
+        }
 
-
-        // Si enseignant assigné pas dans le top, on l'ajoute
+        // If assigned teacher is not in the top, add them
         if ($assignedTeacherId !== null && !in_array($assignedTeacherId, array_column($scores, 'id_teacher'))) {
-            foreach ($scores as $entry) {
-                if ($entry['id_teacher'] == $assignedTeacherId) {
-                    $entry['associe'] = true;
-                    $scores[] = $entry;
+            foreach ($teachers as $teacher) {
+                if ($teacher['id_teacher'] == $assignedTeacherId) {
+                    $scoreData = $model->calculateRelevanceTeacherStudentsAssociate($teacher, $dictCoef, $internship);
+                    $teacherAddress = $teacherModel->getTeacherAddress($teacher['id_teacher']);
+                    $history = $scoreData['A été responsable'] ?? null;
+                    if (empty($history)) {
+                        $history = '<i class="material-icons red-text tooltipped" data-tooltip="Aucune date">close</i>';
+                    } else {
+                        if (is_array($history)) {
+                            $cleanDates = array_map(function ($date) {
+                                return str_replace(['{', '}'], '', htmlspecialchars($date));
+                            }, $history);
+                            $history = implode('<br>', $cleanDates);
+                        } else {
+                            $history = str_replace(['{', '}'], '', htmlspecialchars($history));
+                        }
+                    }
+                    $position = isset($scoreData['Distance']) ? $scoreData['Distance'] . " min" : null;
+
+                    $scores[] = [
+                        'associate' => '<input type="checkbox" class="dispatch-checkbox" name="listTupleAssociate[]" value="' . $teacher['id_teacher'] . '" checked>',
+                        'prof' => $teacher['teacher_firstname'] . ' ' . $teacher['teacher_name'],
+                        'distance' => $position,
+                        'discipline' => $teacher['discipline_name'] ?? null,
+                        'score' => $this->renderStars($scoreData['score'] ?? 0),
+                        'entreprise' => $internship['company_name'] ?? '',
+                        'history' => $history,
+                        'associe' => true,
+                        'id_teacher' => $teacher['id_teacher'],
+                        'teacher_address' => $teacherAddress,
+                        'internship_address' => $internship['address'] ?? '',
+                    ];
                     break;
                 }
             }
@@ -349,9 +405,11 @@ class AjaxController
         }
 
         echo json_encode([
-            'data' => $scores
+            'data' => array_values($scores)
         ]);
     }
+
+
 
 
 
