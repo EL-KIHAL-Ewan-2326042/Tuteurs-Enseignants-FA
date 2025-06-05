@@ -243,6 +243,11 @@ class AjaxController
                     $search,
                     $order
                 );
+                foreach ($result['data'] as &$row) {
+                    if (isset($row['distance'])) {
+                        $row['distance'] .= ' min';
+                    }
+                }
                 break;
             case 'stage':
                 $result = $internshipModel->paginateStage(

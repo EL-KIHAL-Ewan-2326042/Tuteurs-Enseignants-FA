@@ -63,7 +63,7 @@ class Account
      */
     public function showView(): void
     {
-        $headers = ['Élève', 'Formation', 'Groupe', 'Entreprise', 'Sujet', 'Fin De Stage', 'Adresse', 'Distance'];
+        $headers = ['Élève', 'Formation', 'Groupe', 'Entreprise', 'Sujet', 'Fin De Stage', 'Adresse', 'Position'];
 
         $jsColumns = [
             ['data' => 'student'],
