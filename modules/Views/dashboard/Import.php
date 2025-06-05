@@ -51,12 +51,6 @@ class Import
             <form action="/dashboard" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="table_name" value="<?php echo $currentConfig['table_name']; ?>">
                 <div class="file-field input-field">
-                    <div class="file-path-wrapper">
-                        <label>
-                            <input class="file-path validate" type="text"
-                                   placeholder="Aucun fichier sélectionné" required>
-                        </label>
-                    </div>
                     <div class="btn">
                         <i class="material-icons">cloud_upload</i>
                         <label for="<?php echo $currentConfig['input_name']; ?>" style="cursor: pointer;">
@@ -69,6 +63,10 @@ class Import
                                multiple
                                style="display: none;">
                     </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text"
+                               readonly placeholder="Aucun fichier sélectionné" id="file-path-display">
+                    </div>
                     <button class="btn waves-effect waves-light"
                             type="submit" name="<?php echo $currentConfig['submit_name']; ?>">Valider
                         <i class="material-icons right">send</i>
@@ -76,6 +74,19 @@ class Import
                 </div>
             </form>
         </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const fileInput = document.getElementById('<?php echo $currentConfig['input_name']; ?>');
+                const filePathDisplay = document.getElementById('file-path-display');
+
+                fileInput.addEventListener('change', function() {
+                    if (fileInput.files.length > 0) {
+                        filePathDisplay.value = fileInput.files[0].name;
+                    } else {
+                        filePathDisplay.value = '';
+                    }
+                });
+        </script>
         <?php
     }
 }
