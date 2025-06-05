@@ -32,6 +32,8 @@ class CoefBackup
                 <section class="mpsection">
                     <p>Le Répartiteur </p>
                     <div>
+                    <span>Coefficients</span>
+                    <div>
                         <?php foreach ($listCriteria as $criteria):
                             $value = $criteria['coef'];
                             $name = $criteria['name_criteria'];
@@ -55,10 +57,12 @@ class CoefBackup
                                        id="<?php echo $name; ?>"
                                        min="1" max="100"
                                        value="<?php echo $value ?>"
-                                />
-                                <label for="<?php echo $name; ?>">Coeff</label>
+                                /><label for="<?php echo $name; ?>" style="display: none;">Coefficient</label>
+
                             </div>
                         <?php endforeach; ?>
+
+                    </div>
                     </div>
                     <button type="submit" name="action" value="generate" id="generate-btn"
                             data-position="top" data-tooltip="Commencer la répartition">
