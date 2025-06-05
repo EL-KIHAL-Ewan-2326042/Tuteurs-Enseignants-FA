@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const yellowIcon = icon('marker-yellow'), blueIcon = icon('marker-blue');
+    const purpleIcon = icon('marker-p', [35, 55])
 
     function clearMarkers() {
         markers.forEach(m => {
@@ -85,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!row.address) continue;
             const c = await geocode(row.address);
             if (c) {
-                addMarker(c, `${row.student} - ${row.company}`, blueIcon);
+                addMarker(c, `${row.student} - ${row.company}`, purpleIcon);
                 b.push(c);
             }
         }

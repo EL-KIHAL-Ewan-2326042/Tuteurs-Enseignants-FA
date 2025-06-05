@@ -92,21 +92,7 @@ function initDataTable(id, ajaxUrl, columns, paginationEnabled = true) {
                         exportOptions: { columns: ':visible' }
                     },
                     'colvis',
-                    {
-                        text: '<i class="material-icons tiny">select_all</i> <span id="selectText">Tout sélectionner</span>',
-                        attr: { id: 'toggleSelectBtn', class: 'dt-button toggle-select-btn' },
-                        action: function () {
-                            let table = $('#' + id).DataTable();
-                            let selected = table.rows({ selected: true }).count();
-                            if (selected > 0) {
-                                table.rows().deselect();
-                                $('#toggleSelectBtn').text('Tout sélectionner');
-                            } else {
-                                table.rows({ page: 'current' }).select();
-                                $('#toggleSelectBtn').text('Tout désélectionner');
-                            }
-                        }
-                    }
+
                 ],
             },
             topEnd: {
