@@ -1,24 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Gestion des checkboxes pour la vue des étudiants
-    document.getElementById('viewStageContainer').addEventListener('change', function(event) {
+    const viewStageContainer = document.getElementById('viewStageContainer');
+    viewStageContainer?.addEventListener('change', function(event) {
         if (event.target.classList.contains('dispatch-checkbox')) {
-            const checkboxes = this.querySelectorAll('.dispatch-checkbox');
-            checkboxes.forEach(otherCheckbox => {
-                if (otherCheckbox !== event.target) {
-                    otherCheckbox.checked = false;
-                }
+            [...this.querySelectorAll('.dispatch-checkbox')].forEach(cb => {
+                if (cb !== event.target) cb.checked = false;
             });
         }
     });
 
-    document.getElementById('checkAll').addEventListener('click', function() {
-        const checkboxes = document.querySelectorAll('.dispatch-checkbox');
-        checkboxes.forEach(function(checkbox) {
-            checkbox.checked = true;
-        });
+    document.getElementById('checkAll')?.addEventListener('click', () => {
+        document.querySelectorAll('.dispatch-checkbox').forEach(cb => cb.checked = true);
     });
 
-    // Initialisation de la carte
     const map = L.map('map').setView([43.2965, 5.3698], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
@@ -30,217 +23,178 @@ document.addEventListener('DOMContentLoaded', () => {
     const tableCont = document.getElementById('tableContainer');
     const stageCont = document.getElementById('viewStageContainer');
 
-    // Cache pour le géocodage
     const geoCache = JSON.parse(localStorage.getItem('geoCache') || '{}');
     const saveCache = () => localStorage.setItem('geoCache', JSON.stringify(geoCache));
 
-    async function geocode(addr) {
+    const geocode = async (addr) => {
         if (geoCache[addr]) return geoCache[addr];
         try {
-            const r = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr)}`);
-            const d = await r.json();
-            if (d.length) {
-                const c = [+d[0].lat, +d[0].lon];
-                geoCache[addr] = c;
+            const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addr)}`);
+            const data = await res.json();
+            if (data[0]) {
+                const coords = [+data[0].lat, +data[0].lon];
+                geoCache[addr] = coords;
                 saveCache();
-                return c;
+                return coords;
             }
         } catch (e) {
             console.error('Geocoding error:', e);
         }
         return null;
-    }
+    };
 
-    function icon(cls, size = [25, 41]) {
-        return L.icon({
-            iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-            shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-            iconSize: size,
-            iconAnchor: [size[0] / 2, size[1]],
-            popupAnchor: [0, -size[1] / 2],
-            shadowSize: [41, 41],
-            className: cls
-        });
-    }
+    const icon = (cls, size = [25, 41]) => L.icon({
+        iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+        shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+        iconSize: size,
+        iconAnchor: [size[0] / 2, size[1]],
+        popupAnchor: [0, -size[1] / 2],
+        shadowSize: [41, 41],
+        className: cls
+    });
 
-    const redIcon = icon('marker-red');
-    const yellowIcon = icon('marker-yellow');
-    const blueIcon = icon('marker-blue');
-    const purpleIcon = icon('marker-p', [35, 55])
-    const largeRedIcon = icon('marker-red', [35, 55]);
-    const largeYellowIcon = icon('marker-yellow', [35, 55]);
+    const icons = {
+        red: icon('marker-red'),
+        yellow: icon('marker-yellow'),
+        blue: icon('marker-blue'),
+        purple: icon('marker-p', [35, 55]),
+        largeRed: icon('marker-red', [35, 55]),
+        largeYellow: icon('marker-yellow', [35, 55])
+    };
 
-    // Gestion des marqueurs
-    function clearMarkers() {
+    const clearMarkers = () => {
         markers.forEach(m => map.removeLayer(m));
         markers = [];
         teacherMarker = null;
-    }
+    };
 
-    function addMarker(coord, label, icn) {
+    const addMarker = (coord, label, icn) => {
         const m = L.marker(coord, { icon: icn }).addTo(map).bindPopup(label);
         markers.push(m);
         return m;
-    }
+    };
 
-
-    // Affichage des enseignants pour la vue des stages
     async function displayStageTeachers(internshipId) {
+        if (!internshipId) return;
+
         try {
-            const response = await fetch(`/api/datatable/stage/${internshipId}`);
-            const data = await response.json();
+            const res = await fetch(`/api/datatable/stage/${internshipId}`);
+            const { data = [] } = await res.json();
 
-            if (data.data && data.data.length > 0) {
-                await processTeachersData(data.data);
+            if (data.length === 0) return;
 
-                // Géocodage de l'adresse de l'étudiant
-                const studentAddress = data.data[0].internship_address;
-                const studentCoord = await geocode(studentAddress);
+            await processTeachersData(data);
 
-                if (studentCoord) {
-                    addMarker(studentCoord, "Etudiant", purpleIcon);
-                } else {
-                    console.log(`Coordinates not found for student address: ${studentAddress}`);
-                }
-            } else {
-                console.log('No data found for the given internship ID.');
-            }
-        } catch (error) {
-            console.error('Error loading teacher data:', error);
+            const studentAddress = data[0].internship_address;
+            const studentCoord = await geocode(studentAddress);
+            if (studentCoord) addMarker(studentCoord, "Étudiant", icons.purple);
+        } catch (e) {
+            console.error("Erreur lors de l'affichage des enseignants :", e);
         }
     }
 
-
-    // Traitement des données des enseignants
     async function processTeachersData(teachers) {
-        if (!teachers || teachers.length === 0) {
-            console.log('No teachers found.');
-            return;
-        }
-
+        if (!teachers.length) return;
         const bounds = [];
-        const scores = teachers.map(t => {
-            const scoreText = t.score || "Score : 0 / 5";
-            const match = scoreText.match(/Score : (\d+\.\d+) \/ 5/);
-            return match ? parseFloat(match[1]) : 0;
-        });
-
+        const scores = teachers.map(t => parseFloat(t.score?.match(/Score : (\d+\.\d+)/)?.[1]) || 0);
         const maxScore = Math.max(...scores);
 
-        for (const teacher of teachers) {
-            const teacherName = teacher.prof;
-            const teacherAddress = teacher.teacher_address || '';
+        for (const t of teachers) {
+            const { prof, teacher_address = "", associate = "", score = "Score : 0 / 5" } = t;
+            if (!teacher_address) continue;
 
-            if (!teacherAddress) {
-                console.log(`No address found for teacher: ${teacherName}`);
-                continue;
-            }
-
-            const coord = await geocode(teacherAddress);
-            if (!coord) {
-                console.log(`Coordinates not found for: ${teacherAddress}`);
-                continue;
-            }
+            const coord = await geocode(teacher_address);
+            if (!coord) continue;
 
             bounds.push(coord);
 
-            const scoreText = teacher.score || "Score : 0 / 5";
-            const match = scoreText.match(/Score : (\d+\.\d+) \/ 5/);
-            const teacherScore = match ? parseFloat(match[1]) : 0;
+            const parsedScore = parseFloat(score.match(/Score : (\d+\.\d+)/)?.[1]) || 0;
+            const isAssociated = associate.includes("checked");
 
-            const isAssociated = /checked/.test(teacher.associate);
-            let markerIcon = blueIcon;
-            let label = `${teacherName}<br>Score: ${teacherScore}`;
-
+            let icn = icons.blue;
+            let label = `${prof}<br>Score: ${parsedScore}`;
 
             if (isAssociated) {
-                markerIcon = largeRedIcon; // Utilisez une icône plus grande pour les enseignants associés
-                label += '<br><strong>Déjà associé</strong>';
-            } else if (teacherScore === maxScore) {
-                markerIcon = largeYellowIcon; // Utilisez une icône plus grande pour les enseignants avec le score maximum
-                label += '<br><strong>Meilleur score</strong>';
+                icn = icons.largeRed;
+                label += "<br><strong>Déjà associé</strong>";
+            } else if (parsedScore === maxScore) {
+                icn = icons.largeYellow;
+                label += "<br><strong>Meilleur score</strong>";
             }
 
-            addMarker(coord, label, markerIcon);
-        }
-
-        if (teacherCoord) bounds.push(teacherCoord);
-
-        if (bounds.length > 0) {
-            map.fitBounds(bounds, { padding: [50, 50] });
-        }
-    }
-
-    // Interaction avec la table des étudiants
-    const table = $('#dispatch-table').DataTable();
-    let selectedId = null;
-
-    table.on('select deselect', async () => {
-        clearMarkers();
-        if (teacherCoord) {
-            teacherMarker = addMarker(teacherCoord, 'Votre position', redIcon);
-        }
-
-        const sel = table.rows({ selected: true }).data().toArray();
-        const bounds = [];
-
-        for (const row of sel) {
-            if (!row.address) continue;
-            const coord = await geocode(row.address);
-            if (coord) {
-                addMarker(coord, `${row.student} - ${row.subject}`, purpleIcon);
-                bounds.push(coord);
-            }
-
-            const coordt = await geocode(row.teacher_address);
-            if (coordt) {
-                addMarker(coordt, `${row.teacher}`, yellowIcon);
-                bounds.push(coordt);
-            }
+            addMarker(coord, label, icn);
         }
 
         if (teacherCoord) bounds.push(teacherCoord);
         if (bounds.length) map.fitBounds(bounds, { padding: [50, 50] });
+    }
 
-        if (sel.length === 1) {
-            selectedId = sel[0].internship_identifier;
-            toggleBtn.disabled = false;
-        } else {
-            selectedId = null;
-            toggleBtn.disabled = true;
-        }
+    // DataTable selection
+    const table = $('#dispatch-table').DataTable();
+    let selectedId = null;
+
+    let debounceSelection;
+    table.on('select deselect', () => {
+        clearTimeout(debounceSelection);
+        debounceSelection = setTimeout(async () => {
+            clearMarkers();
+            if (teacherCoord) teacherMarker = addMarker(teacherCoord, 'Votre position', icons.red);
+
+            const sel = table.rows({ selected: true }).data().toArray();
+            const bounds = [];
+
+            for (const row of sel) {
+                if (row.address) {
+                    const coord = await geocode(row.address);
+                    if (coord) {
+                        addMarker(coord, `${row.student} - ${row.subject}`, icons.purple);
+                        bounds.push(coord);
+                    }
+                }
+
+                if (row.teacher_address) {
+                    const coordt = await geocode(row.teacher_address);
+                    if (coordt) {
+                        addMarker(coordt, `${row.teacher}`, icons.yellow);
+                        bounds.push(coordt);
+                    }
+                }
+            }
+
+            if (teacherCoord) bounds.push(teacherCoord);
+            if (bounds.length) map.fitBounds(bounds, { padding: [50, 50] });
+
+            selectedId = sel.length === 1 ? sel[0].internship_identifier : null;
+            toggleBtn.disabled = !selectedId;
+        }, 300);
     });
 
-    // Gestion du basculement entre les vues
     const urlParams = new URLSearchParams(window.location.search);
     const internshipParam = urlParams.get('internship');
 
     if (internshipParam) {
         toggleBtn.disabled = false;
         toggleIcon.textContent = 'apps';
-        setTimeout(() => displayStageTeachers(internshipParam), 1000);
+        displayStageTeachers(internshipParam); // Appel unique
     } else {
         toggleBtn.disabled = true;
         toggleIcon.textContent = 'assignment_ind';
     }
 
-    // Préchargement des données
-    let stageDataCache = {};
+    const stageDataCache = {};
     async function preloadStageData(internshipId) {
         if (!stageDataCache[internshipId]) {
-            const response = await fetch(`/api/dispatcherViewStage/${internshipId}`);
-            const html = await response.text();
-            stageDataCache[internshipId] = html;
+            const res = await fetch(`/api/dispatcherViewStage/${internshipId}`);
+            stageDataCache[internshipId] = await res.text();
         }
     }
 
     table.on('select', async () => {
         const sel = table.rows({ selected: true }).data().toArray();
-        if (sel.length === 1) {
-            await preloadStageData(sel[0].internship_identifier);
-        }
+        if (sel.length === 1) await preloadStageData(sel[0].internship_identifier);
     });
 
+    // Toggle vue stage/table
     toggleBtn.addEventListener('click', async () => {
         const url = new URL(window.location.href);
 
@@ -250,46 +204,30 @@ document.addEventListener('DOMContentLoaded', () => {
             url.searchParams.set('internship', selectedId);
             history.replaceState(null, '', url.toString());
 
-            if (stageDataCache[selectedId]) {
-                stageCont.innerHTML = stageDataCache[selectedId];
-            } else {
-                const html = await (await fetch(`/api/dispatcherViewStage/${selectedId}`)).text();
-                stageCont.innerHTML = html;
-            }
-
-            const stageCols = [
-                { data: 'associate', orderable: false, searchable: false },
-                { data: 'prof' },
-                { data: 'distance' },
-                { data: 'score' },
-                { data: 'discipline' },
-                { data: 'entreprise' },
-                { data: 'history' },
-                { data: 'teacher_address' },
-                {data: 'internship_address'}
-            ];
-
-            clearMarkers();
-            if (teacherCoord) {
-                teacherMarker = addMarker(teacherCoord, 'Votre position', redIcon);
-            }
+            stageCont.innerHTML = stageDataCache[selectedId] || await (await fetch(`/api/dispatcherViewStage/${selectedId}`)).text();
 
             tableCont.style.display = 'none';
             stageCont.style.display = '';
             toggleIcon.textContent = 'apps';
 
+            const stageCols = [
+                { data: 'associate', orderable: false, searchable: false },
+                { data: 'prof' }, { data: 'distance' }, { data: 'score' },
+                { data: 'discipline' }, { data: 'entreprise' },
+                { data: 'history' }, { data: 'teacher_address' },
+                { data: 'internship_address' }
+            ];
+
+            clearMarkers();
+            if (teacherCoord) teacherMarker = addMarker(teacherCoord, 'Votre position', icons.red);
+
             const stageTable = initDataTable('viewStage', `/api/datatable/stage/${selectedId}`, stageCols, false);
 
-            if (stageTable && stageTable.ajax) {
-                stageTable.ajax.reload(async () => {
-                    await displayStageTeachers(selectedId);
-                });
+            if (stageTable?.ajax) {
+                stageTable.ajax.reload(() => displayStageTeachers(selectedId));
             } else {
-                setTimeout(async () => {
-                    await displayStageTeachers(selectedId);
-                }, 10000);
+                displayStageTeachers(selectedId);
             }
-
         } else {
             url.searchParams.delete('internship');
             history.replaceState(null, '', url.toString());
@@ -299,9 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleIcon.textContent = 'assignment_ind';
 
             clearMarkers();
-            if (teacherCoord) {
-                teacherMarker = addMarker(teacherCoord, 'Votre position', redIcon);
-            }
+            if (teacherCoord) teacherMarker = addMarker(teacherCoord, 'Votre position', icons.red);
         }
     });
 });
