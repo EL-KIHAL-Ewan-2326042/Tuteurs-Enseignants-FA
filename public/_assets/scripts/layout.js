@@ -9,11 +9,27 @@ toggleMenu.onclick = function() {
     }
 };
 
-function disconnect() {
-    if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
-        window.location.href = '/intramu';
-    }
+function disconnect(event) {
+    event.preventDefault();
+
+    Swal.fire({
+        title: 'Êtes-vous sûr ?',
+        text: 'Vous allez être déconnecté.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#1F63DE',
+        cancelButtonColor: '#990000',
+        confirmButtonText: 'Oui, déconnectez-moi !',
+        cancelButtonText: 'Annuler'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            window.location.href = '/intramu';
+        }
+    });
+
+    return false;
 }
+
 
 function initDataTable(id, ajaxUrl, columns, paginationEnabled = true) {
     if ($.fn.DataTable.isDataTable('#' + id)) {

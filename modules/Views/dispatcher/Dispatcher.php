@@ -44,6 +44,7 @@ class Dispatcher
                 <div class="partie2">
                     <div id="tableContainer" class="dataTable">
                         <form action="./dispatcher" method="post" id="dt">
+                            
                             <?php
                             Table::render(
                                 'dispatch-table',

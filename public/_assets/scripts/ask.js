@@ -98,21 +98,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const validateButton = document.querySelector('button[name="selecInternshipSubmitted"]');
     validateButton.addEventListener('click', async function(event) {
-        event.preventDefault(); // Empêche la soumission par défaut du formulaire
+        event.preventDefault();
 
         const selectedRows = table.rows({ selected: true }).data().toArray();
         if (selectedRows.length === 0) {
-            alert('Veuillez sélectionner au moins une ligne.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'Veuillez sélectionner au moins une ligne.',
+            });
             return;
         }
 
-        // Vérifiez que teacherId est défini
         if (!window.TEACHER_ID) {
-            alert('L\'identifiant de l\'enseignant est manquant.');
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'L\'identifiant de l\'enseignant est manquant.',
+            });
             return;
         }
 
-        // Envoyer les données au serveur
         for (const row of selectedRows) {
             const response = await fetch('/api/update-internship-request', {
                 method: 'POST',
@@ -129,12 +135,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
             if (!data.success) {
                 console.error('Error:', data.message);
-                alert('Une erreur est survenue lors de l\'enregistrement des demandes.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Une erreur est survenue lors de l\'enregistrement des demandes.',
+                });
                 break;
             }
         }
 
-        alert('Les demandes ont été enregistrées avec succès.');
+        Swal.fire({
+            icon: 'success',
+            title: 'Succès',
+            text: 'Les demandes ont été enregistrées avec succès.',
+        });
     });
 
     // Gestion du bouton toggle

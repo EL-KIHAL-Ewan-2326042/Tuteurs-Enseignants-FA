@@ -129,9 +129,9 @@ class Layout
                         <span><?php echo $_SESSION['fullName'] ?></span>
                                         <span><?php echo $_SESSION['role_name_clean']?></span>
                                     </a>
-                                    <a onclick="disconnect();" href="/intramu" class="logout-btn" title="Déconnexion">
-                                        <i class="material-icons">power_settings_new</i>
-                                    </a>
+                        <a onclick="return disconnect(event);" href="/intramu" class="logout-btn" title="Déconnexion">
+                            <i class="material-icons">power_settings_new</i>
+                        </a>
                         <?php } ?>
                 </div>
             </header>
@@ -158,6 +158,8 @@ class Layout
                     </div>
         </footer>
         <script src="/_assets/scripts/layout.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <?php
     if ($jsFilePath) {
         echo '<script src="' . $jsFilePath . '"></script>';

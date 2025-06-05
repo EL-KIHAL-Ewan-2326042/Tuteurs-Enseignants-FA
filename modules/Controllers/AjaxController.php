@@ -406,9 +406,9 @@ class AjaxController
                     break;
                 }
             }
-            usort($scores, fn($a, $b) => $b['score'] <=> $a['score']);
-        }
 
+        }
+        usort($scores, fn($a, $b) => $b['score'] <=> $a['score']);
         echo json_encode([
             'data' => array_values($scores)
         ]);
