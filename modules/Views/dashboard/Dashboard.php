@@ -162,6 +162,8 @@ class Dashboard
                     <!-- Contenu chargé dynamiquement -->
                     <div class="loading-placeholder">
                         <p>Veuillez sélectionner une catégorie</p>
+                        <p class="message"><?php echo $this->message; ?></p>
+                        <p class="errorMessage"><?php echo $this->errorMessage; ?></p>
                     </div>
                 </div>
 
@@ -169,8 +171,6 @@ class Dashboard
                     <!-- Contenu chargé dynamiquement -->
                 </div>
             </div>
-            <p class="message"><?php echo $this->message; ?></p>
-            <p class="errorMessage"><?php echo $this->errorMessage; ?></p>
 
         </main>
         <?php
