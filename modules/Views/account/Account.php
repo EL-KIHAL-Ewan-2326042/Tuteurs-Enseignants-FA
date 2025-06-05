@@ -183,7 +183,7 @@ class Account
                             </div>
 
                             <ul>
-                                <?php foreach ($_SESSION['role_department'] as $dept): ?>
+                                <?php foreach ($_SESSION['role_department_clean'] as $dept): ?>
                                     <li class="dep fs8"><?= htmlspecialchars($dept) ?></li>
                                 <?php endforeach; ?>
                             </ul>
