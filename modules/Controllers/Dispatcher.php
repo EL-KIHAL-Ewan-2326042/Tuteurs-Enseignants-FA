@@ -134,8 +134,6 @@ class Dispatcher
                 )
             ) {
                 if (in_array([$teacher, $internship], $listAssociate)) {
-                    $returnErrorMessage .=
-                        "$teacher et $internship, cette association existe déjà<br>";
                 } elseif (in_array($internship, $associatedInternships)) {
                     continue;
                 } else {

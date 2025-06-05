@@ -114,8 +114,8 @@ class CoefBackup
                 </section>
             </form>
 
-            <p class="red-text" id="checkboxError"><?php echo $errorMessageAfterSort; ?></p>
-            <p class="green-text"><?php echo $checkMessageAfterSort; ?></p>
+            <p class="red-text loose toast" id="checkboxError"><?php echo $errorMessageAfterSort; ?></p>
+            <p class="green-text win toast"><?php echo $checkMessageAfterSort; ?></p>
 
             <div id="loading-section" style="display: none;">
                 <p>Chargement en cours, veuillez patienter...</p>

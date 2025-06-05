@@ -87,7 +87,7 @@ a, li {
 
 .toast {
     position: fixed;
-    top: 20px;
+    bottom: 20px;
     right: 20px;
     background: #333;
     color: white;
@@ -95,8 +95,33 @@ a, li {
     border-radius: 8px;
     opacity: 0.95;
     z-index: 9999;
-    font-family: sans-serif;
     box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    animation: fadeInOut 4s ease-in-out forwards;
+}
+
+@keyframes fadeInOut {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    10% {
+        opacity: 0.95;
+        transform: translateY(0);
+    }
+    90% {
+        opacity: 0.95;
+        transform: translateY(0);
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+}
+
+.win {
+    border: 1px solid var(--couleur-emeraude);
+    color: var(--couleur-emeraude);
+    background-color: var(--couleur-vert-pale);
 }
 .filled::before {
     content: "★";
