@@ -35,7 +35,7 @@ class Teacher extends Model
 
     public function getFullName(string $idTeacher): string
     {
-        $stmt = $this->_db->getConn()->prepare("SELECT CONCAT(teacher_name, ' ', teacher_firstname) FROM teacher where id_teacher = :idTeacher ");
+        $stmt = $this->_db->getConn()->prepare("SELECT CONCAT(teacher_firstname, ' ', teacher_name) FROM teacher where id_teacher = :idTeacher ");
         $stmt->bindValue(':idTeacher', $idTeacher);
         $stmt->execute();
         return $stmt->fetchColumn();
