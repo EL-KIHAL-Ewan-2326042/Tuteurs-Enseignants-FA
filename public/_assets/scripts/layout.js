@@ -10,7 +10,7 @@ toggleMenu.onclick = function() {
 };
 
 function disconnect(event) {
-    event.preventDefault();
+    if (event) event.preventDefault();
 
     Swal.fire({
         title: 'Êtes-vous sûr ?',
@@ -23,7 +23,7 @@ function disconnect(event) {
         cancelButtonText: 'Annuler'
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location.href = '/intramu';
+            window.location.href = '/logout.php';
         }
     });
 

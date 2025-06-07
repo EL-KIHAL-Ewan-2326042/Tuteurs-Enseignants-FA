@@ -262,8 +262,7 @@ class Account
 
                     </div>
                 </div>
-                <a onclick="disconnect();" class="logoutBtn deco">Déconnexion</a>
-
+                <a onclick="return disconnect(event);" href="/logout.php" class="logoutBtn deco">Déconnexion</a>
 
             </div>
             <div>
