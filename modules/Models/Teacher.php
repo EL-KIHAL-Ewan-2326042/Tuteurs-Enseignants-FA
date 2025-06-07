@@ -48,7 +48,18 @@ class Teacher extends Model
         }
 
         $db = $this->_db;
-        $query = 'SELECT address FROM has_address WHERE id_teacher = :id_teacher';
+        $query ='SELECT ha.address, at.type_complet 
+              FROM has_address ha
+              JOIN address_type at ON ha.type = at.type
+              WHERE ha.id_teacher = :id_teacher
+              ORDER BY CASE ha.type
+                  WHEN \'Domicile_1\' THEN 1
+                  WHEN \'Domicile_2\' THEN 2
+                  WHEN \'Travail_1\' THEN 3
+                  WHEN \'Travail_2\' THEN 4
+                  WHEN \'Batiment\' THEN 5
+                  ELSE 6
+              END';
         $stmt = $db->getConn()->prepare($query);
         $stmt->bindParam(':id_teacher', $id_teacher);
         $stmt->execute();

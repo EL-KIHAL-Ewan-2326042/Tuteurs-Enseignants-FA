@@ -44,16 +44,17 @@ class Account
     /**
      * Initialise les attributs passés en paramètre
      *
-     * @param Teacher    $teacherModel    Instance de la classe Teacher
+     * @param Teacher $teacherModel Instance de la classe Teacher
      *                                    servant de modèle
      * @param Internship $internshipModel Instance de la classe Internship
      *                                    servant de modèle
      */
-    public function __construct(private Teacher $teacherModel,
-        private Internship $internshipModel
+    public function __construct(private Teacher    $teacherModel,
+                                private Internship $internshipModel
 
 
-    ) {
+    )
+    {
     }
 
     /**
@@ -146,108 +147,120 @@ class Account
         <main>
             <div>
                 <div>
-                <div>
-                    <h5>
-                        À propos de vous
-                    </h5>
-                    <div class="fs8">
-                        <div>
-                            <div class="df ac g1">
-                                <i class="material-icons left tiny">supervisor_account</i><span>Rôles:</span>
+                    <div>
+                        <h5>
+                            À propos de vous
+                        </h5>
+                        <div class="fs8">
+                            <div>
+                                <div class="df ac g1">
+                                    <i class="material-icons left tiny">supervisor_account</i><span>Rôles:</span>
+                                </div>
+
+                                <ul class="df ac g1">
+                                    <?php foreach ($_SESSION['roles'] as $role): ?>
+                                        <li class="roles fs8">
+                                            <?= htmlspecialchars($role) ?>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
                             </div>
 
-                            <ul class="df ac g1">
-                                <?php foreach ($_SESSION['roles'] as $role): ?>
-                                    <li class="roles fs8">
-                                        <?= htmlspecialchars($role) ?>
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </div>
+                            <div>
+                                <div>
+                                    <div class="df ac g1">
+                                        <i class="material-icons left tiny">location_on</i><span>Adresses:</span>
+                                    </div>
 
-                        <div>
-                            <div class="df ac g1">
-                                <i class="material-icons left tiny">location_on</i><span>Adresses:</span>
+                                    <ul class="address-list">
+                                        <?php foreach ($_SESSION['address'] as $addr): ?>
+                                            <li>
+                                                <a class="fs8 cbr" target="_blank"
+                                                   href="https://www.google.com/maps/search/?api=1&query=<?= urlencode($addr['address']) ?>">
+                                                    <?= htmlspecialchars($addr['address']) ?>
+                                                    <span class="address-type">(<?= htmlspecialchars($addr['type_complet']) ?>)</span>
+                                                </a>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
                             </div>
 
-                            <ul>
-                                <?php foreach ($_SESSION['address'] as $addr): ?>
-                                    <li ><a class="fs8 cbr" target="_blank" href="https://www.google.com/maps/search/?api=1&query=<?= urlencode($addr['address']) ?>"> <?= htmlspecialchars($addr['address']) ?></a></li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </div>
+                            <div>
+                                <div class="df ac g1">
+                                    <i class="material-icons left tiny">apartment</i><span>Département:</span>
+                                </div>
 
-                        <div>
-                            <div class="df ac g1">
-                                <i class="material-icons left tiny">apartment</i><span>Département:</span>
+                                <ul>
+                                    <?php foreach ($_SESSION['role_department_clean'] as $dept): ?>
+                                        <li class="dep fs8"><?= htmlspecialchars($dept) ?></li>
+                                    <?php endforeach; ?>
+                                </ul>
                             </div>
-
-                            <ul>
-                                <?php foreach ($_SESSION['role_department_clean'] as $dept): ?>
-                                    <li class="dep fs8"><?= htmlspecialchars($dept) ?></li>
-                                <?php endforeach; ?>
-                            </ul>
                         </div>
+
                     </div>
+                    <div>
+                        <h5>
+                            Stages et alternances assignés
+                        </h5>
+                        <form method="post" name="max_internship" class="card fs8">
+                            <div class="df ac g1">
+                                <label for="newMaxIntern">Stages max: </label>
+                                <?php if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep'): ?>
+                                    <div>
+                                        <button type="button" onclick="adjustValue('newMaxIntern', -1)"
+                                                class="btn-m moin">
+                                            <i class="material-icons tiny">remove</i>
+                                        </button>
+                                        <input type="number"
+                                               id="newMaxIntern"
+                                               name="newMaxIntern"
+                                               min="0"
+                                               max="100"
+                                               value="<?php echo $result['intern'] ?: 0; ?>"/>
+                                        <button type="button" onclick="adjustValue('newMaxIntern', 1)"
+                                                class="btn-m plus">
+                                            <i class="material-icons tiny">add</i>
+                                        </button>
+                                    </div>
+                                <?php else: ?>
+                                    <span><?php echo $result['intern'] ?: 0; ?></span>
+                                <?php endif; ?>
+                            </div>
 
-                </div>
-                <div>
-                    <h5>
-                        Stages et alternances assignés
-                    </h5>
-                    <form method="post" name="max_internship" class="card fs8">
-                        <div class="df ac g1">
-                            <label for="newMaxIntern">Stages max: </label>
+                            <div class="df ac g1">
+                                <label for="newMaxApprentice">Alternances max: </label>
+                                <?php if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep'): ?>
+                                    <div>
+                                        <button type="button" onclick="adjustValue('newMaxApprentice', -1)"
+                                                class="btn-m moin">
+                                            <i class="material-icons tiny">remove</i>
+                                        </button>
+                                        <input type="number"
+                                               id="newMaxApprentice"
+                                               name="newMaxApprentice"
+                                               min="0"
+                                               max="100"
+                                               value="<?php echo $result['apprentice'] ?: 0; ?>"/>
+                                        <button type="button" onclick="adjustValue('newMaxApprentice', 1)"
+                                                class="btn-m plus">
+                                            <i class="material-icons tiny">add</i>
+                                        </button>
+                                    </div>
+                                <?php else: ?>
+                                    <span><?php echo $result['apprentice'] ?: 0; ?></span>
+                                <?php endif; ?>
+                            </div>
+
                             <?php if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep'): ?>
-                                <div>
-                                    <button type="button" onclick="adjustValue('newMaxIntern', -1)" class="btn-m moin">
-                                        <i class="material-icons tiny">remove</i>
-                                    </button>
-                                    <input type="number"
-                                           id="newMaxIntern"
-                                           name="newMaxIntern"
-                                           min="0"
-                                           max="100"
-                                           value="<?php echo $result['intern'] ?: 0; ?>"/>
-                                    <button type="button" onclick="adjustValue('newMaxIntern', 1)" class="btn-m plus">
-                                        <i class="material-icons tiny">add</i>
-                                    </button>
-                                </div>
-                            <?php else: ?>
-                                <span><?php echo $result['intern'] ?: 0; ?></span>
+                                <button type="submit" name="newMaxSubmitted" value="1" id="save-changes">
+                                    Enregistrer les modifications
+                                </button>
                             <?php endif; ?>
-                        </div>
+                        </form>
 
-                        <div class="df ac g1">
-                            <label for="newMaxApprentice">Alternances max: </label>
-                            <?php if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep'): ?>
-                                <div>
-                                    <button type="button" onclick="adjustValue('newMaxApprentice', -1)" class="btn-m moin">
-                                        <i class="material-icons tiny">remove</i>
-                                    </button>
-                                    <input type="number"
-                                           id="newMaxApprentice"
-                                           name="newMaxApprentice"
-                                           min="0"
-                                           max="100"
-                                           value="<?php echo $result['apprentice'] ?: 0; ?>" />
-                                    <button type="button" onclick="adjustValue('newMaxApprentice', 1)" class="btn-m plus">
-                                        <i class="material-icons tiny">add</i>
-                                    </button>
-                                </div>
-                            <?php else: ?>
-                                <span><?php echo $result['apprentice'] ?: 0; ?></span>
-                            <?php endif; ?>
-                        </div>
-
-                        <?php if (isset($_SESSION['role_name']) && $_SESSION['role_name'] === 'Admin_dep'): ?>
-                            <button type="submit" name="newMaxSubmitted" value="1" id="save-changes">
-                                Enregistrer les modifications
-                            </button>
-                        <?php endif; ?>
-                    </form>
-
-                </div>
+                    </div>
                 </div>
                 <a onclick="disconnect();" class="logoutBtn deco">Déconnexion</a>
 
@@ -257,17 +270,7 @@ class Account
                 <?php Table::render('homepage-table', $headers, $jsColumns, '/api/datatable/account'); ?>
             </div>
         </main>
-        <script>
-            function adjustValue(id, delta) {
-                const input = document.getElementById(id);
-                let value = parseInt(input.value) || 0;
-                value += delta;
-                if (value >= 0 && value <= 100) {
-                    input.value = value;
-                }
-            }
-        </script>
-                        <?php
+        <?php
 
     }
 }
