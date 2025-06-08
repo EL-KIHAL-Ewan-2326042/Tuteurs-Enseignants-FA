@@ -19,7 +19,7 @@ class Setting
 
                     <div class="row">
                         <div class="col s12">
-                            <p class="helper-text">Cette action permet d'attribuer de modifier le nombre max d'alternant ou de stagière d'un enseignant</p>
+                            <p class="helper-text">Cette action permet d'attribuer de définir le nombre maximal d'alternants et de stagiaires qu'un enseignant donné peut tutorer.</p>
                         </div>
 
                         <div class="input-field col s12 m6">
@@ -32,14 +32,14 @@ class Setting
 
                         <div class="input-field col s12 m6">
                             <i class="material-icons prefix">group</i>
-                            <input id="maxInterns" name="maxInterns" type="number" min="0">
-                            <label for="maxInterns">Nombre max de stagiaires</label>
+                            <input id="maxInterns" name="maxInterns" type="number" min="0" required>
+                            <label for="maxInterns">Nombre max. de stagiaires</label>
                         </div>
 
                         <div class="input-field col s12 m6">
                             <i class="material-icons prefix">business_center</i>
-                            <input id="maxApprentices" name="maxApprentices" type="number" min="0">
-                            <label for="maxApprentices">Nombre max d'alternants</label>
+                            <input id="maxApprentices" name="maxApprentices" type="number" min="0" required>
+                            <label for="maxApprentices">Nombre max. d'alternants</label>
                         </div>
 
                         <div class="col s12 center-align">
