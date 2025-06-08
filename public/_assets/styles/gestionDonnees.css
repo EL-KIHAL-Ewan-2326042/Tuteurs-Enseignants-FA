@@ -327,15 +327,14 @@ section.visible {
 .btn.waves-effect.waves-light[type="submit"] {
     background-color: var(--couleur-emeraude);
     color: white;
-    width: 80%;
-    max-width: 20em;
+    width: 20em;
     height: 3em;
     font-size: 1.2em;
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto;
+    margin: 1em;
     border-radius: 0.4em;
     box-shadow: 0 0.125em 0.3em rgba(0,0,0,0.2);
     transition: background-color 0.3s, transform 0.2s;
