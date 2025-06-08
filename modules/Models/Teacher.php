@@ -218,7 +218,7 @@ class Teacher extends Model
     }
     public function getTeacherAddress(string $teacher_id): ?string
     {
-        $query = 'SELECT address FROM has_address WHERE id_teacher = :teacher_id LIMIT 1';
+        $query = 'SELECT address FROM has_address WHERE id_teacher = :teacher_id AND type = \'Domicile_1\'';
         $stmt = $this->_db->getConn()->prepare($query);
         $stmt->bindParam(':teacher_id', $teacher_id);
         $stmt->execute();
@@ -229,8 +229,23 @@ class Teacher extends Model
             return $result['address'];
         }
 
-        return null;
-    }
+        // Fallback
+        $query = 'SELECT address FROM has_address WHERE id_teacher = :teacher_id ORDER BY 
+              CASE type 
+                  WHEN \'Domicile_1\' THEN 1
+                  WHEN \'Domicile_2\' THEN 2
+                  WHEN \'Travail_1\' THEN 3
+                  WHEN \'Travail_2\' THEN 4
+                  WHEN \'Batiment\' THEN 5
+                  ELSE 6
+              END LIMIT 1';
+
+        $stmt = $this->_db->getConn()->prepare($query);
+        $stmt->bindParam(':teacher_id', $teacher_id);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $result && isset($result['address']) ? $result['address'] : null;    }
 
     public function paginateAsk(string $identifier, int $start, int $length, string $search = '', array $order = []): array
     {
