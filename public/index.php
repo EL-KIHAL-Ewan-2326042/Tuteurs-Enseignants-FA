@@ -19,6 +19,7 @@
  */
 
 use Blog\Controllers\AjaxController;
+use Blog\Models\Teacher;
 use Blog\Views;
 use Blog\Views\components\ViewStage;
 use Blog\Views\dashboard\Export;
@@ -231,6 +232,28 @@ $router->post('/api/dispatch-list', function () {
 
 
 
+$router->post('/api/update-teacher-capacity', function () {
+    $db = Database::getInstance();
+    $model = new Teacher($db);
+
+    $idTeacher = $_POST['searchTeacher'] ?? null;
+    $maxStage = $_POST['maxInterns'] ?? null;
+    $maxAlternance = $_POST['maxApprentices'] ?? null;
+
+    if ($idTeacher !== null && ($maxStage !== null || $maxAlternance !== null)) {
+        $result = $model->updateCapacities($idTeacher, $maxStage, $maxAlternance);
+        if ($result === true) {
+            // Redirection vers le tableau de bord
+            header("Location: /dashboard");
+            exit;
+        } else {
+            echo json_encode(['success' => false, 'message' => $result]);
+        }
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Paramètres manquants']);
+    }
+});
+
 
 $router->get('/api/import', function() {
     $category = $_GET['category'] ?? '';
@@ -246,6 +269,11 @@ $router->get('/api/export', function() {
 
 $router->get('/api/association', function() {
     $view = new \Blog\Views\dashboard\Association();
+    $view->showView();
+});
+
+$router->get('/api/parametrage', function() {
+    $view = new \Blog\Views\dashboard\Setting();
     $view->showView();
 });
 

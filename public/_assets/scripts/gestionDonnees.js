@@ -10,7 +10,7 @@ document.addEventListener(
             }, 500
         );
         initTooltips();
-        
+
         // Vérifier si l'URL contient déjà des paramètres pour précharger le bon contenu
         checkUrlAndLoadContent();
     }
@@ -21,19 +21,19 @@ function checkUrlAndLoadContent() {
     const pathParts = window.location.pathname.split('/');
     // La catégorie est la dernière partie de l'URL (après le dernier /)
     const category = pathParts.length > 2 ? pathParts[pathParts.length - 1] : '';
-    
+
     // Si l'URL est simplement /dashboard/xxx, category sera xxx
     if (category && category !== 'dashboard') {
         const urlParams = new URLSearchParams(window.location.search);
         // Par défaut, type est 'import' pour les catégories normales, 'association' pour association
         const type = category === 'association' ? 'association' : (urlParams.get('type') || 'import');
-        
+
         // Met à jour le toggle selon le type (sauf pour association)
         const importExportToggle = document.getElementById('import-export-toggle');
         if (importExportToggle && category !== 'association') {
             importExportToggle.checked = (type === 'export');
         }
-        
+
         // Active le bouton de la catégorie
         const categoryButton = document.getElementById(`choose-${category}`);
         if (categoryButton) {
@@ -41,7 +41,7 @@ function checkUrlAndLoadContent() {
             document.querySelectorAll('.choose-item').forEach(item => item.classList.remove('active'));
             // Active celui-ci
             categoryButton.classList.add('active');
-            
+
             // Charge le contenu approprié
             loadContent(type, category);
         }
@@ -172,7 +172,7 @@ const exportContent = document.getElementById('export-content');
 // Fonction pour mettre à jour l'URL dynamiquement
 function updateUrl(type, category) {
     let newUrl = '/dashboard';
-    
+
     if (category) {
         // Si c'est l'association, on ne met pas de type dans l'URL
         if (category === 'association') {
@@ -185,7 +185,7 @@ function updateUrl(type, category) {
             }
         }
     }
-    
+
     history.pushState({type, category}, '', newUrl);
     return newUrl;
 }
@@ -197,30 +197,30 @@ async function loadContent(type, category = '') {
         if (!category) {
             const targetContent = type === 'export' ? exportContent : importContent;
             targetContent.innerHTML = '<div class="center-align" style="padding: 20px;"><p>Veuillez sélectionner une catégorie</p></div>';
-            
+
             // Mise à jour de l'URL pour refléter l'absence de catégorie
             updateUrl('', '');
-            
+
             // Mise à jour du texte du mode
             updateModeText('');
             return;
         }
-        
+
         // Mise à jour de l'URL dans le navigateur
         updateUrl(type, category);
-        
+
         // Mise à jour du texte du mode
         updateModeText(category);
-        
+
         // Afficher un indicateur de chargement
         const targetContent = type === 'export' ? exportContent : importContent;
         targetContent.innerHTML = '<div class="center-align" style="padding: 20px;"><div class="preloader-wrapper active"><div class="spinner-layer spinner-blue-only"><div class="circle-clipper left"><div class="circle"></div></div><div class="gap-patch"><div class="circle"></div></div><div class="circle-clipper right"><div class="circle"></div></div></div></div><p>Chargement...</p></div>';
-        
+
         let url = `/api/${type}`;
         if (category) {
             url += `?category=${category}`;
         }
-        
+
         console.log(`Chargement de l'URL: ${url}`); // Débogage
         const response = await fetch(url);
 
@@ -239,7 +239,7 @@ async function loadContent(type, category = '') {
             exportContent.style.display = 'block';
             importContent.style.display = 'none';
             setupExportToggle(); // Initialiser le toggle d'export après chargement
-        } else if (type === 'association') {
+        } else if (type === 'association' || type === 'parametrage') {
             importContent.innerHTML = html;
             importContent.style.display = 'block';
             exportContent.style.display = 'none';
@@ -252,7 +252,7 @@ async function loadContent(type, category = '') {
             if (elems.length > 0) {
                 M.FormSelect.init(elems);
             }
-            
+
             updateSelectOptions();
             initTooltips();
         }, 100);
@@ -263,7 +263,7 @@ async function loadContent(type, category = '') {
             <p class="error-details">${error.message}</p>
         </div>`;
 
-        if (type === 'import' || type === 'association') {
+        if (type === 'import' || type === 'association' || type === 'parametrage') {
             importContent.innerHTML = errorMessage;
         } else {
             exportContent.innerHTML = errorMessage;
@@ -273,19 +273,20 @@ async function loadContent(type, category = '') {
 
 // Remplace les gestionnaires d'événements multiples par une seule fonction
 document.addEventListener('DOMContentLoaded', function() {
-    // Éléments DOM
+
+
     const importExportToggle = document.getElementById('import-export-toggle');
     const items = document.querySelectorAll('.choose-item');
 
     // Gestionnaire pour le toggle import/export
     importExportToggle.addEventListener('change', function() {
         const type = this.checked ? 'export' : 'import';
-        
+
         // Récupérer la catégorie actuellement active, si elle existe
         const activeItem = document.querySelector('.choose-item.active');
         const category = activeItem ? activeItem.id.replace('choose-', '') : '';
-        
-        if (category && category !== 'association') {
+
+        if (category && category !== 'association' || category && category !== 'parametrage') {
             loadContent(type, category);
             updateUrl(type, category);
         }
@@ -295,40 +296,43 @@ document.addEventListener('DOMContentLoaded', function() {
     items.forEach(item => {
         item.addEventListener('click', function() {
             const category = this.id.replace('choose-', '');
-            const isAssociation = category === 'association';
-            const type = isAssociation ? 'association' : (importExportToggle.checked ? 'export' : 'import');
-            
-            // Vérifier si le bouton est déjà actif
+            let type;
+
+            if (category === 'parametrage') {
+                type = 'parametrage';
+            } else {
+                type = category === 'association' ? 'association' : (importExportToggle.checked ? 'export' : 'import');
+            }
+
             const wasActive = this.classList.contains('active');
-            
-            // Réinitialiser tous les boutons
+
             items.forEach(btn => btn.classList.remove('active'));
-            
+
             if (!wasActive) {
                 // Activer ce bouton et charger le contenu
                 this.classList.add('active');
                 loadContent(type, category);
             } else {
                 // Désactiver ce bouton (déselection) et vider le contenu
-                // Revenir à l'URL de base /dashboard
                 updateUrl('', '');
-                
+
                 const targetContent = type === 'export' ? exportContent : importContent;
                 targetContent.innerHTML = '<div class="center-align" style="padding: 20px;"><p>Veuillez sélectionner une catégorie</p></div>';
             }
         });
     });
 
+
     // Support de la navigation avec les boutons précédent/suivant du navigateur
     window.addEventListener('popstate', function(event) {
         if (event.state) {
             const { type, category } = event.state;
-            
+
             // Met à jour le toggle selon le type (sauf pour association)
-            if (importExportToggle && category !== 'association') {
+            if (importExportToggle && category !== 'association' || importExportToggle && category !== 'parametrage' ) {
                 importExportToggle.checked = (type === 'export');
             }
-            
+
             // Met à jour l'élément actif
             document.querySelectorAll('.choose-item').forEach(item => item.classList.remove('active'));
             if (category) {
@@ -351,7 +355,6 @@ document.addEventListener('DOMContentLoaded', function() {
 // document.addEventListener('DOMContentLoaded', function() { ... });
 
 const importExportToggle = document.getElementById('import-export-toggle');
-const simpleAdvancedToggle = document.getElementById('simple-advanced-toggle');
 
 // Fonction pour mettre à jour le texte du mode
 function updateModeText(currentCategory) {
@@ -371,22 +374,17 @@ function updateModeText(currentCategory) {
         // Si c'est association, afficher un texte spécifique
         if (category === 'association') {
             modeText.textContent = 'Mode avancé - Association';
+        } else if (category === 'parametre') {
+            modeText.textContent = 'Mode avancé - Parametre'
         } else {
             const importExportMode = importExportToggle.checked ? 'Exporter' : 'Importer';
-            const simpleAdvancedMode = simpleAdvancedToggle.checked ? 'avancé' : 'simple';
-            modeText.textContent = `Mode ${simpleAdvancedMode} - ${importExportMode}`;
+            modeText.textContent = `Mode ${importExportMode}`;
         }
     }
 }
 
 importExportToggle.addEventListener('change', function() {
     // Récupérer la catégorie active pour la passer à updateModeText
-    const activeItem = document.querySelector('.choose-item.active');
-    const category = activeItem ? activeItem.id.replace('choose-', '') : '';
-    updateModeText(category);
-});
-
-simpleAdvancedToggle.addEventListener('change', function() {
     const activeItem = document.querySelector('.choose-item.active');
     const category = activeItem ? activeItem.id.replace('choose-', '') : '';
     updateModeText(category);
@@ -431,3 +429,4 @@ function setupExportToggle() {
         }
     });
 }
+

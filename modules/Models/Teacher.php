@@ -354,6 +354,23 @@ class Teacher extends Model
             'total' => (int)$total
         ];
     }
+    public function updateCapacities(string $idTeacher, ?int $maxStage, ?int $maxAlternance): bool|string
+    {
+        try {
+            $query = "UPDATE teacher SET 
+                    maxi_number_intern = COALESCE(:maxStage, maxi_number_intern),
+                    maxi_number_apprentice = COALESCE(:maxAlternance, maxi_number_apprentice)
+                  WHERE id_teacher = :idTeacher";
+
+            $stmt =  $this->_db->getConn()->prepare($query);
+            $stmt->bindParam(':idTeacher', $idTeacher);
+            $stmt->bindParam(':maxStage', $maxStage);
+            $stmt->bindParam(':maxAlternance', $maxAlternance);
+            return $stmt->execute();
+        } catch (\PDOException $e) {
+            return $e->getMessage();
+        }
+    }
 
     public function getAllTeachers()
     {

@@ -84,18 +84,6 @@ class Dashboard
                         </label>
                     </div>
                 </div>
-                <div class="switch-container">
-                    <div class="switch">
-                        <label>
-                            Simple
-                            <input type="checkbox" id="simple-advanced-toggle"
-                                   checked
-                                   onclick="return false;">
-                            <span class="lever"></span>
-                            Avancé
-                        </label>
-                    </div>
-                </div>
             </div>
 
             <div class="choose">
