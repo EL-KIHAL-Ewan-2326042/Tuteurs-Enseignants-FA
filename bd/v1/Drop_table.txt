@@ -1,9 +1,0 @@
-DROP TABLE IF EXISTS Est_demande;
-
-DROP TABLE IF EXISTS Est_responsable;
-
-DROP TABLE IF EXISTS Stage;
-
-DROP TABLE IF EXISTS Eleve;
-
-DROP TABLE IF EXISTS Enseignant;
