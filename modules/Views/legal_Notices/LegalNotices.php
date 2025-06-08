@@ -59,7 +59,7 @@ class LegalNotices
                 <h4>CONCEPTION ET REALISATION DU SITE</h4>
 
                 <p> Salenson Léo <br> Courriel : leo.salenson@etu.univ-amu.fr <br>
-                    EL KHIAL Ewan <br> Courriel : ewan.el-khial@etu.univ-amu.fr <br>
+                    EL KIHAL Ewan <br> Courriel : ewan.el-kihal@etu.univ-amu.fr <br>
                     Alvares Titouan<br>Courriel : titouan.alvares@etu.univ-amu.fr <br>
                 Avias Daphné <br>Courriel : daphne.avias@etu.univ-amu.fr <br>
                 Kerbadou Islem <br>Courriel : islem.kerbadou@etu.univ-amu.fr <br>
