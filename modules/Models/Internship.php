@@ -377,7 +377,7 @@ class Internship extends Model
         $stmt->execute();
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        $isRequested = !$result ? false : true;
+        $isRequested = (bool)$result;
         $this->cache['isRequested'][$internship_identifier][$id_teacher] = $isRequested;
         return $isRequested;
     }
